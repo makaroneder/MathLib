@@ -1,0 +1,3 @@
+p(x) = log(e, x)
+q(x) = e * pi
+f(x) = p(x) / q(x)

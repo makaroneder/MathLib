@@ -24,6 +24,7 @@ std::vector<T> CreateSet(T start, T end, T separator) {
 template <typename T>
 bool IsInsideSet(std::vector<T> set, T element) {
     if (std::isnan(element) || std::isinf(element)) return false;
+    if (set.size() == 0) return true;
     for (T& i : set)
         if (std::fabs(i - element) < eps) return true;
     return false;

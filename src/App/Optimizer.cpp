@@ -1,6 +1,5 @@
 #include "Optimizer.hpp"
 #include <Factorial.hpp>
-#include <Log.hpp>
 
 Node* OptimizeInternal(Node* node, std::vector<Variable>& variables, std::vector<Function>& funcs, std::vector<BuiltinFunction> builtinFuncs);
 /// @brief Optimizes given node based on the given variables and creates new variables
@@ -139,7 +138,6 @@ Node* OptimizeInternal(Node* node, std::vector<Variable>& variables, std::vector
     else OptimizeOperator(Div, [](num_t x, num_t y) { return x / y; })
     else OptimizeOperator(Pow, [](num_t x, num_t y) { return std::pow<num_t>(x, y); })
     else OptimizeOperator(Root, [](num_t x, num_t y) { return std::pow<num_t>(y, 1 / x); })
-    else OptimizeOperator(Log, [](num_t x, num_t y) { return Log<num_t>(x, y); })
     else return nullptr;
 }
 std::vector<Node*> CommaToArray(Node* node) {

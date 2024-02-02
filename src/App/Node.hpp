@@ -14,7 +14,6 @@ struct Node {
         Mul, Div,
         Pow, Root,
         Factorial,
-        Log,
         Absolute,
     } type;
     /// @brief String representation of the node type
@@ -27,7 +26,6 @@ struct Node {
         "*", "/",
         "^", "$",
         "!",
-        "log",
         "| |",
     };
     /// @brief Value of the node

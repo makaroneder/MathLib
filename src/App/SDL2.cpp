@@ -15,10 +15,10 @@ SDL2Renderer::~SDL2Renderer(void) {
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
-size_t SDL2Renderer::GetWidth(void) {
+size_t SDL2Renderer::GetWidth(void) const {
     return width;
 }
-size_t SDL2Renderer::GetHeight(void) {
+size_t SDL2Renderer::GetHeight(void) const {
     return height;
 }
 bool SDL2Renderer::SetPixel(Vector2<num_t> p, uint32_t color) {

@@ -4,12 +4,13 @@
 #include "Vector2.hpp"
 #include "Typedefs.hpp"
 #include "Functions.hpp"
+#include <stdint.h>
 
 /// @brief Checks if T is float
 /// @tparam T Type of number
 /// @return Result
 template <typename T>
-bool IsFloat(void) {
+constexpr bool IsFloat(void) {
     return typeid(T) == typeid(float) || typeid(T) == typeid(double) || typeid(T) == typeid(num_t);
 }
 struct Renderer {
@@ -20,45 +21,46 @@ struct Renderer {
     virtual bool Update(void) = 0;
     /// @brief Waits until the renderer is destroyed
     virtual void Quit(void) = 0;
-    /// @brief Scale
-    static constexpr num_t pointMultiplier = 100;
 
     /// @brief Calculates start of the graph
     /// @tparam T Type of number
     /// @return Start of graph
     template <typename T>
-    Vector2<T> GetStart(void) {
+    Vector2<T> GetStart(void) const {
         return CreateVector2<T>(-(GetWidth() / 2 / pointMultiplier), -(GetHeight() / 2 / pointMultiplier));
     }
     /// @brief Calculates end of the graph
     /// @tparam T Type of number
     /// @return End of graph
     template <typename T>
-    Vector2<T> GetEnd(void) {
+    Vector2<T> GetEnd(void) const {
         return CreateVector2<T>(GetWidth() / 2 / pointMultiplier, GetHeight() / 2 / pointMultiplier);
-    }
-    /// @brief Draw x and y axis
-    /// @param color Color of the axis
-    /// @return Status
-    bool DrawAxis(uint32_t color) {
-        const num_t w = GetWidth() / 2;
-        const num_t h = GetHeight() / 2;
-        return DrawLine(CreateVector2<num_t>(-w, 0), CreateVector2<num_t>(w, 0), color) && DrawLine(CreateVector2<num_t>(0, -h), CreateVector2<num_t>(0, h), color);
     }
     /// @brief Creates set of every pixel on the screen
     /// @tparam T Type of number
     /// @param axis Axis we are using
     /// @return Set of every pixel on the screen
     template <typename T>
-    std::vector<T> CreateRealNumberSet(void) {
+    std::vector<T> CreateRealNumberSet(void) const {
         const bool isFloat = IsFloat<T>();
         const T div = isFloat ? 1 : pointMultiplier;
-        Vector2<T> startArr = GetStart<T>();
-        Vector2<T> endArr = GetEnd<T>();
+        const Vector2<T> startArr = GetStart<T>();
+        const Vector2<T> endArr = GetEnd<T>();
         return CreateSet<T>(
             std::max<T>(GetVectorAxis(startArr, VectorAxis::X), GetVectorAxis(startArr, VectorAxis::Y)) * div,
             std::max<T>(GetVectorAxis(endArr, VectorAxis::X), GetVectorAxis(endArr, VectorAxis::Y)) * div,
             1 / (isFloat ? pointMultiplier : 1)
+        );
+    }
+    /// @brief Draw x and y axis
+    /// @param color Color of the axis
+    /// @return Status
+    bool DrawAxis(uint32_t color) {
+        const Vector2<num_t> start = GetStart<num_t>();
+        const Vector2<num_t> end = GetEnd<num_t>();
+        return (
+            DrawLine(CreateVector2<num_t>(GetVectorAxis(start, VectorAxis::X), 0), CreateVector2<num_t>(GetVectorAxis(end, VectorAxis::X), 0), color) &&
+            DrawLine(CreateVector2<num_t>(0, GetVectorAxis(start, VectorAxis::Y)), CreateVector2<num_t>(0, GetVectorAxis(end, VectorAxis::Y)), color)
         );
     }
     /// @brief y = f(x) or x = f(y)
@@ -169,25 +171,27 @@ struct Renderer {
     /// @param pos Position of the rectangle
     /// @param width Width of the rectangle
     /// @param height Height of the rectangle
+    /// @param Angle to rotate the rectangle by
     /// @param color Color of the rectangle
     /// @return Status
     template <typename T>
-    bool DrawRectangle(Vector2<T> pos, T width, T height, uint32_t color) {
+    bool DrawRectangle(Vector2<T> pos, T width, T height, T angle, uint32_t color) {
         width /= 2;
         height /= 2;
-        return (
-            DrawLine(CreateVector2<num_t>(pos.x - width, pos.y + height), CreateVector2<num_t>(pos.x + width, pos.y + height), color) &&
-            DrawLine(CreateVector2<num_t>(pos.x - width, pos.y - height), CreateVector2<num_t>(pos.x - width, pos.y + height), color) &&
-            DrawLine(CreateVector2<num_t>(pos.x - width, pos.y - height), CreateVector2<num_t>(pos.x + width, pos.y - height), color) &&
-            DrawLine(CreateVector2<num_t>(pos.x + width, pos.y - height), CreateVector2<num_t>(pos.x + width, pos.y + height), color)
-        );
+        const T x = GetVectorAxis(pos, VectorAxis::X);
+        const T y = GetVectorAxis(pos, VectorAxis::Y);
+        const Vector2<num_t> pos1 = RotateVector2(CreateVector2<num_t>(x - width, y + height), pos, angle);
+        const Vector2<num_t> pos2 = RotateVector2(CreateVector2<num_t>(x + width, y + height), pos, angle);
+        const Vector2<num_t> pos3 = RotateVector2(CreateVector2<num_t>(x - width, y - height), pos, angle);
+        const Vector2<num_t> pos4 = RotateVector2(CreateVector2<num_t>(x + width, y - height), pos, angle);
+        return DrawLine(pos1, pos2, color) && DrawLine(pos3, pos1, color) && DrawLine(pos3, pos4, color) && DrawLine(pos4, pos2, color);
     }
     /// @brief Calculates width of the renderer window
     /// @return Width of the renderer window
-    virtual size_t GetWidth(void) = 0;
+    virtual size_t GetWidth(void) const = 0;
     /// @brief Calculates height of the renderer window
     /// @return Height of the renderer window
-    virtual size_t GetHeight(void) = 0;
+    virtual size_t GetHeight(void) const = 0;
     /// @brief Renders pixel
     /// @param p Position of pixel
     /// @param color Color of pixel

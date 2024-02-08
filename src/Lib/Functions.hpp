@@ -27,7 +27,7 @@
 }
 #define DerivativeFunction(T, f)                    \
 [f](T x) {                                          \
-    const T h = 1 / Renderer::pointMultiplier;      \
+    const T h = 1 / pointMultiplier;                \
     return (f(x + h) - f(x)) / h;                   \
 }
 

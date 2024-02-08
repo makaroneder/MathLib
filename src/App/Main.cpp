@@ -56,12 +56,12 @@ int main(int argc, char** argv) {
                 CreateBuiltinFunction("excsc", Excsc<num_t>, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("versin", Versin<num_t>, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("coversin", Coversin<num_t>, 1, std::stold(args[0]->value))
-                CreateBuiltinFunction("vercosin", Vercosin<num_t>, 1, std::stold(args[0]->value))
-                CreateBuiltinFunction("covercosin", Covercosin<num_t>, 1, std::stold(args[0]->value))
+                CreateBuiltinFunction("vercos", Vercos<num_t>, 1, std::stold(args[0]->value))
+                CreateBuiltinFunction("covercos", Covercos<num_t>, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("haversin", Haversin<num_t>, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("hacoversin", Hacoversin<num_t>, 1, std::stold(args[0]->value))
-                CreateBuiltinFunction("havercosin", Havercosin<num_t>, 1, std::stold(args[0]->value))
-                CreateBuiltinFunction("hacovercosin", Hacovercosin<num_t>, 1, std::stold(args[0]->value))
+                CreateBuiltinFunction("havercos", Havercos<num_t>, 1, std::stold(args[0]->value))
+                CreateBuiltinFunction("hacovercos", Hacovercos<num_t>, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("sinh", std::sinh, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("cosh", std::cosh, 1, std::stold(args[0]->value))
                 CreateBuiltinFunction("tanh", std::tanh, 1, std::stold(args[0]->value))
@@ -79,8 +79,7 @@ int main(int argc, char** argv) {
                 CreateBuiltinFunction("arctanh", std::atanh, 1, std::stold(args[0]->value))
             };
             #ifdef PrintNodes
-            std::cout << "Generated nodes:\n";
-            root->Print();
+            std::cout << "Generated nodes:\n" << root->ToString() << std::endl;
             #endif
             std::vector<Variable> variables = {
                 Variable("e", std::to_string(M_El)),
@@ -90,8 +89,7 @@ int main(int argc, char** argv) {
             Node* optimizedRoot = Optimize(root, variables, funcs, builtinFuncs);
             delete root;
             #ifdef PrintNodes
-            std::cout << "Optimized nodes:\n";
-            optimizedRoot->Print();
+            std::cout << "Optimized nodes:\n" << optimizedRoot->ToString() << std::endl;
             #endif
             delete optimizedRoot;
             Function* funcNode = nullptr;
@@ -102,9 +100,10 @@ int main(int argc, char** argv) {
                 }
             }
             if (funcNode == nullptr) throw std::runtime_error("No function 'f' in specified program");
+            if (funcNode->arguments.size() != 1) throw std::runtime_error("Unexpected number of arguments for function 'f' (" + std::to_string(funcNode->arguments.size()) + ")");
             auto func = [funcNode, variables, funcs, builtinFuncs](num_t x) {
                 std::vector<Variable> vars = variables;
-                vars.push_back(Variable("x", std::to_string(x)));
+                vars.push_back(Variable(funcNode->arguments[0].name, std::to_string(x)));
                 std::vector<Function> tmp = funcs;
                 Node* n = Optimize(funcNode->body, vars, tmp, builtinFuncs);
                 num_t ret = std::stold(n->value);
@@ -115,7 +114,7 @@ int main(int argc, char** argv) {
         }
         else {
             auto func = [](num_t x) {
-                return std::tan(x);
+                return std::pow(x, x);
             };
             CheckError(renderer.DrawFunction<num_t>(func, 0xff0000ff, inputSet, outputSet));
             CheckError(renderer.DrawDerivativeFunction<num_t>(func, 0x00ff00ff, inputSet, outputSet));

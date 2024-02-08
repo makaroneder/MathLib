@@ -1,4 +1,5 @@
 #include "Optimizer.hpp"
+#include <Typedefs.hpp>
 #include <Factorial.hpp>
 
 Node* OptimizeInternal(Node* node, std::vector<Variable>& variables, std::vector<Function>& funcs, std::vector<BuiltinFunction> builtinFuncs);
@@ -139,21 +140,6 @@ Node* OptimizeInternal(Node* node, std::vector<Variable>& variables, std::vector
     else OptimizeOperator(Pow, [](num_t x, num_t y) { return std::pow<num_t>(x, y); })
     else OptimizeOperator(Root, [](num_t x, num_t y) { return std::pow<num_t>(y, 1 / x); })
     else return nullptr;
-}
-std::vector<Node*> CommaToArray(Node* node) {
-    if (node->type != Node::Type::Comma) return { node, };
-    else {
-        std::vector<Node*> ret;
-        if (node->left != nullptr) {
-            std::vector<Node*> tmp = CommaToArray(node->left);
-            for (Node*& i : tmp) ret.push_back(i);
-        }
-        if (node->right != nullptr) {
-            std::vector<Node*> tmp = CommaToArray(node->right);
-            for (Node*& i : tmp) ret.push_back(i);
-        }
-        return ret;
-    }
 }
 Node* Optimize(Node* node, std::vector<Variable>& variables, std::vector<Function>& funcs, std::vector<BuiltinFunction> builtinFuncs) {
     return OptimizeComma(node, variables, funcs, builtinFuncs);

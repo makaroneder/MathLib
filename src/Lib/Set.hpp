@@ -2,7 +2,6 @@
 #define Set_H
 #include "Typedefs.hpp"
 #include <vector>
-#include <cmath>
 
 /// @brief Creates a new set
 /// @tparam T Type of number

@@ -4,13 +4,8 @@
 #include "Variable.hpp"
 #include "Function.hpp"
 #include "BuiltinFunction.hpp"
-#include <vector>
 #include <functional>
 
-/// @brief Converts node to array
-/// @param node Node to convert
-/// @return Converted array
-std::vector<Node*> CommaToArray(Node* node);
 /// @brief Optimizes given node based on the given variables and creates new variables
 /// @param node Node to optimize
 /// @param variables Variable values to use

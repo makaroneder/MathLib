@@ -7,8 +7,8 @@
 /// @param n Number in sequence to calculate
 /// @return Value of requested number in sequence
 template <typename T>
-T Fibbonacci(T n) {
-    return (std::sqrt<T>(5) * (std::pow<T>((1 + std::sqrt<T>(5)) / 2, n) - std::pow<T>((1 - std::sqrt<T>(5)) / 2, n))) / 5;
+constexpr T Fibbonacci(T n) {
+    return (std::sqrt(5) * (std::pow((1 + std::sqrt(5)) / 2, n) - std::pow((1 - std::sqrt(5)) / 2, n))) / 5;
 }
 
 #endif

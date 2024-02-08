@@ -1,17 +1,12 @@
-#ifndef SDL2_H
-#define SDL2_H
-#include "Color.hpp"
+#ifndef Test_H
+#define Test_H
 #include <Renderer.hpp>
-#include <SDL2/SDL.h>
 
-/// @brief Renderer implementation using SDL2 library
-struct SDL2Renderer : Renderer {
+struct Test : Renderer {
     /// @brief Creates a new renderer
     /// @param w Width of the window
     /// @param h Height of the window
-    SDL2Renderer(size_t w, size_t h);
-    /// @brief Destroys the renderer
-    virtual ~SDL2Renderer(void) override;
+    Test(size_t w, size_t h);
     /// @brief Flushes renderer buffer
     /// @return Status
     virtual bool Update(void) override;
@@ -35,22 +30,10 @@ struct SDL2Renderer : Renderer {
     /// @return Status
     virtual bool DrawLine(Vector2<num_t> p1, Vector2<num_t> p2, uint32_t color) override;
 
+    size_t failed;
+    std::vector<Vector2<num_t>> values;
     private:
-    /// @brief Sets current drawing color
-    /// @param c New drawing color
-    /// @return Status
-    bool SetColor(uint32_t c);
-    /// @brief Converts graph point to internal type used to render pixels
-    /// @param p Point we are converting
-    void ToInternalPoint(Vector2<num_t>& p);
-
-    /// @brief Window
-    SDL_Window* window;
-    /// @brief Renderer
-    SDL_Renderer* renderer;
-    /// @brief Width of the window
     size_t width;
-    /// @brief Height of the window
     size_t height;
 };
 

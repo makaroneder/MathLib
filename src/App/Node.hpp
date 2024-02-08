@@ -1,6 +1,7 @@
 #ifndef Node_H
 #define Node_H
 #include <string>
+#include <vector>
 
 /// @brief Contains mathematical operations, constants, functions and variables
 struct Node {
@@ -16,18 +17,6 @@ struct Node {
         Factorial,
         Absolute,
     } type;
-    /// @brief String representation of the node type
-    static constexpr const char* typeStr[] = {
-        "None",
-        "Function", "Variable", "Constant",
-        ",",
-        "=",
-        "+", "-",
-        "*", "/",
-        "^", "$",
-        "!",
-        "| |",
-    };
     /// @brief Value of the node
     std::string value;
     /// @brief Left child of the node
@@ -46,9 +35,13 @@ struct Node {
     /// @brief Creates a new node with the same values as the current node
     /// @return New node
     Node* Recreate(void);
-    /// @brief Prints values of the current node
-    /// @param padding Padding of the strings to print
-    void Print(std::string padding = "");
+    /// @brief Converts values of the current node to string
+    /// @param padding Padding of the generated strings
+    std::string ToString(std::string padding = "");
 };
+/// @brief Converts node to array
+/// @param node Node to convert
+/// @return Converted array
+std::vector<Node*> CommaToArray(Node* node);
 
 #endif

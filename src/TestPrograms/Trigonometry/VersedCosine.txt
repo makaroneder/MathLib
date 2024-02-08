@@ -1,1 +1,1 @@
-f(x) = vercosin(x)
+f(x) = vercos(x)

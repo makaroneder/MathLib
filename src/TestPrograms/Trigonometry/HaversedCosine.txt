@@ -1,1 +1,1 @@
-f(x) = havercosin(x)
+f(x) = havercos(x)

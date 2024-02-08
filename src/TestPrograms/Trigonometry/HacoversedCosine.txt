@@ -1,1 +1,1 @@
-f(x) = hacoversin(x)
+f(x) = hacovercos(x)

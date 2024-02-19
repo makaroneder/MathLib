@@ -1,0 +1,2 @@
+f(x) = arccrd(x)
+a = f(0)

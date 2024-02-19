@@ -25,9 +25,8 @@
 [p, q](T x) {                                       \
     return p(x) / q(x);                             \
 }
-#define DerivativeFunction(T, f)                    \
-[f](T x) {                                          \
-    const T h = 1 / pointMultiplier;                \
+#define DerivativeFunction(T, f, h)                 \
+[f, h](T x) {                                       \
     return (f(x + h) - f(x)) / h;                   \
 }
 

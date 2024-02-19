@@ -1,1 +1,2 @@
 f(x) = arccos(x)
+a = f(0)

@@ -1,0 +1,4 @@
+C = 0
+g(x) = x / 2
+f(x) = integral(g(x), x) + C
+a = f(4)

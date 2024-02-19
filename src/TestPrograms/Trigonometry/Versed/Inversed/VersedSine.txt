@@ -1,0 +1,2 @@
+f(x) = arcversin(x)
+a = f(0)

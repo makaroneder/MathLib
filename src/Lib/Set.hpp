@@ -25,7 +25,7 @@ bool IsInsideSet(std::vector<T> set, T element) {
     if (std::isnan(element) || std::isinf(element)) return false;
     if (set.size() == 0) return true;
     for (T& i : set)
-        if (std::fabs(i - element) < eps) return true;
+        if (FloatsEqual<T>(i, element)) return true;
     return false;
 }
 

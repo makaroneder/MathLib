@@ -1,0 +1,2 @@
+f(x) = arccoth(x)
+a = f(2)

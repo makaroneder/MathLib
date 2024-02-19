@@ -1,0 +1,2 @@
+f(x) = arccsch(x)
+a = f(1)

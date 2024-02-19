@@ -1,0 +1,2 @@
+f(x) = excsc(x)
+a = f(pi / 2)

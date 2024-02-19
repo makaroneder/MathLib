@@ -1,0 +1,2 @@
+f(x) = havercos(x)
+a = f(0)

@@ -1,0 +1,2 @@
+f(x) = coversin(x)
+a = f(0)

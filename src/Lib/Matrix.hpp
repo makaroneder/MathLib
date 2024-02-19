@@ -123,5 +123,19 @@ struct Matrix {
     /// @brief Raw data
     T ptr[width * height];
 };
+/// @brief Converts matrix from one type to another
+/// @tparam T Old type of number
+/// @tparam F New type of number
+/// @tparam width Width of matrix
+/// @tparam height Height of matrix
+/// @param matrix Matrix to convert
+/// @return Converted matrix
+template <typename T, typename F, size_t width, size_t height>
+Matrix<F, width, height> ConvertMatrix(Matrix<T, width, height> matrix) {
+    Matrix<F, width, height> ret;
+    for (size_t y = 0; y < height; y++)
+        for (size_t x = 0; x < width; x++) ret.At(x, y) = (F)matrix.At(x, y);
+    return ret;
+}
 
 #endif

@@ -1,0 +1,2 @@
+f(x) = hacovercos(x)
+a = f(0)

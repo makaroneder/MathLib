@@ -1,0 +1,2 @@
+f(x) = arcexcsc(x)
+a = f(0)

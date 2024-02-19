@@ -1,0 +1,2 @@
+f(x) = archavercos(x)
+a = f(0)

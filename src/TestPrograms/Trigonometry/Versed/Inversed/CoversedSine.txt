@@ -1,0 +1,2 @@
+f(x) = arccoversin(x)
+a = f(0)

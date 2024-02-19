@@ -1,1 +1,2 @@
 f(x) = arctan(x)
+a = f(0)

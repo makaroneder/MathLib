@@ -1,0 +1,2 @@
+f(x) = arccovercos(x)
+a = f(0)

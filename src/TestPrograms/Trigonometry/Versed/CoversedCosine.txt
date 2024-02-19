@@ -1,0 +1,2 @@
+f(x) = covercos(x)
+a = f(0)

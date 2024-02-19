@@ -1,0 +1,2 @@
+f(x) = hacoversin(x)
+a = f(0)

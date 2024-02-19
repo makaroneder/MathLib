@@ -17,7 +17,7 @@ constexpr T Log(T b, T x) {
 /// @return Natural logarithm of specified number
 template <typename T>
 constexpr T Ln(T x) {
-    return Log<T>(M_El, x);
+    return std::log(x);
 }
 
 #endif

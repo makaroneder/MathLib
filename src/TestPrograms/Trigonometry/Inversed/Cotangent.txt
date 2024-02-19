@@ -1,1 +1,2 @@
 f(x) = arccot(x)
+a = f(0)

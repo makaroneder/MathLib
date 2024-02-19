@@ -1,3 +1,4 @@
-p(x) = log(e, x)
+p(x) = ln(x)
 q(x) = e * pi
 f(x) = p(x) / q(x)
+a = f(e)

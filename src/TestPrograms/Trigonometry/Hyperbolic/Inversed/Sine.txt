@@ -1,1 +1,2 @@
 f(x) = arcsinh(x)
+a = f(0)

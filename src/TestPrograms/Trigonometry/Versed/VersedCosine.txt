@@ -1,0 +1,2 @@
+f(x) = vercos(x)
+a = f(0)

@@ -23,6 +23,16 @@ struct Matrix {
     T At(size_t x, size_t y) const {
         return ptr[y * width + x];
     }
+    T GetLength(void) const {
+        return std::sqrt(Dot(*this));
+    }
+    Matrix<T, width, height> Normalize(void) {
+        const T len = GetLength();
+        Matrix<T, width, height> ret;
+        for (size_t y = 0; y < height; y++)
+            for (size_t x = 0; x < width; x++) ret.At(x, y) = At(x, y) / len;
+        return ret;
+    }
     /// @brief a . b = a_0 * b_0 + ... + a_n * b_n
     /// @param other Other matrix
     /// @return Dot product of 2 vectors
@@ -116,6 +126,14 @@ struct Matrix {
         bool ret = true;
         for (size_t y = 0; y < height && ret; y++)
             for (size_t x = 0; x < width && ret; x++) ret = At(x, y) != other.At(x, y);
+        return ret;
+    }
+    /// @brief Multiplies matrix by -1
+    /// @return New matrix
+    Matrix<T, width, height> operator-(void) {
+        Matrix<T, width, height> ret;
+        for (size_t y = 0; y < height; y++)
+            for (size_t x = 0; x < width; x++) ret.At(x, y) = -At(x, y);
         return ret;
     }
 

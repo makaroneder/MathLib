@@ -1,15 +1,7 @@
 #ifndef Trigonometry_H
 #define Trigonometry_H
-#include "Log.hpp"
+#include "Constants.hpp"
 
-/// @brief a * pi / 180
-/// @tparam T Type of number
-/// @param angle Angle in degrees to convert into radians
-/// @return Angle represented in radians
-template <typename T>
-constexpr T DegreeToRadian(T a) {
-    return a * (M_PI_4l / 45);
-}
 /// @brief cot(x) = cos(x) / sin(x)
 /// @tparam T Type of number
 /// @param x Radians
@@ -152,7 +144,7 @@ constexpr T HyperbolicCsc(T x) {
 /// @return Inversed cotangent of x
 template <typename T>
 constexpr T InversedCot(T x) {
-    return M_PI_2l - std::atan(x);
+    return pi / 2 - std::atan(x);
 }
 /// @brief arcsec(x) = arccos(1 / x)
 /// @tparam T Type of number

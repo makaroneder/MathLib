@@ -1,0 +1,2 @@
+f(x) = product(n, 0, 1, e^x)
+a = f(2)

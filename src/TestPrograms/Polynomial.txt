@@ -1,2 +1,5 @@
-f(x) = x^2 + x + 1
+fa = 1
+fb = 1
+fc = 1
+f(x) = fa * x^2 + fb * x + fc
 a = f(1)

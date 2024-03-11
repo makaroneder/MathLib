@@ -7,8 +7,6 @@
 
 /// @brief Defaults type for real numbers
 typedef long double num_t;
-/// @brief Maximal error in float comparison
-static constexpr num_t eps = 0.01;
 
 /// @brief Checks if T is float
 /// @tparam T Type of number
@@ -21,9 +19,10 @@ constexpr bool IsFloat(void) {
 /// @tparam T Type of number
 /// @param a a
 /// @param b b
+/// @param eps Maximum error tolerance
 /// @return Equality
 template <typename T>
-constexpr bool FloatsEqual(T a, T b) {
+constexpr bool FloatsEqual(T a, T b, T eps = 0.01) {
     return std::fabs(a - b) < eps;
 }
 

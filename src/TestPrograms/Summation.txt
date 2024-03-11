@@ -1,0 +1,2 @@
+f(x) = summation(n, 0, 5, e^x)
+a = f(2)

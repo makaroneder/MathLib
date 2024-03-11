@@ -1,5 +1,6 @@
 #ifndef Node_H
 #define Node_H
+#include "../Typedefs.hpp"
 #include <functional>
 #include <string>
 #include <vector>
@@ -9,7 +10,7 @@ struct Node {
     /// @brief Type of the node
     enum class Type {
         None,
-        Function, Variable, Constant,
+        Function, Variable, Constant, Array,
         Comma,
         Equal,
         Add, Sub,
@@ -17,7 +18,8 @@ struct Node {
         Pow, Root,
         Factorial,
         Absolute,
-        Integral,
+        Index,
+        Integral, Summation, Product,
     } type;
     /// @brief Value of the node
     std::string value;
@@ -36,19 +38,27 @@ struct Node {
     ~Node(void);
     /// @brief Creates a new node with the same values as the current node
     /// @return New node
-    Node* Recreate(void);
+    Node* Recreate(void) const;
+    /// @brief Converts node to number array
+    /// @return Number array
+    std::vector<num_t> ToNumber(void) const;
     /// @brief Converts values of the current node to string
     /// @param padding Padding of the generated strings
-    std::string ToString(std::string padding = "");
+    std::string ToString(std::string padding = "") const;
 };
 /// @brief Converts node to array
 /// @param node Node to convert
 /// @return Converted array
-std::vector<Node*> CommaToArray(Node* node);
+std::vector<const Node*> CommaToArray(const Node* node);
 /// @brief Replaces every node with a new node
 /// @param node Root node to replace
 /// @param f Function returning new nodes based on old nodes
 /// @return New root node
-Node* ReplaceNode(Node* node, std::function<Node*(Node*)> f);
+Node* ReplaceNode(const Node* node, std::function<Node*(const Node*)> f);
+/// @brief Checks whether node contains other node
+/// @param node Root node to check
+/// @param f Function returning wheter node contains other node
+/// @return Status
+bool ContainsNode(const Node* node, std::function<bool(const Node*)> f);
 
 #endif

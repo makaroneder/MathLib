@@ -1,15 +1,15 @@
 #ifndef SDL2_H
 #define SDL2_H
-#include "Color.hpp"
 #include <Renderer.hpp>
 #include <SDL2/SDL.h>
 
 /// @brief Renderer implementation using SDL2 library
 struct SDL2Renderer : Renderer {
     /// @brief Creates a new renderer
+    /// @param title Title of the window
     /// @param w Width of the window
     /// @param h Height of the window
-    SDL2Renderer(size_t w, size_t h);
+    SDL2Renderer(const char* title, size_t w, size_t h);
     /// @brief Destroys the renderer
     virtual ~SDL2Renderer(void) override;
     /// @brief Flushes renderer buffer

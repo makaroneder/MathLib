@@ -26,8 +26,8 @@ int main(int argc, char** argv) {
                 }
                 else std::cout << "Invalid answer\n";
             }
-        }   
-        std::cout << "You solved " << (solved / (argc - 1) * 100) << "% of equations (" << solved << "/" << (argc - 1) << ")\n" << std::flush;
+        }
+        if (argc != 1) std::cout << "You solved " << (solved / (argc - 1) * 100) << "% of equations (" << solved << "/" << (argc - 1) << ")\n" << std::flush;
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

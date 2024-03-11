@@ -1,4 +1,4 @@
-a(x) = e^x
+g(x) = e^x
 h = 1 / 100
-f(x) = (a(x + h) - a(x)) / h
+f(x) = (g(x + h) - g(x)) / h
 a = f(0)

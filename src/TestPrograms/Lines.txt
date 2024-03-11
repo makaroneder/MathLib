@@ -1,0 +1,6 @@
+f(x) = {
+    ceil(x),
+    floor(x),
+    x
+}
+a = f(pi)[floor(e)]

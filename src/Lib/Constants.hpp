@@ -1,6 +1,6 @@
 #ifndef Constants_H
 #define Constants_H
-#include "Units/Units.hpp"
+#include "Typedefs.hpp"
 #include "Log.hpp"
 
 #ifdef M_PIl
@@ -110,8 +110,5 @@ static constexpr num_t primeConstant = 0.41468250985111166024;
 static constexpr num_t somosQuadraticRecurrenceConstant = 1.66168794963359412129;
 static constexpr num_t foiasConstant = 1.18745235112650105459;
 static constexpr num_t taniguchiConstant = 0.67823449191739197803;
-
-// TODO: More physical constants
-static const Velocity<num_t> speedOfLightInVacuum = Velocity<num_t>::MetrePerSecond(299792458);
 
 #endif

@@ -4,6 +4,7 @@
 
 Question::Question(std::string eq) {
     equation = eq;
+    solution = NAN;
     State state;
     state.variables = std::vector<Variable>(defaultVariables, defaultVariables + SizeOfArray(defaultVariables));
     state.builtinFunctions = std::vector<BuiltinFunction>(defaultBuiltinFuncs, defaultBuiltinFuncs + SizeOfArray(defaultBuiltinFuncs));

@@ -3,8 +3,9 @@
 #include "Set.hpp"
 #include "Line.hpp"
 #include "Functions.hpp"
+#include "Rectangle.hpp"
 #include <stdint.h>
-#include <complex>
+#include <iostream>
 
 struct Renderer {
     /// @brief Current position
@@ -31,20 +32,40 @@ struct Renderer {
     /// @param color Color of the line
     /// @return Status
     virtual bool DrawLine(Line<num_t> line, uint32_t color) = 0;
-
+    /// @brief Renders filled rectangle
+    /// @tparam T Type of number
+    /// @param rect Rectangle to draw
+    /// @param color Color of the rectangle
+    /// @return Status
+    template <typename T>
+    bool FillRectangle(Rectangle<T> rect, uint32_t color) {
+        T w = rect.width / 2;
+        T h = rect.height / 2;
+        const bool isFloat = IsFloat<T>();
+        const T add = isFloat ? (1 / pointMultiplier) : 1;
+        for (T y = -h; y <= h; y += add) {
+            for (T x = -w; x <= w; x += add) {
+                Vector3<T> pos = rect.position;
+                GetVectorAxis(pos, VectorAxis::X) += x;
+                GetVectorAxis(pos, VectorAxis::Y) += y;
+                if (!SetPixel(ConvertMatrix<T, num_t>(pos), color)) return false;
+            }
+        }
+        return true;
+    }
     /// @brief Calculates start of the graph
     /// @tparam T Type of number
     /// @return Start of graph
     template <typename T>
-    Vector2<T> GetStart(void) const {
-        return CreateVector2<T>(-(GetWidth() / 2 / pointMultiplier), -(GetHeight() / 2 / pointMultiplier));
+    Vector3<T> GetStart(void) const {
+        return CreateVector3<T>(-(GetWidth() / 2 / pointMultiplier), -(GetHeight() / 2 / pointMultiplier), 0);
     }
     /// @brief Calculates end of the graph
     /// @tparam T Type of number
     /// @return End of graph
     template <typename T>
-    Vector2<T> GetEnd(void) const {
-        return CreateVector2<T>(GetWidth() / 2 / pointMultiplier, GetHeight() / 2 / pointMultiplier);
+    Vector3<T> GetEnd(void) const {
+        return CreateVector3<T>(GetWidth() / 2 / pointMultiplier, GetHeight() / 2 / pointMultiplier, 0);
     }
     /// @brief Creates set of every pixel on the screen
     /// @tparam T Type of number
@@ -54,8 +75,8 @@ struct Renderer {
     std::vector<T> CreateRealNumberSet(void) const {
         const bool isFloat = IsFloat<T>();
         const T div = isFloat ? 1 : pointMultiplier;
-        const Vector2<T> startArr = GetStart<T>();
-        const Vector2<T> endArr = GetEnd<T>();
+        const Vector3<T> startArr = GetStart<T>();
+        const Vector3<T> endArr = GetEnd<T>();
         return CreateSet<T>(
             std::max<T>(GetVectorAxis(startArr, VectorAxis::X), GetVectorAxis(startArr, VectorAxis::Y)) * div,
             std::max<T>(GetVectorAxis(endArr, VectorAxis::X), GetVectorAxis(endArr, VectorAxis::Y)) * div,
@@ -90,27 +111,46 @@ struct Renderer {
     /// @param outSet Set of number values we allow as output
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GenerateFunction(std::function<std::complex<T>(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        Vector3<T> prev;
+    std::vector<Line<T>> GenerateFunction(std::function<std::vector<T>(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        std::vector<Vector3<T>> prev;
         std::vector<Line<T>> ret;
         for (const T& i : inSet) {
-            Vector3<T> curr;
-            std::complex<T> tmp = f(i);
-            if (std::isnan(i) || std::isinf(i) || !IsInsideSet<T>(outSet, tmp.real())) {
-                prev = CreateVector3<num_t>(NAN, NAN, NAN);
-                continue;
+            Vector3<T> curr = CreateVector3<T>(0, 0, 0);
+            const std::vector<T> arr = f(i);
+            if (prev.empty()) {
+                prev.reserve(arr.size());
+                for (T j = 0; j < arr.size(); j++) prev.push_back(CreateVector3<T>(NAN, NAN, NAN));
             }
-            GetVectorAxis(curr, inAxis) = i;
-            GetVectorAxis(curr, realAxis) = tmp.real();
-            // TODO: Set z axis to the imaginary part of 'f' output
-            GetVectorAxis(curr, imaginaryAxis) = tmp.imag();
-            ret.push_back(Line<T>(prev - position, curr - position));
-            prev = curr;
+            for (T j = 0; j < arr.size(); j++) {
+                T tmp = arr.at(j);
+                if (std::isnan(i) || std::isinf(i) || !IsInsideSet<T>(outSet, tmp, 1 / pointMultiplier)) {
+                    prev.at(j) = CreateVector3<num_t>(NAN, NAN, NAN);
+                    continue;
+                }
+                GetVectorAxis(curr, inAxis) = i;
+                GetVectorAxis(curr, realAxis) = tmp;
+                ret.push_back(Line<T>(prev.at(j) - position, curr - position));
+                prev.at(j) = curr;
+            }
         }
         return ret;
+    }
+    /// @brief y = f(x)
+    /// @tparam T Type of number
+    /// @param f Function that calculates x or y depending on the 'axis' parameter
+    /// @param inSet Set of number values we allow as input
+    /// @param outSet Set of number values we allow as output
+    /// @param inAxis Axis we are using for input values
+    /// @param realAxis Axis we are using for real part of the output
+    /// @return Result of function
+    template <typename T>
+    std::vector<Line<T>> GenerateFunction(std::function<T(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>([f](T x) {
+            std::vector<T> ret = { f(x), };
+            return ret;
+        }, inSet, outSet, inAxis, realAxis);
     }
     /// @brief f(x) = c
     /// @tparam T Type of number
@@ -118,33 +158,30 @@ struct Renderer {
     /// @param inSet Set of number values we allow as input
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GenerateConstFunction(T c, std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        return GenerateFunction<T>(ConstFunction(T, c), inSet, { c, }, inAxis, realAxis, imaginaryAxis);
+    std::vector<Line<T>> GenerateConstFunction(T c, std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>(ConstFunction(T, c), inSet, { c, }, inAxis, realAxis);
     }
     /// @brief f(x) = x
     /// @tparam T Type of number
     /// @param inSet Set of number values we allow as input
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GenerateIdentityFunction(std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        return GenerateFunction<T>(IdentityFunction(T), inSet, inSet, inAxis, realAxis, imaginaryAxis);
+    std::vector<Line<T>> GenerateIdentityFunction(std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>(IdentityFunction(T), inSet, inSet, inAxis, realAxis);
     }
     /// @brief f(0) = 0 and f(x) = x / |x|
     /// @tparam T Type of number
     /// @param inSet Set of number values we allow as input
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GenerateSignumFunction(std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        return GenerateFunction<T>(SignumFunction(T), inSet, { -1, 0, 1, }, inAxis, realAxis, imaginaryAxis);
+    std::vector<Line<T>> GenerateSignumFunction(std::vector<T> inSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>(SignumFunction(T), inSet, { -1, 0, 1, }, inAxis, realAxis);
     }
     /// @brief f(x) = a_0 * x^0 + ... + a_n * x^n
     /// @tparam T Type of number
@@ -153,11 +190,10 @@ struct Renderer {
     /// @param outSet Set of number values we allow as output
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GeneratePolynomialFunction(std::vector<T> a, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        return GenerateFunction<T>(PolynomialFunction(T, a), inSet, outSet, inAxis, realAxis, imaginaryAxis);
+    std::vector<Line<T>> GeneratePolynomialFunction(std::vector<T> a, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>(PolynomialFunction(T, a), inSet, outSet, inAxis, realAxis);
     }
     /// @brief f(x) = p(x) / q(x)
     /// @tparam T Type of number
@@ -167,11 +203,10 @@ struct Renderer {
     /// @param outSet Set of number values we allow as output
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template <typename T>
-    std::vector<Line<T>> GenerateRationalFunction(std::function<std::complex<T>(T)> p, std::function<std::complex<T>(T)> q, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
-        return GenerateFunction<T>(RationalFunction(T, p, q), inSet, outSet, inAxis, realAxis, imaginaryAxis);
+    std::vector<Line<T>> GenerateRationalFunction(std::function<T(T)> p, std::function<T(T)> q, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
+        return GenerateFunction<T>(RationalFunction(T, p, q), inSet, outSet, inAxis, realAxis);
     }
     /// @brief f'(x) = (f(x + h) - f(x)) / h
     /// @tparam T Type of number
@@ -180,12 +215,11 @@ struct Renderer {
     /// @param outSet Set of number values we allow as output
     /// @param inAxis Axis we are using for input values
     /// @param realAxis Axis we are using for real part of the output
-    /// @param imaginaryAxis Axis we are using for imaginary part of the output
     /// @return Result of function
     template<typename T>
-    std::vector<Line<T>> GenerateDerivativeFunction(std::function<std::complex<T>(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y, VectorAxis imaginaryAxis = VectorAxis::Z) {
+    std::vector<Line<T>> GenerateDerivativeFunction(std::function<T(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
         const T h = 1 / pointMultiplier;
-        return GenerateFunction<T>(DerivativeFunction(T, f, h), inSet, outSet, inAxis, realAxis, imaginaryAxis);
+        return GenerateFunction<T>(DerivativeFunction(T, f, h), inSet, outSet, inAxis, realAxis);
     }
 };
 

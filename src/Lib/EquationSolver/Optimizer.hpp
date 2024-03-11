@@ -7,6 +7,6 @@
 /// @param node Node to optimize
 /// @param state Current state
 /// @return Optimized node and new variables
-Node* Optimize(Node* node, State& state);
+Node* Optimize(const Node* node, State& state);
 
 #endif

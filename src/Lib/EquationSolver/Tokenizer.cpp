@@ -64,9 +64,23 @@ Node* TokenizeData(const std::string str, size_t& i) {
             }
             i++;
             if (name == "integral") return new Node(Node::Type::Integral, "", ret);
+            else if (name == "summation") return new Node(Node::Type::Summation, "", ret);
+            else if (name == "product") return new Node(Node::Type::Product, "", ret);
             else return new Node(Node::Type::Function, name, ret);
         }
         else return new Node(Node::Type::Variable, name);
+    }
+    else if (str[i] == '{') {
+        i++;
+        Node* ret = TokenizeComma(str, i);
+        if (ret == nullptr) return nullptr;
+        SkipWhiteSpace(str, i);
+        if (str[i] != '}') {
+            delete ret;
+            return nullptr;
+        }
+        i++;
+        return new Node(Node::Type::Array, "", ret);
     }
     else if (str[i] == '(') {
         i++;
@@ -96,7 +110,7 @@ Node* TokenizeData(const std::string str, size_t& i) {
         Node* ret = TokenizeInternal(str, i);
         if (ret == nullptr) return nullptr;
         if (ret->type == Node::Type::Constant) {
-            ret->value = std::to_string(-std::stold(ret->value));
+            ret->value = std::to_string(-ret->ToNumber().at(0));
             return ret;
         }
         return new Node(Node::Type::Mul, "", new Node(Node::Type::Constant, "-1"), ret);
@@ -118,8 +132,27 @@ Node* Tokenize##func(const std::string str, size_t& i) {                    \
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeFactorial(const std::string str, size_t& i) {
+Node* TokenizeIndex(const std::string str, size_t& i) {
     Node* ret = TokenizeData(str, i);
+    SkipWhiteSpace(str, i);
+    if (str[i] == '[') {
+        i++;
+        ret = new Node(Node::Type::Index, "", ret, TokenizeInternal(str, i));
+        SkipWhiteSpace(str, i);
+        if (str[i] != ']') {
+            delete ret;
+            return nullptr;
+        }
+        i++;
+    }
+    return ret;
+}
+/// @brief Tokenizes string into nodes
+/// @param str String to tokenize
+/// @param i Current position in the string
+/// @return Tokenized string
+Node* TokenizeFactorial(const std::string str, size_t& i) {
+    Node* ret = TokenizeIndex(str, i);
     if (str[i] == '!') ret = new Node(GetType(str, i), "", ret);
     return ret;
 }

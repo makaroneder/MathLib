@@ -9,7 +9,7 @@ std::string Preproces(std::string path) {
         while (file) {
             std::string line;
             std::getline(file, line);
-            ret += line + "\n";
+            ret += line + '\n';
         }
     }
     ret.pop_back();

@@ -36,7 +36,7 @@ Vector2<T> CreateVector2(T x, T y) {
 /// @tparam T Type of number
 /// @param x X coordinate
 /// @param y Y coordinate
-/// @param Z Z coordinate
+/// @param z Z coordinate
 /// @return New 3D vector
 template <typename T>
 Vector3<T> CreateVector3(T x, T y, T z) {
@@ -45,6 +45,15 @@ Vector3<T> CreateVector3(T x, T y, T z) {
     GetVectorAxis(ret, VectorAxis::Y) = y;
     GetVectorAxis(ret, VectorAxis::Z) = z;
     return ret;
+}
+/// @brief Creates new 3D vector
+/// @tparam T Type of number
+/// @param v 2D vector
+/// @param z Z coordinate
+/// @return New 3D vector
+template <typename T>
+Vector3<T> CreateVector3(Vector2<T> v, T z) {
+    return CreateVector3<T>(GetVectorAxis(v, VectorAxis::X), GetVectorAxis(v, VectorAxis::Y), z);
 }
 /// @brief (x', y') = (x cos a - y sin a, x sin a + y cos a)
 /// @tparam T Type of number
@@ -57,7 +66,7 @@ Vector2<T> RotateVector2(Vector2<T> point, Vector2<T> origin, T angle) {
     point -= origin;
     T sin = 0;
     T cos = 0;
-    sincosl(angle, sin, cos);
+    sincosl(angle, &sin, &cos);
     const T x = GetVectorAxis(point, VectorAxis::X);
     const T y = GetVectorAxis(point, VectorAxis::Y);
     return CreateVector2<T>(x * cos - y * sin, x * sin + y * cos) + origin;

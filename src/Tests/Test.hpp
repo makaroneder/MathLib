@@ -13,19 +13,20 @@ struct Test : Renderer {
     /// @brief Calculates height of the renderer window
     /// @return Height of the renderer window
     virtual size_t GetHeight(void) const override;
+    /// @brief Updates renderer
+    /// @return Status
+    virtual bool Update(void) override;
     /// @brief Renders pixel
-    /// @param p Position of pixel
-    /// @param color Color of pixel
+    /// @param pixels Pixel to render
+    /// @param color Color of the pixel
     /// @return Status
-    virtual bool SetPixel(Vector3<num_t> p, uint32_t color) override;
-    /// @brief Draws a line
-    /// @param line Line to draw
-    /// @param color Color of the line
-    /// @return Status
-    virtual bool DrawLine(Line<num_t> line, uint32_t color) override;
+    virtual bool SetPixel(Matrix<num_t> pixel, uint32_t color) override;
+    /// @brief Gets current event
+    /// @return Event
+    virtual Event GetEvent(void) override;
 
     size_t failed;
-    std::vector<Vector3<num_t>> values;
+    std::vector<Matrix<num_t>> values;
     private:
     size_t width;
     size_t height;

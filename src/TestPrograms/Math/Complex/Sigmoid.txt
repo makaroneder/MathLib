@@ -1,0 +1,2 @@
+fc(z) = sigmoid(z)
+a = re(fc(0))

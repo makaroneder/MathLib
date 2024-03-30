@@ -1,6 +1,7 @@
 #ifndef Variable_H
 #define Variable_H
 #include "../Constants.hpp"
+#include "Node.hpp"
 #include <string>
 #include <vector>
 
@@ -9,8 +10,12 @@ struct Variable {
     /// @brief Name of the variable
     std::string name;
     /// @brief Value of the variable
-    std::string value;
+    Node* value;
 
+    /// @brief Creates a new variable
+    /// @param n Name of the variable
+    /// @param val Value of the variable
+    Variable(std::string n, Node* val);
     /// @brief Creates a new variable
     /// @param n Name of the variable
     /// @param val Value of the variable

@@ -46,7 +46,16 @@ Node* TokenizeData(const std::string str, size_t& i) {
     SkipWhiteSpace(str, i);
     if (isdigit(str[i])) {
         std::string ret = "";
-        while (i < str.size() && (isdigit(str[i]) || str[i] == '.')) ret += str[i++];
+        if ((i + 1) < str.size() && str[i] == '0' && str[i + 1] == 'x') {
+            i += 2;
+            while (i < str.size() && isxdigit(str[i])) ret += str[i++];
+            ret = std::to_string(std::stoull(ret, nullptr, 16));
+        }
+        else while (i < str.size() && (isdigit(str[i]) || str[i] == '.')) ret += str[i++];
+        if (str[i] == 'i') {
+            i++;
+            return new Node(Node::Type::ComplexConstant, "(0, " + ret + ')');
+        }
         return new Node(Node::Type::Constant, ret);
     }
     else if (isalpha(str[i])) {
@@ -68,7 +77,15 @@ Node* TokenizeData(const std::string str, size_t& i) {
             else if (name == "product") return new Node(Node::Type::Product, "", ret);
             else return new Node(Node::Type::Function, name, ret);
         }
+        else if (name == "i") return new Node(Node::Type::ComplexConstant, "(0, 1)");
         else return new Node(Node::Type::Variable, name);
+    }
+    else if (str[i] == '"') {
+        i++;
+        std::string ret = "";
+        while (str[i] != '"') ret += str[i++];
+        i++;
+        return new Node(Node::Type::String, ret);
     }
     else if (str[i] == '{') {
         i++;
@@ -109,10 +126,6 @@ Node* TokenizeData(const std::string str, size_t& i) {
         i++;
         Node* ret = TokenizeInternal(str, i);
         if (ret == nullptr) return nullptr;
-        if (ret->type == Node::Type::Constant) {
-            ret->value = std::to_string(-ret->ToNumber().at(0));
-            return ret;
-        }
         return new Node(Node::Type::Mul, "", new Node(Node::Type::Constant, "-1"), ret);
     }
     else return nullptr;

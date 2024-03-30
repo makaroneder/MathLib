@@ -1,7 +1,7 @@
 #ifndef Functions_H
 #define Functions_H
 #include "Summation.hpp"
-#include <cmath>
+#include "Typedefs.hpp"
 
 #define ConstFunction(T, c)                         \
 [c](T) {                                            \
@@ -25,9 +25,9 @@
 [p, q](T x) {                                       \
     return p(x) / q(x);                             \
 }
-#define DerivativeFunction(T, f, h)                 \
-[f, h](T x) {                                       \
-    return (f(x + h) - f(x)) / h;                   \
+#define DerivativeFunction(T, f)                    \
+[f](T x) {                                          \
+    return (f(x + eps) - f(x)) / eps;               \
 }
 
 #endif

@@ -9,15 +9,7 @@
 /// @return Logarithm of specified base and number
 template <typename T>
 constexpr T Log(T b, T x) {
-    return std::log2(x) / std::log2(b);
-}
-/// @brief ln x = log_e x
-/// @tparam T Type of number
-/// @param x Value of the natural logarithm
-/// @return Natural logarithm of specified number
-template <typename T>
-constexpr T Ln(T x) {
-    return std::log(x);
+    return std::log(x) / std::log(b);
 }
 
 #endif

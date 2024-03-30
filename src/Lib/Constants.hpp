@@ -5,28 +5,22 @@
 
 #ifdef M_PIl
 static constexpr num_t pi = M_PIl;
-#else
-static constexpr num_t pi = M_PI;
-#endif
-#ifdef M_El
 static constexpr num_t e = M_El;
-#else
-static constexpr num_t e = M_E;
-#endif
-#ifdef M_SQRT2l
 static constexpr num_t sqrt2 = M_SQRT2l;
-#else
-static constexpr num_t sqrt2 = M_SQRT2;
-#endif
-#ifdef M_LN2l
 static constexpr num_t ln2 = M_LN2l;
-#else
-static constexpr num_t ln2 = M_LN2;
-#endif
-#ifdef M_LN10l
 static constexpr num_t ln10 = M_LN10l;
 #else
-static constexpr num_t ln10 = M_LN10;
+#ifdef M_PI
+static constexpr num_t pi = M_PI;
+static constexpr num_t e = M_E;
+static constexpr num_t sqrt2 = M_SQRT2;
+static constexpr num_t ln2 = M_LN2;
+#else
+static constexpr num_t pi = 3.14;
+static constexpr num_t e = 2.71;
+static constexpr num_t sqrt2 = 1.41;
+static constexpr num_t ln2 = 0.69;
+#endif
 #endif
 
 static constexpr num_t tau = 2 * pi;
@@ -92,7 +86,7 @@ static constexpr num_t stephensConstant = 0.57595996889294543964;
 static constexpr num_t reciprocalFibonacciConstant = 3.35988566624317755317;
 static constexpr num_t feigenbaumConstant1 = 4.66920160910299067185;
 static constexpr num_t chaitinConstant = 0.0078749969978123844;
-static constexpr num_t robbinsConstant = (4 + 17 * sqrt2 - 6 * std::sqrt(3) - 7 * pi) / 105 + Ln<num_t>(1 + sqrt2) / 5 + (2 * Ln<num_t>(2 + std::sqrt(3))) / 5;
+static constexpr num_t robbinsConstant = (4 + 17 * sqrt2 - 6 * std::sqrt(3) - 7 * pi) / 105 + std::log(1 + sqrt2) / 5 + (2 * std::log(2 + std::sqrt(3))) / 5;
 static constexpr num_t weierstrassConstant = 0.47494937998792065033;
 static constexpr num_t fransenRobinsonConstant = 2.80777024202851936522;
 static constexpr num_t feigenbaumConstant2 = 2.50290787509589282228;

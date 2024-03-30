@@ -10,6 +10,7 @@ struct State {
     std::vector<Variable> variables;
 
     State(std::vector<BuiltinFunction> builtinFuncs = {}, std::vector<Function> funcs = {}, std::vector<Variable> vars = {});
+    const Function* GetFunction(std::string name) const;
 };
 
 #endif

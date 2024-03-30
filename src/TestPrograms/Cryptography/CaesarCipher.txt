@@ -1,0 +1,9 @@
+msg = "Skibidi dap dap dap yes yes"
+key = "-25"
+protocol = "CaesarCipher"
+
+Print("Message: ", msg)
+Print("Key: ", key)
+Print("Protocol: ", protocol)
+Print("Encrypted message: ", Encrypt(protocol, msg, key))
+Print("Decrypted message: ", Decrypt(protocol, msg, key))

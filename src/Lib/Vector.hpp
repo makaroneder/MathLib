@@ -5,32 +5,36 @@
 /// @brief Representation of axis position in matrix
 enum class VectorAxis {
     X = 0,
-    Y = 1,
-    Z = 2,
+    Y,
+    Z,
+    AxisCount,
 };
 
 #define GetVectorAxis(vector, axis) (vector).At((size_t)(axis), 0)
 
-/// @brief Typedef for 2D vector
-/// @tparam T Type of number
 template <typename T>
-using Vector2 = Matrix<T, 2, 1>;
-/// @brief Typedef for 3D vector
-/// @tparam T Type of number
+constexpr T& GetX(Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::X);
+}
 template <typename T>
-using Vector3 = Matrix<T, 3, 1>;
-
-/// @brief Creates new 2D vector
-/// @tparam T Type of number
-/// @param x X coordinate
-/// @param y Y coordinate
-/// @return New 2D vector
+constexpr T& GetY(Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::Y);
+}
 template <typename T>
-Vector2<T> CreateVector2(T x, T y) {
-    Vector2<T> ret;
-    GetVectorAxis(ret, VectorAxis::X) = x;
-    GetVectorAxis(ret, VectorAxis::Y) = y;
-    return ret;
+constexpr T& GetZ(Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::Z);
+}
+template <typename T>
+constexpr T GetX(const Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::X);
+}
+template <typename T>
+constexpr T GetY(const Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::Y);
+}
+template <typename T>
+constexpr T GetZ(const Matrix<T>& v) {
+    return GetVectorAxis(v, VectorAxis::Z);
 }
 /// @brief Creates new 3D vector
 /// @tparam T Type of number
@@ -39,49 +43,19 @@ Vector2<T> CreateVector2(T x, T y) {
 /// @param z Z coordinate
 /// @return New 3D vector
 template <typename T>
-Vector3<T> CreateVector3(T x, T y, T z) {
-    Vector3<T> ret;
-    GetVectorAxis(ret, VectorAxis::X) = x;
-    GetVectorAxis(ret, VectorAxis::Y) = y;
-    GetVectorAxis(ret, VectorAxis::Z) = z;
+Matrix<T> CreateVector(T x, T y, T z) {
+    Matrix<T> ret = Matrix<T>((size_t)VectorAxis::AxisCount, 1, { x, y, z, });
     return ret;
-}
-/// @brief Creates new 3D vector
-/// @tparam T Type of number
-/// @param v 2D vector
-/// @param z Z coordinate
-/// @return New 3D vector
-template <typename T>
-Vector3<T> CreateVector3(Vector2<T> v, T z) {
-    return CreateVector3<T>(GetVectorAxis(v, VectorAxis::X), GetVectorAxis(v, VectorAxis::Y), z);
-}
-/// @brief (x', y') = (x cos a - y sin a, x sin a + y cos a)
-/// @tparam T Type of number
-/// @param point 2D vector to rotate
-/// @param origin 2D vector to rotate around
-/// @param angle Angle to rotate by
-/// @return Rotated 2D vector
-template <typename T>
-Vector2<T> RotateVector2(Vector2<T> point, Vector2<T> origin, T angle) {
-    point -= origin;
-    T sin = 0;
-    T cos = 0;
-    sincosl(angle, &sin, &cos);
-    const T x = GetVectorAxis(point, VectorAxis::X);
-    const T y = GetVectorAxis(point, VectorAxis::Y);
-    return CreateVector2<T>(x * cos - y * sin, x * sin + y * cos) + origin;
 }
 /// @brief Converts 3D vector to 2D vector
 /// @tparam T Type of number
 /// @param point 3D vector
+/// @param fov Distance on Z axis between camera and origin
 /// @return 2D vector
 template <typename T>
-Vector2<T> ConvertVector3ToVector2(Vector3<T> point) {
-    const T fov = 10;
-    const T x = GetVectorAxis(point, VectorAxis::X);
-    const T y = GetVectorAxis(point, VectorAxis::Y);
-    const T z = GetVectorAxis(point, VectorAxis::Z);
-    return CreateVector2((fov * x) / (fov + z), (fov * y) / (fov + z));
+Matrix<T> ConvertVectorToVector2(Matrix<T> point, T fov = 10) {
+    if (GetZ(point) <= (1 - fov)) return CreateVector<T>(NAN, NAN, NAN);
+    return CreateVector<T>(GetX(point), GetY(point), 0) / (1 + GetZ(point) / fov);
 }
 
 #endif

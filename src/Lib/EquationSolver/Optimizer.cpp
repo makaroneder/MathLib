@@ -3,7 +3,7 @@
 #include "../Factorial.hpp"
 #include "../Functions.hpp"
 
-// TODO: Add derivatives and support for complex numbers
+// TODO: Add derivatives and better support for complex numbers
 Node* OptimizeInternal(const Node* node, State& state);
 /// @brief Optimizes given node based on the given variables and creates new variables
 /// @param node Node to optimize
@@ -21,8 +21,8 @@ Node* OptimizeComma(const Node* node, State& state) {
 /// @param state Current state
 /// @return Optimized node and new variables
 Node* OptimizeVariable(const Node* node, std::vector<Variable>& variables) {
-    for (Variable& var : variables)
-        if (node->value == var.name) return new Node(Node::Type::Constant, var.value);
+    for (const Variable& var : variables)
+        if (node->value == var.name) return var.value->Recreate();
     return node->Recreate();
 }
 /// @brief Optimizes given node based on the given variables and creates new variables
@@ -35,11 +35,14 @@ Node* OptimizeFunction(const Node* node, State& state) {
             Node* f = new Node(Node::Type::Function, node->value, OptimizeComma(node->left, state));
             std::vector<const Node*> args = CommaToArray(f->left);
             for (const Node*& arg : args)
-                if (arg->type != Node::Type::Constant) return f;
+                if (!arg->IsConstant() && arg->type != Node::Type::Array && arg->type != Node::Type::String) return f;
             Node* ret = func.function(args);
             if (ret == nullptr) return f;
             delete f;
-            return ret;
+            Node* tmp = Optimize(ret, state);
+            if (tmp == nullptr) return ret;
+            delete ret;
+            return tmp;
         }
     }
     for (Function& func : state.functions) {
@@ -70,7 +73,12 @@ Node* OptimizeFunction(const Node* node, State& state) {
 /// @param state Current state
 /// @return Optimized node and new variables
 Node* OptimizeInternal(const Node* node, State& state) {
-    if (node->type == Node::Type::Constant) return node->Recreate();
+    if (node->type == Node::Type::Constant || node->type == Node::Type::String) return node->Recreate();
+    else if (node->type == Node::Type::ComplexConstant) {
+        const std::complex<num_t> ret = node->ToNumber().at(0);
+        if (ret.imag() == 0) return new Node(Node::Type::Constant, std::to_string(ret.real()));
+        else return node->Recreate();
+    }
     else if (node->type == Node::Type::Variable) return OptimizeVariable(node, state.variables);
     else if (node->type == Node::Type::Function) return OptimizeFunction(node, state);
     else if (node->type == Node::Type::Array) return new Node(Node::Type::Array, "", OptimizeComma(node->left, state));
@@ -78,22 +86,23 @@ Node* OptimizeInternal(const Node* node, State& state) {
         Node* l = OptimizeInternal(node->left, state);
         Node* r = OptimizeInternal(node->right, state);
         if (l->type == Node::Type::Array && r->type == Node::Type::Constant) {
-            std::string tmp = std::to_string(l->ToNumber().at(r->ToNumber().at(0) - 1));
+            const std::complex<num_t> tmp = l->ToNumber().at(r->ToNumber().at(0).real() - 1);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, tmp);
+            if (tmp.imag() == 0) return new Node(Node::Type::Constant, std::to_string(tmp.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(tmp));
         }
         else return new Node(Node::Type::Index, "", l, r);
     }
     else if (node->type == Node::Type::Equal) {
         Node* l = OptimizeInternal(node->left, state);
         Node* r = OptimizeInternal(node->right, state);
-        if (l->type == Node::Type::Variable && r->type == Node::Type::Constant) {
-            state.variables.push_back(Variable(l->value, r->value));
+        if (l->type == Node::Type::Variable && (r->IsConstant() || r->type == Node::Type::Array || r->type == Node::Type::String)) {
+            state.variables.push_back(Variable(l->value, r->Recreate()));
             return r;
         }
-        else if (r->type == Node::Type::Variable && l->type == Node::Type::Constant) {
-            state.variables.push_back(Variable(r->value, l->value));
+        else if (r->type == Node::Type::Variable && (l->IsConstant() || l->type == Node::Type::Array || l->type == Node::Type::String)) {
+            state.variables.push_back(Variable(r->value, l->Recreate()));
             return l;
         }
         else if (l->type == Node::Type::Function) {
@@ -112,8 +121,8 @@ Node* OptimizeInternal(const Node* node, State& state) {
     }
     else if (node->type == Node::Type::Absolute) {
         Node* n = OptimizeInternal(node->left, state);
-        if (n->type == Node::Type::Constant) {
-            const num_t val = n->ToNumber().at(0);
+        if (n->IsConstant()) {
+            const std::complex<num_t> val = n->ToNumber().at(0);
             delete n;
             return new Node(Node::Type::Constant, std::to_string(std::abs(val)));
         }
@@ -122,7 +131,7 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Factorial) {
         Node* n = OptimizeInternal(node->left, state);
         if (n->type == Node::Type::Constant) {
-            const num_t val = n->ToNumber().at(0);
+            const num_t val = n->ToNumber().at(0).real();
             delete n;
             return new Node(Node::Type::Constant, std::to_string(Factorial<num_t>(val)));
         }
@@ -142,8 +151,8 @@ Node* OptimizeInternal(const Node* node, State& state) {
             return new Node(Node::Type::Mul, "", l, r);
         }
         else if (a0->type == Node::Type::Pow) {
-            if (a0->left->type == Node::Type::Variable && a0->left->value == a1->value)
-                pow = std::to_string(a0->right->ToNumber().at(0) + 1);
+            if (a0->left->type == Node::Type::Variable && a0->left->value == a1->value && a0->right->type == Node::Type::Constant)
+                pow = std::to_string(a0->right->ToNumber().at(0).real() + 1);
             else {
                 delete del;
                 return node->Recreate();
@@ -218,7 +227,7 @@ Node* OptimizeInternal(const Node* node, State& state) {
             Node* ret;
             Node** curr = &ret;
             if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) return new Node(Node::Type::Summation, "", del);
-            for (num_t i = a1->ToNumber().at(0); i <= a2->ToNumber().at(0); i++) {
+            for (num_t i = a1->ToNumber().at(0).real(); i <= a2->ToNumber().at(0).real(); i++) {
                 *curr = new Node(Node::Type::Add, "", ReplaceNode(a3, [i, a0](const Node* node) {
                     if (node->type == Node::Type::Variable && node->value == a0->value)
                         return new Node(Node::Type::Constant, std::to_string(i));
@@ -257,7 +266,7 @@ Node* OptimizeInternal(const Node* node, State& state) {
             Node* ret;
             Node** curr = &ret;
             if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) return new Node(Node::Type::Summation, "", del);
-            for (num_t i = a1->ToNumber().at(0); i <= a2->ToNumber().at(0); i++) {
+            for (num_t i = a1->ToNumber().at(0).real(); i <= a2->ToNumber().at(0).real(); i++) {
                 *curr = new Node(Node::Type::Mul, "", ReplaceNode(a3, [i, a0](const Node* node) {
                     if (node->type == Node::Type::Variable && node->value == a0->value)
                         return new Node(Node::Type::Constant, std::to_string(i));
@@ -285,12 +294,13 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Add) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(lv + rv));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(lv.real() + rv.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(lv + rv));
         }
         else if (l->type == Node::Type::Constant && l->value == "0") {
             Node* ret = r->Recreate();
@@ -309,12 +319,13 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Sub) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(lv - rv));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(lv.real() - rv.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(lv - rv));
         }
         else if (l->type == Node::Type::Constant && l->value == "0") {
             Node* ret = new Node(Node::Type::Mul, "", new Node(Node::Type::Constant, "-1"), r->Recreate());
@@ -333,12 +344,13 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Mul) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(lv * rv));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(lv.real() * rv.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(lv * rv));
         }
         else if (l->type == Node::Type::Constant && l->value == "1") {
             Node* ret = r->Recreate();
@@ -362,12 +374,13 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Div) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(lv / rv));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(lv.real() / rv.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(lv / rv));
         }
         else if (r->type == Node::Type::Constant && r->value == "1") {
             Node* ret = l->Recreate();
@@ -380,12 +393,13 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Pow) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(std::pow<num_t>(lv, rv)));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(std::pow(lv.real(), rv.real())));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(std::pow(lv, rv)));
         }
         else if (r->type == Node::Type::Constant && r->value == "1") {
             Node* ret = l->Recreate();
@@ -408,12 +422,14 @@ Node* OptimizeInternal(const Node* node, State& state) {
     else if (node->type == Node::Type::Root) {
         Node* l = Optimize(node->left, state);
         Node* r = Optimize(node->right, state);
-        if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const num_t lv = l->ToNumber().at(0);
-            const num_t rv = r->ToNumber().at(0);
+        if (l->IsConstant() && r->IsConstant()) {
+            const std::complex<num_t> lv = l->ToNumber().at(0);
+            const std::complex<num_t> rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, std::to_string(std::pow<num_t>(rv, 1 / lv)));
+            const num_t one = 1;
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(std::pow(rv.real(), 1 / lv.real())));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(std::pow(rv, one / lv)));
         }
         else return new Node(Node::Type::Root, "", l, r);
     }

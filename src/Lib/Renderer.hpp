@@ -1,15 +1,15 @@
 #ifndef Renderer_H
 #define Renderer_H
 #include "Set.hpp"
-#include "Line.hpp"
+#include "Event.hpp"
+#include "Color.hpp"
 #include "Functions.hpp"
-#include "Rectangle.hpp"
-#include <stdint.h>
-#include <iostream>
+#include "Geometry/Shape.hpp"
+#include "ComplexPosition.hpp"
 
 struct Renderer {
     /// @brief Current position
-    Vector3<num_t> position;
+    Matrix<num_t> position;
     /// @brief Scale
     num_t pointMultiplier;
     /// @brief Creates a new renderer
@@ -22,50 +22,87 @@ struct Renderer {
     /// @brief Calculates height of the renderer window
     /// @return Height of the renderer window
     virtual size_t GetHeight(void) const = 0;
-    /// @brief Renders pixel
-    /// @param p Position of pixel
-    /// @param color Color of pixel
+    /// @brief Updates renderer
     /// @return Status
-    virtual bool SetPixel(Vector3<num_t> p, uint32_t color) = 0;
+    virtual bool Update(void) = 0;
+    /// @brief Renders pixels
+    /// @param pixels Pixels to render
+    /// @param color Color of the pixels
+    /// @return Status
+    virtual bool SetPixel(Matrix<num_t> pixel, uint32_t color) = 0;
+    /// @brief Gets current event
+    /// @return Event
+    virtual Event GetEvent(void) = 0;
+    /// @brief Waits for current event
+    /// @return Event
+    Event WaitForEvent(void);
+    bool Fill(uint32_t color);
     /// @brief Draws a line
+    /// @tparam T Type of number
     /// @param line Line to draw
     /// @param color Color of the line
     /// @return Status
-    virtual bool DrawLine(Line<num_t> line, uint32_t color) = 0;
-    /// @brief Renders filled rectangle
+    template <typename T>
+    bool DrawLine(Line<T> line, uint32_t color) {
+        T x1 = GetX(line.start);
+        T y1 = GetY(line.start);
+        T z1 = GetZ(line.start);
+        T x2 = GetX(line.end);
+        T y2 = GetY(line.end);
+        T z2 = GetZ(line.end);
+        const T dx = x2 - x1;
+        const T dy = y2 - y1;
+        const T dz = z2 - z1;
+        if (dx == 0 && dy == 0) return SetPixel(ConvertMatrix<T, num_t>(CreateVector<T>(x1, y1, z1)), color);
+        if (std::abs(dx) > std::abs(dy)) {
+            if (x1 > x2) {
+                Swap<T>(x1, x2);
+                Swap<T>(y1, y2);
+                Swap<T>(z1, z2);
+            }
+            std::vector<Matrix<num_t>> points;
+            for (T x = x1; x <= x2; x += 1 / pointMultiplier)
+                if (!SetPixel(ConvertMatrix<T, num_t>(CreateVector<T>(x, dy * (x - x1) / dx + y1, dz * (x - x1) / dx + z1)), color)) return false;
+        }
+        else {
+            if (y1 > y2) {
+                Swap<T>(x1, x2);
+                Swap<T>(y1, y2);
+                Swap<T>(z1, z2);
+            }
+            std::vector<Matrix<num_t>> points;
+            for (T y = y1; y <= y2; y += 1 / pointMultiplier)
+                if (!SetPixel(ConvertMatrix<T, num_t>(CreateVector<T>(dx * (y - y1) / dy + x1, y, dz * (y - y1) / dy + z1)), color)) return false;
+        }
+        return true;
+    }
+    /// @brief Renders specified shape
     /// @tparam T Type of number
-    /// @param rect Rectangle to draw
-    /// @param color Color of the rectangle
+    /// @param shape Shape to draw
+    /// @param angle Angle to rotate the shape by
+    /// @param axis Normalized vector containing axis to rotate around
+    /// @param color Color of the shape
     /// @return Status
     template <typename T>
-    bool FillRectangle(Rectangle<T> rect, uint32_t color) {
-        T w = rect.width / 2;
-        T h = rect.height / 2;
-        const bool isFloat = IsFloat<T>();
-        const T add = isFloat ? (1 / pointMultiplier) : 1;
-        for (T y = -h; y <= h; y += add) {
-            for (T x = -w; x <= w; x += add) {
-                Vector3<T> pos = rect.position;
-                GetVectorAxis(pos, VectorAxis::X) += x;
-                GetVectorAxis(pos, VectorAxis::Y) += y;
-                if (!SetPixel(ConvertMatrix<T, num_t>(pos), color)) return false;
-            }
-        }
+    bool DrawShape(const Shape<T>& shape, T angle, Matrix<T> axis, uint32_t color) {
+        std::vector<Line<T>> lines = shape.ToLines(angle, axis);
+        for (const Line<T>& line : lines)
+            if (!DrawLine<T>(Line<T>(line.start - position, line.end - position), color)) return false;
         return true;
     }
     /// @brief Calculates start of the graph
     /// @tparam T Type of number
     /// @return Start of graph
     template <typename T>
-    Vector3<T> GetStart(void) const {
-        return CreateVector3<T>(-(GetWidth() / 2 / pointMultiplier), -(GetHeight() / 2 / pointMultiplier), 0);
+    Matrix<T> GetStart(void) const {
+        return CreateVector<T>(-(GetWidth() / 2 / pointMultiplier), -(GetHeight() / 2 / pointMultiplier), 0);
     }
     /// @brief Calculates end of the graph
     /// @tparam T Type of number
     /// @return End of graph
     template <typename T>
-    Vector3<T> GetEnd(void) const {
-        return CreateVector3<T>(GetWidth() / 2 / pointMultiplier, GetHeight() / 2 / pointMultiplier, 0);
+    Matrix<T> GetEnd(void) const {
+        return CreateVector<T>(GetWidth() / 2 / pointMultiplier, GetHeight() / 2 / pointMultiplier, 0);
     }
     /// @brief Creates set of every pixel on the screen
     /// @tparam T Type of number
@@ -75,18 +112,29 @@ struct Renderer {
     std::vector<T> CreateRealNumberSet(void) const {
         const bool isFloat = IsFloat<T>();
         const T div = isFloat ? 1 : pointMultiplier;
-        const Vector3<T> startArr = GetStart<T>();
-        const Vector3<T> endArr = GetEnd<T>();
+        const Matrix<T> startArr = GetStart<T>();
+        const Matrix<T> endArr = GetEnd<T>();
         return CreateSet<T>(
-            std::max<T>(GetVectorAxis(startArr, VectorAxis::X), GetVectorAxis(startArr, VectorAxis::Y)) * div,
-            std::max<T>(GetVectorAxis(endArr, VectorAxis::X), GetVectorAxis(endArr, VectorAxis::Y)) * div,
+            std::max<T>(GetX(startArr), GetY(startArr)) * div,
+            std::max<T>(GetX(endArr), GetY(endArr)) * div,
             1 / (isFloat ? pointMultiplier : 1)
         );
     }
     /// @brief Draw x and y axis
-    /// @param color Color of the axis
+    /// @param axisColor Color of the axis
+    /// @param cellColor Color of the cells
     /// @return Status
-    bool DrawAxis(uint32_t color);
+    bool DrawAxis(uint32_t axisColor, uint32_t cellColor);
+    /// @brief Draws complex function based on its values
+    /// @tparam T Type of number
+    /// @param values Values generated by function
+    /// @return Status
+    template <typename T>
+    bool DrawComplexFunction(std::vector<ComplexPosition<T>> values) {
+        for (const ComplexPosition<T>& val : values)
+            if (!SetPixel(CreateVector<T>(val.position.real(), val.position.imag(), 0), GetRainbow<T>(std::sqrt(std::pow(val.value.real(), 2) + std::pow(val.value.imag(), 2))))) return false;
+        return true;
+    }
     /// @brief Draws function based on its values
     /// @tparam T Type of number
     /// @param values Values generated by function
@@ -97,12 +145,31 @@ struct Renderer {
         const T div = IsFloat<T>() ? 1 : pointMultiplier;
         for (const Line<T>& val : values) {
             #ifdef FillGapsInFunctions
-            if (!std::isnan(GetVectorAxis(val.start, VectorAxis::X)) && !DrawLine(ConvertLine<T, num_t>(Line<T>(val.start / div, val.end / div)), color)) return false;
+            if (!std::isnan(GetX(val.start)) && !DrawLine<T>(Line<T>(val.start / div, val.end / div), color)) return false;
             #else
-            if (!SetPixel(ConvertMatrix<T, num_t>(val.end) / div, color)) return false;
+            if (!SetPixel(ConvertMatrix<T, num_t>(val.end / div), color)) return false;
             #endif
         }
         return true;
+    }
+    /// @brief f(x + yi)
+    /// @tparam T Type of number
+    /// @param f Complex function to calculate color of the graph
+    /// @param inSet Set of number values we allow as input
+    /// @param outSet Set of number values we allow as output
+    /// @return Result of complex function
+    template <typename T>
+    std::vector<ComplexPosition<T>> GenerateComplexFunction(std::function<std::complex<T>(std::complex<T>)> f, std::vector<T> inSet, std::vector<T> outSet) {
+        std::vector<ComplexPosition<T>> ret;
+        for (T& i : inSet) {
+            for (T& r : inSet) {
+                const std::complex<T> pos = std::complex<T>(r, i);
+                const std::complex<T> val = f(pos);
+                if (IsInsideSet<T>(outSet, val.real()) && IsInsideSet<T>(outSet, val.imag()))
+                    ret.push_back(ComplexPosition<T>(pos, val));
+            }
+        }
+        return ret;
     }
     /// @brief y = f(x)
     /// @tparam T Type of number
@@ -114,19 +181,17 @@ struct Renderer {
     /// @return Result of function
     template <typename T>
     std::vector<Line<T>> GenerateFunction(std::function<std::vector<T>(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
-        std::vector<Vector3<T>> prev;
-        std::vector<Line<T>> ret;
+        std::vector<Matrix<T>> prev = std::vector<Matrix<T>>();
+        std::vector<Line<T>> ret = std::vector<Line<T>>();
         for (const T& i : inSet) {
-            Vector3<T> curr = CreateVector3<T>(0, 0, 0);
+            Matrix<T> curr = CreateVector<T>(0, 0, 0);
             const std::vector<T> arr = f(i);
-            if (prev.empty()) {
-                prev.reserve(arr.size());
-                for (T j = 0; j < arr.size(); j++) prev.push_back(CreateVector3<T>(NAN, NAN, NAN));
-            }
+            if (prev.empty())
+                for (T j = 0; j < arr.size(); j++) prev.push_back(CreateVector<T>(NAN, NAN, NAN));
             for (T j = 0; j < arr.size(); j++) {
-                T tmp = arr.at(j);
-                if (std::isnan(i) || std::isinf(i) || !IsInsideSet<T>(outSet, tmp, 1 / pointMultiplier)) {
-                    prev.at(j) = CreateVector3<num_t>(NAN, NAN, NAN);
+                const T tmp = arr.at(j);
+                if (std::isnan(i) || std::isinf(i) || !IsInsideSet<T>(outSet, tmp)) {
+                    prev.at(j) = CreateVector<num_t>(NAN, NAN, NAN);
                     continue;
                 }
                 GetVectorAxis(curr, inAxis) = i;
@@ -218,8 +283,7 @@ struct Renderer {
     /// @return Result of function
     template<typename T>
     std::vector<Line<T>> GenerateDerivativeFunction(std::function<T(T)> f, std::vector<T> inSet, std::vector<T> outSet, VectorAxis inAxis = VectorAxis::X, VectorAxis realAxis = VectorAxis::Y) {
-        const T h = 1 / pointMultiplier;
-        return GenerateFunction<T>(DerivativeFunction(T, f, h), inSet, outSet, inAxis, realAxis);
+        return GenerateFunction<T>(DerivativeFunction(T, f), inSet, outSet, inAxis, realAxis);
     }
 };
 

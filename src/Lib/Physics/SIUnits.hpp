@@ -1,11 +1,11 @@
-#ifndef SIUnits_H
-#define SIUnits_H
-#include "Constants.hpp"
-#include <ostream>
+#ifndef Physics_SIUnits_H
+#define Physics_SIUnits_H
+#include "../Constants.hpp"
+#include "../Printable.hpp"
 #include <array>
 
 template <typename T>
-struct Unit {
+struct Unit : Printable {
     enum BaseUnit : size_t {
         AmountOfSubstance,
         ElectricCurrent,
@@ -42,8 +42,8 @@ struct Unit {
     constexpr T GetBaseUnit(size_t i) const {
         return baseUnits.at(i);
     }
-    constexpr std::string ToString(void) const {
-        if (count == 0) return "0";
+    virtual std::string ToString(std::string padding = "") const override {
+        if (count == 0) return padding + "0";
         std::string str = count == 1 ? "" : std::to_string(count);
         bool first = true;
         for (size_t i = 0; i < BaseUnit::End; i++) {
@@ -54,7 +54,7 @@ struct Unit {
                 first = false;
             }
         }
-        return str;
+        return padding + ((first && count == 1) ? "1" : str);
     }
     constexpr Unit<T> Pow(T scalar) const {
         return Unit<T>(
@@ -150,6 +150,17 @@ struct Unit {
     static constexpr const char* baseUnitsStr[] = {
         "mol", "A", "m", "cd", "kg", "K", "s",
     };
+};
+template <typename T>
+struct Gram : Unit<T> {
+    Gram<T>(T count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
+    Gram<T>(Unit<T> other) : Unit<T>(other.GetValue()) {
+        for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");
+    }
+    virtual constexpr T GetValue(void) const override {
+        return this->count * 1000;
+    }
 };
 
 #define CreateUnit(name, ...)                                                                                       \
@@ -320,18 +331,6 @@ CreateUnit(NewtonSquareMetrePerSquareKilogram, 0, 0, 3, 0, -1, 0, -2);
 CreateUnit(NewtonSquareMetrePerSquareCoulomb, 0, -2, 3, 0, 1, 0, -4);
 CreateUnit(KelvinMetre, 0, 0, 1, 0, 0, 1);
 CreateUnit(HertzPerKelvin, 0, 0, 0, 0, 0, -1, -1);
-
-template <typename T>
-struct Gram : Unit<T> {
-    Gram<T>(T count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
-    Gram<T>(Unit<T> other) : Unit<T>(other.GetValue()) {
-        for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");
-    }
-    virtual constexpr T GetValue(void) const override {
-        return this->count * 1000;
-    }
-};
 
 CreateUnitPrefix(scalar, Scalar);
 CreateUnitPrefix(mole, Mole);

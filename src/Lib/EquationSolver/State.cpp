@@ -5,7 +5,11 @@ State::State(std::vector<BuiltinFunction> builtinFuncs, std::vector<Function> fu
     builtinFunctions.reserve(builtinFuncs.size());
     for (const BuiltinFunction& func : builtinFuncs) builtinFunctions.push_back(func);
     functions = funcs;
-    variables = std::vector<Variable>(defaultVariables, defaultVariables + SizeOfArray(defaultVariables));
-    variables.reserve(vars.size());
+    for (const Variable& var : defaultVariables) variables.push_back(Variable(var.name, var.value->Recreate()));
     for (const Variable& var : vars) variables.push_back(var);
+}
+const Function* State::GetFunction(std::string name) const {
+    for (const Function& func : functions)
+        if (func.name == name) return &func;
+    return nullptr;
 }

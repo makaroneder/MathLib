@@ -1,12 +1,17 @@
 #ifndef Typedefs_H
 #define Typedefs_H
 #include <cmath>
+#include <complex>
+#include <numeric>
 #include <typeinfo>
 
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
+#define AreCoprimes(a, b) (std::gcd(a, b) == 1)
 
-/// @brief Defaults type for real numbers
+/// @brief Default type for real numbers
 typedef long double num_t;
+/// @brief Default error tolerance
+constexpr num_t eps = 1e-3;
 
 /// @brief Checks if T is float
 /// @tparam T Type of number
@@ -19,11 +24,47 @@ constexpr bool IsFloat(void) {
 /// @tparam T Type of number
 /// @param a a
 /// @param b b
-/// @param eps Maximum error tolerance
+/// @param eps_ Maximum error tolerance
 /// @return Equality
 template <typename T>
-constexpr bool FloatsEqual(T a, T b, T eps = 0.01) {
-    return std::fabs(a - b) < eps;
+constexpr bool FloatsEqual(T a, T b, T eps_ = eps) {
+    return std::fabs(a - b) < eps_;
+}
+/// @brief Converts complex number to string
+/// @tparam T Type of number
+/// @param z Complex number
+/// @return String representation
+template <typename T>
+constexpr std::string ComplexToString(std::complex<T> z) {
+    return '(' + std::to_string(z.real()) + ", " + std::to_string(z.imag()) + ')';
+}
+/// @brief Swaps 2 numbers
+/// @tparam T Type of number
+/// @param a Number 1
+/// @param b Number 2
+template <typename T>
+constexpr void Swap(T& a, T& b) {
+    const T c = a;
+    a = b;
+    b = c;
+}
+/// @brief 1 / (1 + e^-x)
+/// @tparam T Type of number
+/// @param x Sigmoid input
+/// @return Return value
+template <typename T>
+constexpr T Sigmoid(T x) {
+    const T one = 1;
+    return one / (std::exp(-x) + one);
+}
+/// @brief Random number in range [min, max]
+/// @tparam T Type of number
+/// @param min Minimal value
+/// @param max Maximal value
+/// @return Random number
+template <typename T>
+T RandomNumber(T min, T max) {
+    return (T)rand() / RAND_MAX * (max - min) + min;
 }
 
 #endif

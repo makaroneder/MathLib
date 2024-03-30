@@ -21,7 +21,7 @@ union Color {
 
     /// @brief Creates a new color union from a 32 bit color
     /// @param h 32 bit color
-    Color(uint32_t h);
+    Color(uint32_t h = 0);
     /// @brief Creates a new color union from a RGBA color
     /// @param r Red channel
     /// @param g Green channel

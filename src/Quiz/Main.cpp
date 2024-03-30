@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
                 std::string tmp;
                 std::cin >> tmp;
                 if (tmp == "exit") running = false;
-                else if (FloatsEqual<num_t>(std::stold(tmp), question.solution)) {
+                else if (FloatsEqual<num_t>(std::stold(tmp), question.solution, 0.01)) {
                     solved++;
                     break;
                 }

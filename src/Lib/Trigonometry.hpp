@@ -16,7 +16,8 @@ constexpr T Cot(T x) {
 /// @return Secant of x
 template <typename T>
 constexpr T Sec(T x) {
-    return 1 / std::cos(x);
+    const T one = 1;
+    return one / std::cos(x);
 }
 /// @brief csc(x) = 1 / sin(x)
 /// @tparam T Type of number
@@ -24,7 +25,8 @@ constexpr T Sec(T x) {
 /// @return Cosecant of x
 template <typename T>
 constexpr T Csc(T x) {
-    return 1 / std::sin(x);
+    const T one = 1;
+    return one / std::sin(x);
 }
 /// @brief crd(x) = 2sin(x / 2)
 /// @tparam T Type of number
@@ -32,7 +34,8 @@ constexpr T Csc(T x) {
 /// @return Chord of x
 template <typename T>
 constexpr T Crd(T x) {
-    return 2 * std::sin(x / 2);
+    const T two = 2;
+    return two * std::sin(x / two);
 }
 /// @brief versin(x) = 1 - cos(x)
 /// @tparam T Type of number
@@ -40,7 +43,8 @@ constexpr T Crd(T x) {
 /// @return Versed sine of x
 template <typename T>
 constexpr T Versin(T x) {
-    return 1 - std::cos(x);
+    const T one = 1;
+    return one - std::cos(x);
 }
 /// @brief coversin(x) = 1 - sin(x)
 /// @tparam T Type of number
@@ -48,7 +52,8 @@ constexpr T Versin(T x) {
 /// @return Coversed sine of x
 template <typename T>
 constexpr T Coversin(T x) {
-    return 1 - std::sin(x);
+    const T one = 1;
+    return one - std::sin(x);
 }
 /// @brief vercos(x) = 1 + cos(x)
 /// @tparam T Type of number
@@ -56,7 +61,8 @@ constexpr T Coversin(T x) {
 /// @return Versed cosine of x
 template <typename T>
 constexpr T Vercos(T x) {
-    return 1 + std::cos(x);
+    const T one = 1;
+    return one + std::cos(x);
 }
 /// @brief covercos(x) = 1 + sin(x)
 /// @tparam T Type of number
@@ -64,7 +70,8 @@ constexpr T Vercos(T x) {
 /// @return Coversed cosine of x
 template <typename T>
 constexpr T Covercos(T x) {
-    return 1 + std::sin(x);
+    const T one = 1;
+    return one + std::sin(x);
 }
 /// @brief haversin(x) = (1 - cos(x)) / 2
 /// @tparam T Type of number
@@ -72,7 +79,9 @@ constexpr T Covercos(T x) {
 /// @return Haversed sine of x
 template <typename T>
 constexpr T Haversin(T x) {
-    return (1 - std::cos(x)) / 2;
+    const T one = 1;
+    const T two = 2;
+    return (one - std::cos(x)) / two;
 }
 /// @brief hacoversin(x) = (1 - sin(x)) / 2
 /// @tparam T Type of number
@@ -80,7 +89,9 @@ constexpr T Haversin(T x) {
 /// @return Hacoversed sine of x
 template <typename T>
 constexpr T Hacoversin(T x) {
-    return (1 - std::sin(x)) / 2;
+    const T one = 1;
+    const T two = 2;
+    return (one - std::sin(x)) / two;
 }
 /// @brief havercos(x) = (1 + cos(x)) / 2
 /// @tparam T Type of number
@@ -88,7 +99,9 @@ constexpr T Hacoversin(T x) {
 /// @return Haversed cosine of x
 template <typename T>
 constexpr T Havercos(T x) {
-    return (1 + std::cos(x)) / 2;
+    const T one = 1;
+    const T two = 2;
+    return (one + std::cos(x)) / two;
 }
 /// @brief hacovercos(x) = (1 + sin(x)) / 2
 /// @tparam T Type of number
@@ -96,7 +109,9 @@ constexpr T Havercos(T x) {
 /// @return Hacoversed cosine of x
 template <typename T>
 constexpr T Hacovercos(T x) {
-    return (1 + std::sin(x)) / 2;
+    const T one = 1;
+    const T two = 2;
+    return (one + std::sin(x)) / two;
 }
 /// @brief exsec(x) = versin(x) / cos(x)
 /// @tparam T Type of number
@@ -120,7 +135,9 @@ constexpr T Excsc(T x) {
 /// @return Hyperbolic cotangent of x
 template <typename T>
 constexpr T HyperbolicCot(T x) {
-    return (exp(2 * x) + 1) / (exp(2 * x) - 1);
+    const T one = 1;
+    const T two = 2;
+    return (exp(two * x) + one) / (exp(two * x) - one);
 }
 /// @brief sech(x) = 2e^x / (e^2x + 1)
 /// @tparam T Type of number
@@ -128,7 +145,9 @@ constexpr T HyperbolicCot(T x) {
 /// @return Hyperbolic secant of x
 template <typename T>
 constexpr T HyperbolicSec(T x) {
-    return (exp(x) * 2) / (exp(2 * x) + 1);
+    const T one = 1;
+    const T two = 2;
+    return (exp(x) * two) / (exp(two * x) + one);
 }
 /// @brief csch(x) = 2e^x / (e^2x - 1)
 /// @tparam T Type of number
@@ -136,7 +155,9 @@ constexpr T HyperbolicSec(T x) {
 /// @return Hyperbolic cosecant of x
 template <typename T>
 constexpr T HyperbolicCsc(T x) {
-    return (exp(x) * 2) / (exp(2 * x) - 1);
+    const T one = 1;
+    const T two = 2;
+    return (exp(x) * two) / (exp(two * x) - one);
 }
 /// @brief arccot(x) = pi / 2 - arctan(x)
 /// @tparam T Type of number
@@ -144,7 +165,8 @@ constexpr T HyperbolicCsc(T x) {
 /// @return Inversed cotangent of x
 template <typename T>
 constexpr T InversedCot(T x) {
-    return pi / 2 - std::atan(x);
+    const T two = 2;
+    return pi / two - std::atan(x);
 }
 /// @brief arcsec(x) = arccos(1 / x)
 /// @tparam T Type of number
@@ -152,7 +174,8 @@ constexpr T InversedCot(T x) {
 /// @return Inversed secant of x
 template <typename T>
 constexpr T InversedSec(T x) {
-    return std::acos(1 / x);
+    const T one = 1;
+    return std::acos(one / x);
 }
 /// @brief arccsc(x) = arcsin(1 / x)
 /// @tparam T Type of number
@@ -160,7 +183,8 @@ constexpr T InversedSec(T x) {
 /// @return Inversed cosecant of x
 template <typename T>
 constexpr T InversedCsc(T x) {
-    return std::asin(1 / x);
+    const T one = 1;
+    return std::asin(one / x);
 }
 /// @brief arccrd(x) = 2arcsin(x / 2)
 /// @tparam T Type of number
@@ -168,7 +192,8 @@ constexpr T InversedCsc(T x) {
 /// @return Inversed chord of x
 template <typename T>
 constexpr T InversedCrd(T x) {
-    return 2 * std::asin(x / 2);
+    const T two = 2;
+    return two * std::asin(x / two);
 }
 /// @brief arcexsec(x) = arcsec(x + 1)
 /// @tparam T Type of number
@@ -176,7 +201,8 @@ constexpr T InversedCrd(T x) {
 /// @return Inversed exsecant of x
 template <typename T>
 constexpr T InversedExsec(T x) {
-    return InversedSec<T>(x + 1);
+    const T one = 1;
+    return InversedSec<T>(x + one);
 }
 /// @brief arcexcsc(x) = arccsc(x + 1)
 /// @tparam T Type of number
@@ -184,7 +210,8 @@ constexpr T InversedExsec(T x) {
 /// @return Inversed excosecant of x
 template <typename T>
 constexpr T InversedExcsc(T x) {
-    return InversedCsc<T>(x + 1);
+    const T one = 1;
+    return InversedCsc<T>(x + one);
 }
 /// @brief arcversin(x) = arccos(1 - x)
 /// @tparam T Type of number
@@ -192,7 +219,8 @@ constexpr T InversedExcsc(T x) {
 /// @return Inversed versed sine of x
 template <typename T>
 constexpr T InversedVersin(T x) {
-    return std::acos(1 - x);
+    const T one = 1;
+    return std::acos(one - x);
 }
 /// @brief arccoversin(x) = arcsin(1 - x)
 /// @tparam T Type of number
@@ -200,7 +228,8 @@ constexpr T InversedVersin(T x) {
 /// @return Inversed coversed sine of x
 template <typename T>
 constexpr T InversedCoversin(T x) {
-    return std::asin(1 - x);
+    const T one = 1;
+    return std::asin(one - x);
 }
 /// @brief arcvercos(x) = arccos(x - 1)
 /// @tparam T Type of number
@@ -208,7 +237,8 @@ constexpr T InversedCoversin(T x) {
 /// @return Inversed versed cosine of x
 template <typename T>
 constexpr T InversedVercos(T x) {
-    return std::acos(x - 1);
+    const T one = 1;
+    return std::acos(x - one);
 }
 /// @brief arccovercos(x) = arcsin(x - 1)
 /// @tparam T Type of number
@@ -216,7 +246,8 @@ constexpr T InversedVercos(T x) {
 /// @return Inversed coversed cosine of x
 template <typename T>
 constexpr T InversedCovercos(T x) {
-    return std::asin(x - 1);
+    const T one = 1;
+    return std::asin(x - one);
 }
 /// @brief archaversin(x) = arccos(1 - 2x)
 /// @tparam T Type of number
@@ -224,7 +255,9 @@ constexpr T InversedCovercos(T x) {
 /// @return Inversed haversed sine of x
 template <typename T>
 constexpr T InversedHaversin(T x) {
-    return std::acos(1 - 2 * x);
+    const T one = 1;
+    const T two = 2;
+    return std::acos(one - two * x);
 }
 /// @brief archacoversin(x) = arcsin(1 - 2x)
 /// @tparam T Type of number
@@ -232,7 +265,9 @@ constexpr T InversedHaversin(T x) {
 /// @return Inversed hacoversed sine of x
 template <typename T>
 constexpr T InversedHacoversin(T x) {
-    return std::asin(1 - 2 * x);
+    const T one = 1;
+    const T two = 2;
+    return std::asin(one - two * x);
 }
 /// @brief archavercos(x) = arccos(2x - 1)
 /// @tparam T Type of number
@@ -240,7 +275,9 @@ constexpr T InversedHacoversin(T x) {
 /// @return Inversed haversed cosine of x
 template <typename T>
 constexpr T InversedHavercos(T x) {
-    return std::acos(2 * x - 1);
+    const T one = 1;
+    const T two = 2;
+    return std::acos(two * x - one);
 }
 /// @brief archacovercos(x) = arcsin(2x - 1)
 /// @tparam T Type of number
@@ -248,7 +285,9 @@ constexpr T InversedHavercos(T x) {
 /// @return Inversed hacoversed cosine of x
 template <typename T>
 constexpr T InversedHacovercos(T x) {
-    return std::asin(2 * x - 1);
+    const T one = 1;
+    const T two = 2;
+    return std::asin(two * x - one);
 }
 /// @brief arccoth(x) = ln((x + 1) / (x - 1)) / 2
 /// @tparam T Type of number
@@ -256,7 +295,9 @@ constexpr T InversedHacovercos(T x) {
 /// @return Inversed hyperbolic cotangent of x
 template <typename T>
 constexpr T InversedHyperbolicCot(T x) {
-    return Ln<T>((x + 1) / (x - 1)) / 2;
+    const T one = 1;
+    const T two = 2;
+    return std::log((x + one) / (x - one)) / two;
 }
 /// @brief arcsech(x) = ln((1 / x) + sqrt(2 $ (1 / x^2 - 1)))
 /// @tparam T Type of number
@@ -264,7 +305,8 @@ constexpr T InversedHyperbolicCot(T x) {
 /// @return Inversed hyperbolic secant of x
 template <typename T>
 constexpr T InversedHyperbolicSec(T x) {
-    return std::acosh(1 / x);
+    const T one = 1;
+    return std::acosh(one / x);
 }
 /// @brief arccsch(x) = ln((1 / x) + sqrt(2 $ (1 / x^2 + 1)))
 /// @tparam T Type of number
@@ -272,7 +314,8 @@ constexpr T InversedHyperbolicSec(T x) {
 /// @return Inversed hyperbolic cosecant of x
 template <typename T>
 constexpr T InversedHyperbolicCsc(T x) {
-    return Ln<T>(1 / x + std::sqrt(1 / std::pow(x, 2) + 1));
+    const T one = 1;
+    return std::log(one / x + std::sqrt(one / std::pow(x, 2) + one));
 }
 
 #endif

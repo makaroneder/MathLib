@@ -1,2 +1,2 @@
-f(x) = sigmoid(x)
+f(x) : R -> R = sigmoid(x)
 a = f(0)

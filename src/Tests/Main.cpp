@@ -2,7 +2,7 @@
 #include <Factorial.hpp>
 #include <Physics/Equations.hpp>
 #include <iostream>
-#define TestOperation(expr) if (!(expr)) throw std::runtime_error(#expr)
+#define TestOperation(expr) if (!(expr)) test.failed++
 
 // TODO: Add more test cases
 
@@ -10,27 +10,23 @@
 /// @tparam T Type of number
 /// @param test Test case
 /// @param inputSet Input set
-/// @param outputSet Output set
 /// @param f Function to test
-/// @return Status
 template <typename T>
-bool TestFunction(Test& test, std::vector<T> inputSet, std::vector<T> outputSet, std::function<T(T)> f) {
-    if (!test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, outputSet, VectorAxis::X, VectorAxis::Y), 0)) return false;
-    for (Matrix<T>& val : test.values) Swap<num_t>(GetX(val), GetY(val));
-    return test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, outputSet, VectorAxis::Y, VectorAxis::X), 0);
+void TestFunction(Test& test, std::vector<T> inputSet, std::function<T(T)> f) {
+    test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, VectorAxis::X, VectorAxis::Y), UINT32_MAX);
+    for (Matrix<T>& val : test.values) std::swap(GetX(val), GetY(val));
+    test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, VectorAxis::Y, VectorAxis::X), UINT32_MAX);
 }
 /// @brief Tests whether const function return values are correct
 /// @tparam T Type of number
 /// @param test Test case
 /// @param inputSet Input set
-/// @param outputSet Output set
 /// @param c Const value
-/// @return Status
 template <typename T>
-bool TestConstFunction(Test& test, std::vector<T> inputSet, std::vector<T> outputSet, T c) {
+void TestConstFunction(Test& test, std::vector<T> inputSet, T c) {
     test.values = std::vector<Matrix<T>>();
     for (T& x : inputSet) test.values.push_back(CreateVector<T>(x, c, 0));
-    return TestFunction<T>(test, inputSet, outputSet, ConstFunction(T, c));
+    TestFunction<T>(test, inputSet, [c](T) -> T { return c; });
 }
 int main(void) {
     try {
@@ -46,6 +42,7 @@ int main(void) {
         TestOperation(ForceMassAcceleration<num_t>(Newton<num_t>(NAN), mass, acceleration) == force);
         TestOperation(ForceMassAcceleration<num_t>(force, Kilogram<num_t>(NAN), acceleration) == mass);
         TestOperation(Kilometre<num_t>(1) == Metre<num_t>(1000));
+        TestOperation((Second<num_t>(1) * Second<num_t>(1)) == Second<num_t>(1).Pow(2));
         std::vector<num_t> inputSet = test.CreateRealNumberSet<num_t>();
         for (num_t& i : inputSet) TestOperation(IsInsideSet<num_t>(inputSet, i));
         TestOperation(Sigmoid<num_t>(0) == 0.5);
@@ -58,7 +55,7 @@ int main(void) {
         TestOperation(!IsInsideSet<num_t>({ }, INFINITY));
         TestOperation(!IsInsideSet<num_t>({ NAN, }, NAN));
         TestOperation(!IsInsideSet<num_t>({ INFINITY, }, INFINITY));
-        if (!TestConstFunction<num_t>(test, inputSet, {}, 0)) throw std::runtime_error("Failed to test functions");
+        TestConstFunction<num_t>(test, inputSet, 0);
         if (test.failed != 0) std::cout << test.failed << " test(s) failed" << std::endl;
         return test.failed;
     }

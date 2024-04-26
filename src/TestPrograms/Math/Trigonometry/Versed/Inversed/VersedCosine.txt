@@ -1,2 +1,2 @@
-f(x) = arcvercos(x)
+f(x) : R -> R = arcvercos(x)
 a = f(0)

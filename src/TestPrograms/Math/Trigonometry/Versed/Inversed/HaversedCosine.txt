@@ -1,2 +1,2 @@
-f(x) = archavercos(x)
+f(x) : R -> R = archavercos(x)
 a = f(0)

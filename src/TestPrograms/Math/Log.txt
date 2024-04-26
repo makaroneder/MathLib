@@ -1,2 +1,2 @@
-f(x) = log(2, x)
+f(x) : R -> R = log(2, x)
 a = f(4)

@@ -20,7 +20,8 @@ struct GameEngine {
     }
     bool Draw(Renderer& renderer) const {
         if (currentLevel >= levels.size()) return false;
-        return levels.at(currentLevel).Draw(renderer) && player.Draw(renderer);
+        levels.at(currentLevel).Draw(renderer);
+        player.Draw(renderer);
     }
 
     private:

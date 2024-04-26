@@ -1,2 +1,2 @@
-f(x) = sech(x)
+f(x) : R -> R = sech(x)
 a = f(0)

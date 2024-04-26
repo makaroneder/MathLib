@@ -1,2 +1,2 @@
-f(x) = sinh(x)
+f(x) : R -> R = sinh(x)
 a = f(0)

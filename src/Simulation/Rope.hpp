@@ -1,23 +1,36 @@
 #ifndef Rope_H
 #define Rope_H
 #include "Particle.hpp"
-#include <Geometry/Shape.hpp>
-#include <Quaternion.hpp>
+#include <functional>
 
+template <typename T>
+struct RopeSegment {
+    Kilogram<T> mass;
+    Matrix<T> length;
+    bool fixed;
+
+    RopeSegment(Kilogram<T> m, Matrix<T> len, bool f) {
+        mass = m;
+        length = len;
+        fixed = f;
+    }
+};
 template <typename T>
 struct Rope : Shape<T> {
     static constexpr size_t jakobsenIterations = 50;
-    Rope(Matrix<T> start, Matrix<T> end, std::vector<Matrix<T>> velocities) {
-        const size_t particleCount = velocities.size();
-        for (T i = 0; i < particleCount; i++) {
-            const T w = i / (particleCount - 1);
-            particles.push_back(Particle<T>(end * w + start * (1 - w), velocities.at(i), i == 0));
+    Rope(Matrix<T> start, std::vector<RopeSegment<T>> segments) {
+        const Matrix<T> save = start;
+        for (const RopeSegment<T>& segment : segments) {
+            particles.push_back(Particle<T>(start, segment.mass, segment.fixed));
+            start += segment.length;
         }
-        expectedDistance = (start - end).GetLength();
+        expectedDistance = (save - start).GetLength();
     }
-    constexpr void Update(Second<T> time) {
-        for (Particle<T>& particle : particles)
+    constexpr void Update(Second<T> time, std::function<Matrix<T>(Particle<T>)> force) {
+        for (Particle<T>& particle : particles) {
+            particle.Update(time, force(particle));
             if (!particle.IsFixed()) particle.SetPosition((particle.position * 2) - particle.GetPreviousPosition() + particle.GetNewPosition(time));
+        }
         for (size_t iteration = 0; iteration < jakobsenIterations; iteration++) {
             for (size_t i = 1; i < particles.size(); i++) {
                 Particle<T>& p1 = particles.at(i - 1);

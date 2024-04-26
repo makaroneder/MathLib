@@ -1,2 +1,2 @@
-f(x) = arcsin(x)
+f(x) : R -> R = arcsin(x)
 a = f(0)

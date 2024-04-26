@@ -1,2 +1,2 @@
-f(x) = arcsech(x)
+f(x) : R -> R = arcsech(x)
 a = f(1)

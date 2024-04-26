@@ -1,2 +1,2 @@
-f(x) = covercos(x)
+f(x) : R -> R = covercos(x)
 a = f(0)

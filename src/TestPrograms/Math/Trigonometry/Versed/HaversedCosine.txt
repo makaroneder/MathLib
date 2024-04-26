@@ -1,2 +1,2 @@
-f(x) = havercos(x)
+f(x) : R -> R = havercos(x)
 a = f(0)

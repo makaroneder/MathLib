@@ -10,6 +10,8 @@ struct Function {
     std::string name;
     /// @brief Arguments of the function
     std::vector<Variable> arguments;
+    std::string domain;
+    std::string codomain;
     /// @brief Code of the function
     Node* body;
 
@@ -17,7 +19,7 @@ struct Function {
     /// @param n Name of the function
     /// @param args Arguments of the function
     /// @param b Code of the function
-    Function(std::string n, std::vector<Variable> args, Node* b);
+    Function(std::string n, std::vector<Variable> args, Node* b, std::string d, std::string c);
 };
 
 #endif

@@ -1,2 +1,2 @@
-f(x) = sin(x)
+f(x) : R -> R = sin(x)
 a = f(0)

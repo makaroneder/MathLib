@@ -1,2 +1,2 @@
-f(x) = vercos(x)
+f(x) : R -> R = vercos(x)
 a = f(0)

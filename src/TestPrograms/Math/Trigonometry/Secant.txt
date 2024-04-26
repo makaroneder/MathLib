@@ -1,2 +1,2 @@
-f(x) = sec(x)
+f(x) : R -> R = sec(x)
 a = f(0)

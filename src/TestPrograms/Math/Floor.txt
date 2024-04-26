@@ -1,2 +1,2 @@
-f(x) = floor(x)
+f(x) : R -> R = floor(x)
 a = f(pi)

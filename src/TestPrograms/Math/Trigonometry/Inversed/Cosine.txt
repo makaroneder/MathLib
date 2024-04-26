@@ -1,2 +1,2 @@
-f(x) = arccos(x)
+f(x) : R -> R = arccos(x)
 a = f(0)

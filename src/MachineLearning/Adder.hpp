@@ -1,8 +1,6 @@
 #ifndef Adder_H
 #define Adder_H
 #include "State.hpp"
-#include <iostream>
-#include <unistd.h>
 
 /// @brief Creates default state for this neural network
 /// @tparam T Type of number

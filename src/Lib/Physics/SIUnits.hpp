@@ -1,11 +1,13 @@
 #ifndef Physics_SIUnits_H
 #define Physics_SIUnits_H
+#include "../MathObject.hpp"
 #include "../Constants.hpp"
 #include "../Printable.hpp"
 #include <array>
 
 template <typename T>
 struct Unit : Printable {
+    CreateOperators(Unit<T>, T)
     enum BaseUnit : size_t {
         AmountOfSubstance,
         ElectricCurrent,
@@ -68,22 +70,6 @@ struct Unit : Printable {
             this->baseUnits[BaseUnit::Time] * scalar
         );
     }
-    constexpr Unit<T> operator+(Unit<T> other) const {
-        for (size_t i = 0; i < BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units added");
-        return Unit<T>(this->count + other.count, baseUnits);
-    }
-    constexpr Unit<T> operator-(Unit<T> other) const {
-        for (size_t i = 0; i < BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units subtracted");
-        return Unit<T>(this->count - other.count, baseUnits);
-    }
-    constexpr Unit<T> operator*(T scalar) const {
-        return Unit<T>(this->count * scalar, baseUnits);
-    }
-    constexpr Unit<T> operator/(T scalar) const {
-        return Unit<T>(this->count / scalar, baseUnits);
-    }
     constexpr Unit<T> operator*(Unit<T> other) const {
         return Unit<T>(
             count * other.count,
@@ -108,26 +94,6 @@ struct Unit : Printable {
             this->baseUnits[BaseUnit::Time] - other.baseUnits[BaseUnit::Time]
         );
     }
-    constexpr Unit<T> operator+=(Unit<T> other) {
-        for (size_t i = 0; i < BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units added");
-        this->count += other.count;
-        return *this;
-    }
-    constexpr Unit<T> operator-=(Unit<T> other) {
-        for (size_t i = 0; i < BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units added");
-        this->count -= other.count;
-        return *this;
-    }
-    constexpr Unit<T> operator*=(T scalar) {
-        this->count *= scalar;
-        return *this;
-    }
-    constexpr Unit<T> operator/=(T scalar) {
-        this->count /= scalar;
-        return *this;
-    }
     constexpr Unit<T> operator*=(Unit<T> other) {
         count *= other.count;
         for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] += other.baseUnits[i];
@@ -150,11 +116,21 @@ struct Unit : Printable {
     static constexpr const char* baseUnitsStr[] = {
         "mol", "A", "m", "cd", "kg", "K", "s",
     };
+
+    private:
+    void Add(Unit<T> other) {
+        for (size_t i = 0; i < BaseUnit::End; i++)
+            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units added");
+        this->count += other.count;
+    }
+    void Multiply(T scalar) {
+        this->count *= scalar;
+    }
 };
 template <typename T>
 struct Gram : Unit<T> {
     Gram<T>(T count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
-    Gram<T>(Unit<T> other) : Unit<T>(other.GetValue()) {
+    Gram<T>(Unit<T> other) : Unit<T>(other.GetValue(), 0, 0, 0, 0, 1) {
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
             if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");
     }
@@ -250,6 +226,18 @@ CreateUnit(Gray, 0, 0, 2, 0, 0, 0, -2);
 CreateUnit(Sievert, 0, 0, 2, 0, 0, 0, -2);
 CreateUnit(Katal, 1, 0, 0, 0, 0, 0, -1);
 
+CreateUnit(ReciprocalWeber, 0, 1, -2, 0, -1, 0, 2);
+CreateUnit(ReciprocalMetre, 0, 0, -1);
+CreateUnit(ReciprocalMole, -1);
+CreateUnit(ReciprocalSquareMetre, 0, 0, -2);
+CreateUnit(ReciprocalPascal, 0, 0, 1, 0, -1, 0, 2);
+CreateUnit(ReciprocalHenry, 0, 1, 0, 0, -1, 0, 2);
+CreateUnit(ReciprocalKelvin, 0, 0, 0, 0, 0, -1);
+CreateUnit(WattSquareMetre, 0, 0, 4, 0, 1, 0, -3);
+CreateUnit(WattPerSquareMetreKelvinToTheFourth, 0, 0, 0, 0, 1, -4, -3);
+CreateUnit(HertzPerWatt, 0, 0, -2, 0, -1, 0, 2);
+CreateUnit(JouleSecondPerMole, -1, 0, 2, 0, 1, 0, -1);
+CreateUnit(CoulombPerMole, -1, 1, 0, 0, 0, 0, 1);
 CreateUnit(MetrePerSecond, 0, 0, 1, 0, 0, 0, -1);
 CreateUnit(MetrePerSecondSquared, 0, 0, 1, 0, 0, 0, -2);
 CreateUnit(MetrePerSecondCubed, 0, 0, 1, 0, 0, 0, -3);
@@ -264,7 +252,6 @@ CreateUnit(NewtonSecond, 0, 0, 1, 0, 1, 0, -1);
 CreateUnit(NewtonMetreSecond, 0, 0, 2, 0, 1, 0, -1);
 CreateUnit(NewtonMetre, 0, 0, 2, 0, 1, 0, -2);
 CreateUnit(NewtonPerSecond, 0, 0, 1, 0, 1, 0, -3);
-CreateUnit(ReciprocalMetre, 0, 0, -1);
 CreateUnit(KilogramPerSquareMetre, 0, 0, -2, 0, 1);
 CreateUnit(KilogramPerCubicMetre, 0, 0, -3, 0, 1);
 CreateUnit(CubicMetrePerKilogram, 0, 0, 3, 0, -1);
@@ -281,10 +268,8 @@ CreateUnit(WattPerSteradianSquareMetre, 0, 0, 0, 0, 1, 0, -3);
 CreateUnit(WattPerSteradianCubicMetre, 0, 0, -1, 0, 1, 0, -3);
 CreateUnit(WattPerMetre, 0, 0, 1, 0, 1, 0, -3);
 CreateUnit(GrayPerSecond, 0, 0, 2, 0, 0, 0, -3);
-CreateUnit(ReciprocalSquareMetre, 0, 0, -2);
 CreateUnit(WattPerCubicMetre, 0, 0, -1, 0, 1, 0, -3);
 CreateUnit(JoulePerSquareMetreSecond, 0, 0, 0, 0, 1, 0, -3);
-CreateUnit(ReciprocalPascal, 0, 0, 1, 0, -1, 0, 2);
 CreateUnit(JoulePerSquareMetre, 0, 0, 0, 0, 1, 0, -2);
 CreateUnit(KilogramSquareMetre, 0, 0, 2, 0, 1);
 CreateUnit(NewtonMetreSecondPerKilogram, 0, 0, 2, 0, 0, 0, -1);
@@ -311,7 +296,6 @@ CreateUnit(OhmMetre, 0, -2, 3, 0, 1, 0, -3);
 CreateUnit(CoulombPerMetre, 0, 1, -1, 0, 0, 0, 1);
 CreateUnit(JoulePerTesla, 0, 1, 2);
 CreateUnit(SquareMetrePerVoltSecond, 0, 1, 0, 0, -1, 0, 2);
-CreateUnit(ReciprocalHenry, 0, 1, 0, 0, -1, 0, 2);
 CreateUnit(WeberPerMetre, 0, -1, 1, 0, 1, 0, -2);
 CreateUnit(WeberMetre, 0, -1, 3, 0, 1, 0, -2);
 CreateUnit(TeslaMetre, 0, -1, 1, 0, 1, 0, -2);
@@ -325,7 +309,6 @@ CreateUnit(JoulePerKelvin, 0, 0, 2, 0, 1, -1, -2);
 CreateUnit(JoulePerKilogramKelvin, 0, 0, 2, 0, 0, -1, -2);
 CreateUnit(WattPerMetreKelvin, 0, 0, 1, 0, 1, -1, -3);
 CreateUnit(KelvinPerWatt, 0, 0, -2, 0, -1, 1, 3);
-CreateUnit(ReciprocalKelvin, 0, 0, 0, 0, 0, -1);
 CreateUnit(KelvinPerMetre, 0, 0, -1, 0, 0, 1);
 CreateUnit(NewtonSquareMetrePerSquareKilogram, 0, 0, 3, 0, -1, 0, -2);
 CreateUnit(NewtonSquareMetrePerSquareCoulomb, 0, -2, 3, 0, 1, 0, -4);
@@ -372,7 +355,7 @@ CreateAlternativeUnit(Arcsecond, Arcminute, 1 / 60);
 CreateAlternativeUnit(Hectare, SquareMetre, 10000);
 CreateAlternativeUnit(Litre, CubicMetre, 0.001);
 CreateAlternativeUnit(Tonne, Kilogram, 1000);
-CreateAlternativeUnit(Dalton, Kilogram, 1.66053906660505050 / std::pow(10, 27));
-CreateAlternativeUnit(Electronvolt, Joule, 1.602176634 / std::pow(10, 19));
+CreateAlternativeUnit(Dalton, Kilogram, 1.66053906660505050e-27);
+CreateAlternativeUnit(Electronvolt, Joule, 1.602176634e-19);
 
 #endif

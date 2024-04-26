@@ -1,2 +1,2 @@
-f(x) = arccrd(x)
+f(x) : R -> R = arccrd(x)
 a = f(0)

@@ -3,6 +3,8 @@
 #else
 #include "LogicGates.hpp"
 #endif
+#include <iostream>
+#include <unistd.h>
 
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
@@ -52,7 +54,7 @@ int main(int argc, char** argv) {
         std::cout << "Neural network:\n" << state.neuralNetwork << std::endl;
         #endif
         const size_t bits = state.trainingDataInput.GetWidth() / 2;
-        const size_t n = (1 << bits);
+        const size_t n = 1 << bits;
         for (size_t y = 0; y < n; y++) {
             for (size_t x = 0; x < n; x++) {
                 for (size_t i = 0; i < bits; i++) {

@@ -1,11 +1,12 @@
 #include "Tokenizer.hpp"
 #include <string.h>
+#include <iostream>
 
-/// @brief Skips whitespace characters
-/// @param str String to skip
-/// @param i Current position in the string
+bool IsWhiteSpace(char chr) {
+    return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';
+}
 void SkipWhiteSpace(const std::string str, size_t& i) {
-    while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\r') i++;
+    while (IsWhiteSpace(str[i])) i++;
 }
 /// @brief Converts a string to a node type
 /// @param str String to tokenize
@@ -51,7 +52,7 @@ Node* TokenizeData(const std::string str, size_t& i) {
             while (i < str.size() && isxdigit(str[i])) ret += str[i++];
             ret = std::to_string(std::stoull(ret, nullptr, 16));
         }
-        else while (i < str.size() && (isdigit(str[i]) || str[i] == '.')) ret += str[i++];
+        else while (i < str.size() && (isdigit(str[i]) || str[i] == '.' || str[i] == 'e')) ret += str[i++];
         if (str[i] == 'i') {
             i++;
             return new Node(Node::Type::ComplexConstant, "(0, " + ret + ')');
@@ -75,7 +76,32 @@ Node* TokenizeData(const std::string str, size_t& i) {
             if (name == "integral") return new Node(Node::Type::Integral, "", ret);
             else if (name == "summation") return new Node(Node::Type::Summation, "", ret);
             else if (name == "product") return new Node(Node::Type::Product, "", ret);
-            else return new Node(Node::Type::Function, name, ret);
+            else {
+                SkipWhiteSpace(str, i);
+                if (str[i] == ':') {
+                    i++;
+                    Node* inputSet = TokenizeData(str, i);
+                    if (inputSet == nullptr) {
+                        delete ret;
+                        return nullptr;
+                    }
+                    SkipWhiteSpace(str, i);
+                    if (str[i] != '-' || str[i + 1] != '>') {
+                        delete inputSet;
+                        delete ret;
+                        return nullptr;
+                    }
+                    i += 2;
+                    Node* outputSet = TokenizeData(str, i);
+                    if (outputSet == nullptr) {
+                        delete inputSet;
+                        delete ret;
+                        return nullptr;
+                    }
+                    return new Node(Node::Type::Function, name, ret, new Node(Node::Type::Comma, "", inputSet, outputSet));
+                }
+                else return new Node(Node::Type::Function, name, ret);
+            }
         }
         else if (name == "i") return new Node(Node::Type::ComplexConstant, "(0, 1)");
         else return new Node(Node::Type::Variable, name);

@@ -1,2 +1,2 @@
-f(x) = coth(x)
+f(x) : R -> R = coth(x)
 a = f(90)

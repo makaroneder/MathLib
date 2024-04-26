@@ -1,2 +1,2 @@
-f(x) = archaversin(x)
+f(x) : R -> R = archaversin(x)
 a = f(0)

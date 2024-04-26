@@ -1,2 +1,2 @@
-f(x) = hacovercos(x)
+f(x) : R -> R = hacovercos(x)
 a = f(0)

@@ -1,2 +1,2 @@
-f(x) = exsec(x)
+f(x) : R -> R = exsec(x)
 a = f(0)

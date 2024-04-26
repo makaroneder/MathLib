@@ -34,12 +34,12 @@ struct Level {
         }
         return LevelStatus::Normal;
     }
-    bool Draw(Renderer& renderer) const {
+    void Draw(Renderer& renderer) const {
         for (const Object<T>& wall : walls)
-            if (!wall.Draw(renderer)) return false;
+            wall.Draw(renderer);
         for (const Entity<T>& entity : entities)
-            if (!entity.Draw(renderer)) return false;
-        return target.Draw(renderer);
+            entity.Draw(renderer);
+        target.Draw(renderer);
     }
 
     Object<T> target;

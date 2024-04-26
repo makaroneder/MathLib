@@ -77,6 +77,10 @@ std::string Node::ToString(std::string padding) const {
             std::vector<const Node*> params = CommaToArray(left);
             for (size_t i = 0; i < params.size(); i++)
                 ret += params[i]->ToString() + (i + 1 == params.size() ? ")" : ", ");
+            if (right != nullptr) {
+                std::vector<const Node*> sets = CommaToArray(right);
+                ret += " : " + sets.at(0)->ToString() + " -> " + sets.at(1)->ToString();
+            }
             return ret;
         }
         case Type::Constant:

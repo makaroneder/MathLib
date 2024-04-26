@@ -1,2 +1,2 @@
-f(x) = tanh(x)
+f(x) : R -> R = tanh(x)
 a = f(0)

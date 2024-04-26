@@ -1,7 +1,6 @@
 #include "Optimizer.hpp"
 #include "../Typedefs.hpp"
 #include "../Factorial.hpp"
-#include "../Functions.hpp"
 
 // TODO: Add derivatives and better support for complex numbers
 Node* OptimizeInternal(const Node* node, State& state);
@@ -105,17 +104,19 @@ Node* OptimizeInternal(const Node* node, State& state) {
             state.variables.push_back(Variable(r->value, l->Recreate()));
             return l;
         }
-        else if (l->type == Node::Type::Function) {
+        else if (l->type == Node::Type::Function && l->right != nullptr) {
             std::vector<Variable> args;
             std::vector<const Node*> nodeArgs = CommaToArray(l->left);
+            std::vector<const Node*> sets = CommaToArray(l->right);
             for (const Node*& arg : nodeArgs) args.push_back(Variable(arg->value, "0"));
-            state.functions.push_back(Function(l->value, args, r->Recreate()));
+            state.functions.push_back(Function(l->value, args, r->Recreate(), sets.at(0)->value, sets.at(1)->value));
         }
-        else if (r->type == Node::Type::Function) {
+        else if (r->type == Node::Type::Function && r->right != nullptr) {
             std::vector<Variable> args;
             std::vector<const Node*> nodeArgs = CommaToArray(r->left);
+            std::vector<const Node*> sets = CommaToArray(l->right);
             for (const Node*& arg : nodeArgs) args.push_back(Variable(arg->value, "0"));
-            state.functions.push_back(Function(r->value, args, l->Recreate()));
+            state.functions.push_back(Function(r->value, args, l->Recreate(), sets.at(0)->value, sets.at(1)->value));
         }
         return new Node(Node::Type::Equal, "", l, r);
     }
@@ -130,10 +131,11 @@ Node* OptimizeInternal(const Node* node, State& state) {
     }
     else if (node->type == Node::Type::Factorial) {
         Node* n = OptimizeInternal(node->left, state);
-        if (n->type == Node::Type::Constant) {
-            const num_t val = n->ToNumber().at(0).real();
+        if (n->IsConstant()) {
+            const std::complex<num_t> ret = Factorial<num_t>(n->ToNumber().at(0));
             delete n;
-            return new Node(Node::Type::Constant, std::to_string(Factorial<num_t>(val)));
+            if (ret.imag() == 0) return new Node(Node::Type::Constant, std::to_string(ret.real()));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString<num_t>(ret));
         }
         else return new Node(Node::Type::Factorial, "", n);
     }
@@ -227,6 +229,7 @@ Node* OptimizeInternal(const Node* node, State& state) {
             Node* ret;
             Node** curr = &ret;
             if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) return new Node(Node::Type::Summation, "", del);
+            if (a2->ToNumber().at(0).real() < a1->ToNumber().at(0).real()) return new Node(Node::Type::Constant, "0");
             for (num_t i = a1->ToNumber().at(0).real(); i <= a2->ToNumber().at(0).real(); i++) {
                 *curr = new Node(Node::Type::Add, "", ReplaceNode(a3, [i, a0](const Node* node) {
                     if (node->type == Node::Type::Variable && node->value == a0->value)
@@ -265,7 +268,8 @@ Node* OptimizeInternal(const Node* node, State& state) {
         })) {
             Node* ret;
             Node** curr = &ret;
-            if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) return new Node(Node::Type::Summation, "", del);
+            if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) return new Node(Node::Type::Product, "", del);
+            if (a2->ToNumber().at(0).real() < a1->ToNumber().at(0).real()) return new Node(Node::Type::Constant, "1");
             for (num_t i = a1->ToNumber().at(0).real(); i <= a2->ToNumber().at(0).real(); i++) {
                 *curr = new Node(Node::Type::Mul, "", ReplaceNode(a3, [i, a0](const Node* node) {
                     if (node->type == Node::Type::Variable && node->value == a0->value)

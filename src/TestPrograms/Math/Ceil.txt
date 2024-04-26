@@ -1,2 +1,2 @@
-f(x) = ceil(x)
+f(x) : R -> R = ceil(x)
 a = f(2 $ 2)

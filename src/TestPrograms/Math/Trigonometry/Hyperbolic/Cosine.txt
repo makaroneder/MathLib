@@ -1,2 +1,2 @@
-f(x) = cosh(x)
+f(x) : R -> R = cosh(x)
 a = f(0)

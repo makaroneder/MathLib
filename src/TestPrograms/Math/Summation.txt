@@ -1,2 +1,2 @@
-f(x) = summation(n, 0, 5, e^x)
+f(x) : R -> R = summation(n, 0, 5, e^x)
 a = f(2)

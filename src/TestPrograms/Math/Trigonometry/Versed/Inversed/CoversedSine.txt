@@ -1,2 +1,2 @@
-f(x) = arccoversin(x)
+f(x) : R -> R = arccoversin(x)
 a = f(0)

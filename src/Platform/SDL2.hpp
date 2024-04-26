@@ -12,43 +12,21 @@ struct SDL2Renderer : Renderer {
     SDL2Renderer(const char* title, size_t w, size_t h);
     /// @brief Destroys the renderer
     virtual ~SDL2Renderer(void) override;
-    /// @brief Calculates width of the renderer window
-    /// @return Width of the renderer window
-    virtual size_t GetWidth(void) const override;
-    /// @brief Calculates height of the renderer window
-    /// @return Height of the renderer window
-    virtual size_t GetHeight(void) const override;
-    /// @brief Flushes renderer buffer
-    /// @return Status
-    virtual bool Update(void) override;
-    /// @brief Renders pixel
+    /// @brief Copies pixels from memory to screen
     /// @param pixels Pixel to render
-    /// @param color Color of the pixel
     /// @return Status
-    virtual bool SetPixel(Matrix<num_t> pixel, uint32_t color) override;
-    /// @brief Gets current SDL2 event
-    /// @return SDL2 event
+    virtual bool UpdateInternal(Matrix<uint32_t> pixels) override;
+    /// @brief Gets current event
+    /// @return Event
     virtual Event GetEvent(void) override;
 
     private:
-    /// @brief Sets current drawing color
-    /// @param c New drawing color
-    /// @return Status
-    bool SetColor(uint32_t c);
-    /// @brief Converts graph point to internal type used to render pixels
-    /// @param p Point we are converting
-    /// @return Is point visable?
-    bool ToInternalPoint(Matrix<num_t>& p);
-
     /// @brief Window
     SDL_Window* window;
     /// @brief Renderer
     SDL_Renderer* renderer;
-    /// @brief Width of the window
-    size_t width;
-    /// @brief Height of the window
-    size_t height;
-    uint32_t* pixels;
+    /// @brief Texture
+    SDL_Texture* texture;
 };
 
 #endif

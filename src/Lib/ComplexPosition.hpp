@@ -1,6 +1,7 @@
 #ifndef ComplexPosition_H
 #define ComplexPosition_H
-#include "Typedefs.hpp"
+#include "Matrix.hpp"
+#include "Color.hpp"
 
 template <typename T>
 struct ComplexPosition {
@@ -10,6 +11,12 @@ struct ComplexPosition {
     ComplexPosition(std::complex<T> pos, std::complex<T> val) {
         position = pos;
         value = val;
+    }
+    constexpr Matrix<T> GetPosition(void) const {
+        return CreateVector<T>(position.real(), position.imag(), 0);
+    }
+    constexpr uint32_t GetColor(void) const {
+        return GetRainbow<T>(CreateVector<T>(value.real(), value.imag(), 0).GetLength());
     }
 };
 

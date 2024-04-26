@@ -1,24 +1,31 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer(void) {
+Renderer::Renderer(size_t w, size_t h) {
+    width = w;
+    height = h;
+    pixels = Matrix<uint32_t>(width, height);
     position = CreateVector<num_t>(0, 0, 0);
     pointMultiplier = 100;
 }
 Renderer::~Renderer(void) {}
+size_t Renderer::GetWidth(void) const {
+    return width;
+}
+size_t Renderer::GetHeight(void) const {
+    return height;
+}
+void Renderer::Fill(uint32_t color) {
+    pixels.Fill(color);
+}
+bool Renderer::Update(void) {
+    return UpdateInternal(pixels);
+}
 Event Renderer::WaitForEvent(void) {
     Event ret;
     while (ret.type == Event::Type::None) ret = GetEvent();
     return ret;
 }
-bool Renderer::Fill(uint32_t color) {
-    num_t w = GetWidth() / 2;
-    num_t h = GetHeight() / 2;
-    for (num_t x = 0; x < w; x++)
-        for (num_t y = 0; y < h; y++)
-            if (!SetPixel(CreateVector<num_t>(x, y, 0), color)) return false;
-    return true;
-}
-bool Renderer::DrawAxis(uint32_t axisColor, uint32_t cellColor) {
+void Renderer::DrawAxis(uint32_t axisColor, uint32_t cellColor) {
     const num_t step = pointMultiplier / 100;
     const Matrix<num_t> start = (GetStart<num_t>() - position) * step;
     const Matrix<num_t> end = (GetEnd<num_t>() + position) * step;
@@ -28,11 +35,9 @@ bool Renderer::DrawAxis(uint32_t axisColor, uint32_t cellColor) {
     for (num_t& i : setX) i += GetX(position);
     for (num_t& i : setY) i += GetY(position);
     for (num_t i = GetY(start); i <= GetY(end); i += cellSize) {
-        if (!DrawFunction<num_t>(GenerateFunction<num_t>(ConstFunction(num_t, i), setX, {}), cellColor)) return false;
-        if (!DrawFunction<num_t>(GenerateFunction<num_t>(ConstFunction(num_t, i), setY, {}, VectorAxis::Y, VectorAxis::X), cellColor)) return false;
+        DrawFunction<num_t>(GenerateFunction<num_t>([i](num_t) -> num_t { return i; }, setX), cellColor);
+        DrawFunction<num_t>(GenerateFunction<num_t>([i](num_t) -> num_t { return i; }, setY, VectorAxis::Y, VectorAxis::X), cellColor);
     }
-    return (
-        DrawFunction<num_t>(GenerateFunction<num_t>([](num_t) { return 0; }, setX, {}), axisColor) &&
-        DrawFunction<num_t>(GenerateFunction<num_t>([](num_t) { return 0; }, setY, {}, VectorAxis::Y, VectorAxis::X), axisColor)
-    );
+    DrawFunction<num_t>(GenerateFunction<num_t>([](num_t) -> num_t { return 0; }, setX), axisColor);
+    DrawFunction<num_t>(GenerateFunction<num_t>([](num_t) -> num_t { return 0; }, setY, VectorAxis::Y, VectorAxis::X), axisColor);
 }

@@ -1,2 +1,2 @@
-f(x) = arccot(x)
+f(x) : R -> R = arccot(x)
 a = f(0)

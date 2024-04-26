@@ -1,2 +1,2 @@
-f(x) = arcsec(x)
+f(x) : R -> R = arcsec(x)
 a = f(1)

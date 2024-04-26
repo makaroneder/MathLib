@@ -48,10 +48,8 @@ struct NeuralNetwork : Printable, Saveable {
         }
     }
     constexpr void Forward(void) {
-        for (size_t i = 0; i < count; i++) {
-            as.at(i + 1) = as.at(i) * ws.at(i) + bs.at(i);
-            as.at(i + 1).Sigmoid();
-        }
+        for (size_t i = 0; i < count; i++)
+            as.at(i + 1) = ActivateMatrix(as.at(i) * ws.at(i) + bs.at(i));
     }
     constexpr T Cost(Matrix<T> input, Matrix<T> output) {
         if (input.GetHeight() != output.GetHeight()) return NAN;
@@ -154,6 +152,13 @@ struct NeuralNetwork : Printable, Saveable {
     }
 
     private:
+    Matrix<T> ActivateMatrix(Matrix<T> matrix) {
+        Matrix<T> ret = matrix;
+        for (size_t y = 0; y < ret.GetHeight(); y++)
+            for (size_t x = 0; x < ret.GetWidth(); x++) ret.At(x, y) = Sigmoid<T>(ret.At(x, y));
+        return ret;
+    }
+
     size_t count;
     std::vector<Matrix<T>> ws;
     std::vector<Matrix<T>> bs;

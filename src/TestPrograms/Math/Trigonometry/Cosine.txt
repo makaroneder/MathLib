@@ -1,2 +1,2 @@
-f(x) = cos(x)
+f(x) : R -> R = cos(x)
 a = f(0)

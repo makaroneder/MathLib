@@ -14,6 +14,27 @@ struct ChemicalMolecule : Printable {
         for (ChemicalElement<T>& element : ret) element *= count;
         return ret;
     }
+    constexpr bool IsCompound(void) const {
+        return elements.size() > 1;
+    }
+    constexpr bool IsWater(void) const {
+        return IsCompound() && elements.at(0).GetSymbol() == "H" && elements.at(1).GetSymbol() == "O" && elements.at(0).GetCount() == 2 && elements.at(1).GetCount() == 1;
+    }
+    constexpr bool IsMetal(void) const {
+        return !IsCompound() && elements.at(0).IsMetal();
+    }
+    constexpr bool IsNonMetal(void) const {
+        return !IsCompound() && !elements.at(0).IsMetal();
+    }
+    constexpr bool IsAcid(void) const {
+        return IsCompound() && !IsWater() && elements.at(0).GetSymbol() == "H";
+    }
+    constexpr bool IsHydroxide(void) const {
+        return IsCompound() && !IsWater() && elements.at(elements.size() - 2).GetSymbol() == "O" && elements.at(elements.size() - 1).GetSymbol() == "H" && elements.at(elements.size() - 2).GetCount() == elements.at(elements.size() - 1).GetCount();
+    }
+    constexpr bool IsOxide(void) const {
+        return IsCompound() && !IsWater() && elements.at(elements.size() - 1).GetSymbol() == "O";
+    }
     virtual std::string ToString(std::string padding = "") const override {
         std::string str = "";
         for (const ChemicalElement<T>& element : elements) str += element.ToString();

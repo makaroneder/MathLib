@@ -1,2 +1,2 @@
-f(x) = crd(x)
+f(x) : R -> R = crd(x)
 a = f(0)

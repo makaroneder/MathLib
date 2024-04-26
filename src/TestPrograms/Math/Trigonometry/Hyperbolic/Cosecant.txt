@@ -1,2 +1,2 @@
-f(x) = csch(x)
+f(x) : R -> R = csch(x)
 a = f(9)

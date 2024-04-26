@@ -1,2 +1,2 @@
-f(x) = haversin(x)
+f(x) : R -> R = haversin(x)
 a = f(0)

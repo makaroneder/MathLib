@@ -1,2 +1,2 @@
-f(x) = arctan(x)
+f(x) : R -> R = arctan(x)
 a = f(0)

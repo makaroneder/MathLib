@@ -89,7 +89,9 @@ int main(int argc, char** argv) {
         GameEngine<num_t> engine = GameEngine<num_t>(Object<num_t>(Cuboid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(player.at(0), player.at(1), player.at(2))), MetrePerSecond<num_t>(player.at(3)), player.at(4)), levels);
         Matrix<num_t> moveVector = CreateVector<num_t>(0, 0, 0);
         SDL2Renderer renderer = SDL2Renderer("Game Engine", 800, 800);
+        const Second<num_t> time = Second<num_t>(1);
         while (true) {
+            renderer.Fill(0x000000ff);
             if (!engine.Draw(renderer)) throw std::runtime_error("Failed to render level");
             if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
             const Event event = renderer.GetEvent();
@@ -115,7 +117,7 @@ int main(int argc, char** argv) {
                     }
                 }
             }
-            const LevelStatus status = engine.Update(Second<num_t>(1), moveVector);
+            const LevelStatus status = engine.Update(time, moveVector);
             if (status == LevelStatus::Error) throw std::runtime_error("Failed to update game");
             else if (status == LevelStatus::GameOver) {
                 std::cout << "You lost" << std::endl;

@@ -1,2 +1,2 @@
-f(x) = versin(x)
+f(x) : R -> R = versin(x)
 a = f(0)

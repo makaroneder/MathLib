@@ -57,5 +57,14 @@ Matrix<T> ConvertVectorToVector2(Matrix<T> point, T fov = 10) {
     if (GetZ(point) <= (1 - fov)) return CreateVector<T>(NAN, NAN, NAN);
     return CreateVector<T>(GetX(point), GetY(point), 0) / (1 + GetZ(point) / fov);
 }
+/// @brief a x b = (a_2 * b_3 - a_3 * b_2)i + (a_3 * b_1 - a_1 * b_3)j + (a_1 * b_2 - a_2 * b_1)k
+/// @tparam T Type of number
+/// @param a A
+/// @param b B
+/// @return Cross product of vector A and B
+template <typename T>
+Matrix<T> CrossProduct(Matrix<T> a, Matrix<T> b) {
+    return CreateVector<T>(GetY(a) * GetZ(b) - GetZ(a) * GetY(b), GetZ(a) * GetX(b) - GetX(a) * GetZ(b), GetX(a) * GetY(b) - GetY(a) * GetX(b));
+}
 
 #endif

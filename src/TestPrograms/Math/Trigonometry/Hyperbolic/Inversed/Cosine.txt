@@ -1,2 +1,2 @@
-f(x) = arccosh(x)
+f(x) : R -> R = arccosh(x)
 a = f(1)

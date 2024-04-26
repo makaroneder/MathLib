@@ -1,2 +1,2 @@
-f(x) = arcversin(x)
+f(x) : R -> R = arcversin(x)
 a = f(0)

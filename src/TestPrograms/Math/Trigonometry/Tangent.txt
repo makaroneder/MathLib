@@ -1,2 +1,2 @@
-f(x) = tan(x)
+f(x) : R -> R = tan(x)
 a = f(0)

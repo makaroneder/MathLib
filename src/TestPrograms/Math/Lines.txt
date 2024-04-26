@@ -1,4 +1,4 @@
-f(x) = {
+f(x) : R -> R = {
     ceil(x),
     floor(x),
     x

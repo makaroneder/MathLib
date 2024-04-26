@@ -38,16 +38,6 @@ template <typename T>
 constexpr std::string ComplexToString(std::complex<T> z) {
     return '(' + std::to_string(z.real()) + ", " + std::to_string(z.imag()) + ')';
 }
-/// @brief Swaps 2 numbers
-/// @tparam T Type of number
-/// @param a Number 1
-/// @param b Number 2
-template <typename T>
-constexpr void Swap(T& a, T& b) {
-    const T c = a;
-    a = b;
-    b = c;
-}
 /// @brief 1 / (1 + e^-x)
 /// @tparam T Type of number
 /// @param x Sigmoid input

@@ -1,7 +1,7 @@
 #ifndef BuiltinFunction_H
 #define BuiltinFunction_H
 #include "Node.hpp"
-#include "../SequencesOfConstants.hpp"
+#include "../Trigonometry.hpp"
 
 /// @brief Builtin function
 struct BuiltinFunction {
@@ -84,15 +84,6 @@ static const BuiltinFunction defaultBuiltinFuncs[] = {
     CreateComplexBuiltinFunction("arccoth", InversedHyperbolicCot<std::complex<num_t>>, 1, args[0]->ToNumber().at(0).real()),
     CreateComplexBuiltinFunction("arcsech", InversedHyperbolicSec<std::complex<num_t>>, 1, args[0]->ToNumber().at(0).real()),
     CreateComplexBuiltinFunction("arccsch", InversedHyperbolicCsc<std::complex<num_t>>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("harmonicNumber", HarmonicNumber<num_t>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("bernoulliNumber", BernoulliNumber<num_t>, 1, args[0]->ToNumber().at(0).real(), false),
-    CreateBuiltinFunction("negativeBernoulliNumber", BernoulliNumber<num_t>, 1, args[0]->ToNumber().at(0).real(), true),
-    CreateBuiltinFunction("favardConstants", FavardConstants<num_t>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("champernowneConstants", ChampernowneConstants<num_t>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("berahaConstants", BerahaConstants<num_t>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("hyperHarmonicNumber", HyperHarmonicNumber<num_t>, 2, args[0]->ToNumber().at(0).real(), args[1]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("gregoryNumber", GregoryNumber<num_t>, 1, args[0]->ToNumber().at(0).real()),
-    CreateBuiltinFunction("metallicMean", MetallicMean<num_t>, 1, args[0]->ToNumber().at(0).real()),
     #undef CreateComplexBuiltinFunction
     #undef CreateBuiltinFunction
 };

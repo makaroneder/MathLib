@@ -4,10 +4,12 @@ BUILDTYPE ?= Debug
 
 CXX = g++
 AR = ar
+OBJCOPY = objcopy
 VALGRIND = valgrind
 
 CXXFLAGS = -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
+OBJCOPYFLAGS = -O elf64-x86-64 -B i386 -I binary
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
 
 ifeq ($(BUILDTYPE), Debug)
@@ -20,7 +22,9 @@ HEADERS = $(shell find $(SRCDIR) -type f -name "*.hpp")
 HEADERS += $(shell find $(SRCDIR)/Platform -type f -name "*.cpp")
 
 SRCXX = $(shell find $(SRCDIR)/Lib -type f -name "*.cpp")
+SRCPSF = $(shell find $(SRCDIR)/Lib -type f -name "*.psf")
 OBJS = $(patsubst $(SRCDIR)/Lib/%.cpp, $(BUILDDIR)/Lib/%.o, $(SRCXX))
+OBJS += $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Lib/%.o, $(SRCPSF))
 
 GRAPHSRCXX = $(shell find $(SRCDIR)/Graph -type f -name "*.cpp")
 GRAPHOBJS = $(patsubst $(SRCDIR)/Graph/%.cpp, $(BUILDDIR)/Graph/%.o, $(GRAPHSRCXX))
@@ -71,6 +75,10 @@ $(BUILDDIR)/libMath.a: $(OBJS)
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS) Makefile
 	@mkdir -p $(@D)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo "==> Created: $@"
+$(BUILDDIR)/%.o: $(SRCDIR)/%.psf Makefile
+	@mkdir -p $(@D)
+	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
 	@echo "==> Created: $@"
 
 MATHPROGRAMS ?= $(shell find $(SRCDIR)/TestPrograms/Math -type f -name "*.txt")

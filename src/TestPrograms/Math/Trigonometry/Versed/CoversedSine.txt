@@ -1,2 +1,2 @@
-f(x) = coversin(x)
+f(x) : R -> R = coversin(x)
 a = f(0)

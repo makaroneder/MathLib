@@ -6,6 +6,7 @@
 /// @tparam T Type of number
 template <typename T>
 struct Quaternion : Printable {
+    CreateOperators(Quaternion<T>, T)
     /// @brief q = a + bi + cj + dk
     /// @param a_ a
     /// @param b_ b
@@ -49,18 +50,6 @@ struct Quaternion : Printable {
         else if (!FloatsEqual<T>(d, 0)) ret += (ret.empty() ? "" : " + ") + std::to_string(d) + 'k';
         return padding + (ret.empty() ? "0" : ret);
     }
-    /// @brief (a + bi + cj + dk) + (e + fi + gj + hk) = (a + e) + (b + f)i + (c + g)j + (d + h)k
-    /// @param other Other quaternion
-    /// @return New quaternion
-    constexpr Quaternion<T> operator+(Quaternion<T> other) const {
-        return Quaternion<T>(a + other.a, b + other.b, c + other.c, d + other.d);
-    }
-    /// @brief (a + bi + cj + dk) - (e + fi + gj + hk) = (a - e) + (b - f)i + (c - g)j + (d - h)k
-    /// @param other Other quaternion
-    /// @return New quaternion
-    constexpr Quaternion<T> operator-(Quaternion<T> other) const {
-        return Quaternion<T>(a - other.a, b - other.b, c - other.c, d - other.d);
-    }
     /// @brief (a + bi + cj + dk) * (e + fi + gj + hk) = (ae - bf - cg - dh) + (af + be + ch - dg)i + (ag - bh + ce + df)j + (ah + bg - cf + de)k
     /// @param other Other quaternion
     /// @return New quaternion
@@ -72,20 +61,66 @@ struct Quaternion : Printable {
             a * other.d + b * other.c - c * other.b + d * other.a
         );
     }
-    /// @brief (a + bi + cj + dk) * e = ae + (be)i + (ce)j + (de)k
-    /// @param scalar Scalar value
-    /// @return New quaternion
-    constexpr Quaternion<T> operator*(T scalar) const {
-        return Quaternion<T>(a * scalar, b * scalar, c * scalar, d * scalar);
+    /// @brief |q|^2 = a^2 + b^2 + c^2 + d^2
+    /// @return Squared norm of quaternion
+    T GetNormSquared(void) const {
+        return std::pow(a, 2) + std::pow(b, 2) + std::pow(c, 2) + std::pow(d, 2);
     }
-    /// @brief (a + bi + cj + dk) / e = a / e + (b / e)i + (c / e)j + (d / e)k
-    /// @param scalar Scalar value
-    /// @return New quaternion
-    constexpr Quaternion<T> operator/(T scalar) const {
-        return Quaternion<T>(a / scalar, b / scalar, c / scalar, d / scalar);
+    /// @brief |q| = sqrt(a^2 + b^2 + c^2 + d^2)
+    /// @return Norm of quaternion
+    T GetNorm(void) const {
+        return std::sqrt(GetNormSquared());
+    }
+    /// @brief ln(q) = ln(|q|) + v / |v| * arccos(a / |q|)
+    /// @return Logarithm of quaternion
+    Quaternion<T> Log(void) const {
+        const Matrix<T> v = GetVector();
+        const T norm = GetNorm();
+        return Quaternion<T>(std::log(norm), v / v.GetLength() * std::acos(a / norm));
+    }
+    /// @brief e^q = e^a * (cos(|v|) + v / |v| * sin(|v|))
+    /// @return Exponential of quaternion
+    Quaternion<T> Exponential(void) const {
+        const Matrix<T> v = GetVector();
+        const T len = v.GetLength();
+        return Quaternion<T>(std::cos(len), v / len * std::sin(len)) * std::exp(a);
+    }
+    /// @brief q^n = exp(ln(q) * n)
+    /// @param n Exponent
+    /// @return Power of quaternion
+    Quaternion<T> Pow(T n) const {
+        if (n < 0) return GetInverse().Pow(std::abs(n));
+        return (Log() * n).Exponential();
+    }
+    /// @brief q^n = exp(ln(q) * n)
+    /// @param n Exponent quaternion
+    /// @return Power of quaternion
+    Quaternion<T> Pow(Quaternion<T> n) const {
+        return (Log() * n).Exponential();
+    }
+    /// @brief q^-1 = (a - bi - cj - dk) / |q|^2
+    /// @return Inverse of quaternion
+    Quaternion<T> GetInverse(void) const {
+        return Quaternion<T>(a, -b, -c, -d) / GetNormSquared();
     }
 
     private:
+    /// @brief (a + bi + cj + dk) + (e + fi + gj + hk) = (a + e) + (b + f)i + (c + g)j + (d + h)k
+    /// @param other Other quaternion
+    void Add(Quaternion<T> other) {
+        a += other.a;
+        b += other.b;
+        c += other.c;
+        d += other.d;
+    }
+    /// @brief (a + bi + cj + dk) * e = ae + (be)i + (ce)j + (de)k
+    /// @param scalar Scalar value to multiply by
+    void Multiply(T scalar) {
+        a *= scalar;
+        b *= scalar;
+        c *= scalar;
+        d *= scalar;
+    }
     /// @brief a
     T a;
     /// @brief b

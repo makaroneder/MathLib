@@ -1,7 +1,7 @@
-MakePlayer(width, height, depth, velocity, color) = { width, height, depth, velocity, color }
-MakeWall(x, y, z, width, height, depth, color) = { x, y, z, width, height, depth, color }
-MakeEnemy(x, y, z, width, height, depth, velocity, color) = { x, y, z, width, height, depth, velocity, color }
-MakeLevel(target, walls, enemies) = { { target }, walls, enemies }
+MakePlayer(width, height, depth, velocity, color) : V -> V = { width, height, depth, velocity, color }
+MakeWall(x, y, z, width, height, depth, color) : V -> V  = { x, y, z, width, height, depth, color }
+MakeEnemy(x, y, z, width, height, depth, velocity, color) : V -> V  = { x, y, z, width, height, depth, velocity, color }
+MakeLevel(target, walls, enemies) : V -> V  = { { target }, walls, enemies }
 
 player = MakePlayer(0.5, 0.5, 0.01, 0.02, white)
 levels = {

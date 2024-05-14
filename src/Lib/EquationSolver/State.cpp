@@ -1,10 +1,8 @@
 #include "State.hpp"
 
-State::State(std::vector<BuiltinFunction> builtinFuncs, std::vector<Function> funcs, std::vector<Variable> vars) {
-    builtinFunctions = std::vector<BuiltinFunction>(defaultBuiltinFuncs, defaultBuiltinFuncs + SizeOfArray(defaultBuiltinFuncs));
+State::State(std::vector<BuiltinFunction> builtinFuncs, std::vector<Function> funcs, std::vector<Variable> vars) : builtinFunctions(std::vector<BuiltinFunction>(defaultBuiltinFuncs, defaultBuiltinFuncs + SizeOfArray(defaultBuiltinFuncs))), functions(funcs) {
     builtinFunctions.reserve(builtinFuncs.size());
     for (const BuiltinFunction& func : builtinFuncs) builtinFunctions.push_back(func);
-    functions = funcs;
     for (const Variable& var : defaultVariables) variables.push_back(Variable(var.name, var.value->Recreate()));
     for (const Variable& var : vars) variables.push_back(var);
 }

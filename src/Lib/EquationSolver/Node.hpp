@@ -45,7 +45,7 @@ struct Node : Printable {
     Node* Recreate(void) const;
     /// @brief Converts node to number array
     /// @return Number array
-    std::vector<std::complex<num_t>> ToNumber(void) const;
+    std::vector<complex_t> ToNumber(void) const;
     /// @brief Converts values of the current node to string
     /// @param padding Padding of the generated strings
     virtual std::string ToString(std::string padding = "") const override;

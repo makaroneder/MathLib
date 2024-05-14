@@ -22,12 +22,7 @@ struct State : Saveable {
     /// @param in Input data for learning
     /// @param out Output data for learning
     /// @param nn Neural network
-    constexpr State(T r, Matrix<T> in, Matrix<T> out, NeuralNetwork<T> nn) {
-        rate = r;
-        trainingDataInput = in;
-        trainingDataOutput = out;
-        neuralNetwork = nn;
-    }
+    constexpr State(T r, Matrix<T> in, Matrix<T> out, NeuralNetwork<T> nn) : rate(r), trainingDataInput(in), trainingDataOutput(out), neuralNetwork(nn) {}
     constexpr void Forward(void) {
         neuralNetwork.Forward();
     }

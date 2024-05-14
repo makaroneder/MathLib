@@ -1,5 +1,5 @@
 #include "Rope.hpp"
-#include <SDL2.hpp>
+#include <SDL2.cpp>
 #include <iostream>
 
 int main(void) {
@@ -22,7 +22,7 @@ int main(void) {
                 return gravity * particle.GetMass().GetValue();
             });
             renderer.Fill(0x000000ff);
-            renderer.DrawShape<num_t>(rope, 0, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
+            renderer.DrawShape<num_t>(rope, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
             if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
             if (renderer.GetEvent().type == Event::Type::Quit) break;
         }

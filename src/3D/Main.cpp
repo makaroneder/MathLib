@@ -1,6 +1,6 @@
 #include <Geometry/Pyramid.hpp>
 #include <Geometry/Cuboid.hpp>
-#include <SDL2.hpp>
+#include <SDL2.cpp>
 #include <iostream>
 
 /// @brief Entry point for this program
@@ -14,8 +14,8 @@ int main(void) {
         num_t angle = 0;
         while (true) {
             renderer.Fill(0x000000ff);
-            renderer.DrawShape<num_t>(cuboid, angle, axis.Normalize(), 0xff0000ff);
-            renderer.DrawShape<num_t>(triangle, angle, axis.Normalize(), 0x00ff00ff);
+            renderer.DrawShape<num_t>(cuboid, axis.Normalize() * angle, 0xff0000ff);
+            renderer.DrawShape<num_t>(triangle, axis.Normalize() * angle, 0x00ff00ff);
             if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
             const Event event = renderer.GetEvent();
             if (event.type == Event::Type::Quit) break;

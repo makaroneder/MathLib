@@ -14,10 +14,7 @@ struct Line {
     /// @brief Creates a new line
     /// @param s Starting point of line
     /// @param e Ending point of line
-    Line(Matrix<T> s = CreateVector<T>(0, 0, 0), Matrix<T> e = CreateVector<T>(0, 0, 0)) {
-        start = s;
-        end = e;
-    }
+    Line(Matrix<T> s = CreateVector<T>(0, 0, 0), Matrix<T> e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
     /// @brief d = sqrt((b_0 - a_0)^2 + ... + (b_n - a_n)^2)
     /// @return Length of line
     T GetLength(void) const {

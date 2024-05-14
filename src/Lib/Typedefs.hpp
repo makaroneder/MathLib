@@ -2,24 +2,16 @@
 #define Typedefs_H
 #include <cmath>
 #include <complex>
-#include <numeric>
-#include <typeinfo>
 
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
-#define AreCoprimes(a, b) (std::gcd(a, b) == 1)
 
 /// @brief Default type for real numbers
 typedef long double num_t;
+/// @brief Default type for complex numbers
+typedef std::complex<num_t> complex_t;
 /// @brief Default error tolerance
 constexpr num_t eps = 1e-3;
 
-/// @brief Checks if T is float
-/// @tparam T Type of number
-/// @return Result
-template <typename T>
-constexpr bool IsFloat(void) {
-    return typeid(T) == typeid(float) || typeid(T) == typeid(double) || typeid(T) == typeid(num_t);
-}
 /// @brief |a - b| < eps
 /// @tparam T Type of number
 /// @param a a

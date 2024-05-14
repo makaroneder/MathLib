@@ -4,9 +4,7 @@
 
 template <typename T>
 struct NeuralNetwork : Printable, Saveable {
-    NeuralNetwork<T>(void) {
-        count = 0;
-    }
+    NeuralNetwork<T>(void) : count(0) {}
     NeuralNetwork<T>(const std::vector<size_t> arch) {
         const size_t c = arch.size();
         if (c == 0) throw std::runtime_error("Invalid architecture size");

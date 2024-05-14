@@ -2,9 +2,7 @@
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Optimizer.hpp>
 
-Question::Question(std::string eq) {
-    equation = eq;
-    solution = NAN;
+Question::Question(std::string eq) : equation(eq), solution(NAN) {
     Node* root = Tokenize(equation);
     State state;
     Node* optimizedRoot = Optimize(root, state);

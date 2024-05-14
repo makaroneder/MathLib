@@ -18,8 +18,7 @@ struct Unit : Printable {
         Time,
         End,
     };
-    Unit<T>(T count_ = 0, T amountOfSubstance_ = 0, T electricCurrent_ = 0, T length_ = 0, T luminousIntensity_ = 0, T mass_ = 0, T thermodynamicTemperature_ = 0, T time_ = 0) {
-        count = count_;
+    Unit<T>(T count_ = 0, T amountOfSubstance_ = 0, T electricCurrent_ = 0, T length_ = 0, T luminousIntensity_ = 0, T mass_ = 0, T thermodynamicTemperature_ = 0, T time_ = 0) : count(count_) {
         this->baseUnits[BaseUnit::AmountOfSubstance] = amountOfSubstance_;
         this->baseUnits[BaseUnit::ElectricCurrent] = electricCurrent_;
         this->baseUnits[BaseUnit::Length] = length_;
@@ -28,8 +27,7 @@ struct Unit : Printable {
         this->baseUnits[BaseUnit::ThermodynamicTemperature] = thermodynamicTemperature_;
         this->baseUnits[BaseUnit::Time] = time_;
     }
-    Unit<T>(T count_, std::array<T, BaseUnit::End> baseUnits_) {
-        count = count_;
+    Unit<T>(T count_, std::array<T, BaseUnit::End> baseUnits_) : count(count_) {
         this->baseUnits[BaseUnit::AmountOfSubstance] = baseUnits_[BaseUnit::AmountOfSubstance];
         this->baseUnits[BaseUnit::ElectricCurrent] = baseUnits_[BaseUnit::ElectricCurrent];
         this->baseUnits[BaseUnit::Length] = baseUnits_[BaseUnit::Length];
@@ -164,30 +162,30 @@ struct name : base<T> {                                                         
     }                                                                                                               \
 }
 #define CreateUnitPrefix(name, base)                                                                                \
-CreateAlternativeUnit(Quetta##name, base, std::pow(10, 30));                                                        \
-CreateAlternativeUnit(Ronna##name, base, std::pow(10, 27));                                                         \
-CreateAlternativeUnit(Yotta##name, base, std::pow(10, 24));                                                         \
-CreateAlternativeUnit(Zetta##name, base, std::pow(10, 21));                                                         \
-CreateAlternativeUnit(Exa##name, base, std::pow(10, 18));                                                           \
-CreateAlternativeUnit(Peta##name, base, std::pow(10, 15));                                                          \
-CreateAlternativeUnit(Tera##name, base, std::pow(10, 12));                                                          \
-CreateAlternativeUnit(Giga##name, base, std::pow(10, 9));                                                           \
-CreateAlternativeUnit(Mega##name, base, std::pow(10, 6));                                                           \
-CreateAlternativeUnit(Kilo##name, base, std::pow(10, 3));                                                           \
-CreateAlternativeUnit(Hecto##name, base, std::pow(10, 2));                                                          \
-CreateAlternativeUnit(Deca##name, base, std::pow(10, 1));                                                           \
-CreateAlternativeUnit(Deci##name, base, std::pow(10, -1));                                                          \
-CreateAlternativeUnit(Centi##name, base, std::pow(10, -2));                                                         \
-CreateAlternativeUnit(Milli##name, base, std::pow(10, -3));                                                         \
-CreateAlternativeUnit(Micro##name, base, std::pow(10, -6));                                                         \
-CreateAlternativeUnit(Nano##name, base, std::pow(10, -9));                                                          \
-CreateAlternativeUnit(Pico##name, base, std::pow(10, -12));                                                         \
-CreateAlternativeUnit(Femto##name, base, std::pow(10, -15));                                                        \
-CreateAlternativeUnit(Atto##name, base, std::pow(10, -18));                                                         \
-CreateAlternativeUnit(Zepto##name, base, std::pow(10, -21));                                                        \
-CreateAlternativeUnit(Yocto##name, base, std::pow(10, -24));                                                        \
-CreateAlternativeUnit(Ronto##name, base, std::pow(10, -27));                                                        \
-CreateAlternativeUnit(Quecto##name, base, std::pow(10, -30));                                                       \
+CreateAlternativeUnit(Quetta##name, base, 1e30);                                                        \
+CreateAlternativeUnit(Ronna##name, base, 1e27);                                                         \
+CreateAlternativeUnit(Yotta##name, base, 1e24);                                                         \
+CreateAlternativeUnit(Zetta##name, base, 1e21);                                                         \
+CreateAlternativeUnit(Exa##name, base, 1e18);                                                           \
+CreateAlternativeUnit(Peta##name, base, 1e15);                                                          \
+CreateAlternativeUnit(Tera##name, base, 1e12);                                                          \
+CreateAlternativeUnit(Giga##name, base, 1e9);                                                           \
+CreateAlternativeUnit(Mega##name, base, 1e6);                                                           \
+CreateAlternativeUnit(Kilo##name, base, 1e3);                                                           \
+CreateAlternativeUnit(Hecto##name, base, 1e2);                                                          \
+CreateAlternativeUnit(Deca##name, base, 1e1);                                                           \
+CreateAlternativeUnit(Deci##name, base, 1e-1);                                                          \
+CreateAlternativeUnit(Centi##name, base, 1e-2);                                                         \
+CreateAlternativeUnit(Milli##name, base, 1e-3);                                                         \
+CreateAlternativeUnit(Micro##name, base, 1e-6);                                                         \
+CreateAlternativeUnit(Nano##name, base, 1e-9);                                                          \
+CreateAlternativeUnit(Pico##name, base, 1e-12);                                                         \
+CreateAlternativeUnit(Femto##name, base, 1e-15);                                                        \
+CreateAlternativeUnit(Atto##name, base, 1e-18);                                                         \
+CreateAlternativeUnit(Zepto##name, base, 1e-21);                                                        \
+CreateAlternativeUnit(Yocto##name, base, 1e-24);                                                        \
+CreateAlternativeUnit(Ronto##name, base, 1e-27);                                                        \
+CreateAlternativeUnit(Quecto##name, base, 1e-30);                                                       \
 CreateAlternativeUnit(Kibi##name, base, std::pow(2, 10));                                                           \
 CreateAlternativeUnit(Mebi##name, base, std::pow(2, 20));                                                           \
 CreateAlternativeUnit(Gibi##name, base, std::pow(2, 30));                                                           \

@@ -13,9 +13,8 @@ struct SDL2Renderer : Renderer {
     /// @brief Destroys the renderer
     virtual ~SDL2Renderer(void) override;
     /// @brief Copies pixels from memory to screen
-    /// @param pixels Pixel to render
     /// @return Status
-    virtual bool UpdateInternal(Matrix<uint32_t> pixels) override;
+    virtual bool Update(void) override;
     /// @brief Gets current event
     /// @return Event
     virtual Event GetEvent(void) override;

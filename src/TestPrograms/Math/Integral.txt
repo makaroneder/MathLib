@@ -1,4 +1,4 @@
 C = 0
-g(x) = x / 2
+g(x) : R -> R = x / 2
 f(x) : R -> R = integral(g(x), x) + C
 a = f(4)

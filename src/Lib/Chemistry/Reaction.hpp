@@ -5,10 +5,7 @@
 
 template <typename T>
 struct ChemicalReaction : Printable  {
-    ChemicalReaction<T>(std::vector<ChemicalMolecule<T>> l, std::vector<ChemicalMolecule<T>> r) {
-        left = l;
-        right = r;
-    }
+    ChemicalReaction<T>(std::vector<ChemicalMolecule<T>> l, std::vector<ChemicalMolecule<T>> r) : left(l), right(r) {}
     static constexpr ChemicalReaction<T> Create(std::vector<ChemicalMolecule<T>> l) {
         std::vector<ChemicalMolecule<T>> ret;
         if (l.size() == 2) {
@@ -99,24 +96,21 @@ struct ChemicalReaction : Printable  {
                 }
             }
         }
-        Matrix<T> x = a.GetInverse() * b;
-        T i = 1;
-        for (;; i++) {
+        const Matrix<T> x = a.GetInverse() * b;
+        for (T i = 1; true; i++) {
             const Matrix<T> tmp = x * i;
             bool ok = true;
             for (size_t y = 0; y < tmp.GetHeight() && ok; y++)
-                for (size_t x = 0; x < tmp.GetWidth() && ok; x++)
-                    if (!FloatsEqual<T>(tmp.At(x, y), std::ceil(tmp.At(x, y)))) ok = false;
+                if (!FloatsEqual<T>(tmp.At(0, y), std::round(tmp.At(0, y)))) ok = false;
             if (ok) {
-                x = tmp;
-                break;
+                ChemicalReaction<T> ret = *this;
+                for (size_t j = 0; j < ret.left.size(); j++) ret.left.at(j).count = std::round(tmp.At(0, j));
+                for (size_t j = 0; j < ret.right.size() - 1; j++) ret.right.at(j).count = std::round(tmp.At(0, j + ret.left.size()));
+                ret.right.at(ret.right.size() - 1).count = std::round(i);
+                return ret;
             }
         }
-        ChemicalReaction<T> ret = *this;
-        for (size_t i = 0; i < ret.left.size(); i++) ret.left.at(i).count = std::ceil(x.At(0, i));
-        for (size_t i = 0; i < ret.right.size() - 1; i++) ret.right.at(i).count = std::ceil(x.At(0, i + ret.left.size()));
-        ret.right.at(ret.right.size() - 1).count = std::ceil(i);
-        return ret;
+        return ChemicalReaction<T>({}, {});
     }
     virtual std::string ToString(std::string padding = "") const override {
         std::string ret = padding;

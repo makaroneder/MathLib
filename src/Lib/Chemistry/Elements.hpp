@@ -4,20 +4,8 @@
 
 template <typename T>
 struct ChemicalElement : Printable {
-    ChemicalElement(size_t atomicNumber, Dalton<T> atomicWeight, std::string sym, size_t count_, bool metal_) {
-        number = atomicNumber;
-        weight = atomicWeight;
-        symbol = sym;
-        count = count_;
-        metal = metal_;
-    }
-    ChemicalElement(ChemicalElement<T> self, size_t count_) {
-        number = self.number;
-        weight = self.weight;
-        symbol = self.symbol;
-        metal = self.metal;
-        count = count_;
-    }
+    ChemicalElement(size_t atomicNumber, Dalton<T> atomicWeight, std::string sym, size_t count_, bool metal_) : number(atomicNumber), weight(atomicWeight), symbol(sym), count(count_), metal(metal_) {}
+    ChemicalElement(ChemicalElement<T> self, size_t count_) : ChemicalElement(self.number, self.weight, self.symbol, count_, self.metal) {}
     constexpr size_t GetCount(void) const {
         return count;
     }

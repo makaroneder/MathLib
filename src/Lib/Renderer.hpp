@@ -4,11 +4,13 @@
 #include "Font.hpp"
 #include "Event.hpp"
 #include "Color.hpp"
-#include "Geometry/Shape.hpp"
+#include "Saveable.hpp"
+#include "Quaternion.hpp"
 #include "ComplexPosition.hpp"
+#include "Geometry/LineShape.hpp"
 #include <functional>
 
-struct Renderer {
+struct Renderer : Saveable {
     /// @brief Creates a new renderer
     /// @param w Width of the window
     /// @param h Height of the window
@@ -16,9 +18,8 @@ struct Renderer {
     /// @brief Destroys the renderer
     virtual ~Renderer(void);
     /// @brief Updates renderer
-    /// @param pixels Pixel to render
     /// @return Status
-    virtual bool UpdateInternal(Matrix<uint32_t> pixels) = 0;
+    virtual bool Update(void) = 0;
     /// @brief Gets current event
     /// @return Event
     virtual Event GetEvent(void) = 0;
@@ -28,12 +29,12 @@ struct Renderer {
     /// @brief Calculates height of the renderer window
     /// @return Height of the renderer window
     size_t GetHeight(void) const;
+    /// @brief Returns pixel buffer
+    /// @return Framebuffer
+    Matrix<uint32_t> GetPixels(void) const;
     /// @brief Waits for current event
     /// @return Event
     Event WaitForEvent(void);
-    /// @brief Flushes renderer buffer
-    /// @return Status
-    bool Update(void);
     /// @brief Fills screen
     /// @param color Color to fill the screen with
     void Fill(uint32_t color);
@@ -47,6 +48,34 @@ struct Renderer {
         const T x = GetX(pixel) + width / 2;
         const T y = height / 2 - GetY(pixel);
         if (x > 0 && x < width && y > 0 && y < height) pixels.At(x, y) = BlendColor(pixels.At(x, y), color);
+    }
+    /// @brief Returns pixel
+    /// @tparam T Type of number
+    /// @param pixel Position of the pixel
+    template <typename T>
+    uint32_t GetPixel(Matrix<T> pixel) const {
+        pixel = ConvertVectorToVector2<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier;
+        const T x = GetX(pixel) + width / 2;
+        const T y = height / 2 - GetY(pixel);
+        return (x > 0 && x < width && y > 0 && y < height) ? pixels.At(x, y) : 0;
+    }
+    /// @brief Copies pixels from renderer to this renderer
+    /// @tparam T Type of number
+    /// @param renderer Renderer to copy pixels from
+    /// @param rotation Vector containing axis to rotate around
+    /// @return Status
+    template <typename T>
+    bool DrawImage(const Renderer& renderer, Matrix<T> rotation) {
+        if (pointMultiplier != renderer.pointMultiplier) return false;
+        const T w = renderer.GetWidth() / (pointMultiplier * 2);
+        const T h = renderer.GetHeight() / (pointMultiplier * 2);
+        for (T y = -h; y <= h; y += 1 / pointMultiplier) {
+            for (T x = -w; x <= w; x += 1 / pointMultiplier) {
+                const Matrix<T> pos = CreateVector<T>(x, y, 0);
+                SetPixel<T>(RotateVector<T>(pos + renderer.position, renderer.position, rotation), renderer.GetPixel<T>(pos));
+            }
+        }
+        return true;
     }
     /// @brief Draws a line
     /// @tparam T Type of number
@@ -81,72 +110,59 @@ struct Renderer {
     /// @brief Renders specified shape
     /// @tparam T Type of number
     /// @param shape Shape to draw
-    /// @param angle Angle to rotate the shape by
-    /// @param axis Normalized vector containing axis to rotate around
+    /// @param rotation Vector containing axis to rotate around
     /// @param color Color of the shape
     template <typename T>
-    void DrawShape(const Shape<T>& shape, T angle, Matrix<T> axis, uint32_t color) {
-        std::vector<Line<T>> lines = shape.ToLines(angle, axis);
-        for (const Line<T>& line : lines)
-            DrawLine<T>(Line<T>(line.start, line.end), color);
+    void DrawShape(const LineShape<T>& shape, Matrix<T> rotation, uint32_t color) {
+        const std::vector<Line<T>> lines = shape.ToLines(rotation);
+        for (const Line<T>& line : lines) DrawLine<T>(Line<T>(line.start, line.end), color);
     }
-    /// @brief Renders character
+    /// @brief Renders strings
     /// @tparam T Type of number
-    /// @param chr Character to render
-    /// @param pos Position of the character
-    /// @param font Font to renderer character with
-    /// @param color Color to render character with
+    /// @param str Strings to render
+    /// @param font Font to renderer strings with
+    /// @param pos Position of the strings
+    /// @param rotation Vector containing axis to rotate around
+    /// @param scale Scale of the strings
+    /// @param color Color to render strings with
+    /// @return Status
     template <typename T>
-    void Putc(char chr, Matrix<T> pos, const PSF1* font, uint32_t color) {
+    bool Puts(std::vector<std::string> strs, PSF1* font, Matrix<T> pos, Matrix<T> rotation, Matrix<size_t> scale, uint32_t color) {
+        if (!font || !font->IsValid()) return false;
         const T w = font->GetWidth() / 2;
         const T h = font->GetHeight() / 2;
-        const uint8_t* fontPtr = font->GetGlyph(chr);
-        for (T y = -h; y < h; y++) {
-            for (T x = -w; x < w; x++)
-                if (*fontPtr & (1 << (7 - (size_t)(x + w))))
-                    SetPixel<T>(CreateVector<T>(x, -y, 0) / pointMultiplier + pos, color);
-            fontPtr++;
-        }
-    }
-    /// @brief Renders string
-    /// @tparam T Type of number
-    /// @param str String to render
-    /// @param pos Position of the string
-    /// @param startX First x position to render
-    /// @param font Font to renderer string with
-    /// @param color Color to render string with
-    template <typename T>
-    void Puts(std::string str, Matrix<T> pos, T startX, PSF1* font, uint32_t color) {
-        const T w = GetX(GetEnd<T>());
-        for (const char& chr : str) {
-            switch (chr) {
-                case ' ': {
-                    GetX(pos) += font->GetWidth() / pointMultiplier;
-                    break;
+        const size_t sx = GetX(scale);
+        const size_t sy = GetY(scale);
+        const size_t sz = GetZ(scale);
+        GetY(pos) -= strs.size() * font->GetHeight() * sy / (pointMultiplier * 2);
+        Matrix<T> tmp = pos;
+        for (const std::string& str : strs) {
+            pos = tmp;
+            GetX(pos) -= str.size() * font->GetWidth() * sx / (pointMultiplier * 2);
+            const Matrix<T> center = pos;
+            for (const char& chr : str) {
+                const uint8_t* fontPtr = font->GetGlyph(chr);
+                for (T y = -h; y < h; y++) {
+                    for (T x = -w; x < w; x++)
+                        if (*fontPtr & (1 << (7 - (size_t)(x + w))))
+                            for (size_t nz = 0; nz < sz; nz++)
+                                for (size_t ny = 0; ny < sy; ny++)
+                                    for (size_t nx = 0; nx < sx; nx++)
+                                        SetPixel<T>(RotateVector<T>(CreateVector<T>(nx + x, ny - y, nz) / pointMultiplier + pos, center, rotation), color);
+                    fontPtr++;
                 }
-                case '\n': {
-                    GetY(pos) -= font->GetHeight() / pointMultiplier;
-                    GetX(pos) = startX;
-                    break;
-                }
-                default: {
-                    Putc(chr, pos, font, color);
-                    GetX(pos) += font->GetWidth() / pointMultiplier;
-                    break;
-                }
+                GetX(pos) += font->GetWidth() * sx / pointMultiplier;
             }
-            if (GetX(pos) >= w) {
-                GetY(pos) -= font->GetHeight() / pointMultiplier;
-                GetX(pos) = startX;
-            }
+            GetY(tmp) -= font->GetHeight() * sy / pointMultiplier;
         }
+        return true;
     }
     /// @brief Calculates start of the graph
     /// @tparam T Type of number
     /// @return Start of graph
     template <typename T>
     Matrix<T> GetStart(void) const {
-        return CreateVector<T>(-(width / 2 / pointMultiplier), -(height / 2 / pointMultiplier), 0);
+        return -GetEnd<T>();
     }
     /// @brief Calculates end of the graph
     /// @tparam T Type of number
@@ -161,14 +177,12 @@ struct Renderer {
     /// @return Set of every pixel on the screen
     template <typename T>
     std::vector<T> CreateRealNumberSet(void) const {
-        const bool isFloat = IsFloat<T>();
-        const T div = isFloat ? 1 : pointMultiplier;
         const Matrix<T> startArr = GetStart<T>();
         const Matrix<T> endArr = GetEnd<T>();
         return CreateSet<T>(
-            std::max<T>(GetX(startArr), GetY(startArr)) * div,
-            std::max<T>(GetX(endArr), GetY(endArr)) * div,
-            1 / (isFloat ? pointMultiplier : 1)
+            std::max<T>(GetX(startArr), GetY(startArr)),
+            std::max<T>(GetX(endArr), GetY(endArr)),
+            1 / pointMultiplier
         );
     }
     /// @brief Draw x and y axis
@@ -188,12 +202,11 @@ struct Renderer {
     /// @param color Color of function
     template <typename T>
     void DrawFunction(std::vector<Line<T>> values, uint32_t color) {
-        const T div = IsFloat<T>() ? 1 : pointMultiplier;
         for (const Line<T>& val : values) {
             #ifdef FillGapsInFunctions
-            if (!std::isnan(GetX(val.start))) DrawLine<T>(Line<T>(val.start / div, val.end / div), color);
+            if (!std::isnan(GetX(val.start))) DrawLine<T>(Line<T>(val.start, val.end), color);
             #else
-            SetPixel<T>(val.end / div, color);
+            SetPixel<T>(val.end, color);
             #endif
         }
     }
@@ -259,6 +272,15 @@ struct Renderer {
             return ret;
         }, inSet, inAxis, outAxis);
     }
+    /// @brief Saves renderer data as PPM6 image
+    /// @param file File to save renderer data into
+    /// @return Status
+    virtual bool Save(FILE* file) const override;
+    /// @brief Loads renderer data from PPM6 image
+    /// @param file File to load renderer data from
+    /// @return Status
+    virtual bool Load(FILE* file) override;
+
     /// @brief Current position
     Matrix<num_t> position;
     /// @brief Scale

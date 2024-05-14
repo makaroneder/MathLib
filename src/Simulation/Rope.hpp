@@ -9,16 +9,12 @@ struct RopeSegment {
     Matrix<T> length;
     bool fixed;
 
-    RopeSegment(Kilogram<T> m, Matrix<T> len, bool f) {
-        mass = m;
-        length = len;
-        fixed = f;
-    }
+    RopeSegment(Kilogram<T> m, Matrix<T> len, bool f) : mass(m), length(len), fixed(f) {}
 };
 template <typename T>
 struct Rope : Shape<T> {
     static constexpr size_t jakobsenIterations = 50;
-    Rope(Matrix<T> start, std::vector<RopeSegment<T>> segments) {
+    Rope(Matrix<T> start, std::vector<RopeSegment<T>> segments) : Shape<T>(CreateVector<T>(0, 0, 0)) {
         const Matrix<T> save = start;
         for (const RopeSegment<T>& segment : segments) {
             particles.push_back(Particle<T>(start, segment.mass, segment.fixed));
@@ -46,12 +42,12 @@ struct Rope : Shape<T> {
             }
         }
     }
-    virtual std::vector<Line<T>> ToLines(T angle, Matrix<T> axis) const override {
+    virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {
         std::vector<Line<T>> lines;
-        Matrix<T> prev = particles.at(0).position;
+        Matrix<T> prev = particles.at(0).position + this->position;
         for (size_t i = 1; i < particles.size(); i++) {
-            lines.push_back(Line<T>(RotateVector<T>(prev, particles.at(0).position, angle, axis), RotateVector<T>(particles.at(i).position, particles.at(0).position, angle, axis)));
-            prev = lines.back().end;
+            lines.push_back(Line<T>(RotateVector<T>(prev, particles.at(0).position, rotation), RotateVector<T>(particles.at(i).position, particles.at(0).position, rotation)));
+            prev = lines.back().end + this->position;
         }
         return lines;
     }

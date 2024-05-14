@@ -1,133 +1,104 @@
 #include "GameEngine.hpp"
-#include <EquationSolver/Optimizer.hpp>
-#include <EquationSolver/Tokenizer.hpp>
-#include <EquationSolver/Preprocesor.hpp>
-#include <SDL2.hpp>
+#include "TextComponent.hpp"
+#include "LineShapeComponent.hpp"
+#include <Geometry/Cuboid.hpp>
+#include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Creates wall
-/// @tparam T Type of number
-/// @param data Data about the wall
-/// @return Wall
-template <typename T>
-constexpr Object<T> MakeWall(std::vector<T> data) {
-    return Object<T>(Cuboid<T>(CreateVector<T>(data.at(0), data.at(1), data.at(2)), CreateVector<T>(data.at(3), data.at(4), data.at(5))), MetrePerSecond<T>(0), data.at(6));
+/// @brief Creates update function for enemy
+/// @param target Target of the enemy
+/// @param gameOver Game state
+/// @return Update function
+UpdateFunc CreateEnemyUpdate(LineShapeComponent*& target, bool& gameOver) {
+    return [&target, &gameOver](Component& self_, UpdateData data) -> ComponentState {
+        LineShapeComponent& self = (LineShapeComponent&)self_;
+        self.position += (target->position - self.position).Normalize() * data.deltaTime.GetValue();
+        if (self.GetShape<Cuboid<num_t>>().CollidesWith(target->GetShape<Cuboid<num_t>>())) gameOver = true;
+        return ComponentState::Normal;
+    };
 }
-/// @brief Creates entity
-/// @tparam T Type of number
-/// @param data Data about the entity
-/// @return Entity
-template <typename T>
-constexpr Entity<T> MakeEntity(std::vector<T> data) {
-    return Entity<T>(Cuboid<T>(CreateVector<T>(data.at(0), data.at(1), data.at(2)), CreateVector<T>(data.at(3), data.at(4), data.at(5))), MetrePerSecond<T>(data.at(6)), data.at(7));
+/// @brief Creates update function for collectable object
+/// @param collector Component which can collect this object
+/// @param totalScore Total score
+/// @param score Score which this object will add
+/// @param start Start of spawn area
+/// @param end End of spawn area
+/// @param add Addition to spawn location
+/// @return Update function
+UpdateFunc CreateCollectableUpdate(LineShapeComponent*& collector, Scalar<size_t>& totalScore, size_t score, Matrix<num_t> start, Matrix<num_t> end, Matrix<num_t> add) {
+    return [&collector, &totalScore, score, start, end, add](Component& self_, UpdateData) -> ComponentState {
+        LineShapeComponent& self = (LineShapeComponent&)self_;
+        if (self.GetShape<Cuboid<num_t>>().CollidesWith(collector->GetShape<Cuboid<num_t>>())) {
+            totalScore += score;
+            num_t& x = GetX(self.position);
+            num_t& y = GetY(self.position);
+            const num_t save = x;
+            x = y + GetX(add);
+            y = save + GetY(add);
+            if (x < GetX(start) || x > GetX(end) || y < GetY(start) || y > GetY(end)) {
+                x = GetX(add);
+                y = GetY(add);
+            }
+        }
+        return ComponentState::Normal;
+    };
 }
 /// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
 /// @return Status
-int main(int argc, char** argv) {
+int main(void) {
     try {
-        if (argc < 2) throw std::runtime_error("No input files provided");
-        Node* root = Tokenize(Preproces(argv[1]));
-        #ifdef Debug
-        std::cout << "Generated nodes:\n" << *root << std::endl;
-        #endif
-        std::vector<num_t> player;
-        std::vector<std::vector<std::vector<std::vector<num_t>>>> levelsData;
-        State state = State({
-            BuiltinFunction("InitGameEngine", [&player, &levelsData](std::vector<const Node*> args) -> Node* {
-                const std::vector<std::complex<num_t>> tmp = args[0]->ToNumber();
-                for (const std::complex<num_t>& val : tmp) {
-                    if (val.imag() != 0) return new Node(Node::Type::Constant, "1");
-                    player.push_back(val.real());
-                }
-                const std::vector<const Node*> tmp1 = CommaToArray(args[1]->left);
-                for (auto& node : tmp1) {
-                    const std::vector<const Node*> tmp2 = CommaToArray(node->left);
-                    std::vector<std::vector<std::vector<num_t>>> objs1;
-                    for (auto& val1 : tmp2) {
-                        const std::vector<const Node*> tmp3 = CommaToArray(val1->left);
-                        std::vector<std::vector<num_t>> objs2;
-                        for (auto& val2 : tmp3) {
-                            const std::vector<std::complex<num_t>> tmp3 = val2->ToNumber();
-                            std::vector<num_t> obj;
-                            for (const std::complex<num_t>& val : tmp3) {
-                                if (val.imag() != 0) return nullptr;
-                                obj.push_back(val.real());
-                            }
-                            objs2.push_back(obj);
-                        }
-                        objs1.push_back(objs2);
-                    }
-                    levelsData.push_back(objs1);
-                }
-                return new Node(Node::Type::Constant, "0");
-            }),
-        }, {}, {
-            Variable("black", "0x000000ff"),
-            Variable("white", "0xffffffff"),
-            Variable("red", "0xff0000ff"),
-            Variable("green", "0x00ff00ff"),
-            Variable("blue", "0x0000ffff"),
-            Variable("gray", "0x808080ff"),
-            Variable("yellow", "0xffff00ff"),
-        });
-        Node* optimizedRoot = Optimize(root, state);
-        #ifdef Debug
-        std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
-        #endif
-        delete optimizedRoot;
-        delete root;
-        std::vector<Level<num_t>> levels;
-        for (const std::vector<std::vector<std::vector<num_t>>>& level : levelsData) {
-            std::vector<Object<num_t>> walls;
-            std::vector<Entity<num_t>> entities;
-            for (const std::vector<num_t>& wall : level.at(1)) walls.push_back(MakeWall<num_t>(wall));
-            for (const std::vector<num_t>& entity : level.at(2)) entities.push_back(MakeEntity<num_t>(entity));
-            levels.push_back(Level<num_t>(MakeWall<num_t>(level.at(0).at(0)), walls, entities));
-        }
-        GameEngine<num_t> engine = GameEngine<num_t>(Object<num_t>(Cuboid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(player.at(0), player.at(1), player.at(2))), MetrePerSecond<num_t>(player.at(3)), player.at(4)), levels);
-        Matrix<num_t> moveVector = CreateVector<num_t>(0, 0, 0);
         SDL2Renderer renderer = SDL2Renderer("Game Engine", 800, 800);
-        const Second<num_t> time = Second<num_t>(1);
-        while (true) {
-            renderer.Fill(0x000000ff);
-            if (!engine.Draw(renderer)) throw std::runtime_error("Failed to render level");
-            if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
-            const Event event = renderer.GetEvent();
-            if (event.type == Event::Type::Quit) break;
-            else if (event.type == Event::Type::KeyPressed || event.type == Event::Type::KeyReleased) {
-                const bool set = (event.type == Event::Type::KeyPressed);
-                switch (event.data.key) {
+        GameEngine engine = GameEngine(renderer);
+        Matrix<num_t> playerDirection = CreateVector<num_t>(0, 0, 0);
+        bool gameOver = false;
+        Second<num_t> time = Second<num_t>(NAN);
+        Scalar<size_t> score = 0;
+        LineShapeComponent* player = new LineShapeComponent([&playerDirection, &gameOver](Component& self, UpdateData data) -> ComponentState {
+            if (!gameOver && (data.event.type == Event::Type::KeyPressed || data.event.type == Event::Type::KeyReleased)) {
+                const bool pressed = data.event.type == Event::Type::KeyPressed;
+                switch (data.event.data.key) {
                     case 'w': {
-                        GetY(moveVector) = set;
+                        GetY(playerDirection) = pressed;
                         break;
                     }
                     case 's': {
-                        GetY(moveVector) = -set;
+                        GetY(playerDirection) = -pressed;
                         break;
                     }
                     case 'a': {
-                        GetX(moveVector) = -set;
+                        GetX(playerDirection) = -pressed;
                         break;
                     }
                     case 'd': {
-                        GetX(moveVector) = set;
+                        GetX(playerDirection) = pressed;
                         break;
                     }
                 }
+                ((LineShapeComponent&)self).Move(playerDirection * 10 * data.deltaTime.GetValue());
             }
-            const LevelStatus status = engine.Update(time, moveVector);
-            if (status == LevelStatus::Error) throw std::runtime_error("Failed to update game");
-            else if (status == LevelStatus::GameOver) {
-                std::cout << "You lost" << std::endl;
-                break;
+            return ComponentState::Normal;
+        }, CreateVector<num_t>(0, 0, 0), new Cuboid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(100 / renderer.pointMultiplier, 100 / renderer.pointMultiplier, 1 / renderer.pointMultiplier)), UINT32_MAX);
+        engine.AddComponent(player);
+        engine.AddComponent(new LineShapeComponent(CreateEnemyUpdate(player, gameOver), CreateVector<num_t>(0, 0, 0), new Cuboid<num_t>(CreateVector<num_t>(0, 4, 0), CreateVector<num_t>(50 / renderer.pointMultiplier, 50 / renderer.pointMultiplier, 1 / renderer.pointMultiplier)), 0xff0000ff));
+        engine.AddComponent(new LineShapeComponent(CreateCollectableUpdate(player, score, 10, renderer.GetStart<num_t>(), renderer.GetEnd<num_t>(), CreateVector<num_t>(-2, 1, 0)), CreateVector<num_t>(0, 0, 0), new Cuboid<num_t>(CreateVector<num_t>(0, 4, 0), CreateVector<num_t>(50 / renderer.pointMultiplier, 50 / renderer.pointMultiplier, 1 / renderer.pointMultiplier)), 0x00ff00ff));
+        engine.AddComponent(new LineShapeComponent(CreateCollectableUpdate(player, score, 10, renderer.GetStart<num_t>(), renderer.GetEnd<num_t>(), CreateVector<num_t>(1, -2, 0)), CreateVector<num_t>(0, 0, 0), new Cuboid<num_t>(CreateVector<num_t>(0, -4, 0), CreateVector<num_t>(50 / renderer.pointMultiplier, 50 / renderer.pointMultiplier, 1 / renderer.pointMultiplier)), 0x00ff00ff));
+        engine.AddComponent(new TextComponent([&gameOver, &time, &score](Component& self_, UpdateData data) -> ComponentState {
+            if (gameOver) {
+                TextComponent& self = (TextComponent&)self_;
+                if (std::isnan(time.GetValue())) {
+                    time = data.deltaTime * data.iteration;
+                    score += (size_t)time.GetValue() * 10;
+                    self.text = {
+                        "You survived for " + time.ToString(),
+                        "Score: " + score.ToString(),
+                    };
+                }
+                GetY(self.position) -= data.deltaTime.GetValue();
+                if (GetY(self.position) < -4) GetY(self.position) = 4;
             }
-            else if (status == LevelStatus::Victory) {
-                std::cout << "You won" << std::endl;
-                break;
-            }
-        }
+            return ComponentState::Normal;
+        }, CreateVector<num_t>(0, 3, 0), CreateVector<num_t>(0, 0, 0), { "RUN", }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<size_t>(2, 2, 1), 0xff0000ff));
+        if (!engine.Run()) throw std::runtime_error("Engine failed to run");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

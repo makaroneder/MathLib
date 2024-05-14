@@ -1,10 +1,8 @@
 #include "Test.hpp"
 
-Test::Test(size_t w, size_t h) : Renderer(w, h) {
-    failed = 0;
-    values = {};
-}
-bool Test::UpdateInternal(Matrix<uint32_t> pixels) {
+Test::Test(size_t w, size_t h) : Renderer(w, h), failed(0), values({}) {}
+bool Test::Update(void) {
+    const Matrix<uint32_t> pixels = GetPixels();
     for (size_t y = 0; y < pixels.GetHeight(); y++) {
         for (size_t x = 0; x < pixels.GetWidth(); x++) {
             const bool expected = (pixels.At(x, y) != 0);

@@ -1,5 +1,5 @@
 #define FillGapsInFunctions
-#include <SDL2.hpp>
+#include <SDL2.cpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Preprocesor.hpp>

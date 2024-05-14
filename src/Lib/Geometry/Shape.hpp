@@ -1,11 +1,14 @@
 #ifndef Geometry_Shape_H
 #define Geometry_Shape_H
-#include "Line.hpp"
+#include "../Matrix.hpp"
 
 template <typename T>
 struct Shape {
+    Shape(Matrix<T> pos) : position(pos) {}
     virtual ~Shape(void) {}
-    virtual std::vector<Line<T>> ToLines(T angle, Matrix<T> axis) const = 0;
+    virtual bool CollidesWith(const Shape<T>& other) const = 0;
+
+    Matrix<T> position;
 };
 
 #endif

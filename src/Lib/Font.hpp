@@ -23,6 +23,6 @@ struct PSF1 {
         return &buffer[chr * charSize];
     }
 } __attribute__((packed));
-extern "C" uintptr_t _binary_src_Lib_zap_light16_psf_start;
+extern "C" PSF1 _binary_src_Lib_zap_light16_psf_start;
 
 #endif

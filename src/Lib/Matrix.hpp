@@ -13,10 +13,8 @@ template <typename T>
 struct Matrix : Printable, Saveable {
     CreateOperators(Matrix<T>, T)
     /// @brief Creates a new matrix
-    constexpr Matrix(size_t w = 0, size_t h = 0) {
-        width = w;
-        height = h;
-        size_t size = width * height;
+    constexpr Matrix(size_t w = 0, size_t h = 0) : width(w), height(h) {
+        const size_t size = width * height;
         ptr.reserve(size);
         for (size_t i = 0; i < size; i++) ptr.push_back(0);
     }
@@ -24,11 +22,7 @@ struct Matrix : Printable, Saveable {
     /// @param w Width of matrix
     /// @param h Height of matrix
     /// @param arr Values for the matrix
-    constexpr Matrix(size_t w, size_t h, std::vector<T> arr) {
-        width = w;
-        height = h;
-        ptr = arr;
-    }
+    constexpr Matrix(size_t w, size_t h, std::vector<T> arr) : width(w), height(h), ptr(arr) {}
     static constexpr Matrix<T> Identity(size_t n) {
         Matrix<T> ret = Matrix<T>(n, n);
         for (size_t i = 0; i < n; i++) ret.At(i, i) = 1;
@@ -77,8 +71,9 @@ struct Matrix : Printable, Saveable {
     }
     /// @brief ^a = a / |a|
     /// @return Normalized matrix
-    constexpr Matrix<T> Normalize(void) {
-        return *this / GetLength();
+    constexpr Matrix<T> Normalize(void) const {
+        const T len = GetLength();
+        return FloatsEqual<T>(len, 0) ? *this : (*this / len);
     }
     /// @brief a . b = a_0 * b_0 + ... + a_n * b_n
     /// @param other Other matrix
@@ -279,12 +274,12 @@ struct Matrix : Printable, Saveable {
         return ret;
     }
 
-    /// @brief Raw data
-    std::vector<T> ptr;
     /// @brief Width of matrix
     size_t width;
     /// @brief Height of matrix
     size_t height;
+    /// @brief Raw data
+    std::vector<T> ptr;
 };
 /// @brief Converts matrix from one type to another
 /// @tparam T Old type of number

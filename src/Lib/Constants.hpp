@@ -6,20 +6,13 @@
 #ifdef M_PIl
 static constexpr num_t pi = M_PIl;
 static constexpr num_t e = M_El;
-static constexpr num_t sqrt2 = M_SQRT2l;
-static constexpr num_t ln2 = M_LN2l;
-static constexpr num_t ln10 = M_LN10l;
 #else
 #ifdef M_PI
 static constexpr num_t pi = M_PI;
 static constexpr num_t e = M_E;
-static constexpr num_t sqrt2 = M_SQRT2;
-static constexpr num_t ln2 = M_LN2;
 #else
 static constexpr num_t pi = 3.14;
 static constexpr num_t e = 2.71;
-static constexpr num_t sqrt2 = 1.41;
-static constexpr num_t ln2 = 0.69;
 #endif
 #endif
 
@@ -29,12 +22,12 @@ static constexpr num_t regularPaperfoldingSequence = 0.85073618820186726036;
 static constexpr num_t dottieNumber = 0.73908513321516064165;
 static constexpr num_t laplaceLimit = 0.66274341934918158097;
 static constexpr num_t goldenAngle = pi * (3 - std::sqrt(5));
-static constexpr num_t magicAngle = std::atan(sqrt2);
-static constexpr num_t silverRatio = 1 + sqrt2;
+static constexpr num_t magicAngle = std::atan(std::sqrt(2));
+static constexpr num_t silverRatio = 1 + std::sqrt(2);
 static constexpr num_t goldenRatio = (1 + std::sqrt(5)) / 2;
 static constexpr num_t superGoldenRatio = (1 + std::cbrt((29 + 3 * std::sqrt(93)) / 2) + std::cbrt((29 - 3 * std::sqrt(93)) / 2)) / 3;
 static constexpr num_t plasticRatio = std::cbrt(1 / 2 + std::sqrt(69) / 18) + std::cbrt(1 / 2 - std::sqrt(69) / 18);
-static constexpr num_t connectiveConstant = std::sqrt(2 + sqrt2);
+static constexpr num_t connectiveConstant = std::sqrt(2 + std::sqrt(2));
 static constexpr num_t keplerBouwkampConstant = 0.11494204485329620070;
 static constexpr num_t wallisConstant = std::cbrt((45 - std::sqrt(1929)) / 18) + std::cbrt((45 + std::sqrt(1929)) / 18);
 static constexpr num_t gaussConstant = 0.83462684167407318628;
@@ -55,7 +48,7 @@ static constexpr num_t universalParabolicConstant = std::asinh(1) + std::sqrt(2)
 static constexpr num_t cahenConstant = 0.64341054628833802618;
 static constexpr num_t gelfondConstant = std::pow(e, pi);
 static constexpr num_t secondFavardConstant = std::pow(pi, 2) / 8;
-static constexpr num_t gelfondSchneiderConstant = std::pow(2, sqrt2);
+static constexpr num_t gelfondSchneiderConstant = std::pow(2, std::sqrt(2));
 static constexpr num_t sierpinskiConstant = 2.58498175957925321706;
 static constexpr num_t landauRamanujanConstant = 0.76422365358922066299;
 static constexpr num_t firstNielsenRamanujanConstant = std::pow(pi, 2) / 12;
@@ -70,15 +63,15 @@ static constexpr num_t fellerTornierConstant = 0.66131704946962233528;
 static constexpr num_t base10ChampernowneConstant = 0.12345678910111213141;
 static constexpr num_t salemConstant = 1.17628081825991750654;
 static constexpr num_t khinchinConstant = 2.68545200106530644530;
-static constexpr num_t levyConstant1 = std::pow(pi, 2) / (12 * ln2);
+static constexpr num_t levyConstant1 = std::pow(pi, 2) / (12 * std::log(2));
 static constexpr num_t levyConstant2 = std::pow(e, levyConstant1);
 static constexpr num_t copelandErdosConstant = 0.23571113171923293137;
 static constexpr num_t millConstant = 1.30637788386308069046;
 static constexpr num_t gompertzConstant = 0.59634736232319407434;
-static constexpr num_t vanDerPauwConstant = pi / ln2;
+static constexpr num_t vanDerPauwConstant = pi / std::log(2);
 static constexpr num_t artinConstant = 0.37395581361920228805;
 static constexpr num_t porterConstant = 1.46707807943397547289;
-static constexpr num_t lochsConstant = (6 * ln2 * ln10) / std::pow(pi, 2);
+static constexpr num_t lochsConstant = (6 * std::log(2) * std::log(10)) / std::pow(pi, 2);
 static constexpr num_t deVicciTesseractConstant = 1.00743475688427937609;
 static constexpr num_t liebSquareIceConstant = 8 / (3 * std::sqrt(3));
 static constexpr num_t nivenConstant = 1.70521114010536776428;
@@ -86,7 +79,7 @@ static constexpr num_t stephensConstant = 0.57595996889294543964;
 static constexpr num_t reciprocalFibonacciConstant = 3.35988566624317755317;
 static constexpr num_t feigenbaumConstant1 = 4.66920160910299067185;
 static constexpr num_t chaitinConstant = 0.0078749969978123844;
-static constexpr num_t robbinsConstant = (4 + 17 * sqrt2 - 6 * std::sqrt(3) - 7 * pi) / 105 + std::log(1 + sqrt2) / 5 + (2 * std::log(2 + std::sqrt(3))) / 5;
+static constexpr num_t robbinsConstant = (4 + 17 * std::sqrt(2) - 6 * std::sqrt(3) - 7 * pi) / 105 + std::log(1 + std::sqrt(2)) / 5 + (2 * std::log(2 + std::sqrt(3))) / 5;
 static constexpr num_t weierstrassConstant = 0.47494937998792065033;
 static constexpr num_t fransenRobinsonConstant = 2.80777024202851936522;
 static constexpr num_t feigenbaumConstant2 = 2.50290787509589282228;

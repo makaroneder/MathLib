@@ -10,10 +10,12 @@ struct Function {
     std::string name;
     /// @brief Arguments of the function
     std::vector<Variable> arguments;
-    std::string domain;
-    std::string codomain;
     /// @brief Code of the function
     Node* body;
+    /// @brief Domain of the function
+    std::string domain;
+    /// @brief Codomain of the function
+    std::string codomain;
 
     /// @brief Creates new function
     /// @param n Name of the function

@@ -8,10 +8,7 @@ struct ComplexPosition {
     std::complex<T> position;
     std::complex<T> value;
 
-    ComplexPosition(std::complex<T> pos, std::complex<T> val) {
-        position = pos;
-        value = val;
-    }
+    ComplexPosition(std::complex<T> pos, std::complex<T> val) : position(pos), value(val) {}
     constexpr Matrix<T> GetPosition(void) const {
         return CreateVector<T>(position.real(), position.imag(), 0);
     }

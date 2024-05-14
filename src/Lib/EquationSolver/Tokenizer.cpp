@@ -1,6 +1,5 @@
 #include "Tokenizer.hpp"
 #include <string.h>
-#include <iostream>
 
 bool IsWhiteSpace(char chr) {
     return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';

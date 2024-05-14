@@ -6,15 +6,10 @@
 
 template <typename T>
 struct Particle : Shape<T> {
-    Particle(Matrix<T> pos, Kilogram<T> m, bool f) {
-        position = prevPosition = pos;
-        mass = m;
-        fixed = f;
-        velocity = CreateVector<T>(0, 0, 0);
-    }
+    Particle(Matrix<T> pos, Kilogram<T> m, bool f) : Shape<T>(pos), mass(m), velocity(CreateVector<T>(0, 0, 0)), prevPosition(pos), fixed(f) {}
     constexpr void SetPosition(Matrix<T> pos) {
-        const Matrix<T> tmp = position;
-        position = pos;
+        const Matrix<T> tmp = this->position;
+        this->position = pos;
         prevPosition = tmp;
     }
     constexpr Matrix<T> GetPreviousPosition(void) const {
@@ -32,12 +27,10 @@ struct Particle : Shape<T> {
     constexpr void Update(Second<T> dt, Matrix<T> force) {
         velocity += (force / mass.GetValue()) * dt.GetValue();
     }
-    virtual std::vector<Line<T>> ToLines(T angle, Matrix<T> axis) const override {
-        (void)angle;
-        (void)axis;
-        return { Line<T>(position, position), };
+    virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {
+        (void)rotation;
+        return { Line<T>(this->position, this->position), };
     }
-    Matrix<T> position;
 
     private:
     Kilogram<T> mass;

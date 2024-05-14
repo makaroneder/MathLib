@@ -15,8 +15,8 @@ SDL2Renderer::~SDL2Renderer(void) {
     SDL_DestroyTexture(texture);
     SDL_Quit();
 }
-bool SDL2Renderer::UpdateInternal(Matrix<uint32_t> pixels) {
-    if (SDL_UpdateTexture(texture, nullptr, pixels.GetValue().data(), GetWidth() * sizeof(uint32_t))) return false;
+bool SDL2Renderer::Update(void) {
+    if (SDL_UpdateTexture(texture, nullptr, GetPixels().GetValue().data(), GetWidth() * sizeof(uint32_t))) return false;
     if (SDL_RenderClear(renderer)) return false;
     if (SDL_RenderCopy(renderer, texture, nullptr, nullptr)) return false;
     SDL_RenderPresent(renderer);

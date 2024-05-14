@@ -1,18 +1,16 @@
 #ifndef Geometry_WavefrontObject_H
 #define Geometry_WavefrontObject_H
-#include "Shape.hpp"
+#include "LineShape.hpp"
 #include "../Quaternion.hpp"
 #include "../EquationSolver/Tokenizer.hpp"
 #include <fstream>
 
 template <typename T>
-struct WavefrontObject : Shape<T> {
+struct WavefrontObject : LineShape<T> {
     std::vector<Matrix<T>> verticies;
     std::vector<std::array<size_t, 3>> faces;
-    Matrix<T> position;
 
-    WavefrontObject(std::string path, Matrix<T> pos) {
-        position = pos;
+    WavefrontObject(Matrix<T> pos, std::string path) : LineShape<T>(pos) {
         std::ifstream file = std::ifstream(path);
         while (!file.eof()) {
             std::string line;
@@ -53,13 +51,18 @@ struct WavefrontObject : Shape<T> {
             }
         }
     }
-    virtual std::vector<Line<T>> ToLines(T angle, Matrix<T> axis) const override {
+    virtual bool CollidesWith(const Shape<T>& other_) const override {
+        // TODO:
+        (other_);
+        return false;
+    }
+    virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {
         std::vector<Line<T>> lines;
         for (const std::array<size_t, 3>& face : faces) {
             const std::array<Matrix<T>, 3> vert = {
-                RotateVector<T>(verticies.at(face.at(0)) + position, position, angle, axis),
-                RotateVector<T>(verticies.at(face.at(1)) + position, position, angle, axis),
-                RotateVector<T>(verticies.at(face.at(2)) + position, position, angle, axis),
+                RotateVector<T>(verticies.at(face.at(0)) + this->position, this->position, rotation),
+                RotateVector<T>(verticies.at(face.at(1)) + this->position, this->position, rotation),
+                RotateVector<T>(verticies.at(face.at(2)) + this->position, this->position, rotation),
             };
             for (size_t i = 0; i < 3; i++) lines.push_back(Line<T>(vert.at(i), vert.at((i + 1) % 3)));
         }

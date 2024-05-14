@@ -12,21 +12,11 @@ struct Quaternion : Printable {
     /// @param b_ b
     /// @param c_ c
     /// @param d_ d
-    Quaternion(T a_, T b_, T c_, T d_) {
-        a = a_;
-        b = b_;
-        c = c_;
-        d = d_;
-    }
+    Quaternion(T a_, T b_, T c_, T d_) : a(a_), b(b_), c(c_), d(d_) {}
     /// @brief q = a + v_0i + v_1j + v_2k
     /// @param scalar Scalar part of quaternion
     /// @param vector Vector part of quaternion
-    Quaternion(T scalar, Matrix<T> vector) {
-        a = scalar;
-        b = GetX(vector);
-        c = GetY(vector);
-        d = GetZ(vector);
-    }
+    Quaternion(T scalar, Matrix<T> vector) : a(scalar), b(GetX(vector)), c(GetY(vector)), d(GetZ(vector)) {}
     /// @brief Returns scalar part of quaternion
     /// @return Scalar part of quaternion
     constexpr T GetScalar(void) const {
@@ -134,13 +124,13 @@ struct Quaternion : Printable {
 /// @tparam T Type of number
 /// @param point 3D vector to rotate
 /// @param origin 3D vector to rotate around
-/// @param angle Angles to rotate by
-/// @param axis Normalized vector containing axis to rotate around
+/// @param rotation Vector containing axis to rotate around
 /// @return Rotated 3D vector
 template <typename T>
-Matrix<T> RotateVector(Matrix<T> point, Matrix<T> origin, T angle, Matrix<T> axis) {
-    const Quaternion<T> rotation = Quaternion<T>(std::cos(angle / 2), axis * std::sin(angle / 2));
-    return (rotation * Quaternion<T>(0, point - origin) * Quaternion<T>(rotation.GetScalar(), -rotation.GetVector())).GetVector() + origin;
+Matrix<T> RotateVector(Matrix<T> point, Matrix<T> origin, Matrix<T> rotation) {
+    const T angle = rotation.GetLength();
+    const Quaternion<T> quaternion = Quaternion<T>(std::cos(angle / 2), rotation.Normalize() * std::sin(angle / 2));
+    return (quaternion * Quaternion<T>(0, point - origin) * Quaternion<T>(quaternion.GetScalar(), -quaternion.GetVector())).GetVector() + origin;
 }
 
 #endif

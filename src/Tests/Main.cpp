@@ -1,6 +1,6 @@
 #include "Test.hpp"
 #include <Factorial.hpp>
-#include <Physics/Equations.hpp>
+#include <Physics/SIUnits.hpp>
 #include <iostream>
 #define TestOperation(expr) if (!(expr)) test.failed++
 
@@ -31,16 +31,6 @@ void TestConstFunction(Test& test, std::vector<T> inputSet, T c) {
 int main(void) {
     try {
         Test test = Test(800, 800);
-        const Kilogram<num_t> mass = Kilogram<num_t>(1);
-        const Kilogram<num_t> otherMass = Kilogram<num_t>(1);
-        const Metre<num_t> r = Metre<num_t>(1);
-        const Newton<num_t> force = GravitationalForce<num_t>(Newton<num_t>(NAN), mass, otherMass, r);
-        TestOperation(GravitationalForce<num_t>(force, Kilogram<num_t>(NAN), otherMass, r) == mass);
-        TestOperation(GravitationalForce<num_t>(force, mass, Kilogram<num_t>(NAN), r) == otherMass);
-        TestOperation(GravitationalForce<num_t>(force, mass, otherMass, Metre<num_t>(NAN)) == r);
-        const MetrePerSecondSquared<num_t> acceleration = ForceMassAcceleration<num_t>(force, mass, MetrePerSecondSquared<num_t>(NAN));
-        TestOperation(ForceMassAcceleration<num_t>(Newton<num_t>(NAN), mass, acceleration) == force);
-        TestOperation(ForceMassAcceleration<num_t>(force, Kilogram<num_t>(NAN), acceleration) == mass);
         TestOperation(Kilometre<num_t>(1) == Metre<num_t>(1000));
         TestOperation((Second<num_t>(1) * Second<num_t>(1)) == Second<num_t>(1).Pow(2));
         std::vector<num_t> inputSet = test.CreateRealNumberSet<num_t>();

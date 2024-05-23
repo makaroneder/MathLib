@@ -4,7 +4,7 @@
 #include "Factorial.hpp"
 #include "Printable.hpp"
 #include "Saveable.hpp"
-#include "Typedefs.hpp"
+#include "Host.hpp"
 #include <vector>
 
 /// @brief Structure representing mathematic matrixes
@@ -67,7 +67,7 @@ struct Matrix : Printable, Saveable {
     /// @brief |a| = sqrt(a . a)
     /// @return Length of the vector
     constexpr T GetLength(void) const {
-        return std::sqrt(Dot(*this));
+        return Sqrt(Dot(*this));
     }
     /// @brief ^a = a / |a|
     /// @return Normalized matrix
@@ -92,15 +92,15 @@ struct Matrix : Printable, Saveable {
         if (other.width != width || other.height != height) return NAN;
         T ret = 0;
         for (size_t y = 0; y < height; y++)
-            for (size_t x = 0; x < width; x++) ret += std::pow(other.At(x, y) - At(x, y), 2);
-        return std::sqrt(ret);
+            for (size_t x = 0; x < width; x++) ret += Pow(other.At(x, y) - At(x, y), 2);
+        return Sqrt(ret);
     }
     /// @brief ln(A) = (-1)^(1 + 1) * ((A - I)^1 / 1) + ... + (-1)^(1 + ∞) * ((A - I)^∞ / ∞)
     /// @return Logarithm of matrix
     Matrix<T> Log(void) const {
         const Matrix<T> identity = Identity(width);
         Matrix<T> ret = Matrix<T>(width, height);
-        for (T k = 1; k < 100; k++) ret += ((*this - identity).UnsignedPow(k) / k) * std::pow(-1, k + 1);
+        for (T k = 1; k < 100; k++) ret += ((*this - identity).UnsignedPow(k) / k) * Pow(-1, k + 1);
         return ret;
     }
     /// @brief e^X = X^0 / 0! + ... + X^∞ / ∞!
@@ -114,7 +114,7 @@ struct Matrix : Printable, Saveable {
     /// @param n Exponent
     /// @return Power of matrix
     Matrix<T> Pow(T n) const {
-        if (n < 0) return GetInverse().Pow(std::abs(n));
+        if (n < 0) return GetInverse().Pow(Abs(n));
         return (Log() * n).Exponential();
     }
     /// @brief X^n = exp(ln(X) * n)
@@ -138,7 +138,7 @@ struct Matrix : Printable, Saveable {
     }
     T GetDeterminant(void) const {
         if (width != height) return NAN;
-        size_t dimension = width;
+        const size_t dimension = width;
         if (dimension == 0) return 1;
         if (dimension == 1) return At(0, 0);
         if (dimension == 2) return At(0, 0) * At(1, 1) - At(0, 1) * At(1, 0);
@@ -183,7 +183,7 @@ struct Matrix : Printable, Saveable {
                     }
                     p++;
                 }
-                ret.At(i, j) = std::pow(-1, i + j) * sub.GetDeterminant();
+                ret.At(i, j) = Pow(-1, i + j) * sub.GetDeterminant();
             }
         }
         return ret;
@@ -234,14 +234,14 @@ struct Matrix : Printable, Saveable {
     virtual bool Save(FILE* file) const override {
         if (fwrite(&width, sizeof(size_t), 1, file) != 1) return false;
         if (fwrite(&height, sizeof(size_t), 1, file) != 1) return false;
-        size_t size = width * height;
+        const size_t size = width * height;
         if (fwrite(ptr.data(), sizeof(T), size, file) != size) return false;
         return true;
     }
     virtual bool Load(FILE* file) override {
         if (fread(&width, sizeof(size_t), 1, file) != 1) return false;
         if (fread(&height, sizeof(size_t), 1, file) != 1) return false;
-        size_t size = width * height;
+        const size_t size = width * height;
         ptr = {};
         ptr.reserve(size);
         for (size_t i = 0; i < width * height; i++) ptr.push_back(0);

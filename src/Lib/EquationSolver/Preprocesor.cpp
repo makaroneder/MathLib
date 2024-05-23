@@ -2,8 +2,7 @@
 #include <fstream>
 
 std::string Preproces(std::string path) {
-    std::ifstream file;
-    file.open(path);
+    std::ifstream file = std::ifstream(path);
     std::string ret = "";
     if (file.is_open()) {
         while (file) {

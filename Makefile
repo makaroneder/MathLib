@@ -56,6 +56,9 @@ GRAVOBJS = $(patsubst $(SRCDIR)/Gravity/%.cpp, $(BUILDDIR)/Objects/Gravity/%.o, 
 CMPSRCXX = $(shell find $(SRCDIR)/ComplexAnimation -type f -name "*.cpp")
 CMPOBJS = $(patsubst $(SRCDIR)/ComplexAnimation/%.cpp, $(BUILDDIR)/Objects/ComplexAnimation/%.o, $(CMPSRCXX))
 
+GAMBSRCXX = $(shell find $(SRCDIR)/Gambling -type f -name "*.cpp")
+GAMBOBJS = $(patsubst $(SRCDIR)/Gambling/%.cpp, $(BUILDDIR)/Objects/Gambling/%.o, $(GAMBSRCXX))
+
 TESTSRCXX = $(shell find $(SRCDIR)/Tests -type f -name "*.cpp")
 TESTOBJS = $(patsubst $(SRCDIR)/Tests/%.cpp, $(BUILDDIR)/Objects/Tests/%.o, $(TESTSRCXX))
 
@@ -99,6 +102,7 @@ $(eval $(call AddTarget,$(BUILDDIR)/3D.out,$(3DOBJS),-l SDL2))
 $(eval $(call AddTarget,$(BUILDDIR)/Cryptography.out,$(CRYPTOBJS),))
 $(eval $(call AddTarget,$(BUILDDIR)/Gravity.out,$(GRAVOBJS),-l SDL2))
 $(eval $(call AddTarget,$(BUILDDIR)/ComplexAnimation.out,$(CMPOBJS),-l SDL2))
+$(eval $(call AddTarget,$(BUILDDIR)/Gambling.out,$(GAMBOBJS),-l SDL2))
 $(eval $(call AddTarget,$(BUILDDIR)/Tests.out,$(TESTOBJS),))
 
 $(eval $(call RunTarget,run,debug,$(BUILDDIR)/MathGraph.out,$(MATHPROGRAMS)))
@@ -109,6 +113,7 @@ $(eval $(call RunTarget,runEngine,debugEngine,$(BUILDDIR)/GameEngine.out,))
 $(eval $(call RunTarget,run3D,debug3D,$(BUILDDIR)/3D.out,))
 $(eval $(call RunTarget,runCrypt,debugCrypt,$(BUILDDIR)/Cryptography.out,$(CRYPTMSG)))
 $(eval $(call RunTarget,runGrav,debugGrav,$(BUILDDIR)/Gravity.out,))
+$(eval $(call RunTarget,runGamb,debugGamb,$(BUILDDIR)/Gambling.out,))
 
 MLITERS = 20000
 

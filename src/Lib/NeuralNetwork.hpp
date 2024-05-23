@@ -56,7 +56,7 @@ struct NeuralNetwork : Printable, Saveable {
         for (size_t y = 0; y < input.GetHeight(); y++) {
             GetInput() = input.GetRow(y);
             Forward();
-            for (size_t x = 0; x < output.GetWidth(); x++) ret += std::pow(GetOutput().At(x, 0) - output.At(x, y), 2);
+            for (size_t x = 0; x < output.GetWidth(); x++) ret += Pow(GetOutput().At(x, 0) - output.At(x, y), 2);
         }
         return ret / input.GetHeight();
     }

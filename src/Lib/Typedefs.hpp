@@ -4,6 +4,7 @@
 #include <complex>
 
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
+#define IsBetween(x, a, b) ((x) >= (a) && (x) <= (b))
 
 /// @brief Default type for real numbers
 typedef long double num_t;
@@ -11,6 +12,8 @@ typedef long double num_t;
 typedef std::complex<num_t> complex_t;
 /// @brief Default error tolerance
 constexpr num_t eps = 1e-3;
+
+num_t Abs(num_t x);
 
 /// @brief |a - b| < eps
 /// @tparam T Type of number
@@ -20,7 +23,7 @@ constexpr num_t eps = 1e-3;
 /// @return Equality
 template <typename T>
 constexpr bool FloatsEqual(T a, T b, T eps_ = eps) {
-    return std::fabs(a - b) < eps_;
+    return Abs(a - b) < eps_;
 }
 /// @brief Converts complex number to string
 /// @tparam T Type of number

@@ -137,7 +137,7 @@ template <typename T>
 constexpr T HyperbolicCot(T x) {
     const T one = 1;
     const T two = 2;
-    return (exp(two * x) + one) / (exp(two * x) - one);
+    return (std::exp(two * x) + one) / (std::exp(two * x) - one);
 }
 /// @brief sech(x) = 2e^x / (e^2x + 1)
 /// @tparam T Type of number
@@ -147,7 +147,7 @@ template <typename T>
 constexpr T HyperbolicSec(T x) {
     const T one = 1;
     const T two = 2;
-    return (exp(x) * two) / (exp(two * x) + one);
+    return (std::exp(x) * two) / (std::exp(two * x) + one);
 }
 /// @brief csch(x) = 2e^x / (e^2x - 1)
 /// @tparam T Type of number
@@ -157,7 +157,7 @@ template <typename T>
 constexpr T HyperbolicCsc(T x) {
     const T one = 1;
     const T two = 2;
-    return (exp(x) * two) / (exp(two * x) - one);
+    return (std::exp(x) * two) / (std::exp(two * x) - one);
 }
 /// @brief arccot(x) = pi / 2 - arctan(x)
 /// @tparam T Type of number
@@ -297,7 +297,7 @@ template <typename T>
 constexpr T InversedHyperbolicCot(T x) {
     const T one = 1;
     const T two = 2;
-    return std::log((x + one) / (x - one)) / two;
+    return NaturalLog((x + one) / (x - one)) / two;
 }
 /// @brief arcsech(x) = ln((1 / x) + sqrt(2 $ (1 / x^2 - 1)))
 /// @tparam T Type of number
@@ -315,7 +315,7 @@ constexpr T InversedHyperbolicSec(T x) {
 template <typename T>
 constexpr T InversedHyperbolicCsc(T x) {
     const T one = 1;
-    return std::log(one / x + std::sqrt(one / std::pow(x, 2) + one));
+    return NaturalLog(one / x + Sqrt(one / Pow(x, 2) + one));
 }
 
 #endif

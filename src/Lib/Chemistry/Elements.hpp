@@ -16,7 +16,7 @@ struct ChemicalElement : Printable {
         return number * count;
     }
     constexpr size_t GetNeutrons(void) const {
-        return (std::roundl(weight.GetValue()) - number) * count;
+        return (std::round(weight.GetValue()) - number) * count;
     }
     constexpr std::string GetSymbol(void) const {
         return symbol;

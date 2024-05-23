@@ -1,6 +1,6 @@
 #ifndef Log_H
 #define Log_H
-#include <cmath>
+#include "Host.hpp"
 
 /// @brief log_b x = log x / log b
 /// @tparam T Type of number
@@ -9,7 +9,7 @@
 /// @return Logarithm of specified base and number
 template <typename T>
 constexpr T Log(T b, T x) {
-    return std::log(x) / std::log(b);
+    return NaturalLog(x) / NaturalLog(b);
 }
 
 #endif

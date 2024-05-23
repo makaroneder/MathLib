@@ -10,7 +10,7 @@ struct Pyramid : LineShape<T> {
     Pyramid(Matrix<T> pos, Matrix<T> s) : LineShape<T>(pos), sizes(s) {}
     virtual bool CollidesWith(const Shape<T>& other_) const override {
         // TODO:
-        (other_);
+        (void)other_;
         return false;
     }
     virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {

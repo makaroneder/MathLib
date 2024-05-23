@@ -54,19 +54,19 @@ struct Quaternion : Printable {
     /// @brief |q|^2 = a^2 + b^2 + c^2 + d^2
     /// @return Squared norm of quaternion
     T GetNormSquared(void) const {
-        return std::pow(a, 2) + std::pow(b, 2) + std::pow(c, 2) + std::pow(d, 2);
+        return Pow(a, 2) + Pow(b, 2) + Pow(c, 2) + Pow(d, 2);
     }
     /// @brief |q| = sqrt(a^2 + b^2 + c^2 + d^2)
     /// @return Norm of quaternion
     T GetNorm(void) const {
-        return std::sqrt(GetNormSquared());
+        return Sqrt(GetNormSquared());
     }
     /// @brief ln(q) = ln(|q|) + v / |v| * arccos(a / |q|)
     /// @return Logarithm of quaternion
     Quaternion<T> Log(void) const {
         const Matrix<T> v = GetVector();
         const T norm = GetNorm();
-        return Quaternion<T>(std::log(norm), v / v.GetLength() * std::acos(a / norm));
+        return Quaternion<T>(NaturalLog(norm), v / v.GetLength() * std::acos(a / norm));
     }
     /// @brief e^q = e^a * (cos(|v|) + v / |v| * sin(|v|))
     /// @return Exponential of quaternion
@@ -79,7 +79,7 @@ struct Quaternion : Printable {
     /// @param n Exponent
     /// @return Power of quaternion
     Quaternion<T> Pow(T n) const {
-        if (n < 0) return GetInverse().Pow(std::abs(n));
+        if (n < 0) return GetInverse().Pow(Abs(n));
         return (Log() * n).Exponential();
     }
     /// @brief q^n = exp(ln(q) * n)

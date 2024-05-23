@@ -44,20 +44,16 @@ struct Renderer : Saveable {
     /// @param color Color of the pixel
     template <typename T>
     void SetPixel(Matrix<T> pixel, uint32_t color) {
-        pixel = ConvertVectorToVector2<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier;
-        const T x = GetX(pixel) + width / 2;
-        const T y = height / 2 - GetY(pixel);
-        if (x > 0 && x < width && y > 0 && y < height) pixels.At(x, y) = BlendColor(pixels.At(x, y), color);
+        SetPixelInternal<T>(ConvertVectorToVector2<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier, color);
     }
     /// @brief Returns pixel
     /// @tparam T Type of number
     /// @param pixel Position of the pixel
+    /// @return Color of the pixel
     template <typename T>
-    uint32_t GetPixel(Matrix<T> pixel) const {
-        pixel = ConvertVectorToVector2<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier;
-        const T x = GetX(pixel) + width / 2;
-        const T y = height / 2 - GetY(pixel);
-        return (x > 0 && x < width && y > 0 && y < height) ? pixels.At(x, y) : 0;
+    uint32_t GetPixel(Matrix<T> pixel) {
+        uint32_t* color = GetPixelInternal<T>(ConvertVectorToVector2<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+        return color ? *color : 0;
     }
     /// @brief Copies pixels from renderer to this renderer
     /// @tparam T Type of number
@@ -83,29 +79,33 @@ struct Renderer : Saveable {
     /// @param color Color of the line
     template <typename T>
     void DrawLine(Line<T> line, uint32_t color) {
-        const Matrix<T> diff = line.end - line.start;
-        const T dx = GetX(diff);
-        const T dy = GetY(diff);
-        const T dz = GetZ(diff);
-        VectorAxis inputAxis = VectorAxis::AxisCount;
-        std::array<VectorAxis, (size_t)VectorAxis::AxisCount - 1> outputAxis;
-        if (dx == 0 && dy == 0 && dz == 0) {
-            SetPixel<T>(line.start, color);
+        Matrix<ssize_t> startVector = ConvertMatrix<T, ssize_t>(ConvertVectorToVector2<T>(line.start - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+        Matrix<ssize_t> endVector = ConvertMatrix<T, ssize_t>(ConvertVectorToVector2<T>(line.end - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+        const Matrix<ssize_t> diff = endVector - startVector;
+        const ssize_t dx = GetX(diff);
+        const ssize_t dy = GetY(diff);
+        bool steep = false;
+        ssize_t start;
+        ssize_t end;
+        if (dx == 0 && dy == 0) {
+            SetPixelInternal<ssize_t>(startVector, color);
             return;
         }
-        else if (std::abs(dx) > std::abs(dy) && std::abs(dx) > std::abs(dz)) inputAxis = VectorAxis::X;
-        else if (std::abs(dy) > std::abs(dx) && std::abs(dy) > std::abs(dz)) inputAxis = VectorAxis::Y;
-        else inputAxis = VectorAxis::Z;
-        for (size_t i = 0; i < (size_t)VectorAxis::AxisCount; i++)
-            if (i != (size_t)inputAxis) outputAxis[i - (i > (size_t)inputAxis)] = (VectorAxis)i;
-        if (GetVectorAxis(line.start, inputAxis) > GetVectorAxis(line.end, inputAxis)) std::swap(line.start, line.end);
-        for (T i = GetVectorAxis(line.start, inputAxis); i <= GetVectorAxis(line.end, inputAxis); i += 1 / pointMultiplier) {
-            Matrix<T> pos = CreateVector<T>(0, 0, 0);
-            GetVectorAxis(pos, inputAxis) = i;
-            for (const VectorAxis& out : outputAxis)
-                GetVectorAxis(pos, out) = (GetVectorAxis(diff, out) * (i - GetVectorAxis(line.start, inputAxis)) / GetVectorAxis(diff, inputAxis) + GetVectorAxis(line.start, out));
-            SetPixel<T>(pos, color);
+        else if (Abs(dx) > Abs(dy)) {
+            start = GetX(startVector);
+            end = GetX(endVector);
         }
+        else {
+            steep = true;
+            start = GetY(startVector);
+            end = GetY(endVector);
+        }
+        if (start > end) {
+            Swap(startVector, endVector);
+            Swap(start, end);
+        }
+        for (ssize_t i = start; i <= end; i++)
+            SetPixelInternal<ssize_t>(steep ? CreateVector<ssize_t>(GetX(diff) * (i - start) / GetY(diff) + GetX(startVector), i, 0) : CreateVector<ssize_t>(i, GetY(diff) * (i - start) / GetX(diff) + GetY(startVector), 0), color);
     }
     /// @brief Renders specified shape
     /// @tparam T Type of number
@@ -180,8 +180,8 @@ struct Renderer : Saveable {
         const Matrix<T> startArr = GetStart<T>();
         const Matrix<T> endArr = GetEnd<T>();
         return CreateSet<T>(
-            std::max<T>(GetX(startArr), GetY(startArr)),
-            std::max<T>(GetX(endArr), GetY(endArr)),
+            Max(GetX(startArr), GetY(startArr)),
+            Max(GetX(endArr), GetY(endArr)),
             1 / pointMultiplier
         );
     }
@@ -204,7 +204,7 @@ struct Renderer : Saveable {
     void DrawFunction(std::vector<Line<T>> values, uint32_t color) {
         for (const Line<T>& val : values) {
             #ifdef FillGapsInFunctions
-            if (!std::isnan(GetX(val.start))) DrawLine<T>(Line<T>(val.start, val.end), color);
+            if (!IsNan(GetX(val.start))) DrawLine<T>(Line<T>(val.start, val.end), color);
             #else
             SetPixel<T>(val.end, color);
             #endif
@@ -222,7 +222,7 @@ struct Renderer : Saveable {
             for (T& r : inSet) {
                 const std::complex<T> pos = std::complex<T>(r, i);
                 const std::complex<T> val = f(pos);
-                if (!(std::isnan(val.real()) || std::isinf(val.real()) || std::isnan(val.imag()) || std::isinf(val.imag())))
+                if (!(IsNaN(val) || IsInf(val) || IsNaN(pos) || IsInf(pos)))
                     ret.push_back(ComplexPosition<T>(pos, val));
             }
         }
@@ -246,7 +246,7 @@ struct Renderer : Saveable {
                 for (T j = 0; j < arr.size(); j++) prev.push_back(CreateVector<T>(NAN, NAN, NAN));
             for (T j = 0; j < arr.size(); j++) {
                 const T tmp = arr.at(j);
-                if (std::isnan(i) || std::isinf(i) || std::isnan(tmp) || std::isinf(tmp)) {
+                if (IsNaN(i) || IsInf(i) || IsNaN(tmp) || IsInf(tmp)) {
                     prev.at(j) = CreateVector<num_t>(NAN, NAN, NAN);
                     continue;
                 }
@@ -287,6 +287,21 @@ struct Renderer : Saveable {
     num_t pointMultiplier;
 
     private:
+    template <typename T>
+    bool CreateIndex(Matrix<T>& pos) const {
+        pos = CreateVector<T>(width / 2 + GetX(pos), height / 2 - GetY(pos), 0);
+        return IsBetween(GetX(pos), 0, (ssize_t)width - 1) && IsBetween(GetY(pos), 0, (ssize_t)height - 1);
+    }
+    template <typename T>
+    uint32_t* GetPixelInternal(Matrix<T> pos) {
+        return CreateIndex<T>(pos) ? &pixels.At(GetX(pos), GetY(pos)) : nullptr;
+    }
+    template <typename T>
+    void SetPixelInternal(Matrix<T> pos, uint32_t color) {
+        uint32_t* pixel = GetPixelInternal<T>(pos);
+        if (pixel) *pixel = BlendColor(*pixel, color);
+    }
+
     /// @brief Width of the window
     size_t width;
     /// @brief Height of the window

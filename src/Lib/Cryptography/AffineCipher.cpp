@@ -1,14 +1,15 @@
 #include "AffineCipher.hpp"
+#include "../Host.hpp"
 
 bool AffineCipher::DecodeKey(std::string key, ssize_t& a, ssize_t& b) const {
     std::string str = "";
     size_t i = 0;
-    while (key[i] == '-' || isdigit(key[i])) str += key[i++];
-    a = std::stoll(str);
+    while (key[i] == '-' || IsDigit(key[i])) str += key[i++];
+    a = (ssize_t)std::stold(str);
     str = "";
     if (key[i++] != ' ') return false;
-    while (key[i] == '-' || isdigit(key[i])) str += key[i++];
-    b = std::stoll(str);
+    while (key[i] == '-' || IsDigit(key[i])) str += key[i++];
+    b = (ssize_t)std::stold(str);
     return true;
 }
 char AffineCipher::EncryptChar(char chr, std::string key) const {

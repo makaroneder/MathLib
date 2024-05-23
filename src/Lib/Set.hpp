@@ -1,6 +1,6 @@
 #ifndef Set_H
 #define Set_H
-#include "Typedefs.hpp"
+#include "Host.hpp"
 #include <vector>
 
 /// @brief Creates a new set
@@ -23,7 +23,7 @@ std::vector<T> CreateSet(T start, T end, T separator) {
 /// @return Result
 template <typename T>
 bool IsInsideSet(std::vector<T> set, T element, T eps_ = eps) {
-    if (std::isnan(element) || std::isinf(element)) return false;
+    if (IsNaN(element) || IsInf(element)) return false;
     if (set.size() == 0) return true;
     for (T& i : set)
         if (FloatsEqual<T>(i, element, eps_)) return true;

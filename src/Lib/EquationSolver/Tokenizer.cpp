@@ -1,5 +1,5 @@
 #include "Tokenizer.hpp"
-#include <string.h>
+#include "../Host.hpp"
 
 bool IsWhiteSpace(char chr) {
     return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';
@@ -44,23 +44,18 @@ Node* TokenizeComma(const std::string str, size_t& i) {
 /// @return Tokenized string
 Node* TokenizeData(const std::string str, size_t& i) {
     SkipWhiteSpace(str, i);
-    if (isdigit(str[i])) {
+    if (IsDigit(str[i])) {
         std::string ret = "";
-        if ((i + 1) < str.size() && str[i] == '0' && str[i + 1] == 'x') {
-            i += 2;
-            while (i < str.size() && isxdigit(str[i])) ret += str[i++];
-            ret = std::to_string(std::stoull(ret, nullptr, 16));
-        }
-        else while (i < str.size() && (isdigit(str[i]) || str[i] == '.' || str[i] == 'e')) ret += str[i++];
+        while (i < str.size() && (IsDigit(str[i]) || str[i] == '.' || str[i] == 'e')) ret += str[i++];
         if (str[i] == 'i') {
             i++;
             return new Node(Node::Type::ComplexConstant, "(0, " + ret + ')');
         }
         return new Node(Node::Type::Constant, ret);
     }
-    else if (isalpha(str[i])) {
+    else if (IsAlpha(str[i])) {
         std::string name = "";
-        while (isalnum(str[i])) name += str[i++];
+        while (IsAlphaDigit(str[i])) name += str[i++];
         SkipWhiteSpace(str, i);
         if (str[i] == '(') {
             i++;

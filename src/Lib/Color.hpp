@@ -1,7 +1,7 @@
 #ifndef Color_H
 #define Color_H
-#include <stdint.h>
 #include "Constants.hpp"
+#include <stdint.h>
 
 /// @brief Union for converting 32 bit color to RGBA
 union Color {
@@ -31,7 +31,7 @@ union Color {
 };
 template <typename T>
 static uint32_t GetRainbow(T t) {
-    return Color(UINT8_MAX * std::pow(std::sin(t), 2), UINT8_MAX * std::pow(std::sin(t + 0.33 * 2 * pi), 2), UINT8_MAX * std::pow(std::sin(t + 0.66 * 2 * pi), 2), UINT8_MAX).hex;
+    return Color(UINT8_MAX * Pow(std::sin(t), 2), UINT8_MAX * Pow(std::sin(t + 0.33 * 2 * pi), 2), UINT8_MAX * Pow(std::sin(t + 0.66 * 2 * pi), 2), UINT8_MAX).hex;
 }
 uint32_t BlendColor(uint32_t c1, uint32_t c2);
 

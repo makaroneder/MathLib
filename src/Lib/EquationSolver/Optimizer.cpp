@@ -1,5 +1,5 @@
 #include "Optimizer.hpp"
-#include "../Typedefs.hpp"
+#include "../Host.hpp"
 #include "../Factorial.hpp"
 
 // TODO: Add derivatives and better support for complex numbers
@@ -125,7 +125,7 @@ Node* OptimizeInternal(const Node* node, State& state) {
         if (n->IsConstant()) {
             const complex_t val = n->ToNumber().at(0);
             delete n;
-            return new Node(Node::Type::Constant, std::to_string(std::abs(val)));
+            return new Node(Node::Type::Constant, std::to_string(Abs(val)));
         }
         else return new Node(Node::Type::Absolute, "", n);
     }
@@ -402,8 +402,8 @@ Node* OptimizeInternal(const Node* node, State& state) {
             const complex_t rv = r->ToNumber().at(0);
             delete l;
             delete r;
-            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(std::pow(lv.real(), rv.real())));
-            else return new Node(Node::Type::ComplexConstant, ComplexToString(std::pow(lv, rv)));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(Pow(lv.real(), rv.real())));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(Pow(lv, rv)));
         }
         else if (r->type == Node::Type::Constant && r->value == "1") {
             Node* ret = l->Recreate();
@@ -432,8 +432,8 @@ Node* OptimizeInternal(const Node* node, State& state) {
             delete l;
             delete r;
             const num_t one = 1;
-            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(std::pow(rv.real(), 1 / lv.real())));
-            else return new Node(Node::Type::ComplexConstant, ComplexToString(std::pow(rv, one / lv)));
+            if (lv.imag() == 0 && rv.imag() == 0) return new Node(Node::Type::Constant, std::to_string(Pow(rv.real(), 1 / lv.real())));
+            else return new Node(Node::Type::ComplexConstant, ComplexToString(Pow(rv, one / lv)));
         }
         else return new Node(Node::Type::Root, "", l, r);
     }

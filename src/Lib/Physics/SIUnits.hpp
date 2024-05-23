@@ -3,7 +3,6 @@
 #include "../MathObject.hpp"
 #include "../Constants.hpp"
 #include "../Printable.hpp"
-#include <array>
 
 template <typename T>
 struct Unit : Printable {
@@ -27,7 +26,7 @@ struct Unit : Printable {
         this->baseUnits[BaseUnit::ThermodynamicTemperature] = thermodynamicTemperature_;
         this->baseUnits[BaseUnit::Time] = time_;
     }
-    Unit<T>(T count_, std::array<T, BaseUnit::End> baseUnits_) : count(count_) {
+    Unit<T>(T count_, T* baseUnits_) : count(count_) {
         this->baseUnits[BaseUnit::AmountOfSubstance] = baseUnits_[BaseUnit::AmountOfSubstance];
         this->baseUnits[BaseUnit::ElectricCurrent] = baseUnits_[BaseUnit::ElectricCurrent];
         this->baseUnits[BaseUnit::Length] = baseUnits_[BaseUnit::Length];
@@ -40,7 +39,7 @@ struct Unit : Printable {
         return count;
     }
     constexpr T GetBaseUnit(size_t i) const {
-        return baseUnits.at(i);
+        return baseUnits[i];
     }
     virtual std::string ToString(std::string padding = "") const override {
         if (count == 0) return padding + "0";
@@ -58,7 +57,7 @@ struct Unit : Printable {
     }
     constexpr Unit<T> Pow(T scalar) const {
         return Unit<T>(
-            std::pow(count, scalar),
+            ::Pow(count, scalar),
             this->baseUnits[BaseUnit::AmountOfSubstance] * scalar,
             this->baseUnits[BaseUnit::ElectricCurrent] * scalar,
             this->baseUnits[BaseUnit::Length] * scalar,
@@ -110,7 +109,7 @@ struct Unit : Printable {
 
     protected:
     T count;
-    std::array<T, BaseUnit::End> baseUnits;
+    T baseUnits[BaseUnit::End];
     static constexpr const char* baseUnitsStr[] = {
         "mol", "A", "m", "cd", "kg", "K", "s",
     };
@@ -162,40 +161,40 @@ struct name : base<T> {                                                         
     }                                                                                                               \
 }
 #define CreateUnitPrefix(name, base)                                                                                \
-CreateAlternativeUnit(Quetta##name, base, 1e30);                                                        \
-CreateAlternativeUnit(Ronna##name, base, 1e27);                                                         \
-CreateAlternativeUnit(Yotta##name, base, 1e24);                                                         \
-CreateAlternativeUnit(Zetta##name, base, 1e21);                                                         \
-CreateAlternativeUnit(Exa##name, base, 1e18);                                                           \
-CreateAlternativeUnit(Peta##name, base, 1e15);                                                          \
-CreateAlternativeUnit(Tera##name, base, 1e12);                                                          \
-CreateAlternativeUnit(Giga##name, base, 1e9);                                                           \
-CreateAlternativeUnit(Mega##name, base, 1e6);                                                           \
-CreateAlternativeUnit(Kilo##name, base, 1e3);                                                           \
-CreateAlternativeUnit(Hecto##name, base, 1e2);                                                          \
-CreateAlternativeUnit(Deca##name, base, 1e1);                                                           \
-CreateAlternativeUnit(Deci##name, base, 1e-1);                                                          \
-CreateAlternativeUnit(Centi##name, base, 1e-2);                                                         \
-CreateAlternativeUnit(Milli##name, base, 1e-3);                                                         \
-CreateAlternativeUnit(Micro##name, base, 1e-6);                                                         \
-CreateAlternativeUnit(Nano##name, base, 1e-9);                                                          \
-CreateAlternativeUnit(Pico##name, base, 1e-12);                                                         \
-CreateAlternativeUnit(Femto##name, base, 1e-15);                                                        \
-CreateAlternativeUnit(Atto##name, base, 1e-18);                                                         \
-CreateAlternativeUnit(Zepto##name, base, 1e-21);                                                        \
-CreateAlternativeUnit(Yocto##name, base, 1e-24);                                                        \
-CreateAlternativeUnit(Ronto##name, base, 1e-27);                                                        \
-CreateAlternativeUnit(Quecto##name, base, 1e-30);                                                       \
-CreateAlternativeUnit(Kibi##name, base, std::pow(2, 10));                                                           \
-CreateAlternativeUnit(Mebi##name, base, std::pow(2, 20));                                                           \
-CreateAlternativeUnit(Gibi##name, base, std::pow(2, 30));                                                           \
-CreateAlternativeUnit(Tebi##name, base, std::pow(2, 40));                                                           \
-CreateAlternativeUnit(Pebi##name, base, std::pow(2, 50));                                                           \
-CreateAlternativeUnit(Exbi##name, base, std::pow(2, 60));                                                           \
-CreateAlternativeUnit(Zebi##name, base, std::pow(2, 70));                                                           \
-CreateAlternativeUnit(Yobi##name, base, std::pow(2, 80))
+CreateAlternativeUnit(Quetta##name, base, 1e30);                                                                    \
+CreateAlternativeUnit(Ronna##name, base, 1e27);                                                                     \
+CreateAlternativeUnit(Yotta##name, base, 1e24);                                                                     \
+CreateAlternativeUnit(Zetta##name, base, 1e21);                                                                     \
+CreateAlternativeUnit(Exa##name, base, 1e18);                                                                       \
+CreateAlternativeUnit(Peta##name, base, 1e15);                                                                      \
+CreateAlternativeUnit(Tera##name, base, 1e12);                                                                      \
+CreateAlternativeUnit(Giga##name, base, 1e9);                                                                       \
+CreateAlternativeUnit(Mega##name, base, 1e6);                                                                       \
+CreateAlternativeUnit(Kilo##name, base, 1e3);                                                                       \
+CreateAlternativeUnit(Hecto##name, base, 1e2);                                                                      \
+CreateAlternativeUnit(Deca##name, base, 1e1);                                                                       \
+CreateAlternativeUnit(Deci##name, base, 1e-1);                                                                      \
+CreateAlternativeUnit(Centi##name, base, 1e-2);                                                                     \
+CreateAlternativeUnit(Milli##name, base, 1e-3);                                                                     \
+CreateAlternativeUnit(Micro##name, base, 1e-6);                                                                     \
+CreateAlternativeUnit(Nano##name, base, 1e-9);                                                                      \
+CreateAlternativeUnit(Pico##name, base, 1e-12);                                                                     \
+CreateAlternativeUnit(Femto##name, base, 1e-15);                                                                    \
+CreateAlternativeUnit(Atto##name, base, 1e-18);                                                                     \
+CreateAlternativeUnit(Zepto##name, base, 1e-21);                                                                    \
+CreateAlternativeUnit(Yocto##name, base, 1e-24);                                                                    \
+CreateAlternativeUnit(Ronto##name, base, 1e-27);                                                                    \
+CreateAlternativeUnit(Quecto##name, base, 1e-30);                                                                   \
+CreateAlternativeUnit(Kibi##name, base, Pow(2, 10));                                                                \
+CreateAlternativeUnit(Mebi##name, base, Pow(2, 20));                                                                \
+CreateAlternativeUnit(Gibi##name, base, Pow(2, 30));                                                                \
+CreateAlternativeUnit(Tebi##name, base, Pow(2, 40));                                                                \
+CreateAlternativeUnit(Pebi##name, base, Pow(2, 50));                                                                \
+CreateAlternativeUnit(Exbi##name, base, Pow(2, 60));                                                                \
+CreateAlternativeUnit(Zebi##name, base, Pow(2, 70));                                                                \
+CreateAlternativeUnit(Yobi##name, base, Pow(2, 80))
 
-CreateUnit(Scalar, 0);
+CreateUnit(Scalar, 0, 0);
 CreateUnit(Mole, 1);
 CreateUnit(Ampere, 0, 1);
 CreateUnit(Metre, 0, 0, 1);
@@ -203,8 +202,8 @@ CreateUnit(Candela, 0, 0, 0, 1);
 CreateUnit(Kelvin, 0, 0, 0, 0, 0, 1);
 CreateUnit(Second, 0, 0, 0, 0, 0, 0, 1);
 CreateUnit(Hertz, 0, 0, 0, 0, 0, 0, -1);
-CreateUnit(Radian, 0);
-CreateUnit(Steradian, 0);
+CreateUnit(Radian, 0, 0);
+CreateUnit(Steradian, 0, 0);
 CreateUnit(Newton, 0, 0, 1, 0, 1, 0, -2);
 CreateUnit(Pascal, 0, 0, -1, 0, 1, 0, -2);
 CreateUnit(Joule, 0, 0, 2, 0, 1, 0, -2);

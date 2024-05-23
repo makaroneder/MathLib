@@ -34,7 +34,7 @@ static const BuiltinFunction defaultBuiltinFuncs[] = {
     CreateBuiltinFunction("im", args[0]->ToNumber().at(0).imag, 1, ),
     CreateComplexBuiltinFunction("sigmoid", Sigmoid<complex_t>, 1, args[0]->ToNumber().at(0)),
     CreateBuiltinFunction("log", Log<num_t>, 2, args[0]->ToNumber().at(0).real(), args[1]->ToNumber().at(0).real()),
-    CreateComplexBuiltinFunction("ln", std::log, 1, args[0]->ToNumber().at(0)),
+    CreateComplexBuiltinFunction("ln", NaturalLog, 1, args[0]->ToNumber().at(0)),
     CreateBuiltinFunction("floor", std::floor, 1, args[0]->ToNumber().at(0).real()),
     CreateBuiltinFunction("ceil", std::ceil, 1, args[0]->ToNumber().at(0).real()),
     CreateBuiltinFunction("atan2", std::atan2, 2, args[0]->ToNumber().at(0).real(), args[1]->ToNumber().at(0).real()),

@@ -14,7 +14,7 @@ struct Cuboid : LineShape<T> {
             if ((this->position.At(x, 0) + sizes.At(x, 0) <= other.position.At(x, 0)) || (other.position.At(x, 0) + other.sizes.At(x, 0) <= this->position.At(x, 0))) return false;
         return true;
     }
-    virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {
+    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const override {
         const T sizeX = GetX(sizes) / 2;
         const T sizeY = GetY(sizes) / 2;
         const T sizeZ = GetZ(sizes) / 2;
@@ -26,11 +26,20 @@ struct Cuboid : LineShape<T> {
         const Matrix<T> p6 = RotateVector<T>(this->position + CreateVector<T>(sizeX, -sizeY, -sizeZ), this->position, rotation);
         const Matrix<T> p7 = RotateVector<T>(this->position + CreateVector<T>(-sizeX, sizeY, -sizeZ), this->position, rotation);
         const Matrix<T> p8 = RotateVector<T>(this->position + CreateVector<T>(-sizeX, -sizeY, -sizeZ), this->position, rotation);
-        return {
-            Line<T>(p1, p2), Line<T>(p1, p3), Line<T>(p2, p4), Line<T>(p3, p4),
-            Line<T>(p1, p5), Line<T>(p2, p6), Line<T>(p3, p7), Line<T>(p4, p8),
-            Line<T>(p5, p6), Line<T>(p5, p7), Line<T>(p6, p8), Line<T>(p7, p8),
-        };
+        Array<Line<T>> ret = Array<Line<T>>(12);
+        ret.At(0) = Line<T>(p1, p2);
+        ret.At(1) = Line<T>(p1, p3);
+        ret.At(2) = Line<T>(p2, p4);
+        ret.At(3) = Line<T>(p3, p4);
+        ret.At(4) = Line<T>(p1, p5);
+        ret.At(5) = Line<T>(p2, p6);
+        ret.At(6) = Line<T>(p3, p7);
+        ret.At(7) = Line<T>(p4, p8);
+        ret.At(8) = Line<T>(p5, p6);
+        ret.At(9) = Line<T>(p5, p7);
+        ret.At(10) = Line<T>(p6, p8);
+        ret.At(11) = Line<T>(p7, p8);
+        return ret;
     }
 };
 

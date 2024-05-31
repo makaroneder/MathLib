@@ -1,13 +1,13 @@
 #include "State.hpp"
 
-State::State(std::vector<BuiltinFunction> builtinFuncs, std::vector<Function> funcs, std::vector<Variable> vars) : builtinFunctions(std::vector<BuiltinFunction>(defaultBuiltinFuncs, defaultBuiltinFuncs + SizeOfArray(defaultBuiltinFuncs))), functions(funcs) {
-    builtinFunctions.reserve(builtinFuncs.size());
-    for (const BuiltinFunction& func : builtinFuncs) builtinFunctions.push_back(func);
-    for (const Variable& var : defaultVariables) variables.push_back(Variable(var.name, var.value->Recreate()));
-    for (const Variable& var : vars) variables.push_back(var);
+State::State(Array<BuiltinFunction> builtinFuncs, Array<Function> funcs, Array<Variable> vars) : builtinFunctions(builtinFuncs), functions(funcs), variables(vars) {
+    for (size_t i = 0; i < SizeOfArray(defaultBuiltinFuncs); i++)
+        builtinFunctions.Add(defaultBuiltinFuncs[i]);
+    for (size_t i = 0; i < SizeOfArray(defaultVariables); i++)
+        variables.Add(Variable(defaultVariables[i].name, defaultVariables[i].value->Recreate()));
 }
-const Function* State::GetFunction(std::string name) const {
-    for (const Function& func : functions)
-        if (func.name == name) return &func;
-    return nullptr;
+Function State::GetFunction(String name) const {
+    for (size_t i = 0; i < functions.GetSize(); i++)
+        if (functions.At(i).name == name) return functions.At(i);
+    return Function("", Array<Variable>(), nullptr, "", "");
 }

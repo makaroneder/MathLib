@@ -18,37 +18,37 @@ void BalanceReaction(ChemicalReaction<T> reaction) {
 int main(void) {
     try {
         // 2KMnO4 + 5KNO2 + 6HNO3 => 2MnN2O6 + 7KNO3 + 3H2O
-        BalanceReaction<num_t>(ChemicalReaction<num_t>({
-            ChemicalMolecule<num_t>({ Potassium<num_t>(1), Manganese<num_t>(1), Oxygen<num_t>(4), }, 1),
-            ChemicalMolecule<num_t>({ Potassium<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(2), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
-        }, {
-            ChemicalMolecule<num_t>({ Manganese<num_t>(1), Nitrogen<num_t>(2), Oxygen<num_t>(6), }, 1),
-            ChemicalMolecule<num_t>({ Potassium<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(2), Oxygen<num_t>(1), }, 1),
+        BalanceReaction<num_t>(ChemicalReaction<num_t>(std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(1), Manganese<num_t>(1), Oxygen<num_t>(4), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(2), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
+        }, std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Manganese<num_t>(1), Nitrogen<num_t>(2), Oxygen<num_t>(6), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(2), Oxygen<num_t>(1), }, 1),
         }));
         // 2NaOH + H2SO4 => Na2SO4 + 2H2O
-        BalanceReaction<num_t>(ChemicalReaction<num_t>::Create({
-            ChemicalMolecule<num_t>({ Sodium<num_t>(1), Oxygen<num_t>(1), Hydrogen<num_t>(1), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
+        BalanceReaction<num_t>(ChemicalReaction<num_t>::Create(std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Sodium<num_t>(1), Oxygen<num_t>(1), Hydrogen<num_t>(1), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
         }));
         // 2Na + Cl2 => 2NaCl
-        BalanceReaction<num_t>(ChemicalReaction<num_t>::Create({
-            ChemicalMolecule<num_t>({ Sodium<num_t>(1), }, 1),
-            ChemicalMolecule<num_t>({ Chlorine<num_t>(2), }, 1),
+        BalanceReaction<num_t>(ChemicalReaction<num_t>::Create(std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Sodium<num_t>(1), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Chlorine<num_t>(2), }, 1),
         }));
         // 10Cr7N66H96C42O24 + 1176KMnO4 + 1729H2SO4 => 35K2Cr2O7 + 420CO2 + 660HNO3 + 1176MnSO4 + 1879H2O + 553K2SO4
-        BalanceReaction<num_t>(ChemicalReaction<num_t>({
-            ChemicalMolecule<num_t>({ Chromium<num_t>(7), Nitrogen<num_t>(66), Hydrogen<num_t>(96), Carbon<num_t>(42), Oxygen<num_t>(24), }, 1),
-            ChemicalMolecule<num_t>({ Potassium<num_t>(1), Manganese<num_t>(1), Oxygen<num_t>(4), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
-        }, {
-            ChemicalMolecule<num_t>({ Potassium<num_t>(2), Chromium<num_t>(2), Oxygen<num_t>(7), }, 1),
-            ChemicalMolecule<num_t>({ Carbon<num_t>(1), Oxygen<num_t>(2), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
-            ChemicalMolecule<num_t>({ Manganese<num_t>(1), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
-            ChemicalMolecule<num_t>({ Hydrogen<num_t>(2), Oxygen<num_t>(1), }, 1),
-            ChemicalMolecule<num_t>({ Potassium<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
+        BalanceReaction<num_t>(ChemicalReaction<num_t>(std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Chromium<num_t>(7), Nitrogen<num_t>(66), Hydrogen<num_t>(96), Carbon<num_t>(42), Oxygen<num_t>(24), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(1), Manganese<num_t>(1), Oxygen<num_t>(4), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
+        }, std::vector<ChemicalMolecule<num_t>> {
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(2), Chromium<num_t>(2), Oxygen<num_t>(7), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Carbon<num_t>(1), Oxygen<num_t>(2), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(1), Nitrogen<num_t>(1), Oxygen<num_t>(3), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Manganese<num_t>(1), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Hydrogen<num_t>(2), Oxygen<num_t>(1), }, 1),
+            ChemicalMolecule<num_t>(std::vector<ChemicalElement<num_t>> { Potassium<num_t>(2), Sulfur<num_t>(1), Oxygen<num_t>(4), }, 1),
         }));
         return EXIT_SUCCESS;
     }

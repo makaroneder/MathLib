@@ -4,7 +4,8 @@
 
 template <typename T>
 struct ChemicalElement : Printable {
-    ChemicalElement(size_t atomicNumber, Dalton<T> atomicWeight, std::string sym, size_t count_, bool metal_) : number(atomicNumber), weight(atomicWeight), symbol(sym), count(count_), metal(metal_) {}
+    ChemicalElement(void) {}
+    ChemicalElement(size_t atomicNumber, Dalton<T> atomicWeight, String sym, size_t count_, bool metal_) : number(atomicNumber), weight(atomicWeight), symbol(sym), count(count_), metal(metal_) {}
     ChemicalElement(ChemicalElement<T> self, size_t count_) : ChemicalElement(self.number, self.weight, self.symbol, count_, self.metal) {}
     constexpr size_t GetCount(void) const {
         return count;
@@ -16,16 +17,16 @@ struct ChemicalElement : Printable {
         return number * count;
     }
     constexpr size_t GetNeutrons(void) const {
-        return (std::round(weight.GetValue()) - number) * count;
+        return (Round(weight.GetValue()) - number) * count;
     }
-    constexpr std::string GetSymbol(void) const {
+    constexpr String GetSymbol(void) const {
         return symbol;
     }
     constexpr bool IsMetal(void) const {
         return metal;
     }
-    virtual std::string ToString(std::string padding = "") const override {
-        return padding + symbol + (count == 1 ? "" : std::to_string(count));
+    virtual String ToString(String padding = "") const override {
+        return padding + symbol + (count == 1 ? "" : ::ToString(count));
     }
     constexpr ChemicalElement<T> operator*=(size_t num) {
         count *= num;
@@ -35,7 +36,7 @@ struct ChemicalElement : Printable {
     private:
     size_t number;
     Dalton<T> weight;
-    std::string symbol;
+    String symbol;
     size_t count;
     bool metal;
 };

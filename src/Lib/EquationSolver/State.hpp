@@ -5,12 +5,12 @@
 #include "Variable.hpp"
 
 struct State {
-    std::vector<BuiltinFunction> builtinFunctions;
-    std::vector<Function> functions;
-    std::vector<Variable> variables;
+    Array<BuiltinFunction> builtinFunctions;
+    Array<Function> functions;
+    Array<Variable> variables;
 
-    State(std::vector<BuiltinFunction> builtinFuncs = {}, std::vector<Function> funcs = {}, std::vector<Variable> vars = {});
-    const Function* GetFunction(std::string name) const;
+    State(Array<BuiltinFunction> builtinFuncs = Array<BuiltinFunction>(), Array<Function> funcs = Array<Function>(), Array<Variable> vars = Array<Variable>());
+    Function GetFunction(String name) const;
 };
 
 #endif

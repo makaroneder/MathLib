@@ -15,11 +15,6 @@ struct Line {
     /// @param s Starting point of line
     /// @param e Ending point of line
     Line(Matrix<T> s = CreateVector<T>(0, 0, 0), Matrix<T> e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
-    /// @brief d = sqrt((b_0 - a_0)^2 + ... + (b_n - a_n)^2)
-    /// @return Length of line
-    T GetLength(void) const {
-        return start.GetDistance(end);
-    }
 };
 /// @brief Converts a line from one type to another
 /// @tparam T Old type

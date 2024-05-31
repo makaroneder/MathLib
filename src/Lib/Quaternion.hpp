@@ -1,6 +1,7 @@
 #ifndef Quaternion_H
 #define Quaternion_H
 #include "Vector.hpp"
+#include "Trigonometry.hpp"
 
 /// @brief q = a + bi + cj + dk
 /// @tparam T Type of number
@@ -30,15 +31,15 @@ struct Quaternion : Printable {
     /// @brief Converts quaternion to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual std::string ToString(std::string padding = "") const override {
-        std::string ret = FloatsEqual<T>(a, 0) ? "" : std::to_string(a);
-        if (FloatsEqual<T>(b, 1)) ret += ret.empty() ? "i" : " + i";
-        else if (!FloatsEqual<T>(b, 0)) ret += (ret.empty() ? "" : " + ") + std::to_string(b) + 'i';
-        if (FloatsEqual<T>(c, 1)) ret += ret.empty() ? "j" : " + j";
-        else if (!FloatsEqual<T>(c, 0)) ret += (ret.empty() ? "" : " + ") + std::to_string(c) + 'j';
-        if (FloatsEqual<T>(d, 1)) ret += ret.empty() ? "k" : " + k";
-        else if (!FloatsEqual<T>(d, 0)) ret += (ret.empty() ? "" : " + ") + std::to_string(d) + 'k';
-        return padding + (ret.empty() ? "0" : ret);
+    virtual String ToString(String padding = "") const override {
+        String ret = FloatsEqual<T>(a, 0) ? "" : ::ToString(a);
+        if (FloatsEqual<T>(b, 1)) ret += ret.IsEmpty() ? "i" : " + i";
+        else if (!FloatsEqual<T>(b, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + ::ToString(b) + 'i';
+        if (FloatsEqual<T>(c, 1)) ret += ret.IsEmpty() ? "j" : " + j";
+        else if (!FloatsEqual<T>(c, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + ::ToString(c) + 'j';
+        if (FloatsEqual<T>(d, 1)) ret += ret.IsEmpty() ? "k" : " + k";
+        else if (!FloatsEqual<T>(d, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + ::ToString(d) + 'k';
+        return padding + (ret.IsEmpty() ? "0" : ret);
     }
     /// @brief (a + bi + cj + dk) * (e + fi + gj + hk) = (ae - bf - cg - dh) + (af + be + ch - dg)i + (ag - bh + ce + df)j + (ah + bg - cf + de)k
     /// @param other Other quaternion
@@ -66,14 +67,14 @@ struct Quaternion : Printable {
     Quaternion<T> Log(void) const {
         const Matrix<T> v = GetVector();
         const T norm = GetNorm();
-        return Quaternion<T>(NaturalLog(norm), v / v.GetLength() * std::acos(a / norm));
+        return Quaternion<T>(NaturalLog(norm), v / v.GetLength() * InversedCos<T>(a / norm));
     }
     /// @brief e^q = e^a * (cos(|v|) + v / |v| * sin(|v|))
     /// @return Exponential of quaternion
     Quaternion<T> Exponential(void) const {
         const Matrix<T> v = GetVector();
         const T len = v.GetLength();
-        return Quaternion<T>(std::cos(len), v / len * std::sin(len)) * std::exp(a);
+        return Quaternion<T>(Cos<T>(len), v / len * Sin(len)) * Exp(a);
     }
     /// @brief q^n = exp(ln(q) * n)
     /// @param n Exponent
@@ -129,8 +130,17 @@ struct Quaternion : Printable {
 template <typename T>
 Matrix<T> RotateVector(Matrix<T> point, Matrix<T> origin, Matrix<T> rotation) {
     const T angle = rotation.GetLength();
-    const Quaternion<T> quaternion = Quaternion<T>(std::cos(angle / 2), rotation.Normalize() * std::sin(angle / 2));
+    const Quaternion<T> quaternion = Quaternion<T>(Cos<T>(angle / 2), rotation.Normalize() * Sin(angle / 2));
     return (quaternion * Quaternion<T>(0, point - origin) * Quaternion<T>(quaternion.GetScalar(), -quaternion.GetVector())).GetVector() + origin;
+}
+/// @brief a x b = (a_2 * b_3 - a_3 * b_2)i + (a_3 * b_1 - a_1 * b_3)j + (a_1 * b_2 - a_2 * b_1)k
+/// @tparam T Type of number
+/// @param a A
+/// @param b B
+/// @return Cross product of vector A and B
+template <typename T>
+Matrix<T> CrossProduct(Matrix<T> a, Matrix<T> b) {
+    return (Quaternion<T>(0, a) * Quaternion<T>(0, b)).GetVector();
 }
 
 #endif

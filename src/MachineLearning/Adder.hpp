@@ -10,7 +10,7 @@ State<T> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
     const size_t rows = StdPow(n, 2);
-    State<T> state = State<T>(1, Matrix<T>(bits * 2, rows), Matrix<T>(bits, rows), NeuralNetwork<T>({ bits * 2, bits * 4, bits, }));
+    State<T> state = State<T>(1, Matrix<T>(bits * 2, rows), Matrix<T>(bits, rows), NeuralNetwork<T>(std::vector<size_t> { bits * 2, bits * 4, bits, }));
     for (size_t i = 0; i < rows; i++) {
         const size_t x = i / n;
         const size_t y = i % n;

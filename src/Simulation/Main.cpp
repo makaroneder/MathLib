@@ -1,13 +1,12 @@
 #include "Rope.hpp"
 #include <SDL2.cpp>
-#include <iostream>
 
 int main(void) {
     try {
         SDL2Renderer renderer = SDL2Renderer("Physics simulation", 800, 800);
         const Kilogram<num_t> baseMass = Kilogram<num_t>(1);
         const Matrix<num_t> gravity = CreateVector<num_t>(0, -9.81, 0);
-        Rope<num_t> rope = Rope<num_t>(CreateVector<num_t>(0, 3, 0), {
+        Rope<num_t> rope = Rope<num_t>(CreateVector<num_t>(0, 3, 0), std::vector<RopeSegment<num_t>> {
             RopeSegment<num_t>(baseMass, CreateVector<num_t>(0, -1, 0), true),
             RopeSegment<num_t>(Kilogram<num_t>(baseMass * 5), CreateVector<num_t>(2, -1, 0), false),
             RopeSegment<num_t>(Kilogram<num_t>(baseMass * 10), CreateVector<num_t>(0, 0, 0), false),
@@ -23,7 +22,7 @@ int main(void) {
             });
             renderer.Fill(0x000000ff);
             renderer.DrawShape<num_t>(rope, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
-            if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
+            if (!renderer.Update()) Panic("Failed to update UI");
             if (renderer.GetEvent().type == Event::Type::Quit) break;
         }
         return EXIT_SUCCESS;

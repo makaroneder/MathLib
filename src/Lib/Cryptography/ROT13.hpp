@@ -3,8 +3,8 @@
 #include "CaesarCipher.hpp"
 
 struct ROT13 : Protocol {
-    virtual char EncryptChar(char chr, std::string key) const override;
-    virtual char DecryptChar(char chr, std::string key) const override;
+    virtual char EncryptChar(char chr, String key) const override;
+    virtual char DecryptChar(char chr, String key) const override;
 
     private:
     CaesarCipher base;

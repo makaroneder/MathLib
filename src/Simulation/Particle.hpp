@@ -1,12 +1,12 @@
 #ifndef Particle_H
 #define Particle_H
 #include <Physics/SIUnits.hpp>
-#include <Geometry/Shape.hpp>
+#include <Geometry/LineShape.hpp>
 #include <Quaternion.hpp>
 
 template <typename T>
-struct Particle : Shape<T> {
-    Particle(Matrix<T> pos, Kilogram<T> m, bool f) : Shape<T>(pos), mass(m), velocity(CreateVector<T>(0, 0, 0)), prevPosition(pos), fixed(f) {}
+struct Particle : LineShape<T> {
+    Particle(Matrix<T> pos, Kilogram<T> m, bool f) : LineShape<T>(pos), mass(m), velocity(CreateVector<T>(0, 0, 0)), prevPosition(pos), fixed(f) {}
     constexpr void SetPosition(Matrix<T> pos) {
         const Matrix<T> tmp = this->position;
         this->position = pos;
@@ -27,9 +27,15 @@ struct Particle : Shape<T> {
     constexpr void Update(Second<T> dt, Matrix<T> force) {
         velocity += (force / mass.GetValue()) * dt.GetValue();
     }
-    virtual std::vector<Line<T>> ToLines(Matrix<T> rotation) const override {
+    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const override {
         (void)rotation;
-        return { Line<T>(this->position, this->position), };
+        Array<Line<T>> ret = Array<Line<T>>(1);
+        ret.At(0) = Line<T>(this->position, this->position);
+        return ret;
+    }
+    virtual bool CollidesWith(const Shape<T>&) const override {
+        // TODO:
+        return false;
     }
 
     private:

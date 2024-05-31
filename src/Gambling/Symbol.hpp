@@ -3,10 +3,10 @@
 #include <Geometry/WavefrontObject.hpp>
 
 struct Symbol : WavefrontObject<num_t> {
-    std::string name;
-    std::vector<size_t> multiplier;
+    String name;
+    Array<size_t> multiplier;
 
-    Symbol(std::string path, std::string n, std::vector<size_t> mult);
+    Symbol(FileSystem& fileSystem, String path, String n, Array<size_t> mult);
     bool operator==(const Symbol& other) const;
 };
 

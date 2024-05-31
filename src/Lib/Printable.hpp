@@ -1,6 +1,6 @@
 #ifndef Printable_H
 #define Printable_H
-#include <ostream>
+#include "Typedefs.hpp"
 
 /// @brief Interface for printable structures
 struct Printable {
@@ -9,12 +9,11 @@ struct Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual std::string ToString(std::string padding = "") const = 0;
+    virtual String ToString(String padding = "") const = 0;
 };
-/// @brief Prints a string representation of printable structures
-/// @param stream Stream to print data into
-/// @param printable Data to print
-/// @return Stream
-std::ostream& operator<<(std::ostream& stream, const Printable& printable);
+/// @brief Converts struct to string
+/// @param printable Struct to convert
+/// @return String representation
+String ToString(const Printable& printable);
 
 #endif

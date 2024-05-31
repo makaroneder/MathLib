@@ -12,9 +12,9 @@
 /// @param inputSet Input set
 /// @param f Function to test
 template <typename T>
-void TestFunction(Test& test, std::vector<T> inputSet, std::function<T(T)> f) {
+void TestFunction(Test& test, Array<T> inputSet, std::function<T(T)> f) {
     test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, VectorAxis::X, VectorAxis::Y), UINT32_MAX);
-    for (Matrix<T>& val : test.values) std::swap(GetX(val), GetY(val));
+    for (Matrix<T>& val : test.values) Swap<T>(GetX(val), GetY(val));
     test.DrawFunction<T>(test.GenerateFunction<num_t>(f, inputSet, VectorAxis::Y, VectorAxis::X), UINT32_MAX);
 }
 /// @brief Tests whether const function return values are correct
@@ -23,9 +23,9 @@ void TestFunction(Test& test, std::vector<T> inputSet, std::function<T(T)> f) {
 /// @param inputSet Input set
 /// @param c Const value
 template <typename T>
-void TestConstFunction(Test& test, std::vector<T> inputSet, T c) {
+void TestConstFunction(Test& test, Array<T> inputSet, T c) {
     test.values = std::vector<Matrix<T>>();
-    for (T& x : inputSet) test.values.push_back(CreateVector<T>(x, c, 0));
+    for (size_t i = 0; i < inputSet.GetSize(); i++) test.values.push_back(CreateVector<T>(inputSet.At(i), c, 0));
     TestFunction<T>(test, inputSet, [c](T) -> T { return c; });
 }
 int main(void) {
@@ -33,18 +33,18 @@ int main(void) {
         Test test = Test(800, 800);
         TestOperation(Kilometre<num_t>(1) == Metre<num_t>(1000));
         TestOperation((Second<num_t>(1) * Second<num_t>(1)) == Second<num_t>(1).Pow(2));
-        std::vector<num_t> inputSet = test.CreateRealNumberSet<num_t>();
-        for (num_t& i : inputSet) TestOperation(IsInsideSet<num_t>(inputSet, i));
+        Array<num_t> inputSet = test.CreateRealNumberSet<num_t>();
+        for (size_t i = 0; i < inputSet.GetSize(); i++) TestOperation(IsInsideSet<num_t>(inputSet, inputSet.At(i)));
         TestOperation(Sigmoid<num_t>(0) == 0.5);
         TestOperation(Factorial<num_t>(0) == 1);
-        TestOperation(Matrix<num_t>(1, 1, { 2, }).Normalize().GetLength() == 1);
-        TestOperation(IsInsideSet<num_t>({ }, 0));
-        TestOperation(!IsInsideSet<num_t>({ NAN, }, 0));
-        TestOperation(!IsInsideSet<num_t>({ INFINITY, }, 0));
-        TestOperation(!IsInsideSet<num_t>({ }, NAN));
-        TestOperation(!IsInsideSet<num_t>({ }, INFINITY));
-        TestOperation(!IsInsideSet<num_t>({ NAN, }, NAN));
-        TestOperation(!IsInsideSet<num_t>({ INFINITY, }, INFINITY));
+        TestOperation(Matrix<num_t>(1, 1, std::vector<num_t> { 2, }).Normalize().GetLength() == 1);
+        TestOperation(IsInsideSet<num_t>(std::vector<num_t> { }, 0));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { NAN, }, 0));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { INFINITY, }, 0));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { }, NAN));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { }, INFINITY));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { NAN, }, NAN));
+        TestOperation(!IsInsideSet<num_t>(std::vector<num_t> { INFINITY, }, INFINITY));
         TestConstFunction<num_t>(test, inputSet, 0);
         if (test.failed != 0) std::cout << test.failed << " test(s) failed" << std::endl;
         return test.failed;

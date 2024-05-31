@@ -1,4 +1,9 @@
 #include "Host.hpp"
+#include "Constants.hpp"
+
+#define ComplexToReal(x)                                                \
+    const complex_t complex = x;                                        \
+    return FloatsEqual<num_t>(complex.imag(), 0) ? complex.real() : NAN
 
 bool IsUpper(char chr) {
     return chr >= 'A' && chr <= 'Z';
@@ -21,47 +26,46 @@ bool IsAlphaDigit(char chr) {
 num_t Abs(num_t x) {
     return Abs(complex_t(x, 0));
 }
-#ifndef Freestanding
-num_t Abs(complex_t x) {
-    return std::abs(x);
-}
-#endif
 num_t Max(num_t x, num_t y) {
     return (x <= y) ? y : x;
 }
-#ifndef Freestanding
-complex_t Pow(complex_t x, complex_t y) {
-    return std::pow(x, y);
-}
-#endif
 num_t Pow(num_t x, num_t y) {
-    return Pow(complex_t(x, 0), complex_t(y, 0)).real();
+    ComplexToReal(Pow(complex_t(x, 0), complex_t(y, 0)));
 }
 complex_t Sqrt(complex_t x) {
     return Pow(x, 0.5);
 }
 num_t Sqrt(num_t x) {
-    return Pow(x, 0.5);
+    ComplexToReal(Sqrt(complex_t(x, 0)));
 }
-#ifndef Freestanding
-num_t NaturalLog(num_t x) {
-    return std::log(x);
-}
-complex_t NaturalLog(complex_t x) {
-    return std::log(x);
-}
-bool IsNaN(num_t x) {
-    return std::isnan(x);
+#ifdef Freestanding
+num_t Cbrt(num_t x) {
+    return Pow(x, 1 / 3);
 }
 #endif
+num_t NaturalLog(num_t x) {
+    ComplexToReal(NaturalLog(complex_t(x, 0)));
+}
 bool IsNaN(complex_t x) {
     return IsNaN(x.real()) || IsNaN(x.imag());
 }
-#ifndef Freestanding
-bool IsInf(num_t x) {
-    return std::isinf(x);
-}
-#endif
 bool IsInf(complex_t x) {
     return IsInf(x.real()) || IsInf(x.imag());
+}
+num_t Exp(num_t x) {
+    ComplexToReal(Exp(complex_t(x, 0)));
+}
+#ifdef Freestanding
+complex_t Exp(complex_t x) {
+    return Pow(e, x);
+}
+#endif
+num_t Ceil(num_t x) {
+    return Floor(x) + 1;
+}
+num_t Sin(num_t x) {
+    ComplexToReal(Sin(complex_t(x, 0)));
+}
+num_t InversedSin(num_t x) {
+    ComplexToReal(InversedSin(complex_t(x, 0)));
 }

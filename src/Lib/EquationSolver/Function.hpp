@@ -7,21 +7,23 @@
 /// @brief Function
 struct Function {
     /// @brief Name of the function
-    std::string name;
+    String name;
     /// @brief Arguments of the function
-    std::vector<Variable> arguments;
+    Array<Variable> arguments;
     /// @brief Code of the function
     Node* body;
     /// @brief Domain of the function
-    std::string domain;
+    String domain;
     /// @brief Codomain of the function
-    std::string codomain;
+    String codomain;
 
+    /// @brief Creates empty function
+    Function(void);
     /// @brief Creates new function
     /// @param n Name of the function
     /// @param args Arguments of the function
     /// @param b Code of the function
-    Function(std::string n, std::vector<Variable> args, Node* b, std::string d, std::string c);
+    Function(String n, Array<Variable> args, Node* b, String d, String c);
 };
 
 #endif

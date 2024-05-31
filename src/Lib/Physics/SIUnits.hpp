@@ -41,15 +41,15 @@ struct Unit : Printable {
     constexpr T GetBaseUnit(size_t i) const {
         return baseUnits[i];
     }
-    virtual std::string ToString(std::string padding = "") const override {
+    virtual String ToString(String padding = "") const override {
         if (count == 0) return padding + "0";
-        std::string str = count == 1 ? "" : std::to_string(count);
+        String str = count == 1 ? "" : ::ToString(count);
         bool first = true;
         for (size_t i = 0; i < BaseUnit::End; i++) {
             if (baseUnits[i] != 0) {
-                if (!first) str += std::string(" * ");
+                if (!first) str += " * ";
                 str += baseUnitsStr[i];
-                if (baseUnits[i] != 1) str += "^" + std::to_string(baseUnits[i]);
+                if (baseUnits[i] != 1) str += String("^") + ::ToString(baseUnits[i]);
                 first = false;
             }
         }
@@ -117,7 +117,7 @@ struct Unit : Printable {
     private:
     void Add(Unit<T> other) {
         for (size_t i = 0; i < BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.baseUnits[i]) throw std::runtime_error("Invalid units added");
+            if (this->baseUnits[i] != other.baseUnits[i]) Panic("Invalid units added");
         this->count += other.count;
     }
     void Multiply(T scalar) {
@@ -129,7 +129,7 @@ struct Gram : Unit<T> {
     Gram<T>(T count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
     Gram<T>(Unit<T> other) : Unit<T>(other.GetValue(), 0, 0, 0, 0, 1) {
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");
     }
     virtual constexpr T GetValue(void) const override {
         return this->count * 1000;
@@ -142,7 +142,7 @@ struct name : Unit<T> {                                                         
     name<T>(T count_ = 0) : Unit<T>(count_, __VA_ARGS__) {}                                                         \
     name<T>(Unit<T> other) : Unit<T>(other.GetValue(), __VA_ARGS__) {                                               \
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");    \
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");    \
     }                                                                                                               \
 }
 #define CreateAlternativeUnit(name, base, mul)                                                                      \
@@ -151,7 +151,7 @@ struct name : base<T> {                                                         
     name<T>(T count_ = 0) : base<T>(count_ * (mul)) {}                                                              \
     name<T>(base<T> other) : base<T>(other.GetValue()) {                                                            \
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) throw std::runtime_error("Invalid units converted");    \
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");    \
     }                                                                                                               \
     constexpr base<T> ToBaseUnit(void) const {                                                                      \
         return base<T>(this->count);                                                                                \

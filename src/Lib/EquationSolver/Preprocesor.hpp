@@ -1,10 +1,10 @@
 #ifndef Preprocesor_H
 #define Preprocesor_H
-#include <string>
+#include "../FileSystem.hpp"
 
 /// @brief Reads file from given path
 /// @param path Path to the file to read
 /// @return Contents of the specified file
-std::string Preproces(std::string path);
+String Preproces(FileSystem& fileSystem, String path);
 
 #endif

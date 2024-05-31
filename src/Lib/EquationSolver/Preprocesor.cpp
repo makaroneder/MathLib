@@ -1,16 +1,12 @@
 #include "Preprocesor.hpp"
-#include <fstream>
 
-std::string Preproces(std::string path) {
-    std::ifstream file = std::ifstream(path);
-    std::string ret = "";
-    if (file.is_open()) {
-        while (file) {
-            std::string line;
-            std::getline(file, line);
-            ret += line + '\n';
-        }
+// TODO: Add includes and other preprocesor instructions
+String Preproces(FileSystem& fileSystem, String path) {
+    const size_t file = fileSystem.Open(path, OpenMode::Read);
+    String ret = "";
+    if (file != SIZE_MAX) {
+        const size_t size = fileSystem.GetFileSize(file);
+        while (fileSystem.Tell(file) < size) ret += fileSystem.ReadUntil(file, '\n') + '\n';
     }
-    ret.pop_back();
     return ret;
 }

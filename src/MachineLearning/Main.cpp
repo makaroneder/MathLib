@@ -3,6 +3,7 @@
 #else
 #include "LogicGates.hpp"
 #endif
+#include <Libc/HostFileSystem.hpp>
 #include <iostream>
 #include <unistd.h>
 
@@ -12,20 +13,21 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 3) throw std::runtime_error("No input file provided");
+        if (argc < 3) Panic("No input file provided");
         #ifdef Debug
         const clock_t start = clock();
         #else
         srand(time(nullptr));
         #endif
+        HostFileSystem fs;
         const size_t printStatements = 10;
-        const size_t limit = std::stoull(argv[2]);
+        const size_t limit = (size_t)StringToNumber(argv[2]);
         State<num_t> state;
         if (access(argv[1], F_OK) == -1) {
             state = GetDefaultState<num_t>();
             state.neuralNetwork.Random(0, 1);
         }
-        else if (!state.LoadFromPath(argv[1])) throw std::runtime_error("Failed to load neural network");
+        else if (!state.LoadFromPath(fs, argv[1])) Panic("Failed to load neural network");
         #ifdef Debug
         std::cout << "Start data:\n";
         std::cout << "Cost = " << state.Cost() << std::endl;
@@ -37,7 +39,7 @@ int main(int argc, char** argv) {
             #else
             const NeuralNetwork<num_t> diff = state.Backprop();
             #endif
-            if (diff.GetCount() == 0) throw std::runtime_error("Failed to update neural network");
+            if (diff.GetCount() == 0) Panic("Failed to update neural network");
             state.Learn(diff);
             #ifdef Debug
             if (i % (limit / printStatements) == 0) {
@@ -67,7 +69,7 @@ int main(int argc, char** argv) {
                 std::cout << '[' << y << ", " << x << "] => " << z << '\n';
             }
         }
-        if (!state.SaveFromPath(argv[1])) throw std::runtime_error("Failed to save neural network");
+        if (!state.SaveFromPath(fs, argv[1])) Panic("Failed to save neural network");
         #ifdef Debug
         std::cout << (num_t)(clock() - start) / CLOCKS_PER_SEC << std::endl;
         #endif

@@ -1,7 +1,6 @@
 #include <Geometry/Pyramid.hpp>
 #include <Geometry/Cuboid.hpp>
 #include <SDL2.cpp>
-#include <iostream>
 
 /// @brief Entry point for this program
 /// @return Status
@@ -16,7 +15,7 @@ int main(void) {
             renderer.Fill(0x000000ff);
             renderer.DrawShape<num_t>(cuboid, axis.Normalize() * angle, 0xff0000ff);
             renderer.DrawShape<num_t>(triangle, axis.Normalize() * angle, 0x00ff00ff);
-            if (!renderer.Update()) throw std::runtime_error("Failed to update UI");
+            if (!renderer.Update()) Panic("Failed to update UI");
             const Event event = renderer.GetEvent();
             if (event.type == Event::Type::Quit) break;
             else if (event.type == Event::Type::KeyPressed) {

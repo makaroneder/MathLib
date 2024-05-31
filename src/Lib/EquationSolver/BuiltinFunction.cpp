@@ -1,3 +1,4 @@
 #include "BuiltinFunction.hpp"
 
-BuiltinFunction::BuiltinFunction(std::string n, std::function<Node*(std::vector<const Node*>)> func) : name(n), function(func) {}
+BuiltinFunction::BuiltinFunction(void) {}
+BuiltinFunction::BuiltinFunction(String n, std::function<Node*(Array<const Node*>)> func) : name(n), function(func) {}

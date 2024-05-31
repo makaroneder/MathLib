@@ -38,11 +38,11 @@ struct State : Saveable {
     constexpr void Learn(NeuralNetwork<T> diff) {
         neuralNetwork.Learn(diff, rate);
     }
-    virtual bool Save(FILE* file) const override {
-        return fwrite(&rate, sizeof(T), 1, file) == 1 && trainingDataInput.Save(file) && trainingDataOutput.Save(file) && neuralNetwork.Save(file);
+    virtual bool Save(FileSystem& fileSystem, size_t file) const override {
+        return fileSystem.Write(file, &rate, sizeof(T)) && trainingDataInput.Save(fileSystem, file) && trainingDataOutput.Save(fileSystem, file) && neuralNetwork.Save(fileSystem, file);
     }
-    virtual bool Load(FILE* file) override {
-        return fread(&rate, sizeof(T), 1, file) == 1 && trainingDataInput.Load(file) && trainingDataOutput.Load(file) && neuralNetwork.Load(file);
+    virtual bool Load(FileSystem& fileSystem, size_t file) override {
+        return fileSystem.Read(file, &rate, sizeof(T)) && trainingDataInput.Load(fileSystem, file) && trainingDataOutput.Load(fileSystem, file) && neuralNetwork.Load(fileSystem, file);
     }
 };
 

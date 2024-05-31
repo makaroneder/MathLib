@@ -1,19 +1,19 @@
 #include "Protocol.hpp"
 #include "../Host.hpp"
 
-std::string Protocol::Encrypt(std::string str, std::string key) const {
-    std::string ret = "";
-    for (const char& chr : str) {
-        if (!IsAlphaDigit(chr)) ret += chr;
-        else ret += EncryptChar(chr, key);
+String Protocol::Encrypt(String str, String key) const {
+    String ret = "";
+    for (size_t i = 0; i < str.GetSize(); i++) {
+        if (!IsAlphaDigit(str.At(i))) ret += str.At(i);
+        else ret += EncryptChar(str.At(i), key);
     }
     return ret;
 }
-std::string Protocol::Decrypt(std::string str, std::string key) const {
-    std::string ret = "";
-    for (const char& chr : str) {
-        if (!IsAlphaDigit(chr)) ret += chr;
-        else ret += DecryptChar(chr, key);
+String Protocol::Decrypt(String str, String key) const {
+    String ret = "";
+    for (size_t i = 0; i < str.GetSize(); i++) {
+        if (!IsAlphaDigit(str.At(i))) ret += str.At(i);
+        else ret += DecryptChar(str.At(i), key);
     }
     return ret;
 }

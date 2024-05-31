@@ -13,16 +13,14 @@ template <typename T>
 struct Matrix : Printable, Saveable {
     CreateOperators(Matrix<T>, T)
     /// @brief Creates a new matrix
-    constexpr Matrix(size_t w = 0, size_t h = 0) : width(w), height(h) {
-        const size_t size = width * height;
-        ptr.reserve(size);
-        for (size_t i = 0; i < size; i++) ptr.push_back(0);
+    constexpr Matrix(size_t w = 0, size_t h = 0) : width(w), height(h), ptr(Array<T>(w * h)) {
+        for (size_t i = 0; i < width * height; i++) ptr.At(i) = 0;
     }
     /// @brief Creates a new matrix
     /// @param w Width of matrix
     /// @param h Height of matrix
     /// @param arr Values for the matrix
-    constexpr Matrix(size_t w, size_t h, std::vector<T> arr) : width(w), height(h), ptr(arr) {}
+    constexpr Matrix(size_t w, size_t h, Array<T> arr) : width(w), height(h), ptr(arr) {}
     static constexpr Matrix<T> Identity(size_t n) {
         Matrix<T> ret = Matrix<T>(n, n);
         for (size_t i = 0; i < n; i++) ret.At(i, i) = 1;
@@ -34,12 +32,12 @@ struct Matrix : Printable, Saveable {
     constexpr size_t GetHeight(void) const {
         return height;
     }
-    constexpr std::vector<T> GetValue(void) const {
+    constexpr Array<T> GetValue(void) const {
         return ptr;
     }
     constexpr Matrix<T> GetRow(size_t y) const {
-        std::vector<T> ret;
-        for (size_t x = 0; x < width; x++) ret.push_back(At(x, y));
+        Array<T> ret = Array<T>(width);
+        for (size_t x = 0; x < width; x++) ret.At(x) = At(x, y);
         return Matrix<T>(width, 1, ret);
     }
     constexpr void Fill(T v) {
@@ -55,19 +53,24 @@ struct Matrix : Printable, Saveable {
     /// @param y Y position
     /// @return Data at specified position
     T& At(size_t x, size_t y) {
-        return ptr.at(y * width + x);
+        return ptr.At(y * width + x);
     }
     /// @brief Returns data at specified position
     /// @param x X position
     /// @param y Y position
     /// @return Data at specified position
     constexpr T At(size_t x, size_t y) const {
-        return ptr.at(y * width + x);
+        return ptr.At(y * width + x);
+    }
+    /// @brief |a|^2 = a . a
+    /// @return Squared length of the vector
+    constexpr T GetLengthSquared(void) const {
+        return Dot(*this);
     }
     /// @brief |a| = sqrt(a . a)
     /// @return Length of the vector
     constexpr T GetLength(void) const {
-        return Sqrt(Dot(*this));
+        return Sqrt(GetLengthSquared());
     }
     /// @brief ^a = a / |a|
     /// @return Normalized matrix
@@ -84,16 +87,6 @@ struct Matrix : Printable, Saveable {
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) ret += At(x, y) * other.At(x, y);
         return ret;
-    }
-    /// @brief d = sqrt((b_0 - a_0)^2 + ... + (b_n - a_n)^2)
-    /// @param other Other matrix
-    /// @return Distance between two matrices
-    constexpr T GetDistance(Matrix<T> other) const {
-        if (other.width != width || other.height != height) return NAN;
-        T ret = 0;
-        for (size_t y = 0; y < height; y++)
-            for (size_t x = 0; x < width; x++) ret += Pow(other.At(x, y) - At(x, y), 2);
-        return Sqrt(ret);
     }
     /// @brief ln(A) = (-1)^(1 + 1) * ((A - I)^1 / 1) + ... + (-1)^(1 + ∞) * ((A - I)^∞ / ∞)
     /// @return Logarithm of matrix
@@ -123,6 +116,9 @@ struct Matrix : Printable, Saveable {
     Matrix<T> Pow(Matrix<T> n) const {
         return (Log() * n).Exponential();
     }
+    /// @brief Checks whether the matrix is multiple of another matrix
+    /// @param other Another matrix
+    /// @return Check status
     bool IsMultipleOf(Matrix<T> other) const {
         if (other.width != width || other.height != height) return false;
         T prev = 0;
@@ -136,6 +132,8 @@ struct Matrix : Printable, Saveable {
         }
         return true;
     }
+    /// @brief Returns determinant of the matrix
+    /// @return Determinant of the matrix
     T GetDeterminant(void) const {
         if (width != height) return NAN;
         const size_t dimension = width;
@@ -160,12 +158,16 @@ struct Matrix : Printable, Saveable {
         }
         return ret;
     }
+    /// @brief Returns transpose of the matrix
+    /// @return Transpose of the matrix
     Matrix<T> GetTranspose(void) const {
         Matrix<T> ret = Matrix<T>(height, width);
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) ret.At(y, x) = At(x, y);
         return ret;
     }
+    /// @brief Returns cofactor of the matrix
+    /// @return Cofactor of the matrix
     Matrix<T> GetCofactor(void) const {
         if (width != height) return Matrix<T>(0, 0);
         Matrix<T> ret = Matrix<T>(width, width);
@@ -183,11 +185,13 @@ struct Matrix : Printable, Saveable {
                     }
                     p++;
                 }
-                ret.At(i, j) = Pow(-1, i + j) * sub.GetDeterminant();
+                ret.At(i, j) = ::Pow(-1, i + j) * sub.GetDeterminant();
             }
         }
         return ret;
     }
+    /// @brief Returns inverse of the matrix
+    /// @return Inverse of the matrix
     Matrix<T> GetInverse(void) const {
         if (GetDeterminant() == 0) return Matrix<T>(0, 0);
         return GetCofactor().GetTranspose() / GetDeterminant();
@@ -195,22 +199,25 @@ struct Matrix : Printable, Saveable {
     /// @brief Converts matrix to string
     /// @param padding String to pad with
     /// @return String representation of matrix
-    virtual std::string ToString(std::string padding = "") const override {
+    virtual String ToString(String padding = "") const override {
         if (height == 1) {
-            std::string ret = padding + "[";
-            for (size_t x = 0; x < width; x++) ret += std::to_string(At(x, 0)) + (((x + 1) == width) ? "]" : ", ");
+            String ret = padding + "[";
+            for (size_t x = 0; x < width; x++) ret += ::ToString(At(x, 0)) + (((x + 1) == width) ? "]" : ", ");
             return ret;
         }
         else {
-            std::string ret = padding + "[\n";
+            String ret = padding + "[\n";
             for (size_t y = 0; y < height; y++) {
                 ret += padding + '\t';
-                for (size_t x = 0; x < width; x++) ret += std::to_string(At(x, y)) + (((x + 1) == width && (y + 1) == height) ? "\n" : ", ");
+                for (size_t x = 0; x < width; x++) ret += ::ToString(At(x, y)) + (((x + 1) == width && (y + 1) == height) ? "\n" : ", ");
                 if ((y + 1) != height) ret += '\n';
             }
             return ret + padding + ']';
         }
     }
+    /// @brief Multiplies 2 matrices
+    /// @param other Another matrix
+    /// @return Result of multiplication
     constexpr Matrix<T> operator*(Matrix<T> other) const {
         if (width != other.height) return Matrix<T>();
         Matrix<T> ret = Matrix<T>(other.width, height);
@@ -231,21 +238,33 @@ struct Matrix : Printable, Saveable {
             for (size_t x = 0; x < width && ret; x++) ret = At(x, y) == other.At(x, y);
         return ret;
     }
-    virtual bool Save(FILE* file) const override {
-        if (fwrite(&width, sizeof(size_t), 1, file) != 1) return false;
-        if (fwrite(&height, sizeof(size_t), 1, file) != 1) return false;
-        const size_t size = width * height;
-        if (fwrite(ptr.data(), sizeof(T), size, file) != size) return false;
+    /// @brief Saves matrix data
+    /// @param fileSystem File system to save matrix data into
+    /// @param file File to save matrix data into
+    /// @return Status
+    virtual bool Save(FileSystem& fileSystem, size_t file) const override {
+        if (!fileSystem.Write(file, &width, sizeof(size_t)) || !fileSystem.Write(file, &height, sizeof(size_t))) return false;
+        const size_t size = ptr.GetSize();
+        for (size_t i = 0; i < size; i++) {
+            const T tmp = ptr.At(i);
+            if (!fileSystem.Write(file, &tmp, sizeof(T))) return false;
+        }
         return true;
     }
-    virtual bool Load(FILE* file) override {
-        if (fread(&width, sizeof(size_t), 1, file) != 1) return false;
-        if (fread(&height, sizeof(size_t), 1, file) != 1) return false;
-        const size_t size = width * height;
-        ptr = {};
-        ptr.reserve(size);
-        for (size_t i = 0; i < width * height; i++) ptr.push_back(0);
-        if (fread(ptr.data(), sizeof(T), size, file) != size) return false;
+    /// @brief Loads matrix data
+    /// @param fileSystem File system to load matrix data from
+    /// @param file File to load matrix data from
+    /// @return Status
+    virtual bool Load(FileSystem& fileSystem, size_t file) override {
+        if (!fileSystem.Read(file, &width, sizeof(size_t))) return false;
+        if (!fileSystem.Read(file, &height, sizeof(size_t))) return false;
+        ptr = Array<T>(width * height);
+        const size_t size = ptr.GetSize();
+        for (size_t i = 0; i < size; i++) {
+            T tmp;
+            if (!fileSystem.Read(file, &tmp, sizeof(T))) return false;
+            ptr.At(i) = tmp;
+        }
         return true;
     }
 
@@ -253,7 +272,7 @@ struct Matrix : Printable, Saveable {
     /// @brief a + b = [a_0 + b_0, ..., a_n + b_n]
     /// @param other Matrix to add
     void Add(Matrix<T> other) {
-        if (other.width != width || other.height != height) throw std::runtime_error("Invalid width or height of matrixes for addition");
+        if (other.width != width || other.height != height) Panic("Invalid width or height of matrixes for addition");
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) At(x, y) += other.At(x, y);
     }
@@ -267,7 +286,7 @@ struct Matrix : Printable, Saveable {
     /// @param n Exponent
     /// @return Unsigned power of matrix
     Matrix<T> UnsignedPow(size_t n) const {
-        if (width != height) throw std::runtime_error("Matrix is not quadratic");
+        if (width != height) Panic("Matrix is not quadratic");
         if (n == 0) return Matrix<T>::Identity(width);
         Matrix<T> ret = *this;
         for (size_t i = 1; i < n; i++) ret = ret * *this;
@@ -279,7 +298,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Height of matrix
     size_t height;
     /// @brief Raw data
-    std::vector<T> ptr;
+    Array<T> ptr;
 };
 /// @brief Converts matrix from one type to another
 /// @tparam T Old type of number

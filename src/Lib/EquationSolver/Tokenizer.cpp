@@ -1,17 +1,18 @@
 #include "Tokenizer.hpp"
 #include "../Host.hpp"
+#include <iostream>
 
 bool IsWhiteSpace(char chr) {
     return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';
 }
-void SkipWhiteSpace(const std::string str, size_t& i) {
-    while (IsWhiteSpace(str[i])) i++;
+void SkipWhiteSpace(const String str, size_t& i) {
+    while (i < str.GetSize() && IsWhiteSpace(str[i])) i++;
 }
 /// @brief Converts a string to a node type
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Node type
-Node::Type GetType(const std::string str, size_t& i) {
+Node::Type GetType(const String str, size_t& i) {
     SkipWhiteSpace(str, i);
     switch (str[i++]) {
         case ',': return Node::Type::Comma;
@@ -26,15 +27,15 @@ Node::Type GetType(const std::string str, size_t& i) {
         default: return Node::Type::None;
     }
 }
-Node* TokenizeInternal(const std::string str, size_t& i);
+Node* TokenizeInternal(const String str, size_t& i);
 /// @brief Tokenizes string into nodes
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeComma(const std::string str, size_t& i) {
+Node* TokenizeComma(const String str, size_t& i) {
     Node* ret = TokenizeInternal(str, i);
     SkipWhiteSpace(str, i);
-    while (i < str.size() && str[i] == ',')
+    while (i < str.GetSize() && str[i] == ',')
         ret = new Node(GetType(str, i), "", ret, TokenizeInternal(str, i));
     return ret;
 }
@@ -42,19 +43,19 @@ Node* TokenizeComma(const std::string str, size_t& i) {
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeData(const std::string str, size_t& i) {
+Node* TokenizeData(const String str, size_t& i) {
     SkipWhiteSpace(str, i);
     if (IsDigit(str[i])) {
-        std::string ret = "";
-        while (i < str.size() && (IsDigit(str[i]) || str[i] == '.' || str[i] == 'e')) ret += str[i++];
+        String ret = "";
+        while (i < str.GetSize() && (IsDigit(str[i]) || str[i] == '.' || str[i] == 'e')) ret += str[i++];
         if (str[i] == 'i') {
             i++;
-            return new Node(Node::Type::ComplexConstant, "(0, " + ret + ')');
+            return new Node(Node::Type::ComplexConstant, String("(0, ") + ret + ')');
         }
         return new Node(Node::Type::Constant, ret);
     }
     else if (IsAlpha(str[i])) {
-        std::string name = "";
+        String name = "";
         while (IsAlphaDigit(str[i])) name += str[i++];
         SkipWhiteSpace(str, i);
         if (str[i] == '(') {
@@ -72,7 +73,7 @@ Node* TokenizeData(const std::string str, size_t& i) {
             else if (name == "product") return new Node(Node::Type::Product, "", ret);
             else {
                 SkipWhiteSpace(str, i);
-                if (str[i] == ':') {
+                if (i < str.GetSize() && str[i] == ':') {
                     i++;
                     Node* inputSet = TokenizeData(str, i);
                     if (inputSet == nullptr) {
@@ -102,7 +103,7 @@ Node* TokenizeData(const std::string str, size_t& i) {
     }
     else if (str[i] == '"') {
         i++;
-        std::string ret = "";
+        String ret = "";
         while (str[i] != '"') ret += str[i++];
         i++;
         return new Node(Node::Type::String, ret);
@@ -152,10 +153,10 @@ Node* TokenizeData(const std::string str, size_t& i) {
 }
 
 #define TokenizeLayer(func, req, next)                                      \
-Node* Tokenize##func(const std::string str, size_t& i) {                    \
+Node* Tokenize##func(const String str, size_t& i) {                         \
     Node* ret = Tokenize##next(str, i);                                     \
     SkipWhiteSpace(str, i);                                                 \
-    while (i < str.size() && (req)) {                                       \
+    while (i < str.GetSize() && (req)) {                                    \
         ret = new Node(GetType(str, i), "", ret, Tokenize##next(str, i));   \
         if (ret == nullptr) return nullptr;                                 \
     }                                                                       \
@@ -165,10 +166,10 @@ Node* Tokenize##func(const std::string str, size_t& i) {                    \
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeIndex(const std::string str, size_t& i) {
+Node* TokenizeIndex(const String str, size_t& i) {
     Node* ret = TokenizeData(str, i);
     SkipWhiteSpace(str, i);
-    if (str[i] == '[') {
+    if (i < str.GetSize() && str[i] == '[') {
         i++;
         ret = new Node(Node::Type::Index, "", ret, TokenizeInternal(str, i));
         SkipWhiteSpace(str, i);
@@ -184,9 +185,9 @@ Node* TokenizeIndex(const std::string str, size_t& i) {
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeFactorial(const std::string str, size_t& i) {
+Node* TokenizeFactorial(const String str, size_t& i) {
     Node* ret = TokenizeIndex(str, i);
-    if (str[i] == '!') ret = new Node(GetType(str, i), "", ret);
+    if (i < str.GetSize() && str[i] == '!') ret = new Node(GetType(str, i), "", ret);
     return ret;
 }
 TokenizeLayer(Exponentiation, str[i] == '^' || str[i] == '$', Factorial)
@@ -197,12 +198,12 @@ TokenizeLayer(Equality, str[i] == '=', Addition)
 /// @param str String to tokenize
 /// @param i Current position in the string
 /// @return Tokenized string
-Node* TokenizeInternal(const std::string str, size_t& i) {
+Node* TokenizeInternal(const String str, size_t& i) {
     return TokenizeEquality(str, i);
 }
-Node* Tokenize(const std::string str) {
+Node* Tokenize(const String str) {
     size_t i = 0;
     Node* ret = TokenizeInternal(str, i);
-    while (i < str.size() && ret != nullptr) ret = new Node(Node::Type::Comma, "", ret, TokenizeInternal(str, i));
+    while (i < str.GetSize() && ret != nullptr) ret = new Node(Node::Type::Comma, "", ret, TokenizeInternal(str, i));
     return ret;
 }

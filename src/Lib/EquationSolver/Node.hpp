@@ -1,10 +1,7 @@
 #ifndef Node_H
 #define Node_H
-#include "../Typedefs.hpp"
 #include "../Printable.hpp"
-#include <functional>
 #include <string>
-#include <vector>
 
 /// @brief Contains mathematical operations, constants, functions and variables
 struct Node : Printable {
@@ -23,7 +20,7 @@ struct Node : Printable {
         Integral, Summation, Product,
     } type;
     /// @brief Value of the node
-    std::string value;
+    String value;
     /// @brief Left child of the node
     Node* left;
     /// @brief Right child of the node
@@ -34,7 +31,7 @@ struct Node : Printable {
     /// @param val Value
     /// @param l Left child
     /// @param r Right child
-    Node(Type t, std::string val, Node* l = nullptr, Node* r = nullptr);
+    Node(Type t, String val, Node* l = nullptr, Node* r = nullptr);
     /// @brief Destroys current node and it's children
     virtual ~Node(void) override;
     /// @brief Is the node constant
@@ -45,28 +42,29 @@ struct Node : Printable {
     Node* Recreate(void) const;
     /// @brief Converts node to number array
     /// @return Number array
-    std::vector<complex_t> ToNumber(void) const;
+    Array<complex_t> ToNumber(void) const;
     /// @brief Converts values of the current node to string
     /// @param padding Padding of the generated strings
-    virtual std::string ToString(std::string padding = "") const override;
+    virtual String ToString(String padding = "") const override;
 };
 /// @brief Converts node to array
 /// @param node Node to convert
 /// @return Converted array
-std::vector<const Node*> CommaToArray(const Node* node);
+Array<const Node*> CommaToArray(const Node* node);
 /// @brief Converts array to node
 /// @param array Array to convert
 /// @return Converted node
-Node* ArrayToComma(std::vector<Node*> array);
-/// @brief Replaces every node with a new node
+Node* ArrayToComma(Array<Node*> array);
+/// @brief Replaces every node containing specified variable with specified replacement
 /// @param node Root node to replace
-/// @param f Function returning new nodes based on old nodes
+/// @param name Name of the variable to replace
+/// @param replacement Node to replace with
 /// @return New root node
-Node* ReplaceNode(const Node* node, std::function<Node*(const Node*)> f);
-/// @brief Checks whether node contains other node
+Node* ReplaceVariable(const Node* node, String name, const Node* replacement);
+/// @brief Checks whether node contains specified variable
 /// @param node Root node to check
-/// @param f Function returning wheter node contains other node
+/// @param name Name of the variable
 /// @return Status
-bool ContainsNode(const Node* node, std::function<bool(const Node*)> f);
+bool ContainsVariable(const Node* node, String name);
 
 #endif

@@ -1,7 +1,8 @@
 #include "Question.hpp"
 #include <EquationSolver/Preprocesor.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <Host.hpp>
 #include <iostream>
-#include <vector>
 
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
@@ -9,18 +10,19 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        HostFileSystem fs;
         const size_t retryCount = 3;
         num_t solved = 0;
         bool running = true;
         for (int i = 1; i < argc && running; i++) {
-            const Question question = Question(Preproces(argv[i]));
+            const Question question = Question(Preproces(fs, argv[i]));
             std::cout << question.equation;
             for (size_t j = 0; j < retryCount && running; j++) {
                 std::cout << "> ";
                 std::string tmp;
                 std::cin >> tmp;
                 if (tmp == "exit") running = false;
-                else if (FloatsEqual<num_t>(std::stold(tmp), question.solution, 0.01)) {
+                else if (FloatsEqual<num_t>(StringToNumber(tmp), question.solution, 0.01)) {
                     solved++;
                     break;
                 }

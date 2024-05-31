@@ -5,81 +5,88 @@
 
 template <typename T>
 struct ChemicalReaction : Printable  {
-    ChemicalReaction<T>(std::vector<ChemicalMolecule<T>> l, std::vector<ChemicalMolecule<T>> r) : left(l), right(r) {}
-    static constexpr ChemicalReaction<T> Create(std::vector<ChemicalMolecule<T>> l) {
-        std::vector<ChemicalMolecule<T>> ret;
-        if (l.size() == 2) {
-            std::vector<ChemicalElement<T>> l0 = l.at(0).GetElements();
-            std::vector<ChemicalElement<T>> l1 = l.at(1).GetElements();
-            if ((l.at(0).IsHydroxide() && l.at(1).IsAcid()) || (l.at(1).IsHydroxide() && l.at(0).IsAcid())) {
-                std::vector<ChemicalElement<T>>& hydroxide = l.at(0).IsHydroxide() ? l0 : l1;
-                std::vector<ChemicalElement<T>>& acid = l.at(0).IsAcid() ? l0 : l1;
-                std::vector<ChemicalElement<T>> elements;
-                for (size_t i = 0; i < hydroxide.size() - 2; i++)
-                    elements.push_back(ChemicalElement<T>(hydroxide.at(i), hydroxide.at(i).GetCount() * acid.at(0).GetCount()));
-                for (size_t i = 1; i < acid.size(); i++)
-                    elements.push_back(ChemicalElement<T>(acid.at(i), acid.at(i).GetCount() * hydroxide.at(hydroxide.size() - 1).GetCount()));
-                ret.push_back(ChemicalMolecule<T>(elements, 1));
-                ret.push_back(ChemicalMolecule<T>({ Hydrogen<T>(2), Oxygen<T>(1), }, 1));
+    ChemicalReaction<T>(Array<ChemicalMolecule<T>> l, Array<ChemicalMolecule<T>> r) : left(l), right(r) {}
+    static constexpr ChemicalReaction<T> Create(Array<ChemicalMolecule<T>> l) {
+        Array<ChemicalMolecule<T>> ret;
+        if (l.GetSize() == 2) {
+            Array<ChemicalElement<T>> l0 = l.At(0).GetElements();
+            Array<ChemicalElement<T>> l1 = l.At(1).GetElements();
+            if ((l.At(0).IsHydroxide() && l.At(1).IsAcid()) || (l.At(1).IsHydroxide() && l.At(0).IsAcid())) {
+                Array<ChemicalElement<T>>& hydroxide = l.At(0).IsHydroxide() ? l0 : l1;
+                Array<ChemicalElement<T>>& acid = l.At(0).IsAcid() ? l0 : l1;
+                Array<ChemicalElement<T>> elements;
+                for (size_t i = 0; i < hydroxide.GetSize() - 2; i++)
+                    elements.Add(ChemicalElement<T>(hydroxide.At(i), hydroxide.At(i).GetCount() * acid.At(0).GetCount()));
+                for (size_t i = 1; i < acid.GetSize(); i++)
+                    elements.Add(ChemicalElement<T>(acid.At(i), acid.At(i).GetCount() * hydroxide.At(hydroxide.GetSize() - 1).GetCount()));
+                ret.Add(ChemicalMolecule<T>(elements, 1));
+                Array<ChemicalElement<num_t>> arr = Array<ChemicalElement<num_t>>(2);
+                arr.At(0) = Hydrogen<T>(2);
+                arr.At(1) = Oxygen<T>(1);
+                ret.Add(ChemicalMolecule<T>(arr, 1));
             }
-            else if ((l.at(0).IsMetal() && l.at(1).IsNonMetal()) || (l.at(1).IsMetal() && l.at(0).IsNonMetal()))
-                ret.push_back(ChemicalMolecule<T>({ ChemicalElement<T>((l.at(0).IsMetal() ? l0 : l1).at(0), 1), ChemicalElement<T>((l.at(0).IsNonMetal() ? l0 : l1).at(0), 1), }, 1));
+            else if ((l.At(0).IsMetal() && l.At(1).IsNonMetal()) || (l.At(1).IsMetal() && l.At(0).IsNonMetal())) {
+                Array<ChemicalElement<num_t>> arr = Array<ChemicalElement<num_t>>(2);
+                arr.At(0) = ChemicalElement<T>((l.At(0).IsMetal() ? l0 : l1).At(0), 1);
+                arr.At(1) = ChemicalElement<T>((l.At(0).IsNonMetal() ? l0 : l1).At(0), 1);
+                ret.Add(ChemicalMolecule<T>(arr, 1));
+            }
         }
         return ChemicalReaction<T>(l, ret);
     }
-    constexpr std::vector<std::vector<ChemicalElement<T>>> GetLeftList(void) const {
-        std::vector<std::vector<ChemicalElement<T>>> ret;
-        for (const ChemicalMolecule<T>& mol : left) ret.push_back(mol.GetElements());
+    constexpr Array<Array<ChemicalElement<T>>> GetLeftList(void) const {
+        Array<Array<ChemicalElement<T>>> ret;
+        for (size_t i = 0; i < left.GetSize(); i++) ret.Add(left.At(i).GetElements());
         return ret;
     }
-    constexpr std::vector<std::vector<ChemicalElement<T>>> GetRightList(void) const {
-        std::vector<std::vector<ChemicalElement<T>>> ret;
-        for (const ChemicalMolecule<T>& mol : right) ret.push_back(mol.GetElements());
+    constexpr Array<Array<ChemicalElement<T>>> GetRightList(void) const {
+        Array<Array<ChemicalElement<T>>> ret;
+        for (size_t i = 0; i < right.GetSize(); i++) ret.Add(right.At(i).GetElements());
         return ret;
     }
-    constexpr size_t GetLeftElementCount(std::string symbol) const {
+    constexpr size_t GetLeftElementCount(String symbol) const {
         return GetElementCount(GetLeftList(), symbol);
     }
-    constexpr size_t GetRightElementCount(std::string symbol) const {
+    constexpr size_t GetRightElementCount(String symbol) const {
         return GetElementCount(GetRightList(), symbol);
     }
-    std::vector<ChemicalReactionElement> GetReactionElements(std::vector<ChemicalMolecule<T>> molecules) const {
-        std::vector<ChemicalReactionElement> elements;
-        for (size_t i = 0; i < molecules.size(); i++) {
-            std::vector<ChemicalElement<T>> chemElements = molecules[i].GetElements();
-            for (const ChemicalElement<T>& element : chemElements) {
+    Array<ChemicalReactionElement> GetReactionElements(Array<ChemicalMolecule<T>> molecules) const {
+        Array<ChemicalReactionElement> elements;
+        for (size_t i = 0; i < molecules.GetSize(); i++) {
+            Array<ChemicalElement<T>> chemElements = molecules.At(i).GetElements();
+            for (size_t j = 0; j < chemElements.GetSize(); j++) {
                 bool found = false;
-                for (ChemicalReactionElement& rElement : elements) {
-                    if (rElement.symbol == element.GetSymbol()) {
-                        rElement.coefficients.At(i, 0) = element.GetCount();
+                for (size_t k = 0; k < elements.GetSize(); k++) {
+                    if (elements.At(k).symbol == chemElements.At(j).GetSymbol()) {
+                        elements.At(k).coefficients.At(i, 0) = chemElements.At(j).GetCount();
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    ChemicalReactionElement rElement = ChemicalReactionElement(element.GetSymbol(), molecules.size());
-                    rElement.coefficients.At(i, 0) = element.GetCount();
-                    elements.push_back(rElement);
+                    ChemicalReactionElement rElement = ChemicalReactionElement(chemElements.At(j).GetSymbol(), molecules.GetSize());
+                    rElement.coefficients.At(i, 0) = chemElements.At(j).GetCount();
+                    elements.Add(rElement);
                 }
             }
         }
         return elements;
     }
     constexpr ChemicalReaction<T> Balance(void) {
-        const std::vector<ChemicalReactionElement> l = GetReactionElements(left);
-        const std::vector<ChemicalReactionElement> r = GetReactionElements(right);
-        const size_t size = left.size() + right.size() - 1;
+        const Array<ChemicalReactionElement> l = GetReactionElements(left);
+        const Array<ChemicalReactionElement> r = GetReactionElements(right);
+        const size_t size = left.GetSize() + right.GetSize() - 1;
         Matrix<T> a = Matrix<T>(size, size);
         Matrix<T> b = Matrix<T>(1, size);
         size_t sub = 0;
-        for (size_t y = 0; y < l.size(); y++) {
+        for (size_t y = 0; y < l.GetSize(); y++) {
             if ((y - sub) == size) break;
-            Matrix<ssize_t> v = l.at(y).coefficients;
+            Matrix<ssize_t> v = l.At(y).coefficients;
             const size_t w = v.GetWidth();
             for (size_t x = 0; x < w; x++) a.At(x, y - sub) = v.At(x, 0);
-            for (const ChemicalReactionElement& element : r) {
-                if (element.symbol == l.at(y).symbol) {
-                    v = element.coefficients;
+            for (size_t i = 0; i < r.GetSize(); i++) {
+                if (r.At(i).symbol == l.At(y).symbol) {
+                    v = r.At(i).coefficients;
                     break;
                 }
             }
@@ -101,37 +108,37 @@ struct ChemicalReaction : Printable  {
             const Matrix<T> tmp = x * i;
             bool ok = true;
             for (size_t y = 0; y < tmp.GetHeight() && ok; y++)
-                if (!FloatsEqual<T>(tmp.At(0, y), std::round(tmp.At(0, y)))) ok = false;
+                if (!FloatsEqual<T>(tmp.At(0, y), Round(tmp.At(0, y)))) ok = false;
             if (ok) {
                 ChemicalReaction<T> ret = *this;
-                for (size_t j = 0; j < ret.left.size(); j++) ret.left.at(j).count = std::round(tmp.At(0, j));
-                for (size_t j = 0; j < ret.right.size() - 1; j++) ret.right.at(j).count = std::round(tmp.At(0, j + ret.left.size()));
-                ret.right.at(ret.right.size() - 1).count = std::round(i);
+                for (size_t j = 0; j < ret.left.GetSize(); j++) ret.left.At(j).count = Round(tmp.At(0, j));
+                for (size_t j = 0; j < ret.right.GetSize() - 1; j++) ret.right.At(j).count = Round(tmp.At(0, j + ret.left.GetSize()));
+                ret.right.At(ret.right.GetSize() - 1).count = Round(i);
                 return ret;
             }
         }
         return ChemicalReaction<T>({}, {});
     }
-    virtual std::string ToString(std::string padding = "") const override {
-        std::string ret = padding;
-        for (size_t i = 0; i < left.size(); i++)
-            ret += left.at(i).ToString() + ((i + 1) == left.size() ? "" : " + ");
+    virtual String ToString(String padding = "") const override {
+        String ret = padding;
+        for (size_t i = 0; i < left.GetSize(); i++)
+            ret += left.At(i).ToString() + ((i + 1) == left.GetSize() ? "" : " + ");
         ret += " => ";
-        for (size_t i = 0; i < right.size(); i++)
-            ret += right.at(i).ToString() + ((i + 1) == right.size() ? "" : " + ");
+        for (size_t i = 0; i < right.GetSize(); i++)
+            ret += right.At(i).ToString() + ((i + 1) == right.GetSize() ? "" : " + ");
         return ret;
     }
 
     private:
-    std::vector<ChemicalMolecule<T>> left;
-    std::vector<ChemicalMolecule<T>> right;
+    Array<ChemicalMolecule<T>> left;
+    Array<ChemicalMolecule<T>> right;
 
-    static constexpr size_t GetElementCount(std::vector<std::vector<ChemicalElement<T>>> molecules, std::string symbol) {
+    static constexpr size_t GetElementCount(Array<Array<ChemicalElement<T>>> molecules, String symbol) {
         size_t ret = 0;
-        for (const std::vector<ChemicalElement<T>>& molecule : molecules) {
-            for (const ChemicalElement<T>& element : molecule) {
-                if (element.GetSymbol() == symbol) {
-                    ret += element.GetCount();
+        for (size_t i = 0; i < molecules.GetSize(); i++) {
+            for (size_t j = 0; j < molecules.At(i).GetSize(); j++) {
+                if (molecules.At(i).At(j).GetSymbol() == symbol) {
+                    ret += molecules.At(i).At(j).GetCount();
                     break;
                 }
             }

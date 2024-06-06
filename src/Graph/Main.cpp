@@ -4,6 +4,7 @@
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Preprocesor.hpp>
+#include <iostream>
 
 /// @brief Main loop of this program
 /// @tparam T Type of number
@@ -23,7 +24,7 @@ bool HandleEvents(Renderer& renderer, std::function<bool(void)> func, Array<T>& 
         if (event.type == Event::Type::Quit) running = false;
         else if (event.type == Event::Type::KeyPressed) {
             bool update = true;
-            switch (event.data.key) {
+            switch (event.key) {
                 case 'w': {
                     GetY(renderer.position) += speed;
                     break;

@@ -1,6 +1,9 @@
 #include "PhysicsObject.hpp"
 #include <SDL2.cpp>
+#include <iostream>
 
+/// @brief Entry point for this program
+/// @return Status
 int main(void) {
     try {
         SDL2Renderer renderer = SDL2Renderer("Gravity simulation", 800, 800);

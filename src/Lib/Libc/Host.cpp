@@ -2,16 +2,16 @@
 #include "../Host.hpp"
 
 std::ostream& operator<<(std::ostream& stream, const String& string) {
-    return stream << string.ToString();
+    return stream << string.GetValue();
 }
 std::ostream& operator<<(std::ostream& stream, const Printable& printable) {
     return stream << printable.ToString();
 }
 void Panic(String str) {
-    throw std::runtime_error(str.ToString());
+    throw std::runtime_error(str.GetValue());
 }
 num_t StringToNumber(String str) {
-    return std::stold(str.ToString());
+    return std::stold(str.GetValue());
 }
 String ToString(num_t x) {
     const ssize_t ix = (ssize_t)x;

@@ -16,9 +16,6 @@ struct ChemicalReactionElement : Printable {
         for (size_t i = 0; i < coefficients.GetWidth(); i++) ret += coefficients.At(i, 0);
         return ret;
     }
-    /// @brief Converts matrix to string
-    /// @param padding String to pad with
-    /// @return String representation of matrix
     virtual String ToString(String padding = "") const override {
         return padding + symbol + ": " + coefficients.ToString();
     }

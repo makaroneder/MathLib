@@ -8,7 +8,6 @@
 #include "Quaternion.hpp"
 #include "ComplexPosition.hpp"
 #include "Geometry/LineShape.hpp"
-#include <functional>
 
 struct Renderer : Saveable {
     /// @brief Creates a new renderer

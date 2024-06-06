@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib moneyfix.mtl
+mtllib Money.mtl
 o Text
 v 0.083182 -0.138636 -0.000000
 v 0.083182 -0.027727 -0.000000

@@ -2,7 +2,6 @@
 #define BuiltinFunction_H
 #include "Node.hpp"
 #include "../Trigonometry.hpp"
-#include <functional>
 
 /// @brief Builtin function
 struct BuiltinFunction {

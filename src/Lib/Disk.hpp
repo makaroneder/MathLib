@@ -1,7 +1,7 @@
 #ifndef Disk_H
 #define Disk_H
 #include "SeekMode.hpp"
-#include <string>
+#include "Typedefs.hpp"
 
 /// @brief Disk
 struct Disk {

@@ -1,7 +1,6 @@
 #ifndef Rope_H
 #define Rope_H
 #include "Particle.hpp"
-#include <functional>
 
 template <typename T>
 struct RopeSegment {

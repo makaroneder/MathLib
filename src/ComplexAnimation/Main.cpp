@@ -1,5 +1,6 @@
 #include <Libc/HostFileSystem.hpp>
 #include <SDL2.cpp>
+#include <iostream>
 
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
@@ -8,7 +9,7 @@
 int main(int argc, char** argv) {
     try {
         if (argc < 3) Panic("No input files provided");
-        SDL2Renderer renderer = SDL2Renderer("Complex Animation", 800, 800);
+        SDL2Renderer renderer = SDL2Renderer("Complex animation", 800, 800);
         HostFileSystem fs;
         auto func = [](complex_t z) -> complex_t {
             return std::pow(Factorial(z), Factorial(z));
@@ -32,7 +33,7 @@ int main(int argc, char** argv) {
             if (!renderer.Update()) Panic("Failed to update renderer");
             if (!renderer.SaveFromPath(fs, String(argv[1]) + "/Stage" + ToString((size_t)i) + ".ppm")) Panic("Failed to save frame");
         }
-        if (system((String("ffmpeg -hide_banner -y -framerate 30 -i ") + String(argv[1]) + String("/Stage%d.ppm -c:v libx264 -r 30 ") + String(argv[2])).ToString())) Panic("Failed to generate video");
+        if (system((String("ffmpeg -hide_banner -y -framerate 30 -i ") + String(argv[1]) + String("/Stage%d.ppm -c:v libx264 -r 30 ") + String(argv[2])).GetValue())) Panic("Failed to generate video");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

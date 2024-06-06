@@ -1,7 +1,6 @@
 #ifndef Node_H
 #define Node_H
 #include "../Printable.hpp"
-#include <string>
 
 /// @brief Contains mathematical operations, constants, functions and variables
 struct Node : Printable {

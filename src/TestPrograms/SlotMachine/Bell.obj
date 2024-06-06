@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib dzwon.mtl
+mtllib Bell.mtl
 o Plane.001
 v -0.184179 -0.097901 -0.000000
 v 0.183321 -0.097901 -0.000000

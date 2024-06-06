@@ -5,7 +5,7 @@
 HostDisk::~HostDisk(void) {
     if (fclose(file)) Panic("Failed to close file");
 }
-HostDisk::HostDisk(String path, size_t size_, size_t sectorSize_) : size(size_ + size_ % sectorSize_), sectorSize(sectorSize_), file(fopen(path.ToString(), "w")) {
+HostDisk::HostDisk(String path, size_t size_, size_t sectorSize_) : size(size_ + size_ % sectorSize_), sectorSize(sectorSize_), file(fopen(path.GetValue(), "w")) {
     if (!file) Panic("No file specified");
     uint8_t zero = 0;
     for (size_t i = 0; i < size; i++)

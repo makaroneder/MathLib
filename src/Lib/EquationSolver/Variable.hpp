@@ -2,8 +2,6 @@
 #define Variable_H
 #include "../Constants.hpp"
 #include "Node.hpp"
-#include <string>
-#include <vector>
 
 /// @brief Contains the name, value and type of the variable
 struct Variable {

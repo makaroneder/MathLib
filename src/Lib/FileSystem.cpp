@@ -17,7 +17,7 @@ String FileSystem::ReadUntil(size_t file, char end) {
     return ret;
 }
 bool FileSystem::Puts(size_t file, String str) {
-    return Write(file, str.ToString(), str.GetSize());
+    return Write(file, str.GetValue(), str.GetSize());
 }
 char FileSystem::Getc(size_t file) {
     char chr;

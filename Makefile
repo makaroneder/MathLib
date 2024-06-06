@@ -4,12 +4,12 @@ BUILDTYPE ?= Debug
 
 CXX = g++
 AR = ar
-OBJCOPY = objcopy
+OBJCPY = objcopy
 VALGRIND = valgrind
 
 CXXFLAGS = -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
-OBJCOPYFLAGS = -O elf64-x86-64 -B i386 -I binary
+OBJCPYFLAGS = -O elf64-x86-64 -B i386 -I binary
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
 
 ifeq ($(BUILDTYPE), Debug)
@@ -53,8 +53,11 @@ GRAVOBJS = $(patsubst $(SRCDIR)/Gravity/%.cpp, $(BUILDDIR)/Objects/Gravity/%.o, 
 CMPSRCXX = $(shell find $(SRCDIR)/ComplexAnimation -type f -name "*.cpp")
 CMPOBJS = $(patsubst $(SRCDIR)/ComplexAnimation/%.cpp, $(BUILDDIR)/Objects/ComplexAnimation/%.o, $(CMPSRCXX))
 
-GAMBSRCXX = $(shell find $(SRCDIR)/Gambling -type f -name "*.cpp")
-GAMBOBJS = $(patsubst $(SRCDIR)/Gambling/%.cpp, $(BUILDDIR)/Objects/Gambling/%.o, $(GAMBSRCXX))
+SLOTSRCXX = $(shell find $(SRCDIR)/SlotMachine -type f -name "*.cpp")
+SLOTOBJS = $(patsubst $(SRCDIR)/SlotMachine/%.cpp, $(BUILDDIR)/Objects/SlotMachine/%.o, $(SLOTSRCXX))
+
+EMUSRCXX = $(shell find $(SRCDIR)/Emulator -type f -name "*.cpp")
+EMUOBJS = $(patsubst $(SRCDIR)/Emulator/%.cpp, $(BUILDDIR)/Objects/Emulator/%.o, $(EMUSRCXX))
 
 TESTSRCXX = $(shell find $(SRCDIR)/Tests -type f -name "*.cpp")
 TESTOBJS = $(patsubst $(SRCDIR)/Tests/%.cpp, $(BUILDDIR)/Objects/Tests/%.o, $(TESTSRCXX))
@@ -67,9 +70,9 @@ $(1): $(2) $(BUILDDIR)/libMath.a
 endef
 define RunTarget
 $(1): $(3) $(4) test
-	@./$(3) $(4)
+	@./$(3) $(4) $(5)
 $(2): $(3) $(4) test
-	@$(VALGRIND) $(VALGRINDFLAGS) ./$(3) $(4)
+	@$(VALGRIND) $(VALGRINDFLAGS) ./$(3) $(4) $(5)
 .PHONY: $(1) $(2)
 endef
 
@@ -83,7 +86,7 @@ $(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.cpp $(HEADERS) Makefile
 	@echo "==> Created: $@"
 $(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.psf Makefile
 	@mkdir -p $(@D)
-	@$(OBJCOPY) $(OBJCOPYFLAGS) $< $@
+	@$(OBJCPY) $(OBJCPYFLAGS) $< $@
 	@echo "==> Created: $@"
 
 MATHPROGRAMS ?= $(shell find $(SRCDIR)/TestPrograms/Math -type f -name "*.txt")
@@ -98,17 +101,19 @@ $(eval $(call AddTarget,$(BUILDDIR)/3D.out,$(3DOBJS),-l SDL2))
 $(eval $(call AddTarget,$(BUILDDIR)/Cryptography.out,$(CRYPTOBJS),))
 $(eval $(call AddTarget,$(BUILDDIR)/Gravity.out,$(GRAVOBJS),-l SDL2))
 $(eval $(call AddTarget,$(BUILDDIR)/ComplexAnimation.out,$(CMPOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/Gambling.out,$(GAMBOBJS),-l SDL2))
+$(eval $(call AddTarget,$(BUILDDIR)/SlotMachine.out,$(SLOTOBJS),-l SDL2))
+$(eval $(call AddTarget,$(BUILDDIR)/Emulator.out,$(EMUOBJS),))
 $(eval $(call AddTarget,$(BUILDDIR)/Tests.out,$(TESTOBJS),))
 
-$(eval $(call RunTarget,run,debug,$(BUILDDIR)/MathGraph.out,$(MATHPROGRAMS)))
-$(eval $(call RunTarget,runQuiz,debugQuiz,$(BUILDDIR)/Quiz.out,$(MATHPROGRAMS)))
-$(eval $(call RunTarget,runSim,debugSim,$(BUILDDIR)/Simulation.out,))
-$(eval $(call RunTarget,runChem,debugChem,$(BUILDDIR)/Chemistry.out,))
-$(eval $(call RunTarget,run3D,debug3D,$(BUILDDIR)/3D.out,))
-$(eval $(call RunTarget,runCrypt,debugCrypt,$(BUILDDIR)/Cryptography.out,$(CRYPTMSG)))
-$(eval $(call RunTarget,runGrav,debugGrav,$(BUILDDIR)/Gravity.out,))
-$(eval $(call RunTarget,runGamb,debugGamb,$(BUILDDIR)/Gambling.out,))
+$(eval $(call RunTarget,run,debug,$(BUILDDIR)/MathGraph.out,$(MATHPROGRAMS),))
+$(eval $(call RunTarget,runQuiz,debugQuiz,$(BUILDDIR)/Quiz.out,$(MATHPROGRAMS),))
+$(eval $(call RunTarget,runSim,debugSim,$(BUILDDIR)/Simulation.out,,))
+$(eval $(call RunTarget,runChem,debugChem,$(BUILDDIR)/Chemistry.out,,))
+$(eval $(call RunTarget,run3D,debug3D,$(BUILDDIR)/3D.out,,))
+$(eval $(call RunTarget,runCrypt,debugCrypt,$(BUILDDIR)/Cryptography.out,$(CRYPTMSG),))
+$(eval $(call RunTarget,runGrav,debugGrav,$(BUILDDIR)/Gravity.out,,))
+$(eval $(call RunTarget,runSlot,debugSlot,$(BUILDDIR)/SlotMachine.out,,))
+$(eval $(call RunTarget,runEmu,debugEmu,$(BUILDDIR)/Emulator.out,,))
 
 MLITERS = 20000
 

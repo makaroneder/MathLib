@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib nic.mtl
+mtllib Nothing.mtl
 o Circle
 v 0.000000 0.250000 0.000000
 v -0.125000 0.216506 0.000000

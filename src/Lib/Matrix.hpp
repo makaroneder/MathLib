@@ -5,7 +5,6 @@
 #include "Printable.hpp"
 #include "Saveable.hpp"
 #include "Host.hpp"
-#include <vector>
 
 /// @brief Structure representing mathematic matrixes
 /// @tparam T Type of number
@@ -61,6 +60,12 @@ struct Matrix : Printable, Saveable {
     /// @return Data at specified position
     constexpr T At(size_t x, size_t y) const {
         return ptr.At(y * width + x);
+    }
+    /// @brief a = (a . b) / (|a| * |b|)
+    /// @param other Other matrix
+    /// @return Angle between 2 matrices
+    constexpr T GetAngle(Matrix<T> other) const {
+        return Dot(other) / (GetLength() * other.GetLength());
     }
     /// @brief |a|^2 = a . a
     /// @return Squared length of the vector

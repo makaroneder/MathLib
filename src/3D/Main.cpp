@@ -1,6 +1,7 @@
 #include <Geometry/Pyramid.hpp>
 #include <Geometry/Cuboid.hpp>
 #include <SDL2.cpp>
+#include <iostream>
 
 /// @brief Entry point for this program
 /// @return Status
@@ -19,7 +20,7 @@ int main(void) {
             const Event event = renderer.GetEvent();
             if (event.type == Event::Type::Quit) break;
             else if (event.type == Event::Type::KeyPressed) {
-                switch (event.data.key) {
+                switch (event.key) {
                     case 'w': {
                         GetZ(renderer.position)++;
                         break;

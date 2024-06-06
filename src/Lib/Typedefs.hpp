@@ -1,12 +1,15 @@
 #ifndef Typedefs_H
 #define Typedefs_H
-#include <cmath>
-#include <complex>
 #include "Libc/HostString.hpp"
 #include "Libc/HostCollection.hpp"
+#include <functional>
+#include <complex>
 
+/// @brief Default collection implementation
+/// @tparam T Type of data stored in the collection
 template <typename T>
 using Array = HostCollection<T>;
+/// @brief Default char collection implementation
 using String = HostString;
 
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))

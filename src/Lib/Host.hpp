@@ -29,6 +29,7 @@ num_t RandomFloat(void);
 num_t Abs(num_t x);
 num_t Abs(complex_t x);
 num_t Max(num_t x, num_t y);
+num_t Min(num_t x, num_t y);
 complex_t Pow(complex_t x, complex_t y);
 num_t Pow(num_t x, num_t y);
 complex_t Sqrt(complex_t x);

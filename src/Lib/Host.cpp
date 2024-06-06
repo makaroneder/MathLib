@@ -27,7 +27,10 @@ num_t Abs(num_t x) {
     return Abs(complex_t(x, 0));
 }
 num_t Max(num_t x, num_t y) {
-    return (x <= y) ? y : x;
+    return (x < y) ? y : x;
+}
+num_t Min(num_t x, num_t y) {
+    return (x < y) ? x : y;
 }
 num_t Pow(num_t x, num_t y) {
     ComplexToReal(Pow(complex_t(x, 0), complex_t(y, 0)));

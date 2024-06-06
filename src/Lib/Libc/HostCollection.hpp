@@ -22,6 +22,9 @@ struct HostCollection : Collection<T> {
     virtual size_t GetSize(void) const override {
         return buffer.size();
     }
+    virtual const T* GetValue(void) const override {
+        return buffer.data();
+    }
     std::vector<T> ToVector(void) const {
         return buffer;
     }

@@ -38,6 +38,9 @@ struct Buffer : Collection<T> {
     virtual size_t GetSize(void) const override {
         return size;
     }
+    virtual const T* GetValue(void) const override {
+        return buffer;
+    }
     Buffer<T>& operator=(const Buffer<T>& other) {
         delete [] buffer;
         size = other.size;

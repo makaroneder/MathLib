@@ -1,5 +1,4 @@
 #include "SDL2.hpp"
-#include <iostream>
 
 SDL2Renderer::SDL2Renderer(const char* title, size_t w, size_t h) : Renderer(w, h) {
     if (SDL_Init(SDL_INIT_VIDEO)) Panic("Failed to initialize SDL2");
@@ -16,7 +15,7 @@ SDL2Renderer::~SDL2Renderer(void) {
     SDL_Quit();
 }
 bool SDL2Renderer::Update(void) {
-    if (SDL_UpdateTexture(texture, nullptr, GetPixels().GetValue().ToVector().data(), GetWidth() * sizeof(uint32_t))) return false;
+    if (SDL_UpdateTexture(texture, nullptr, GetPixels().GetValue().GetValue(), GetWidth() * sizeof(uint32_t))) return false;
     if (SDL_RenderClear(renderer)) return false;
     if (SDL_RenderCopy(renderer, texture, nullptr, nullptr)) return false;
     SDL_RenderPresent(renderer);

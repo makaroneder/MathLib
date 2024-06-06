@@ -22,7 +22,7 @@ size_t HostFileSystem::Open(String path, OpenMode mode) {
             break;
         }
     }
-    FILE* file = fopen(path.ToString(), modeStr);
+    FILE* file = fopen(path.GetValue(), modeStr);
     if (!file) return SIZE_MAX;
     for (size_t i = 0; i < files.GetSize(); i++) {
         if (!files[i]) {

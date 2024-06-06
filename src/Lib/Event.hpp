@@ -10,11 +10,8 @@ struct Event {
         KeyPressed,
         KeyReleased,
     } type;
-    /// @brief Data for different event types
-    union Data {
-        /// @brief Pressed or released key
-        char key;
-    } data;
+    /// @brief Pressed or released key
+    char key;
 
     /// @brief Creates a new event
     /// @param t Type of event

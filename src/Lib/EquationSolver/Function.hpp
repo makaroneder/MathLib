@@ -2,7 +2,6 @@
 #define Function_H
 #include "Node.hpp"
 #include "Variable.hpp"
-#include <vector>
 
 /// @brief Function
 struct Function {

@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib cytryna.mtl
+mtllib Lemon.mtl
 o Plane
 v 0.203293 0.203293 0.000000
 v 0.099019 0.239054 0.000000

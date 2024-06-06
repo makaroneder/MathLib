@@ -1,7 +1,7 @@
 #ifndef Particle_H
 #define Particle_H
-#include <Physics/SIUnits.hpp>
 #include <Geometry/LineShape.hpp>
+#include <Physics/SIUnits.hpp>
 #include <Quaternion.hpp>
 
 template <typename T>

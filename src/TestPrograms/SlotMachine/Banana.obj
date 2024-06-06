@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib bananafix.mtl
+mtllib Banana.mtl
 o Circle
 v -0.273513 -0.134749 -0.000000
 v -0.276477 -0.169551 -0.000000

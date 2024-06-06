@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib siedemfixed.mtl
+mtllib 7.mtl
 o Plane.001
 v -0.087461 -0.263224 -0.000000
 v 0.047539 -0.263224 -0.000000

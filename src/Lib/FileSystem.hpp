@@ -2,7 +2,6 @@
 #define FileSystem_H
 #include "SeekMode.hpp"
 #include "Typedefs.hpp"
-#include <string>
 
 /// @brief Mode to open file in
 enum class OpenMode {

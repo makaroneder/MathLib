@@ -1,6 +1,6 @@
 # Blender 4.0.2
 # www.blender.org
-mtllib bar.mtl
+mtllib Bar.mtl
 o Text
 v 0.193455 -0.084636 -0.000000
 v 0.193455 -0.036273 -0.000000

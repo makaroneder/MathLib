@@ -22,7 +22,7 @@ struct HostString : Collection<char> {
     virtual size_t GetSize(void) const override {
         return string.size();
     }
-    const char* ToString(void) const {
+    virtual const char* GetValue(void) const override {
         return string.c_str();
     }
     std::string ToStdString(void) const {

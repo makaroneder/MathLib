@@ -1,7 +1,6 @@
 #ifndef Chemistry_Molecule_H
 #define Chemistry_Molecule_H
 #include "Elements.hpp"
-#include <vector>
 
 template <typename T>
 struct ChemicalMolecule : Printable {

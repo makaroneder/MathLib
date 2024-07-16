@@ -1,19 +1,18 @@
 #include "Test.hpp"
 
-Test::Test(size_t w, size_t h) : Renderer(w, h), failed(0), values({}) {}
-bool Test::Update(void) {
-    const Matrix<uint32_t> pixels = GetPixels();
-    for (size_t y = 0; y < pixels.GetHeight(); y++) {
-        for (size_t x = 0; x < pixels.GetWidth(); x++) {
-            const bool expected = (pixels.At(x, y) != 0);
-            bool found = expected;
-            for (size_t i = 0; i < values.size() && (found == expected); i++)
-                if (values[i] == CreateVector<num_t>(x, y, 0)) found = !expected;
-            if (found == expected) failed++;
-        }
-    }
-    return true;
+bool Test::ReportRecord(const Record& record) {
+    return records.Add(record);
 }
-Event Test::GetEvent(void) {
-    return Event();
+size_t Test::GetRecordCount(void) const {
+    return records.GetSize();
+}
+size_t Test::GetPassed(void) const {
+    size_t ret = 0;
+    for (const Record& record : records) ret += record.passed;
+    return ret;
+}
+String Test::ToString(const String& padding) const {
+    String ret;
+    for (const Record& record : records) ret += record.ToString(padding) + '\n';
+    return ret;
 }

@@ -1,18 +1,23 @@
 SRCDIR = src
 BUILDDIR = bin
+SCRIPTSDIR = Scripts
 BUILDTYPE ?= Debug
 
 CXX = g++
+AS = nasm
 AR = ar
 OBJCPY = objcopy
 VALGRIND = valgrind
+PYTHON = python3
 
 CXXFLAGS = -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
+ASFLAGS = -Werror -f elf64 -I $(SRCDIR) -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
 OBJCPYFLAGS = -O elf64-x86-64 -B i386 -I binary
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
 
 ifeq ($(BUILDTYPE), Debug)
+ASFLAGS += -g -O0 -DDebug
 CXXFLAGS += -g -O0 -DDebug
 else
 CXXFLAGS += -O2
@@ -20,125 +25,45 @@ endif
 
 HEADERS = $(shell find $(SRCDIR) -type f -name "*.hpp")
 HEADERS += $(shell find $(SRCDIR)/Platform -type f -name "*.cpp")
+HEADERS += $(SRCDIR)/Lib/MathLib.hpp
 
 SRCXX = $(shell find $(SRCDIR)/Lib -type f -name "*.cpp")
 SRCPSF = $(shell find $(SRCDIR)/Lib -type f -name "*.psf")
-OBJS = $(patsubst $(SRCDIR)/Lib/%.cpp, $(BUILDDIR)/Objects/Lib/%.o, $(SRCXX))
-OBJS += $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Objects/Lib/%.o, $(SRCPSF))
+OBJS = $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Objects/Lib/%.o, $(SRCPSF))
 
-GRAPHSRCXX = $(shell find $(SRCDIR)/Graph -type f -name "*.cpp")
-GRAPHOBJS = $(patsubst $(SRCDIR)/Graph/%.cpp, $(BUILDDIR)/Objects/Graph/%.o, $(GRAPHSRCXX))
-
-QUIZSRCXX = $(shell find $(SRCDIR)/Quiz -type f -name "*.cpp")
-QUIZOBJS = $(patsubst $(SRCDIR)/Quiz/%.cpp, $(BUILDDIR)/Objects/Quiz/%.o, $(QUIZSRCXX))
-
-SIMSRCXX = $(shell find $(SRCDIR)/Simulation -type f -name "*.cpp")
-SIMOBJS = $(patsubst $(SRCDIR)/Simulation/%.cpp, $(BUILDDIR)/Objects/Simulation/%.o, $(SIMSRCXX))
-
-CHEMSRCXX = $(shell find $(SRCDIR)/Chemistry -type f -name "*.cpp")
-CHEMOBJS = $(patsubst $(SRCDIR)/Chemistry/%.cpp, $(BUILDDIR)/Objects/Chemistry/%.o, $(CHEMSRCXX))
-
-MLSRCXX = $(shell find $(SRCDIR)/MachineLearning -type f -name "*.cpp")
-MLOBJS = $(patsubst $(SRCDIR)/MachineLearning/%.cpp, $(BUILDDIR)/Objects/MachineLearning/%.o, $(MLSRCXX))
-
-3DSRCXX = $(shell find $(SRCDIR)/3D -type f -name "*.cpp")
-3DOBJS = $(patsubst $(SRCDIR)/3D/%.cpp, $(BUILDDIR)/Objects/3D/%.o, $(3DSRCXX))
-
-CRYPTSRCXX = $(shell find $(SRCDIR)/Cryptography -type f -name "*.cpp")
-CRYPTOBJS = $(patsubst $(SRCDIR)/Cryptography/%.cpp, $(BUILDDIR)/Objects/Cryptography/%.o, $(CRYPTSRCXX))
-
-GRAVSRCXX = $(shell find $(SRCDIR)/Gravity -type f -name "*.cpp")
-GRAVOBJS = $(patsubst $(SRCDIR)/Gravity/%.cpp, $(BUILDDIR)/Objects/Gravity/%.o, $(GRAVSRCXX))
-
-CMPSRCXX = $(shell find $(SRCDIR)/ComplexAnimation -type f -name "*.cpp")
-CMPOBJS = $(patsubst $(SRCDIR)/ComplexAnimation/%.cpp, $(BUILDDIR)/Objects/ComplexAnimation/%.o, $(CMPSRCXX))
-
-SLOTSRCXX = $(shell find $(SRCDIR)/SlotMachine -type f -name "*.cpp")
-SLOTOBJS = $(patsubst $(SRCDIR)/SlotMachine/%.cpp, $(BUILDDIR)/Objects/SlotMachine/%.o, $(SLOTSRCXX))
-
-EMUSRCXX = $(shell find $(SRCDIR)/Emulator -type f -name "*.cpp")
-EMUOBJS = $(patsubst $(SRCDIR)/Emulator/%.cpp, $(BUILDDIR)/Objects/Emulator/%.o, $(EMUSRCXX))
-
-TESTSRCXX = $(shell find $(SRCDIR)/Tests -type f -name "*.cpp")
-TESTOBJS = $(patsubst $(SRCDIR)/Tests/%.cpp, $(BUILDDIR)/Objects/Tests/%.o, $(TESTSRCXX))
-
-define AddTarget
-$(1): $(2) $(BUILDDIR)/libMath.a
-	@mkdir -p $(BUILDDIR)
-	@$(CXX) $(CXXFLAGS) $(2) -o $(1) $(3) -L $(BUILDDIR) -l Math
-	@echo "==> Created: $(1)"
-endef
-define RunTarget
-$(1): $(3) $(4) test
-	@./$(3) $(4) $(5)
-$(2): $(3) $(4) test
-	@$(VALGRIND) $(VALGRINDFLAGS) ./$(3) $(4) $(5)
-.PHONY: $(1) $(2)
-endef
-
-$(BUILDDIR)/libMath.a: $(OBJS)
+$(BUILDDIR)/libExtras.a: $(OBJS)
 	@mkdir -p $(@D)
 	@$(AR) $(ARFLAGS) $@ $^
 	@echo "==> Created: $@"
-$(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.cpp $(HEADERS) Makefile
-	@mkdir -p $(@D)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
-	@echo "==> Created: $@"
-$(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.psf Makefile
+$(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.psf Makefile $(BUILDDIR)/Targets.mk
 	@mkdir -p $(@D)
 	@$(OBJCPY) $(OBJCPYFLAGS) $< $@
+	@echo "==> Created: $@"
+$(BUILDDIR)/Targets.mk: $(SCRIPTSDIR)/Config.py Targets.txt
+	@mkdir -p $(@D)
+	@$(PYTHON) $^ $@
+	@echo "==> Created: $@"
+$(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX)
+	@mkdir -p $(@D)
+	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
 	@echo "==> Created: $@"
 
 MATHPROGRAMS ?= $(shell find $(SRCDIR)/TestPrograms/Math -type f -name "*.txt")
 CRYPTMSG ?= $(SRCDIR)/TestPrograms/Cryptography/CaesarCipher.txt
+MLITERS ?= 20000
+SERVERPORT ?= 8080
+OSROOT ?= $(SRCDIR)/TestPrograms/OS
+OSCXX = x86_64-elf-$(CXX)
+OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -fno-exceptions -fno-rtti -fstack-protector-all -mno-red-zone
 
-$(eval $(call AddTarget,$(BUILDDIR)/MathGraph.out,$(GRAPHOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/Quiz.out,$(QUIZOBJS),))
-$(eval $(call AddTarget,$(BUILDDIR)/Simulation.out,$(SIMOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/Chemistry.out,$(CHEMOBJS),))
-$(eval $(call AddTarget,$(BUILDDIR)/MachineLearning.out,$(MLOBJS),))
-$(eval $(call AddTarget,$(BUILDDIR)/3D.out,$(3DOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/Cryptography.out,$(CRYPTOBJS),))
-$(eval $(call AddTarget,$(BUILDDIR)/Gravity.out,$(GRAVOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/ComplexAnimation.out,$(CMPOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/SlotMachine.out,$(SLOTOBJS),-l SDL2))
-$(eval $(call AddTarget,$(BUILDDIR)/Emulator.out,$(EMUOBJS),))
-$(eval $(call AddTarget,$(BUILDDIR)/Tests.out,$(TESTOBJS),))
-
-$(eval $(call RunTarget,run,debug,$(BUILDDIR)/MathGraph.out,$(MATHPROGRAMS),))
-$(eval $(call RunTarget,runQuiz,debugQuiz,$(BUILDDIR)/Quiz.out,$(MATHPROGRAMS),))
-$(eval $(call RunTarget,runSim,debugSim,$(BUILDDIR)/Simulation.out,,))
-$(eval $(call RunTarget,runChem,debugChem,$(BUILDDIR)/Chemistry.out,,))
-$(eval $(call RunTarget,run3D,debug3D,$(BUILDDIR)/3D.out,,))
-$(eval $(call RunTarget,runCrypt,debugCrypt,$(BUILDDIR)/Cryptography.out,$(CRYPTMSG),))
-$(eval $(call RunTarget,runGrav,debugGrav,$(BUILDDIR)/Gravity.out,,))
-$(eval $(call RunTarget,runSlot,debugSlot,$(BUILDDIR)/SlotMachine.out,,))
-$(eval $(call RunTarget,runEmu,debugEmu,$(BUILDDIR)/Emulator.out,,))
-
-MLITERS = 20000
-
-$(BUILDDIR)/%.bin: $(BUILDDIR)/MachineLearning.out test
-	@mkdir -p $(@D)
-	@./$< $@ $(MLITERS)
-	@echo "==> Created: $@"
-$(BUILDDIR)/%.mp4: $(BUILDDIR)/ComplexAnimation.out test
-	@mkdir -p $(@D)
-	@./$< $(@D) $@
-	@echo "==> Created: $@"
-
-runML: $(BUILDDIR)/ML.bin
-cleanML:
-	@mkdir -p $(BUILDDIR)
-	@rm -rf $(BUILDDIR)/ML.bin
-runAnim: $(BUILDDIR)/Animation/Final.mp4
-cleanAnim:
-	@mkdir -p $(BUILDDIR)/Animation
-	@rm -rf $(BUILDDIR)/Animation
+include $(BUILDDIR)/Targets.mk
 
 test: $(BUILDDIR)/Tests.out
 	@./$<
 clean:
 	@mkdir -p $(BUILDDIR)
 	@rm -rf $(BUILDDIR)/*
+	@touch $(SRCDIR)/Lib/MathLib.hpp
+	@rm $(SRCDIR)/Lib/MathLib.hpp
 	@echo "==> Deleted compiled files"
-.PHONY: test clean runML cleanML runAnim cleanAnim
+.PHONY: test clean

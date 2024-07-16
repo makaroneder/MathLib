@@ -1,9 +1,8 @@
 #ifndef Geometry_WavefrontObject_H
 #define Geometry_WavefrontObject_H
-#include "../Host.hpp"
+#include "../File.hpp"
 #include "LineShape.hpp"
 #include "../Quaternion.hpp"
-#include "../FileSystem.hpp"
 #include "../EquationSolver/Tokenizer.hpp"
 
 template <typename T>
@@ -12,11 +11,11 @@ struct WavefrontObject : LineShape<T> {
     Array<Array<size_t>> faces;
     Array<size_t> lines;
 
-    WavefrontObject(Matrix<T> pos, FileSystem& fileSystem, String path) : LineShape<T>(pos) {
-        const size_t file = fileSystem.Open(path, OpenMode::Read);
-        const size_t size = fileSystem.GetFileSize(file);
-        while (file != SIZE_MAX && fileSystem.Tell(file) < size) {
-            String line = fileSystem.ReadUntil(file, '\n');
+    WavefrontObject(const Matrix<T>& pos, FileSystem& fileSystem, const String& path) : LineShape<T>(pos) {
+        File file = fileSystem.Open(path, OpenMode::Read);
+        const size_t size = file.GetSize();
+        while (file.Tell() < size) {
+            String line = file.ReadUntil('\n');
             if (line[0] == 'v' && line[1] == ' ') {
                 size_t i = 2;
                 Matrix<T> v = CreateVector<T>(0, 0, 0);
@@ -66,13 +65,13 @@ struct WavefrontObject : LineShape<T> {
         // TODO:
         return false;
     }
-    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const override {
+    virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
         Array<Line<T>> ret;
-        for (size_t i = 0; i < faces.GetSize(); i++) {
-            Array<Matrix<T>> verts = Array<Matrix<T>>(faces.At(i).GetSize());
-            for (size_t j = 0; j < verts.GetSize(); j++)
-                verts.At(j) = RotateVector<T>(verticies.At(faces.At(i).At(j)) + this->position, this->position, rotation);
-            for (size_t j = 0; j < verts.GetSize(); j++) ret.Add(Line<T>(verts.At(j), verts.At((j + 1) % verts.GetSize())));
+        for (const Array<size_t>& face : faces) {
+            Array<Matrix<T>> verts = Array<Matrix<T>>(face.GetSize());
+            for (size_t i = 0; i < verts.GetSize(); i++)
+                verts.At(i) = RotateVector<T>(verticies.At(face.At(i)) + this->position, this->position, rotation);
+            for (size_t i = 0; i < verts.GetSize(); i++) ret.Add(Line<T>(verts.At(i), verts.At((i + 1) % verts.GetSize())));
         }
         for (size_t i = 0; i < lines.GetSize(); i += 2) {
             Matrix<T> tmp[2];

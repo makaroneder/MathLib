@@ -1,9 +1,11 @@
 #define FillGapsInFunctions
-#include <SDL2.cpp>
+#include <MathLib.hpp>
+#include <Libc/HostFunction.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Preprocesor.hpp>
+#include <SDL2.cpp>
 #include <iostream>
 
 /// @brief Main loop of this program
@@ -15,7 +17,7 @@
 /// @param lastState Last state of the program
 /// @return Status
 template <typename T>
-bool HandleEvents(Renderer& renderer, std::function<bool(void)> func, Array<T>& inputSet, size_t& state, size_t lastState) {
+bool HandleEvents(Renderer& renderer, const Function<bool>& func, size_t& state, const size_t& lastState) {
     bool running = true;
     const T speed = 1;
     if (!func()) return false;
@@ -35,28 +37,20 @@ bool HandleEvents(Renderer& renderer, std::function<bool(void)> func, Array<T>& 
                 }
                 case 'd': {
                     GetX(renderer.position) += speed;
-                    for (size_t i = 0; i < inputSet.GetSize(); i++) inputSet.At(i) += speed;
                     break;
                 }
                 case 'a': {
-                    if (GetX(renderer.position) >= (-17 + speed)) {
-                        GetX(renderer.position) -= speed;
-                        for (size_t i = 0; i < inputSet.GetSize(); i++) inputSet.At(i) -= speed;
-                    }
+                    GetX(renderer.position) -= speed;
                     break;
                 }
                 case 'q': {
-                    if (renderer.pointMultiplier > (9 + speed) && FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0)) {
+                    if (renderer.pointMultiplier > (9 + speed) && FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0))
                         renderer.pointMultiplier -= speed;
-                        inputSet = renderer.CreateRealNumberSet<T>();
-                    }
                     break;
                 }
                 case 'e': {
-                    if (FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0)) {
+                    if (FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0))
                         renderer.pointMultiplier += speed;
-                        inputSet = renderer.CreateRealNumberSet<T>();
-                    }
                     break;
                 }
                 case 'z': {
@@ -81,57 +75,62 @@ bool HandleEvents(Renderer& renderer, std::function<bool(void)> func, Array<T>& 
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 2) Panic("No input files provided");
+        if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input file>");
         HostFileSystem fs;
         SDL2Renderer renderer = SDL2Renderer("Math graph", 800, 800);
-        Array<num_t> inputSet = renderer.CreateRealNumberSet<num_t>();
-        Array<State> states;
+        Array<EquationSolverState> states;
         for (int i = 1; i < argc; i++) {
             Node* root = Tokenize(Preproces(fs, argv[i]));
             #ifdef Debug
             std::cout << "Generated nodes:\n" << *root << std::endl;
             #endif
-            State state = State();
+            EquationSolverState state = EquationSolverState();
             Node* optimizedRoot = Optimize(root, state);
             delete root;
             #ifdef Debug
             std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
             #endif
             delete optimizedRoot;
+            state.runtime = true;
             states.Add(state);
         }
         size_t state = 0;
-        const auto func = [&states, &state](num_t x) -> Array<num_t> {
-            const Function funcNode = states.At(state).GetFunction("f");
-            State tmp = states.At(state);
-            tmp.variables.Add(Variable(funcNode.arguments[0].name, std::to_string(x)));
+        const HostFunction<Array<num_t>, num_t> func = HostFunction<Array<num_t>, num_t>(nullptr, [&states, &state](const void*, num_t x) -> Array<num_t> {
+            const FunctionNode funcNode = states.At(state).GetFunction("f");
+            EquationSolverState tmp = states.At(state);
+            Variable var = Variable(funcNode.arguments[0].name, ToString(x), true);
+            tmp.variables.Add(var);
             Node* n = Optimize(funcNode.body, tmp);
+            delete var.value;
             const Array<complex_t> complexRet = n->ToNumber();
             delete n;
             Array<num_t> ret = Array<num_t>(complexRet.GetSize());
-            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).imag() == 0 ? complexRet.At(i).real() : NAN;
+            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).GetImaginary() == 0 ? complexRet.At(i).GetReal() : MakeNaN();
             return ret;
-        };
-        const auto complexFunc = [&states, &state](complex_t z) -> complex_t {
-            const Function funcNode = states.At(state).GetFunction("f");
-            State tmp = states.At(state);
-            tmp.variables.Add(Variable(funcNode.arguments[0].name, ComplexToString<num_t>(z)));
+        });
+        const HostFunction<complex_t, complex_t> complexFunc = HostFunction<complex_t, complex_t>(nullptr, [&states, &state](const void*, complex_t z) -> complex_t {
+            const FunctionNode funcNode = states.At(state).GetFunction("f");
+            EquationSolverState tmp = states.At(state);
+            Variable var = Variable(funcNode.arguments[0].name, z.ToString(), true);
+            tmp.variables.Add(var);
             Node* n = Optimize(funcNode.body, tmp);
+            delete var.value;
             const complex_t ret = n->ToNumber().At(0);
             delete n;
             return ret;
-        };
-        if (!HandleEvents<num_t>(renderer, [&renderer, func, complexFunc, &inputSet, &states, &state](void) {
-            renderer.Fill(0x000000ff);
+        });
+        if (!HandleEvents<num_t>(renderer, HostFunction<bool>(nullptr, [&renderer, func, complexFunc, &states, &state](const void*) -> bool {
+            renderer.Fill(0);
             renderer.DrawAxis(0xffffffff, 0x808080ff);
-            const Function funcNode = states.At(state).GetFunction("f");
+            const FunctionNode funcNode = states.At(state).GetFunction("f");
             if (funcNode.domain == "C" && funcNode.codomain == "C")
-                renderer.DrawComplexFunction<num_t>(renderer.GenerateComplexFunction<num_t>(complexFunc, inputSet));
+                renderer.DrawComplexFunction<num_t>(renderer.GenerateComplexFunction<num_t>(complexFunc));
             else if (funcNode.domain == "R" && funcNode.codomain == "R")
-                renderer.DrawFunction<num_t>(renderer.GenerateMultiFunction<num_t>(func, inputSet), 0xff0000ff);
+                renderer.DrawFunction<num_t>(renderer.GenerateMultiFunction<num_t>(func), 0xff0000ff);
             else return false;
             return renderer.Update();
-        }, inputSet, state, states.GetSize())) Panic("Failed to render function");
+        }), state, states.GetSize())) Panic("Failed to render function");
+        for (EquationSolverState& state : states) state.Destroy();
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

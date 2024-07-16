@@ -7,15 +7,15 @@
 struct HostString : Collection<char> {
     HostString(void) {}
     HostString(const char* str) : string(str) {}
-    HostString(std::string str) : string(str) {}
-    HostString(char chr) : string("" + chr) {}
-    virtual char At(size_t index) const override {
+    HostString(const std::string& str) : string(str) {}
+    HostString(const char& chr) : HostString((HostString() + chr).GetValue()) {}
+    virtual char At(const size_t& index) const override {
         return string.at(index);
     }
-    virtual char& At(size_t index) override {
+    virtual char& At(const size_t& index) override {
         return string.at(index);
     }
-    virtual bool Add(char val) override {
+    virtual bool Add(const char& val) override {
         string += val;
         return true;
     }
@@ -28,7 +28,7 @@ struct HostString : Collection<char> {
     std::string ToStdString(void) const {
         return string;
     }
-    HostString& operator+=(HostString other) {
+    HostString& operator+=(const HostString& other) {
         string += other.string;
         return *this;
     }
@@ -36,11 +36,11 @@ struct HostString : Collection<char> {
         string += other;
         return *this;
     }
-    HostString& operator+=(char chr) {
+    HostString& operator+=(const char& chr) {
         string += chr;
         return *this;
     }
-    HostString operator+(HostString other) const {
+    HostString operator+(const HostString& other) const {
         HostString tmp = *this;
         tmp += other;
         return tmp;
@@ -50,18 +50,18 @@ struct HostString : Collection<char> {
         tmp += other;
         return tmp;
     }
-    HostString operator+(char chr) const {
+    HostString operator+(const char& chr) const {
         HostString tmp = *this;
         tmp += chr;
         return tmp;
     }
-    bool operator==(HostString other) const {
+    bool operator==(const HostString& other) const {
         return string == other.string;
     }
     bool operator==(const char* other) const {
         return string == other;
     }
-    bool operator!=(HostString other) const {
+    bool operator!=(const HostString& other) const {
         return string != other.string;
     }
     bool operator!=(const char* other) const {

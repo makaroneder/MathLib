@@ -11,43 +11,48 @@ Array<const Node*> CommaToArray(const Node* node) {
     else {
         if (node->left != nullptr) {
             Array<const Node*> tmp = CommaToArray(node->left);
-            for (size_t i = 0; i < tmp.GetSize(); i++)
-                if (!ret.Add(tmp.At(i))) return Array<const Node*>();
+            for (const Node*& x : tmp)
+                if (!ret.Add(x)) return Array<const Node*>();
         }
         if (node->right != nullptr) {
             Array<const Node*> tmp = CommaToArray(node->right);
-            for (size_t i = 0; i < tmp.GetSize(); i++)
-                if (!ret.Add(tmp.At(i))) return Array<const Node*>();
+            for (const Node*& x : tmp)
+                if (!ret.Add(x)) return Array<const Node*>();
         }
         return ret;
     }
 }
-Node* ArrayToComma(Array<Node*> array) {
+Node* ArrayToComma(const Array<Node*>& array) {
     Node* ret = array.At(0);
     size_t i = 1;
     while (i < array.GetSize()) ret = new Node(Node::Type::Comma, "", ret, array.At(i++));
     return ret;
 }
-Node* ReplaceVariable(const Node* node, String name, const Node* replacement) {
+Node* ReplaceVariable(const Node* node, const String& name, const Node* replacement) {
     if (node->type == Node::Type::Variable && node->value == name) return replacement->Recreate();
     Node* ret = node->Recreate();
-    if (ret->left) ret->left = ReplaceVariable(ret->left, name, replacement);
-    if (ret->right) ret->right = ReplaceVariable(ret->right, name, replacement);
+    if (ret->left) {
+        Node* tmp = ReplaceVariable(ret->left, name, replacement);
+        delete ret->left;
+        ret->left = tmp;
+    }
+    if (ret->right) {
+        Node* tmp = ReplaceVariable(ret->right, name, replacement);
+        delete ret->right;
+        ret->right = tmp;
+    }
     return ret;
 }
-bool ContainsVariable(const Node* node, String name) {
+bool ContainsVariable(const Node* node, const String& name) {
     if (node->type == Node::Type::Variable && node->value == name) return true;
     if (node->left) return ContainsVariable(node->left, name);
     if (node->right) return ContainsVariable(node->right, name);
     return false;
 }
-Node::Node(Type t, String val, Node* l, Node* r) : type(t), value(val), left(l), right(r) {}
+Node::Node(const Type& t, const String& val, Node* l, Node* r) : type(t), value(val), left(l), right(r) {}
 Node::~Node(void) {
     if (left != nullptr) delete left;
     if (right != nullptr) delete right;
-}
-bool Node::IsConstant(void) const {
-    return type == Type::Constant || type == Type::ComplexConstant;
 }
 Node* Node::Recreate(void) const {
     return new Node(type, value, left == nullptr ? nullptr : left->Recreate(), right == nullptr ? nullptr : right->Recreate());
@@ -55,32 +60,50 @@ Node* Node::Recreate(void) const {
 Array<complex_t> Node::ToNumber(void) const {
     Array<complex_t> ret;
     if (type == Type::Constant) {
-        ret.Add(complex_t(StringToNumber(value), 0));
-        return ret;
-    }
-    else if (type == Type::ComplexConstant) {
         size_t i = 0;
-        if (value[i++] != '(') {
-            ret.Add(complex_t(StringToNumber(value), 0));
+        String real;
+        if (value[i] == '-') {
+            real += '-';
+            i++;
+        }
+        if (value[i] == 'n' && value[i + 1] == 'a' && value[i + 2] == 'n') {
+            i += 3;
+            real += "nan";
+        }
+        else if (value[i] == 'i' && value[i + 1] == 'n' && value[i + 2] == 'f') {
+            i += 3;
+            real += "inf";
+        }
+        else while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.')) real += value[i++];
+        SkipWhiteSpace(value, i);
+        if (i >= value.GetSize() || value[i++] != '+') {
+            ret.Add(complex_t(StringToNumber(real), 0));
             return ret;
         }
         SkipWhiteSpace(value, i);
-        String real;
-        while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.' || value[i] == '-')) real += value[i++];
-        SkipWhiteSpace(value, i);
-        if (value[i++] != ',') return ret;
-        SkipWhiteSpace(value, i);
         String imag;
-        while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.' || value[i] == '-')) imag += value[i++];
+        if (value[i] == '-') {
+            imag += '-';
+            i++;
+        }
+        if (value[i] == 'n' && value[i + 1] == 'a' && value[i + 2] == 'n') {
+            i += 3;
+            imag += "nan";
+        }
+        else if (value[i] == 'i' && value[i + 1] == 'n' && value[i + 2] == 'f') {
+            i += 3;
+            imag += "inf";
+        }
+        else while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.')) imag += value[i++];
         SkipWhiteSpace(value, i);
-        if (value[i++] != ')') return ret;
+        if (value[i++] != 'i') return ret;
         ret.Add(complex_t(StringToNumber(real), StringToNumber(imag)));
         return ret;
     }
     else if (type == Type::Array) {
         Array<const Node*> values = CommaToArray(left);
-        for (size_t i = 0; i < values.GetSize(); i++){
-            Array<complex_t> tmp = values.At(i)->ToNumber();
+        for (const Node*& value : values) {
+            Array<complex_t> tmp = value->ToNumber();
             if (tmp.IsEmpty()) return Array<complex_t>();
             for (size_t j = 0; j < tmp.GetSize(); j++) ret.Add(tmp.At(j));
         }
@@ -88,7 +111,7 @@ Array<complex_t> Node::ToNumber(void) const {
     }
     else return Array<complex_t>();
 }
-String Node::ToString(String padding) const {
+String Node::ToString(const String& padding) const {
     switch (type) {
         case Type::Function: {
             String ret = padding + value + '(';
@@ -101,16 +124,15 @@ String Node::ToString(String padding) const {
             }
             return ret;
         }
-        case Type::Constant:
         case Type::Variable: return padding + value;
         case Type::String: return padding + '"' + value + '"';
-        case Type::ComplexConstant: {
+        case Type::Constant: {
             const complex_t val = ToNumber().At(0);
-            const String r = std::to_string(val.real());
-            const String i = std::to_string(val.imag());
-            if (val.real() == 0) return padding + (val.imag() == 1 ? "" : i) + 'i';
-            else if (val.imag() == 0) return padding + r;
-            return padding + '(' + r + " + " + (val.imag() == 1 ? "" : i) + "i)";
+            const String r = ::ToString(val.GetReal());
+            const String i = ::ToString(val.GetImaginary());
+            if (val.GetReal() == 0) return padding + (val.GetImaginary() == 1 ? "" : i) + 'i';
+            else if (val.GetImaginary() == 0) return padding + r;
+            return padding + '(' + r + " + " + (val.GetImaginary() == 1 ? "" : i) + "i)";
         }
         case Type::Index: {
             return padding + left->ToString() + '[' + right->ToString() + ']';
@@ -118,7 +140,7 @@ String Node::ToString(String padding) const {
         case Type::Comma: {
             String ret = "List:\n";
             Array<const Node*> values = CommaToArray(this);
-            for (size_t i = 0; i < values.GetSize(); i++) ret += values.At(i)->ToString(padding + '\t') + '\n';
+            for (const Node*& value : values) ret += value->ToString(padding + '\t') + '\n';
             return ret;
         }
         case Type::Array: {
@@ -129,6 +151,7 @@ String Node::ToString(String padding) const {
             return ret;
         }
         case Type::Equal: return padding + left->ToString() + " = " + right->ToString();
+        case Type::DynamicEqual: return padding + left->ToString() + " := " + right->ToString();
         case Type::Add: return padding + '(' + left->ToString() + " + " + right->ToString() + ')';
         case Type::Sub: return padding + '(' + left->ToString() + " - " + right->ToString() + ')';
         case Type::Mul: return padding + '(' + left->ToString() + " * " + right->ToString() + ')';

@@ -34,7 +34,7 @@ struct PSF1 {
     /// @brief Returns glyph
     /// @param chr Character to return glyph of
     /// @return Glyph
-    const uint8_t* GetGlyph(char chr) const {
+    const uint8_t* GetGlyph(const char& chr) const {
         return &buffer[chr * charSize];
     }
 } __attribute__((packed));

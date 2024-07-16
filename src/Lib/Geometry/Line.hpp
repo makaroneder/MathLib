@@ -14,7 +14,7 @@ struct Line {
     /// @brief Creates a new line
     /// @param s Starting point of line
     /// @param e Ending point of line
-    Line(Matrix<T> s = CreateVector<T>(0, 0, 0), Matrix<T> e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
+    Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
 };
 /// @brief Converts a line from one type to another
 /// @tparam T Old type
@@ -22,7 +22,7 @@ struct Line {
 /// @param line line to convert
 /// @return Converted line
 template <typename T, typename F>
-Line<F> ConvertLine(Line<T> line) {
+Line<F> ConvertLine(const Line<T>& line) {
     return Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end));
 }
 

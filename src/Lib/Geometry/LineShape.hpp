@@ -5,8 +5,8 @@
 
 template <typename T>
 struct LineShape : Shape<T> {
-    LineShape(Matrix<T> pos) : Shape<T>(pos) {}
-    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const = 0;
+    LineShape(const Matrix<T>& pos) : Shape<T>(pos) {}
+    virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const = 0;
 };
 
 #endif

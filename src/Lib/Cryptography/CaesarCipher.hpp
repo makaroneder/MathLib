@@ -2,9 +2,9 @@
 #define Cryptography_CaesarCipher_H
 #include "AffineCipher.hpp"
 
-struct CaesarCipher : Protocol {
-    virtual char EncryptChar(char chr, String key) const override;
-    virtual char DecryptChar(char chr, String key) const override;
+struct CaesarCipher : Cipher {
+    virtual char EncryptChar(const char& chr, const String& key) const override;
+    virtual char DecryptChar(const char& chr, const String& key) const override;
 
     private:
     AffineCipher base;

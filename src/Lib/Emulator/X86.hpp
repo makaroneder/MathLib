@@ -2,19 +2,25 @@
 #define Emulator_X86_H
 #include "Emulator.hpp"
 #include "Register.hpp"
+#include "Flags.hpp"
 
 struct X86 : Emulator {
-    X86(Array<uint8_t> mem);
+    X86(const Array<uint8_t>& mem);
     virtual bool Step(void) override;
+    Register GetIP(void) const;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(String padding = "") const override;
+    virtual String ToString(const String& padding = "") const override;
 
     private:
+    void UpdateFlags(uint64_t val, uint64_t a, uint64_t b);
     bool Fetch(uint8_t& out);
-    Register* GetRegister(uint8_t code);
+    bool Push(uint8_t val);
+    uint8_t Pop(void);
+    Register* GetRegister(const uint8_t& code);
 
+    Flags flags;
     Register ip;
     Register a;
     Register b;

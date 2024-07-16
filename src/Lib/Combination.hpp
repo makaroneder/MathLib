@@ -8,8 +8,8 @@
 /// @param k Number of elements to select
 /// @return Number of ways to select k elements from n elements set
 template <typename T>
-T Combination(T n, T k) {
-    return Factorial<T>(n) / (Factorial<T>(k) * Factorial<T>(n - k));
+T Combination(const T& n, const T& k) {
+    return Factorial<T>(n, 1) / (Factorial<T>(k, 1) * Factorial<T>(n - k, 1));
 }
 
 #endif

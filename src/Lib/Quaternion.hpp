@@ -13,11 +13,11 @@ struct Quaternion : Printable {
     /// @param b_ b
     /// @param c_ c
     /// @param d_ d
-    Quaternion(T a_, T b_, T c_, T d_) : a(a_), b(b_), c(c_), d(d_) {}
+    Quaternion(const T& a_, const T& b_, const T& c_, const T& d_) : a(a_), b(b_), c(c_), d(d_) {}
     /// @brief q = a + v_0i + v_1j + v_2k
     /// @param scalar Scalar part of quaternion
     /// @param vector Vector part of quaternion
-    Quaternion(T scalar, Matrix<T> vector) : a(scalar), b(GetX(vector)), c(GetY(vector)), d(GetZ(vector)) {}
+    Quaternion(const T& scalar, const Matrix<T>& vector) : a(scalar), b(GetX(vector)), c(GetY(vector)), d(GetZ(vector)) {}
     /// @brief Returns scalar part of quaternion
     /// @return Scalar part of quaternion
     constexpr T GetScalar(void) const {
@@ -31,7 +31,7 @@ struct Quaternion : Printable {
     /// @brief Converts quaternion to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         String ret = FloatsEqual<T>(a, 0) ? "" : ::ToString(a);
         if (FloatsEqual<T>(b, 1)) ret += ret.IsEmpty() ? "i" : " + i";
         else if (!FloatsEqual<T>(b, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + ::ToString(b) + 'i';
@@ -44,7 +44,7 @@ struct Quaternion : Printable {
     /// @brief (a + bi + cj + dk) * (e + fi + gj + hk) = (ae - bf - cg - dh) + (af + be + ch - dg)i + (ag - bh + ce + df)j + (ah + bg - cf + de)k
     /// @param other Other quaternion
     /// @return New quaternion
-    constexpr Quaternion<T> operator*(Quaternion<T> other) const {
+    constexpr Quaternion<T> operator*(const Quaternion<T>& other) const {
         return Quaternion<T>(
             a * other.a - b * other.b - c * other.c - d * other.d,
             a * other.b + b * other.a + c * other.d - d * other.c,
@@ -79,14 +79,14 @@ struct Quaternion : Printable {
     /// @brief q^n = exp(ln(q) * n)
     /// @param n Exponent
     /// @return Power of quaternion
-    Quaternion<T> Pow(T n) const {
+    Quaternion<T> Pow(const T& n) const {
         if (n < 0) return GetInverse().Pow(Abs(n));
         return (Log() * n).Exponential();
     }
     /// @brief q^n = exp(ln(q) * n)
     /// @param n Exponent quaternion
     /// @return Power of quaternion
-    Quaternion<T> Pow(Quaternion<T> n) const {
+    Quaternion<T> Pow(const Quaternion<T>& n) const {
         return (Log() * n).Exponential();
     }
     /// @brief q^-1 = (a - bi - cj - dk) / |q|^2
@@ -98,7 +98,7 @@ struct Quaternion : Printable {
     private:
     /// @brief (a + bi + cj + dk) + (e + fi + gj + hk) = (a + e) + (b + f)i + (c + g)j + (d + h)k
     /// @param other Other quaternion
-    void Add(Quaternion<T> other) {
+    void Add(const Quaternion<T>& other) {
         a += other.a;
         b += other.b;
         c += other.c;
@@ -106,7 +106,7 @@ struct Quaternion : Printable {
     }
     /// @brief (a + bi + cj + dk) * e = ae + (be)i + (ce)j + (de)k
     /// @param scalar Scalar value to multiply by
-    void Multiply(T scalar) {
+    void Multiply(const T& scalar) {
         a *= scalar;
         b *= scalar;
         c *= scalar;
@@ -128,7 +128,7 @@ struct Quaternion : Printable {
 /// @param rotation Vector containing axis to rotate around
 /// @return Rotated 3D vector
 template <typename T>
-Matrix<T> RotateVector(Matrix<T> point, Matrix<T> origin, Matrix<T> rotation) {
+Matrix<T> RotateVector(const Matrix<T>& point, const Matrix<T>& origin, const Matrix<T>& rotation) {
     const T angle = rotation.GetLength();
     const Quaternion<T> quaternion = Quaternion<T>(Cos<T>(angle / 2), rotation.Normalize() * Sin(angle / 2));
     return (quaternion * Quaternion<T>(0, point - origin) * Quaternion<T>(quaternion.GetScalar(), -quaternion.GetVector())).GetVector() + origin;
@@ -139,7 +139,7 @@ Matrix<T> RotateVector(Matrix<T> point, Matrix<T> origin, Matrix<T> rotation) {
 /// @param b B
 /// @return Cross product of vector A and B
 template <typename T>
-Matrix<T> CrossProduct(Matrix<T> a, Matrix<T> b) {
+Matrix<T> CrossProduct(const Matrix<T>& a, const Matrix<T>& b) {
     return (Quaternion<T>(0, a) * Quaternion<T>(0, b)).GetVector();
 }
 

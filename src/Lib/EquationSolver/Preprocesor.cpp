@@ -1,12 +1,10 @@
 #include "Preprocesor.hpp"
+#include "File.hpp"
 
-// TODO: Add includes and other preprocesor instructions
-String Preproces(FileSystem& fileSystem, String path) {
-    const size_t file = fileSystem.Open(path, OpenMode::Read);
+String Preproces(FileSystem& fileSystem, const String& path) {
+    File file = fileSystem.Open(path, OpenMode::Read);
     String ret = "";
-    if (file != SIZE_MAX) {
-        const size_t size = fileSystem.GetFileSize(file);
-        while (fileSystem.Tell(file) < size) ret += fileSystem.ReadUntil(file, '\n') + '\n';
-    }
+    const size_t size = file.GetSize();
+    while (file.Tell() < size) ret += file.ReadUntil('\n') + '\n';
     return ret;
 }

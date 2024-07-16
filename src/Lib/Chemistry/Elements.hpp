@@ -5,8 +5,8 @@
 template <typename T>
 struct ChemicalElement : Printable {
     ChemicalElement(void) {}
-    ChemicalElement(String sym, size_t count_, bool metal_) : symbol(sym), count(count_), metal(metal_) {}
-    ChemicalElement(ChemicalElement<T> self, size_t count_) : ChemicalElement(self.symbol, count_, self.metal) {}
+    ChemicalElement(const String& sym, const size_t& count_, const bool& metal_) : symbol(sym), count(count_), metal(metal_) {}
+    ChemicalElement(const ChemicalElement<T>& self, const size_t& count_) : ChemicalElement(self.symbol, count_, self.metal) {}
     constexpr String GetSymbol(void) const {
         return symbol;
     }
@@ -16,10 +16,10 @@ struct ChemicalElement : Printable {
     constexpr bool IsMetal(void) const {
         return metal;
     }
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         return padding + symbol + (count == 1 ? "" : ::ToString(count));
     }
-    constexpr ChemicalElement<T> operator*=(size_t num) {
+    constexpr ChemicalElement<T> operator*=(const size_t& num) {
         count *= num;
         return *this;
     }
@@ -30,10 +30,10 @@ struct ChemicalElement : Printable {
     bool metal;
 };
 
-#define CreateChemicalElement(name, symbol, metal)                          \
-template <typename T>                                                       \
-struct name : ChemicalElement<T> {                                          \
-    name<T>(size_t count_) : ChemicalElement<T>(#symbol, count_, metal) {}  \
+#define CreateChemicalElement(name, symbol, metal)                                  \
+template <typename T>                                                               \
+struct name : ChemicalElement<T> {                                                  \
+    name<T>(const size_t& count_) : ChemicalElement<T>(#symbol, count_, metal) {}   \
 }
 
 CreateChemicalElement(Hydrogen, H, false);

@@ -1,9 +1,10 @@
 #ifndef Host_H
 #define Host_H
 #include "Printable.hpp"
-#include <ostream>
+#include "Complex.hpp"
 
 #ifndef Freestanding
+#include <ostream>
 /// @brief Prints a string
 /// @param stream Stream to print string into
 /// @param string String to print
@@ -16,9 +17,17 @@ std::ostream& operator<<(std::ostream& stream, const String& string);
 std::ostream& operator<<(std::ostream& stream, const Printable& printable);
 #endif
 
-void Panic(String str);
+struct Thread;
+[[noreturn]] void Panic(String str);
+[[noreturn]] void Panic(const char* str);
 num_t StringToNumber(String str);
 String ToString(num_t x);
+num_t GetTime(void);
+size_t GetThreadCount(void);
+Thread* AllocThread(void);
+void DeallocThread(Thread* thread);
+num_t MakeNaN(void);
+num_t MakeInf(void);
 bool IsUpper(char chr);
 bool IsLower(char chr);
 bool IsAlpha(char chr);
@@ -44,7 +53,6 @@ bool IsInf(complex_t x);
 num_t Exp(num_t x);
 complex_t Exp(complex_t x);
 num_t Round(num_t x);
-num_t Gamma(num_t x);
 num_t Floor(num_t x);
 num_t Ceil(num_t x);
 num_t Sin(num_t x);
@@ -59,18 +67,5 @@ constexpr void Swap(T& a, T& b) {
     a = b;
     b = tmp;
 }
-
-// 2 All:
-// std::complex, std::function
-
-// 1 ComplexPosition.hpp: std::complex
-// 1 Factorial.hpp: std::complex
-// 1 Typedefs.hpp: std::complex
-// 1 EquationSolver/Optimizer.cpp: std::complex
-// 1 EquationSolver/Node.hpp: std::complex
-// 1 EquationSolver/Node.cpp: std::complex
-// 1 EquationSolver/BuiltinFunction.cpp: std::function
-// 2 Renderer.hpp: std::function, std::complex
-// 2 EquationSolver/BuiltinFunction.hpp: std::function, std::complex
 
 #endif

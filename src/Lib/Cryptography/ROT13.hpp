@@ -2,9 +2,9 @@
 #define Cryptography_ROT13_H
 #include "CaesarCipher.hpp"
 
-struct ROT13 : Protocol {
-    virtual char EncryptChar(char chr, String key) const override;
-    virtual char DecryptChar(char chr, String key) const override;
+struct ROT13 : Cipher {
+    virtual char EncryptChar(const char& chr, const String& key) const override;
+    virtual char DecryptChar(const char& chr, const String& key) const override;
 
     private:
     CaesarCipher base;

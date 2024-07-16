@@ -5,7 +5,7 @@
 /// @brief Contains every information needed by neural network
 /// @tparam T Type of number
 template <typename T>
-struct State : Saveable {
+struct NeuralNetworkState : Saveable {
     /// @brief Rate by which the neural network is learning
     T rate;
     /// @brief Input data for learning
@@ -16,33 +16,33 @@ struct State : Saveable {
     NeuralNetwork<T> neuralNetwork;
 
     /// @brief Creates empty state
-    constexpr State(void) {}
+    constexpr NeuralNetworkState(void) {}
     /// @brief Creates a new state
     /// @param r Rate by which the neural network is learning
     /// @param in Input data for learning
     /// @param out Output data for learning
     /// @param nn Neural network
-    constexpr State(T r, Matrix<T> in, Matrix<T> out, NeuralNetwork<T> nn) : rate(r), trainingDataInput(in), trainingDataOutput(out), neuralNetwork(nn) {}
+    constexpr NeuralNetworkState(const T& r, const Matrix<T>& in, const Matrix<T>& out, const NeuralNetwork<T>& nn) : rate(r), trainingDataInput(in), trainingDataOutput(out), neuralNetwork(nn) {}
     constexpr void Forward(void) {
         neuralNetwork.Forward();
     }
     constexpr T Cost(void) {
         return neuralNetwork.Cost(trainingDataInput, trainingDataOutput);
     }
-    constexpr NeuralNetwork<T> FiniteDiff(T eps_ = eps) {
+    constexpr NeuralNetwork<T> FiniteDiff(const T& eps_ = eps) {
         return neuralNetwork.FiniteDiff(trainingDataInput, trainingDataOutput, eps_);
     }
     constexpr NeuralNetwork<T> Backprop(void) {
         return neuralNetwork.Backprop(trainingDataInput, trainingDataOutput);
     }
-    constexpr void Learn(NeuralNetwork<T> diff) {
+    constexpr void Learn(const NeuralNetwork<T>& diff) {
         neuralNetwork.Learn(diff, rate);
     }
-    virtual bool Save(FileSystem& fileSystem, size_t file) const override {
-        return fileSystem.Write(file, &rate, sizeof(T)) && trainingDataInput.Save(fileSystem, file) && trainingDataOutput.Save(fileSystem, file) && neuralNetwork.Save(fileSystem, file);
+    virtual bool Save(ByteDevice& file) const override {
+        return file.Write<T>(rate) && trainingDataInput.Save(file) && trainingDataOutput.Save(file) && neuralNetwork.Save(file);
     }
-    virtual bool Load(FileSystem& fileSystem, size_t file) override {
-        return fileSystem.Read(file, &rate, sizeof(T)) && trainingDataInput.Load(fileSystem, file) && trainingDataOutput.Load(fileSystem, file) && neuralNetwork.Load(fileSystem, file);
+    virtual bool Load(ByteDevice& file) override {
+        return file.Read<T>(rate) && trainingDataInput.Load(file) && trainingDataOutput.Load(file) && neuralNetwork.Load(file);
     }
 };
 

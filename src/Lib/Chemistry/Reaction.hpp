@@ -5,8 +5,8 @@
 
 template <typename T>
 struct ChemicalReaction : Printable  {
-    ChemicalReaction<T>(Array<ChemicalMolecule<T>> l, Array<ChemicalMolecule<T>> r) : left(l), right(r) {}
-    static constexpr ChemicalReaction<T> Create(Array<ChemicalMolecule<T>> l) {
+    ChemicalReaction<T>(const Array<ChemicalMolecule<T>>& l, const Array<ChemicalMolecule<T>>& r) : left(l), right(r) {}
+    static constexpr ChemicalReaction<T> Create(const Array<ChemicalMolecule<T>>& l) {
         Array<ChemicalMolecule<T>> ret;
         if (l.GetSize() == 2) {
             Array<ChemicalElement<T>> l0 = l.At(0).GetElements();
@@ -36,43 +36,43 @@ struct ChemicalReaction : Printable  {
     }
     constexpr Array<Array<ChemicalElement<T>>> GetLeftList(void) const {
         Array<Array<ChemicalElement<T>>> ret;
-        for (size_t i = 0; i < left.GetSize(); i++) ret.Add(left.At(i).GetElements());
+        for (const ChemicalElement<T>& element : left) ret.Add(element.GetElements());
         return ret;
     }
     constexpr Array<Array<ChemicalElement<T>>> GetRightList(void) const {
         Array<Array<ChemicalElement<T>>> ret;
-        for (size_t i = 0; i < right.GetSize(); i++) ret.Add(right.At(i).GetElements());
+        for (const ChemicalElement<T>& element : right) ret.Add(element.GetElements());
         return ret;
     }
-    constexpr size_t GetLeftElementCount(String symbol) const {
+    constexpr size_t GetLeftElementCount(const String& symbol) const {
         return GetElementCount(GetLeftList(), symbol);
     }
-    constexpr size_t GetRightElementCount(String symbol) const {
+    constexpr size_t GetRightElementCount(const String& symbol) const {
         return GetElementCount(GetRightList(), symbol);
     }
-    Array<ChemicalReactionElement> GetReactionElements(Array<ChemicalMolecule<T>> molecules) const {
+    Array<ChemicalReactionElement> GetReactionElements(const Array<ChemicalMolecule<T>>& molecules) const {
         Array<ChemicalReactionElement> elements;
         for (size_t i = 0; i < molecules.GetSize(); i++) {
             Array<ChemicalElement<T>> chemElements = molecules.At(i).GetElements();
-            for (size_t j = 0; j < chemElements.GetSize(); j++) {
+            for (const ChemicalElement<T>& element : chemElements) {
                 bool found = false;
-                for (size_t k = 0; k < elements.GetSize(); k++) {
-                    if (elements.At(k).symbol == chemElements.At(j).GetSymbol()) {
-                        elements.At(k).coefficients.At(i, 0) = chemElements.At(j).GetCount();
+                for (ChemicalReactionElement& rElement : elements) {
+                    if (rElement.symbol == element.GetSymbol()) {
+                        rElement.coefficients.At(i, 0) = element.GetCount();
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    ChemicalReactionElement rElement = ChemicalReactionElement(chemElements.At(j).GetSymbol(), molecules.GetSize());
-                    rElement.coefficients.At(i, 0) = chemElements.At(j).GetCount();
+                    ChemicalReactionElement rElement = ChemicalReactionElement(element.GetSymbol(), molecules.GetSize());
+                    rElement.coefficients.At(i, 0) = element.GetCount();
                     elements.Add(rElement);
                 }
             }
         }
         return elements;
     }
-    constexpr ChemicalReaction<T> Balance(void) {
+    constexpr ChemicalReaction<T> Balance(void) const {
         const Array<ChemicalReactionElement> l = GetReactionElements(left);
         const Array<ChemicalReactionElement> r = GetReactionElements(right);
         const size_t size = left.GetSize() + right.GetSize() - 1;
@@ -84,9 +84,9 @@ struct ChemicalReaction : Printable  {
             Matrix<ssize_t> v = l.At(y).coefficients;
             const size_t w = v.GetWidth();
             for (size_t x = 0; x < w; x++) a.At(x, y - sub) = v.At(x, 0);
-            for (size_t i = 0; i < r.GetSize(); i++) {
-                if (r.At(i).symbol == l.At(y).symbol) {
-                    v = r.At(i).coefficients;
+            for (const ChemicalReactionElement& elment : r) {
+                if (elment.symbol == l.At(y).symbol) {
+                    v = elment.coefficients;
                     break;
                 }
             }
@@ -119,7 +119,7 @@ struct ChemicalReaction : Printable  {
         }
         return ChemicalReaction<T>({}, {});
     }
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         String ret = padding;
         for (size_t i = 0; i < left.GetSize(); i++)
             ret += left.At(i).ToString() + ((i + 1) == left.GetSize() ? "" : " + ");
@@ -133,12 +133,12 @@ struct ChemicalReaction : Printable  {
     Array<ChemicalMolecule<T>> left;
     Array<ChemicalMolecule<T>> right;
 
-    static constexpr size_t GetElementCount(Array<Array<ChemicalElement<T>>> molecules, String symbol) {
+    static constexpr size_t GetElementCount(const Array<Array<ChemicalElement<T>>>& molecules, const String& symbol) {
         size_t ret = 0;
-        for (size_t i = 0; i < molecules.GetSize(); i++) {
-            for (size_t j = 0; j < molecules.At(i).GetSize(); j++) {
-                if (molecules.At(i).At(j).GetSymbol() == symbol) {
-                    ret += molecules.At(i).At(j).GetCount();
+        for (const Array<ChemicalElement<T>>& elements : molecules) {
+            for (const ChemicalElement<T>& element : elements) {
+                if (element.GetSymbol() == symbol) {
+                    ret += element.GetCount();
                     break;
                 }
             }

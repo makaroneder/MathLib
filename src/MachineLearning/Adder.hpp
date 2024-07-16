@@ -6,11 +6,11 @@
 /// @tparam T Type of number
 /// @return State
 template <typename T>
-State<T> GetDefaultState(void) {
+NeuralNetworkState<T> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
-    const size_t rows = StdPow(n, 2);
-    State<T> state = State<T>(1, Matrix<T>(bits * 2, rows), Matrix<T>(bits, rows), NeuralNetwork<T>(std::vector<size_t> { bits * 2, bits * 4, bits, }));
+    const size_t rows = Pow(n, 2);
+    NeuralNetworkState<T> state = NeuralNetworkState<T>(1, Matrix<T>(bits * 2, rows), Matrix<T>(bits, rows), NeuralNetwork<T>(NeuralNetwork<T>::ActivationFunction::Sigmoid, std::vector<size_t> { bits * 2, bits * 4, bits, }));
     for (size_t i = 0; i < rows; i++) {
         const size_t x = i / n;
         const size_t y = i % n;
@@ -22,6 +22,25 @@ State<T> GetDefaultState(void) {
         }
     }
     return state;
+}
+template <typename T>
+String StateToString(NeuralNetworkState<T>& state) {
+    const size_t bits = state.trainingDataInput.GetWidth() / 2;
+    const size_t n = 1 << bits;
+    String ret;
+    for (size_t y = 0; y < n; y++) {
+        for (size_t x = 0; x < n; x++) {
+            for (size_t i = 0; i < bits; i++) {
+                state.neuralNetwork.GetInput().At(i, 0) = (y >> i) & 1;
+                state.neuralNetwork.GetInput().At(i + bits, 0) = (x >> i) & 1;
+            }
+            state.Forward();
+            size_t z = 0;
+            for (size_t i = 0; i < state.trainingDataOutput.GetWidth(); i++) z |= (state.neuralNetwork.GetOutput().At(i, 0) > 0.5) << i;
+            ret += String("[") + ToString(y) + ", " + ToString(x) + "] => " + ToString(z) + '\n';
+        }
+    }
+    return ret;
 }
 
 #endif

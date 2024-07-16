@@ -1,21 +1,19 @@
 #ifndef Test_H
 #define Test_H
-#include <Renderer.hpp>
+#include "Record.hpp"
 
-struct Test : Renderer {
-    /// @brief Creates a new renderer
-    /// @param w Width of the window
-    /// @param h Height of the window
-    Test(size_t w, size_t h);
-    /// @brief Updates renderer
-    /// @return Status
-    virtual bool Update(void) override;
-    /// @brief Gets current event
-    /// @return Event
-    virtual Event GetEvent(void) override;
+struct Test : Printable {
+    bool ReportRecord(const Record& record);
+    size_t GetRecordCount(void) const;
+    size_t GetPassed(void) const;
+    /// @brief Converts struct to string
+    /// @param padding String to pad with
+    /// @return String representation
+    virtual String ToString(const String& padding = "") const override;
 
-    size_t failed;
-    std::vector<Matrix<num_t>> values;
+    private:
+    Array<Record> records;
 };
+#define TestOperation(test, expr) if (!test.ReportRecord(Record(#expr, expr))) Panic("Failed to add test record")
 
 #endif

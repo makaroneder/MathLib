@@ -17,7 +17,7 @@ struct Unit : Printable {
         Time,
         End,
     };
-    Unit<T>(T count_ = 0, T amountOfSubstance_ = 0, T electricCurrent_ = 0, T length_ = 0, T luminousIntensity_ = 0, T mass_ = 0, T thermodynamicTemperature_ = 0, T time_ = 0) : count(count_) {
+    Unit<T>(const T& count_ = 0, const T& amountOfSubstance_ = 0, const T& electricCurrent_ = 0, const T& length_ = 0, const T& luminousIntensity_ = 0, const T& mass_ = 0, const T& thermodynamicTemperature_ = 0, const T& time_ = 0) : count(count_) {
         this->baseUnits[BaseUnit::AmountOfSubstance] = amountOfSubstance_;
         this->baseUnits[BaseUnit::ElectricCurrent] = electricCurrent_;
         this->baseUnits[BaseUnit::Length] = length_;
@@ -26,7 +26,7 @@ struct Unit : Printable {
         this->baseUnits[BaseUnit::ThermodynamicTemperature] = thermodynamicTemperature_;
         this->baseUnits[BaseUnit::Time] = time_;
     }
-    Unit<T>(T count_, T* baseUnits_) : count(count_) {
+    Unit<T>(const T& count_, const T* baseUnits_) : count(count_) {
         this->baseUnits[BaseUnit::AmountOfSubstance] = baseUnits_[BaseUnit::AmountOfSubstance];
         this->baseUnits[BaseUnit::ElectricCurrent] = baseUnits_[BaseUnit::ElectricCurrent];
         this->baseUnits[BaseUnit::Length] = baseUnits_[BaseUnit::Length];
@@ -35,13 +35,13 @@ struct Unit : Printable {
         this->baseUnits[BaseUnit::ThermodynamicTemperature] = baseUnits_[BaseUnit::ThermodynamicTemperature];
         this->baseUnits[BaseUnit::Time] = baseUnits_[BaseUnit::Time];
     }
-    virtual constexpr T GetValue(void) const {
+    virtual T GetValue(void) const {
         return count;
     }
-    constexpr T GetBaseUnit(size_t i) const {
+    constexpr T GetBaseUnit(const size_t& i) const {
         return baseUnits[i];
     }
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         if (count == 0) return padding + "0";
         String str = count == 1 ? "" : ::ToString(count);
         bool first = true;
@@ -55,7 +55,7 @@ struct Unit : Printable {
         }
         return padding + ((first && count == 1) ? "1" : str);
     }
-    constexpr Unit<T> Pow(T scalar) const {
+    constexpr Unit<T> Pow(const T& scalar) const {
         return Unit<T>(
             ::Pow(count, scalar),
             this->baseUnits[BaseUnit::AmountOfSubstance] * scalar,
@@ -67,7 +67,7 @@ struct Unit : Printable {
             this->baseUnits[BaseUnit::Time] * scalar
         );
     }
-    constexpr Unit<T> operator*(Unit<T> other) const {
+    constexpr Unit<T> operator*(const Unit<T>& other) const {
         return Unit<T>(
             count * other.count,
             this->baseUnits[BaseUnit::AmountOfSubstance] + other.baseUnits[BaseUnit::AmountOfSubstance],
@@ -79,7 +79,7 @@ struct Unit : Printable {
             this->baseUnits[BaseUnit::Time] + other.baseUnits[BaseUnit::Time]
         );
     }
-    constexpr Unit<T> operator/(Unit<T> other) const {
+    constexpr Unit<T> operator/(const Unit<T>& other) const {
         return Unit<T>(
             count / other.count,
             this->baseUnits[BaseUnit::AmountOfSubstance] - other.baseUnits[BaseUnit::AmountOfSubstance],
@@ -91,20 +91,20 @@ struct Unit : Printable {
             this->baseUnits[BaseUnit::Time] - other.baseUnits[BaseUnit::Time]
         );
     }
-    constexpr Unit<T> operator*=(Unit<T> other) {
+    constexpr Unit<T> operator*=(const Unit<T>& other) {
         count *= other.count;
         for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] += other.baseUnits[i];
         return *this;
     }
-    constexpr Unit<T> operator/=(Unit<T> other) {
+    constexpr Unit<T> operator/=(const Unit<T>& other) {
         count /= other.count;
         for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] -= other.baseUnits[i];
         return *this;
     }
-    constexpr bool operator==(Unit<T> other) const {
+    constexpr bool operator==(const Unit<T>& other) const {
         bool ret = true;
         for (size_t i = 0; i < BaseUnit::End && ret; i++) ret = this->baseUnits[i] == other.baseUnits[i];
-        return ret && this->count == other.count;
+        return ret && FloatsEqual<T>(this->count, other.count);
     }
 
     protected:
@@ -115,23 +115,23 @@ struct Unit : Printable {
     };
 
     private:
-    void Add(Unit<T> other) {
+    void Add(const Unit<T>& other) {
         for (size_t i = 0; i < BaseUnit::End; i++)
             if (this->baseUnits[i] != other.baseUnits[i]) Panic("Invalid units added");
         this->count += other.count;
     }
-    void Multiply(T scalar) {
+    void Multiply(const T& scalar) {
         this->count *= scalar;
     }
 };
 template <typename T>
 struct Gram : Unit<T> {
-    Gram<T>(T count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
-    Gram<T>(Unit<T> other) : Unit<T>(other.GetValue(), 0, 0, 0, 0, 1) {
+    Gram<T>(const T& count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
+    Gram<T>(const Unit<T>& other) : Unit<T>(other.GetValue(), 0, 0, 0, 0, 1) {
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
             if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");
     }
-    virtual constexpr T GetValue(void) const override {
+    virtual T GetValue(void) const override {
         return this->count * 1000;
     }
 };
@@ -139,24 +139,24 @@ struct Gram : Unit<T> {
 #define CreateUnit(name, ...)                                                                                       \
 template <typename T>                                                                                               \
 struct name : Unit<T> {                                                                                             \
-    name<T>(T count_ = 0) : Unit<T>(count_, __VA_ARGS__) {}                                                         \
-    name<T>(Unit<T> other) : Unit<T>(other.GetValue(), __VA_ARGS__) {                                               \
+    name<T>(const T& count_ = 0) : Unit<T>(count_, __VA_ARGS__) {}                                                  \
+    name<T>(const Unit<T>& other) : Unit<T>(other.GetValue(), __VA_ARGS__) {                                        \
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");    \
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");                       \
     }                                                                                                               \
 }
 #define CreateAlternativeUnit(name, base, mul)                                                                      \
 template <typename T>                                                                                               \
 struct name : base<T> {                                                                                             \
-    name<T>(T count_ = 0) : base<T>(count_ * (mul)) {}                                                              \
-    name<T>(base<T> other) : base<T>(other.GetValue()) {                                                            \
+    name<T>(const T& count_ = 0) : base<T>(count_ * (mul)) {}                                                       \
+    name<T>(const base<T>& other) : base<T>(other.GetValue()) {                                                     \
         for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
-            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");    \
+            if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");                       \
     }                                                                                                               \
     constexpr base<T> ToBaseUnit(void) const {                                                                      \
         return base<T>(this->count);                                                                                \
     }                                                                                                               \
-    virtual constexpr T GetValue(void) const override {                                                             \
+    virtual T GetValue(void) const override {                                                                       \
         return this->count / (mul);                                                                                 \
     }                                                                                                               \
 }

@@ -1,16 +1,25 @@
 #ifndef NeuralNetwork_H
 #define NeuralNetwork_H
 #include "Matrix.hpp"
+#include "Sigmoid.hpp"
+#include "Trigonometry.hpp"
 
 /// @brief Neural network
 /// @tparam T Type of number
 template <typename T>
 struct NeuralNetwork : Printable, Saveable {
+    enum class ActivationFunction : uint8_t {
+        None,
+        Sigmoid,
+        Tanh,
+        ReLU,
+        LeakyReLU,
+    } activation;
     /// @brief Creates empty neural network
-    NeuralNetwork<T>(void) : count(0) {}
+    NeuralNetwork<T>(void) : activation(ActivationFunction::None) {}
     /// @brief Creates a new neural network
     /// @param arch Architecture of the neural network
-    NeuralNetwork<T>(const Array<size_t>& arch) {
+    NeuralNetwork<T>(ActivationFunction activation, const Array<size_t>& arch) : activation(activation) {
         const size_t c = arch.GetSize();
         if (c == 0) Panic("Invalid architecture size");
         count = c - 1;
@@ -48,7 +57,7 @@ struct NeuralNetwork : Printable, Saveable {
     }
     /// @brief Fills weights, biases and neurons
     /// @param x Value to fill with
-    constexpr void Fill(T x) {
+    constexpr void Fill(const T& x) {
         GetOutput().Fill(x);
         for (size_t i = 0; i < count; i++) {
             ws.At(i).Fill(x);
@@ -59,7 +68,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Randomizes weights and biases
     /// @param min Minimal value
     /// @param max Maximal value
-    void Random(T min, T max) {
+    void Random(const T& min, const T& max) {
         for (size_t i = 0; i < count; i++) {
             ws.At(i).Random(min, max);
             bs.At(i).Random(min, max);
@@ -68,16 +77,20 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Applies weights and biases to neurons
     /// @param  
     constexpr void Forward(void) {
-        for (size_t i = 0; i < count; i++)
-            as.At(i + 1) = ActivateMatrix(as.At(i) * ws.At(i) + bs.At(i));
+        for (size_t i = 0; i < count; i++) {
+            as.At(i + 1) = as.At(i) * ws.At(i) + bs.At(i);
+            for (size_t y = 0; y < as.At(i + 1).GetHeight(); y++)
+                for (size_t x = 0; x < as.At(i + 1).GetWidth(); x++)
+                    as.At(i + 1).At(x, y) = Activation(as.At(i + 1).At(x, y));
+        }
     }
     /// @brief Calculates average error
     /// @param input Input data
     /// @param output Output data
     /// @return Average error
-    constexpr T Cost(Matrix<T> input, Matrix<T> output) {
-        if (input.GetHeight() != output.GetHeight()) return NAN;
-        if (output.GetWidth() != GetOutput().GetWidth()) return NAN;
+    constexpr T Cost(const Matrix<T>& input, const Matrix<T>& output) {
+        if (input.GetHeight() != output.GetHeight()) return MakeNaN();
+        if (output.GetWidth() != GetOutput().GetWidth()) return MakeNaN();
         T ret = 0;
         for (size_t y = 0; y < input.GetHeight(); y++) {
             GetInput() = input.GetRow(y);
@@ -91,7 +104,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @param output Output data
     /// @param eps_ Error tolerance
     /// @return Difference
-    constexpr NeuralNetwork<T> FiniteDiff(Matrix<T> input, Matrix<T> output, T eps_ = eps) {
+    constexpr NeuralNetwork<T> FiniteDiff(const Matrix<T>& input, const Matrix<T>& output, const T& eps_ = eps) {
         const T cost = Cost(input, output);
         NeuralNetwork<T> ret = *this;
         for (size_t i = 0; i < count; i++) {
@@ -118,7 +131,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @param input Input data
     /// @param output Output data
     /// @return Difference
-    constexpr NeuralNetwork<T> Backprop(Matrix<T> input, Matrix<T> output) {
+    constexpr NeuralNetwork<T> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
         if (input.GetHeight() != output.GetHeight()) return NeuralNetwork<T>();
         if (GetOutput().GetWidth() != output.GetWidth()) return NeuralNetwork<T>();
         NeuralNetwork<T> ret = *this;
@@ -132,11 +145,12 @@ struct NeuralNetwork : Printable, Saveable {
                 for (size_t j = 0; j < as.At(l).GetWidth(); j++) {
                     const T a = as.At(l).At(j, 0);
                     const T da = ret.as.At(l).At(j, 0);
-                    ret.bs.At(l - 1).At(j, 0) += 2 * da * a * (1 - a);
+                    const T qa = ActivationDerivate(a);
+                    ret.bs.At(l - 1).At(j, 0) += 2 * da * qa;
                     for (size_t k = 0; k < as.At(l - 1).GetWidth(); k++) {
                         const T w = ws.At(l - 1).At(j, k);
-                        ret.ws.At(l - 1).At(j, k) += 2 * da * a * (1 - a) * as.At(l - 1).At(k, 0);
-                        ret.as.At(l - 1).At(k, 0) += 2 * da * a * (1 - a) * w;
+                        ret.ws.At(l - 1).At(j, k) += 2 * da * qa * as.At(l - 1).At(k, 0);
+                        ret.as.At(l - 1).At(k, 0) += 2 * da * qa * w;
                     }
                 }
             }
@@ -150,7 +164,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Learns
     /// @param diff Difference between expected and actual results
     /// @param rate Rate to learn in
-    constexpr void Learn(NeuralNetwork<T> diff, T rate) {
+    constexpr void Learn(const NeuralNetwork<T>& diff, T rate) {
         for (size_t i = 0; i < count; i++) {
             ws.At(i) -= diff.ws.At(i) * rate;
             bs.At(i) -= diff.bs.At(i) * rate;
@@ -159,53 +173,58 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Converts neural network to string
     /// @param padding String to pad with
     /// @return String representation of neural network
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         String ret = padding + "a[0] = " + GetInput().ToString() + '\n';
         for (size_t i = 0; i < count; i++)
             ret += padding + "a[" + ::ToString(i + 1) + "] = " + as.At(i + 1).ToString() + '\n' + padding + "b[" + ::ToString(i) + "] = " + bs.At(i).ToString() + '\n' + padding + "w[" + ::ToString(i) + "] = " + ws.At(i).ToString() + '\n';
         return ret;
     }
     /// @brief Saves neural network data
-    /// @param fileSystem File system to save neural network data into
     /// @param file File to save neural network data into
     /// @return Status
-    virtual bool Save(FileSystem& fileSystem, size_t file) const override {
-        if (!fileSystem.Write(file, &count, sizeof(size_t)) || !GetInput().Save(fileSystem, file)) return false;
+    virtual bool Save(ByteDevice& file) const override {
+        if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) return false;
         for (size_t i = 0; i < count; i++) {
-            if (!as.At(i + 1).Save(fileSystem, file)) return false;
-            if (!ws.At(i).Save(fileSystem, file)) return false;
-            if (!bs.At(i).Save(fileSystem, file)) return false;
+            if (!as.At(i + 1).Save(file)) return false;
+            if (!ws.At(i).Save(file)) return false;
+            if (!bs.At(i).Save(file)) return false;
         }
         return true;
     }
     /// @brief Loads neural network data
-    /// @param fileSystem File system to load neural network data from
     /// @param file File to load neural network data from
     /// @return Status
-    virtual bool Load(FileSystem& fileSystem, size_t file) override {
-        if (!fileSystem.Read(file, &count, sizeof(size_t))) return false;
-        if (!as.Add(Matrix<T>())) return false;
-        if (!GetInput().Load(fileSystem, file)) return false;
+    virtual bool Load(ByteDevice& file) override {
+        if (!file.Read<ActivationFunction>(activation) || !file.Read<size_t>(count) || !as.Add(Matrix<T>()) || !GetInput().Load(file)) return false;
         for (size_t i = 0; i < count; i++) {
             if (!as.Add(Matrix<T>())) return false;
             if (!ws.Add(Matrix<T>())) return false;
             if (!bs.Add(Matrix<T>())) return false;
-            if (!as.At(i + 1).Load(fileSystem, file)) return false;
-            if (!ws.At(i).Load(fileSystem, file)) return false;
-            if (!bs.At(i).Load(fileSystem, file)) return false;
+            if (!as.At(i + 1).Load(file)) return false;
+            if (!ws.At(i).Load(file)) return false;
+            if (!bs.At(i).Load(file)) return false;
         }
         return true;
     }
 
     private:
-    /// @brief Activates matrix
-    /// @param matrix Matrix to activate
-    /// @return Activated matrix
-    Matrix<T> ActivateMatrix(Matrix<T> matrix) {
-        Matrix<T> ret = matrix;
-        for (size_t y = 0; y < ret.GetHeight(); y++)
-            for (size_t x = 0; x < ret.GetWidth(); x++) ret.At(x, y) = Sigmoid<T>(ret.At(x, y));
-        return ret;
+    T Activation(const T& x) {
+        switch (activation) {
+            case ActivationFunction::Sigmoid: return Sigmoid<T>(x);
+            case ActivationFunction::Tanh: return HyperbolicTan<T>(x);
+            case ActivationFunction::ReLU: return x > 0 ? x : x;
+            case ActivationFunction::LeakyReLU: return x > 0 ? x : x * eps;
+            default: return MakeNaN();
+        }
+    }
+    T ActivationDerivate(T y) {
+        switch (activation) {
+            case ActivationFunction::Sigmoid: return y * (1 - y);
+            case ActivationFunction::Tanh: return 1 - Pow(y, 2);
+            case ActivationFunction::ReLU: return y >= 0 ? 1 : 0;
+            case ActivationFunction::LeakyReLU: return y >= 0 ? 1 : eps;
+            default: return MakeNaN();
+        }
     }
 
     /// @brief Count of weights, biases and count of neurons - 1

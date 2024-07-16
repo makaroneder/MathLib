@@ -1,21 +1,22 @@
 #include <Chemistry/Reaction.hpp>
+#include <MathLib.hpp>
 #include <iostream>
 
 /// @brief Balances reaction and prints it
 /// @tparam T Type of number
 /// @param reaction Reaction to balance
 template <typename T>
-void BalanceReaction(ChemicalReaction<T> reaction) {
-    const clock_t start = clock();
+void BalanceReaction(const ChemicalReaction<T>& reaction) {
+    const T start = GetTime();
     std::cout << reaction << '\n';
     std::cout << reaction.Balance() << '\n';
-    std::cout << "Reaction balanced in " << (T)(clock() - start) / CLOCKS_PER_SEC << " second(s)\n";
+    std::cout << "Reaction balanced in " << GetTime() - start << " second(s)\n";
     for (size_t i = 0; i < 50; i++) std::cout << '-';
     std::cout << '\n';
 }
 /// @brief Entry point for this program
 /// @return Status
-int main(void) {
+int main(int, char**) {
     try {
         // 2KMnO4 + 5KNO2 + 6HNO3 => 2MnN2O6 + 7KNO3 + 3H2O
         BalanceReaction<num_t>(ChemicalReaction<num_t>(std::vector<ChemicalMolecule<num_t>> {

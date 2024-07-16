@@ -5,10 +5,10 @@
 template <typename T>
 struct ChemicalMolecule : Printable {
     ChemicalMolecule(void) {}
-    ChemicalMolecule(Array<ChemicalElement<T>> elements_, size_t count_) : count(count_), elements(elements_) {}
+    ChemicalMolecule(const Array<ChemicalElement<T>>& elements_, const size_t& count_) : count(count_), elements(elements_) {}
     constexpr Array<ChemicalElement<T>> GetElements(void) const {
         Array<ChemicalElement<T>> ret = elements;
-        for (size_t i = 0; i < ret.GetSize(); i++) elements.At(i) *= count;
+        for (ChemicalElement<T>& element : ret) element *= count;
         return ret;
     }
     constexpr bool IsCompound(void) const {
@@ -32,9 +32,9 @@ struct ChemicalMolecule : Printable {
     constexpr bool IsOxide(void) const {
         return IsCompound() && !IsWater() && elements.At(elements.GetSize() - 1).GetSymbol() == "O";
     }
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         String str = "";
-        for (size_t i = 0; i < elements.GetSize(); i++) str += elements.At(i).ToString();
+        for (const ChemicalElement<T>& element : elements) str += element.ToString();
         return padding + (count == 1 ? "" : ::ToString(count)) + str;
     }
 

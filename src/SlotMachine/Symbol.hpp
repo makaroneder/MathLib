@@ -6,7 +6,7 @@ struct Symbol : WavefrontObject<num_t> {
     String name;
     Array<size_t> multiplier;
 
-    Symbol(FileSystem& fileSystem, String path, String n, Array<size_t> mult);
+    Symbol(FileSystem& fileSystem, const String& path, const String& n, const Array<size_t>& mult);
     bool operator==(const Symbol& other) const;
 };
 

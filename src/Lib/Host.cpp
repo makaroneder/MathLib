@@ -3,8 +3,11 @@
 
 #define ComplexToReal(x)                                                \
     const complex_t complex = x;                                        \
-    return FloatsEqual<num_t>(complex.imag(), 0) ? complex.real() : NAN
+    return FloatsEqual<num_t>(complex.GetImaginary(), 0) ? complex.GetReal() : MakeNaN()
 
+[[noreturn]] void Panic(String str) {
+    Panic(str.GetValue());
+}
 bool IsUpper(char chr) {
     return chr >= 'A' && chr <= 'Z';
 }
@@ -50,19 +53,17 @@ num_t NaturalLog(num_t x) {
     ComplexToReal(NaturalLog(complex_t(x, 0)));
 }
 bool IsNaN(complex_t x) {
-    return IsNaN(x.real()) || IsNaN(x.imag());
+    return IsNaN(x.GetReal()) || IsNaN(x.GetImaginary());
 }
 bool IsInf(complex_t x) {
-    return IsInf(x.real()) || IsInf(x.imag());
+    return IsInf(x.GetReal()) || IsInf(x.GetImaginary());
 }
 num_t Exp(num_t x) {
     ComplexToReal(Exp(complex_t(x, 0)));
 }
-#ifdef Freestanding
 complex_t Exp(complex_t x) {
     return Pow(e, x);
 }
-#endif
 num_t Ceil(num_t x) {
     return Floor(x) + 1;
 }

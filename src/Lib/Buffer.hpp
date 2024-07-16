@@ -1,32 +1,32 @@
 #ifndef Buffer_H
 #define Buffer_H
 #include "Collection.hpp"
-#include "Host.hpp"
 
+[[noreturn]] void Panic(const char*);
 template <typename T>
 struct Buffer : Collection<T> {
     Buffer(void) : buffer(nullptr), size(0) {}
-    Buffer(size_t size_) : buffer(new T[size_]), size(size_) {}
+    Buffer(const size_t& size_) : buffer(new T[size_]), size(size_) {}
     Buffer(const Buffer<T>& other) : buffer(new T[other.size]), size(other.size) {
         if (other.size != 0) {
             if (!buffer || !other.buffer) Panic("Buffer allocation failed");
             for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
         }
     }
-    virtual ~Buffer(void) {
+    virtual ~Buffer(void) override {
         delete [] buffer;
     }
-    virtual T At(size_t index) const override {
+    virtual T At(const size_t& index) const override {
         if (index >= size) Panic("Index out of bounds");
         if (!buffer) Panic("Buffer allocation failed");
         return buffer[index];
     }
-    virtual T& At(size_t index) override {
+    virtual T& At(const size_t& index) override {
         if (index >= size) Panic("Index out of bounds");
         if (!buffer) Panic("Buffer allocation failed");
         return buffer[index];
     }
-    virtual bool Add(T val) override {
+    virtual bool Add(const T& val) override {
         T* tmp = new T[size + 1];
         if (!tmp) return false;
         for (size_t i = 0; i < size; i++) tmp[i] = buffer[i];
@@ -50,7 +50,7 @@ struct Buffer : Collection<T> {
         return *this;
     }
 
-    private:
+    protected:
     T* buffer;
     size_t size;
 };

@@ -1,15 +1,16 @@
 #ifndef Node_H
 #define Node_H
 #include "../Printable.hpp"
+#include "../Complex.hpp"
 
 /// @brief Contains mathematical operations, constants, functions and variables
 struct Node : Printable {
     /// @brief Type of the node
     enum class Type {
         None,
-        Function, Variable, Constant, ComplexConstant, Array, String,
+        Function, Variable, Constant, Array, String,
         Comma,
-        Equal,
+        Equal, DynamicEqual,
         Add, Sub,
         Mul, Div,
         Pow, Root,
@@ -30,12 +31,9 @@ struct Node : Printable {
     /// @param val Value
     /// @param l Left child
     /// @param r Right child
-    Node(Type t, String val, Node* l = nullptr, Node* r = nullptr);
+    Node(const Type& t, const String& val, Node* l = nullptr, Node* r = nullptr);
     /// @brief Destroys current node and it's children
     virtual ~Node(void) override;
-    /// @brief Is the node constant
-    /// @return True if the node is constant
-    bool IsConstant(void) const;
     /// @brief Creates a new node with the same values as the current node
     /// @return New node
     Node* Recreate(void) const;
@@ -44,7 +42,7 @@ struct Node : Printable {
     Array<complex_t> ToNumber(void) const;
     /// @brief Converts values of the current node to string
     /// @param padding Padding of the generated strings
-    virtual String ToString(String padding = "") const override;
+    virtual String ToString(const String& padding = "") const override;
 };
 /// @brief Converts node to array
 /// @param node Node to convert
@@ -53,17 +51,17 @@ Array<const Node*> CommaToArray(const Node* node);
 /// @brief Converts array to node
 /// @param array Array to convert
 /// @return Converted node
-Node* ArrayToComma(Array<Node*> array);
+Node* ArrayToComma(const Array<Node*>& array);
 /// @brief Replaces every node containing specified variable with specified replacement
 /// @param node Root node to replace
 /// @param name Name of the variable to replace
 /// @param replacement Node to replace with
 /// @return New root node
-Node* ReplaceVariable(const Node* node, String name, const Node* replacement);
+Node* ReplaceVariable(const Node* node, const String& name, const Node* replacement);
 /// @brief Checks whether node contains specified variable
 /// @param node Root node to check
 /// @param name Name of the variable
 /// @return Status
-bool ContainsVariable(const Node* node, String name);
+bool ContainsVariable(const Node* node, const String& name);
 
 #endif

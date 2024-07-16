@@ -7,8 +7,8 @@ struct ChemicalReactionElement : Printable {
     Matrix<ssize_t> coefficients;
 
     ChemicalReactionElement(void) {}
-    ChemicalReactionElement(String sym, size_t size) : symbol(sym), coefficients(Matrix<ssize_t>(size, 1)) {}
-    void SetCount(Array<size_t> counts, size_t start) {
+    ChemicalReactionElement(const String& sym, const size_t& size) : symbol(sym), coefficients(Matrix<ssize_t>(size, 1)) {}
+    void SetCount(const Array<size_t>& counts, const size_t& start) {
         for (size_t i = 0; i < coefficients.GetWidth(); i++) coefficients.At(i, 0) *= counts.At(i + start);
     }
     size_t GetCoefficients(void) const {
@@ -16,7 +16,7 @@ struct ChemicalReactionElement : Printable {
         for (size_t i = 0; i < coefficients.GetWidth(); i++) ret += coefficients.At(i, 0);
         return ret;
     }
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         return padding + symbol + ": " + coefficients.ToString();
     }
 };

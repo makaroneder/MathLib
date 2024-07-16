@@ -1,2 +1,2 @@
-f(x) : R -> R = x / |x|
+f(x) : R -> R = sign(x)
 a = f(-4)

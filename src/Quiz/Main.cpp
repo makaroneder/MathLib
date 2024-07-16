@@ -1,6 +1,7 @@
 #include "Question.hpp"
 #include <EquationSolver/Preprocesor.hpp>
 #include <Libc/HostFileSystem.hpp>
+#include <MathLib.hpp>
 #include <Host.hpp>
 #include <iostream>
 
@@ -10,6 +11,7 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input files>");
         HostFileSystem fs;
         const size_t retryCount = 3;
         num_t solved = 0;

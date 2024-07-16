@@ -1,13 +1,23 @@
 #include "State.hpp"
 
-State::State(Array<BuiltinFunction> builtinFuncs, Array<Function> funcs, Array<Variable> vars) : builtinFunctions(builtinFuncs), functions(funcs), variables(vars) {
+EquationSolverState::EquationSolverState(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(builtinFuncs), functions(funcs), variables(CreateDefaultVariables()), runtime(false) {
     for (size_t i = 0; i < SizeOfArray(defaultBuiltinFuncs); i++)
         builtinFunctions.Add(defaultBuiltinFuncs[i]);
-    for (size_t i = 0; i < SizeOfArray(defaultVariables); i++)
-        variables.Add(Variable(defaultVariables[i].name, defaultVariables[i].value->Recreate()));
+    for (size_t i = 0; i < vars.GetSize(); i++) variables.Add(vars.At(i));
 }
-Function State::GetFunction(String name) const {
-    for (size_t i = 0; i < functions.GetSize(); i++)
-        if (functions.At(i).name == name) return functions.At(i);
-    return Function("", Array<Variable>(), nullptr, "", "");
+void EquationSolverState::Destroy(void) {
+    for (FunctionNode& function : functions) {
+        for (Variable& arg : function.arguments) delete arg.value;
+        delete function.body;
+    }
+    for (Variable& variable : variables) delete variable.value;
+    builtinFunctions = {};
+    functions = {};
+    variables = {};
+    runtime = false;
+}
+FunctionNode EquationSolverState::GetFunction(const String& name) const {
+    for (const FunctionNode& function : functions)
+        if (function.name == name) return function;
+    return FunctionNode("", Array<Variable>(), nullptr, "", "");
 }

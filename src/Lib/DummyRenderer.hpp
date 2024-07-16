@@ -7,7 +7,7 @@ struct DummyRenderer : Renderer {
     /// @brief Creates a new renderer
     /// @param w Width of the window
     /// @param h Height of the window
-    DummyRenderer(size_t w, size_t h);
+    DummyRenderer(const size_t& w, const size_t& h);
     /// @brief Does nothing
     /// @return Status
     virtual bool Update(void) override;

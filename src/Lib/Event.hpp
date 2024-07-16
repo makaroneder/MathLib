@@ -1,8 +1,9 @@
 #ifndef Event_H
 #define Event_H
+#include "Allocatable.hpp"
 
 /// @brief Renderer event
-struct Event {
+struct Event : Allocatable {
     /// @brief Type of event
     enum class Type {
         None,
@@ -15,11 +16,11 @@ struct Event {
 
     /// @brief Creates a new event
     /// @param t Type of event
-    Event(Type t = Type::None);
+    Event(const Type& t = Type::None);
     /// @brief Creates a new event
     /// @param chr Key pressed or released
     /// @param pressed Key status
-    Event(char chr, bool pressed);
+    Event(const char& chr, const bool& pressed);
 };
 
 #endif

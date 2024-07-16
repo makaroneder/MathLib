@@ -7,14 +7,14 @@ template <typename T>
 struct Cuboid : LineShape<T> {
     Matrix<T> sizes;
 
-    Cuboid(Matrix<T> pos = CreateVector<T>(0, 0, 0), Matrix<T> s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {}
+    Cuboid(const Matrix<T>& pos = CreateVector<T>(0, 0, 0), const Matrix<T>& s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {}
     virtual bool CollidesWith(const Shape<T>& other_) const override {
         const Cuboid<T>& other = (const Cuboid<T>&)other_;
         for (size_t x = 0; x < this->position.GetWidth(); x++)
             if ((this->position.At(x, 0) + sizes.At(x, 0) <= other.position.At(x, 0)) || (other.position.At(x, 0) + other.sizes.At(x, 0) <= this->position.At(x, 0))) return false;
         return true;
     }
-    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const override {
+    virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
         const T sizeX = GetX(sizes) / 2;
         const T sizeY = GetY(sizes) / 2;
         const T sizeZ = GetZ(sizes) / 2;

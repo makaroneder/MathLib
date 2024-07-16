@@ -1,12 +1,13 @@
 #include "Symbol.hpp"
 #include "Consumable.hpp"
 #include <Libc/HostFileSystem.hpp>
+#include <MathLib.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
 /// @brief Entry point for this program
 /// @return Status
-int main(void) {
+int main(int, char**) {
     try {
         #ifndef Debug
         srand(time(nullptr));
@@ -34,22 +35,23 @@ int main(void) {
         ssize_t score = 100000;
         Array<size_t> symbolIndexes = Array<size_t>(3);
         num_t specialTime = 0;
-        num_t prevTime = (num_t)clock() / CLOCKS_PER_SEC;
+        num_t prevTime = GetTime();
         size_t bet = 50;
         size_t multiplier = 1;
         size_t rankIncreaser = 0;
         while (true) {
-            const num_t currTime = (num_t)clock() / CLOCKS_PER_SEC;
+            const num_t currTime = GetTime();
             const num_t deltaTime = currTime - prevTime;
-            renderer.Fill(0x000000ff);
+            prevTime = currTime;
+            renderer.Fill(0);
             for (size_t i = 0; i < SizeOfArray(consumables); i++) {
                 Consumable tmp = consumables[i];
                 const num_t y = ((ssize_t)i - 1) * 1.3;
                 tmp.position = CreateVector<num_t>(-3, y, 0);
-                if (!renderer.Puts(std::vector<String> { std::to_string(SizeOfArray(consumables) - i) + ")" }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(-3.5, y, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
+                if (!renderer.Puts<num_t>(std::vector<String> { ToString(SizeOfArray(consumables) - i) + ")" }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(-3.5, y, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
                 renderer.DrawShape<num_t>(tmp, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
             }
-            if (!renderer.Puts(std::vector<String> { "Score: " + std::to_string(score), "Bet: " + std::to_string(bet), }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, -0.6, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
+            if (!renderer.Puts<num_t>(std::vector<String> { String("Score: ") + ToString(score), String("Bet: ") + ToString(bet), }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, -0.6, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
             for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
                 Symbol tmp = symbols[symbolIndexes.At(i)];
                 tmp.position = CreateVector<num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);
@@ -62,27 +64,27 @@ int main(void) {
             else if (event.type == Event::Type::KeyPressed) {
                 switch (event.key) {
                     case ' ': {
-                        specialTime = NAN;
+                        specialTime = MakeNaN();
                         bool special = true;
                         symbolIndexes = Array<size_t>(3);
-                        for (size_t i = 0; i < 3; i++) symbolIndexes.At(i) = Round(RandomNumber<num_t>(0, SizeOfArray(symbols) - 1));
+                        for (size_t& i : symbolIndexes) i = Round(RandomNumber<num_t>(0, SizeOfArray(symbols) - 1));
                         for (size_t i = 0; i < symbolIndexes.GetSize() - 1 && special; i++)
                             special = (symbolIndexes.At(i) == symbolIndexes.At(i + 1));
                         if (special) specialTime = 0;
                         Array<std::pair<Symbol, size_t>> scores;
-                        for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
+                        for (const size_t& i : symbolIndexes) {
                             bool found = false;
                             for (size_t j = 0; j < scores.GetSize(); j++) {
-                                if (scores.At(j).first == symbols[symbolIndexes.At(i)]) {
+                                if (scores.At(j).first == symbols[i]) {
                                     scores.At(j).second++;
                                     found = true;
                                     break;
                                 }
                             }
-                            if (!found) scores.Add(std::make_pair(symbols[symbolIndexes.At(i)], 0));
+                            if (!found) scores.Add(std::make_pair(symbols[i], 0));
                         }
                         score -= bet;
-                        for (size_t i = 0; i < scores.GetSize(); i++) score += multiplier * bet * scores.At(i).first.multiplier.At(Min(scores.At(i).second + rankIncreaser, scores.At(i).first.multiplier.GetSize()));
+                        for (const std::pair<Symbol, size_t>& pair : scores) score += multiplier * bet * pair.first.multiplier.At(Min(pair.second + rankIncreaser, pair.first.multiplier.GetSize()));
                         multiplier = 1;
                         rankIncreaser = 0;
                         break;

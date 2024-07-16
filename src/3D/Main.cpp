@@ -1,11 +1,12 @@
 #include <Geometry/Pyramid.hpp>
 #include <Geometry/Cuboid.hpp>
+#include <MathLib.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
 /// @brief Entry point for this program
 /// @return Status
-int main(void) {
+int main(int, char**) {
     try {
         SDL2Renderer renderer = SDL2Renderer("3D viewer", 800, 800);
         Cuboid<num_t> cuboid = Cuboid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(2, 2, 2));
@@ -13,7 +14,7 @@ int main(void) {
         Matrix<num_t> axis = CreateVector<num_t>(0, 1, 0);
         num_t angle = 0;
         while (true) {
-            renderer.Fill(0x000000ff);
+            renderer.Fill(0);
             renderer.DrawShape<num_t>(cuboid, axis.Normalize() * angle, 0xff0000ff);
             renderer.DrawShape<num_t>(triangle, axis.Normalize() * angle, 0x00ff00ff);
             if (!renderer.Update()) Panic("Failed to update UI");

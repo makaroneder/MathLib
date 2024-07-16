@@ -8,7 +8,7 @@
 /// @param x Value of the logarithm
 /// @return Logarithm of specified base and number
 template <typename T>
-constexpr T Log(T b, T x) {
+constexpr T Log(const T& b, const T& x) {
     return NaturalLog(x) / NaturalLog(b);
 }
 

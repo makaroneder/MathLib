@@ -4,6 +4,7 @@
 #include "LogicGates.hpp"
 #endif
 #include <Libc/HostFileSystem.hpp>
+#include <MathLib.hpp>
 #include <iostream>
 #include <unistd.h>
 
@@ -13,16 +14,16 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 3) Panic("No input file provided");
+        if (argc < 3) Panic(String("Usage: ") + argv[0] + " <file> <iteration count>");
         #ifdef Debug
-        const clock_t start = clock();
+        const num_t start = GetTime();
         #else
         srand(time(nullptr));
         #endif
         HostFileSystem fs;
         const size_t printStatements = 10;
         const size_t limit = (size_t)StringToNumber(argv[2]);
-        State<num_t> state;
+        NeuralNetworkState<num_t> state;
         if (access(argv[1], F_OK) == -1) {
             state = GetDefaultState<num_t>();
             state.neuralNetwork.Random(0, 1);
@@ -55,23 +56,10 @@ int main(int argc, char** argv) {
         std::cout << "Cost = " << state.Cost() << std::endl;
         std::cout << "Neural network:\n" << state.neuralNetwork << std::endl;
         #endif
-        const size_t bits = state.trainingDataInput.GetWidth() / 2;
-        const size_t n = 1 << bits;
-        for (size_t y = 0; y < n; y++) {
-            for (size_t x = 0; x < n; x++) {
-                for (size_t i = 0; i < bits; i++) {
-                    state.neuralNetwork.GetInput().At(i, 0) = (y >> i) & 1;
-                    state.neuralNetwork.GetInput().At(i + bits, 0) = (x >> i) & 1;
-                }
-                state.Forward();
-                size_t z = 0;
-                for (size_t i = 0; i < state.trainingDataOutput.GetWidth(); i++) z |= (state.neuralNetwork.GetOutput().At(i, 0) > 0.5) << i;
-                std::cout << '[' << y << ", " << x << "] => " << z << '\n';
-            }
-        }
+        std::cout << StateToString<num_t>(state) << std::endl;
         if (!state.SaveFromPath(fs, argv[1])) Panic("Failed to save neural network");
         #ifdef Debug
-        std::cout << (num_t)(clock() - start) / CLOCKS_PER_SEC << std::endl;
+        std::cout << "Time: " << GetTime() - start << " second(s)" << std::endl;
         #endif
         return EXIT_SUCCESS;
     }

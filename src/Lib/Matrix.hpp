@@ -12,14 +12,16 @@ template <typename T>
 struct Matrix : Printable, Saveable {
     CreateOperators(Matrix<T>, T)
     /// @brief Creates a new matrix
-    constexpr Matrix(size_t w = 0, size_t h = 0) : width(w), height(h), ptr(Array<T>(w * h)) {
-        for (size_t i = 0; i < width * height; i++) ptr.At(i) = 0;
+    /// @param w Width of matrix
+    /// @param h Height of matrix
+    constexpr Matrix(const size_t& w = 0, const size_t& h = 0) : width(w), height(h), ptr(Array<T>(w * h)) {
+        for (T& val : ptr) val = 0;
     }
     /// @brief Creates a new matrix
     /// @param w Width of matrix
     /// @param h Height of matrix
     /// @param arr Values for the matrix
-    constexpr Matrix(size_t w, size_t h, Array<T> arr) : width(w), height(h), ptr(arr) {}
+    constexpr Matrix(const size_t& w, const size_t& h, const Array<T>& arr) : width(w), height(h), ptr(arr) {}
     static constexpr Matrix<T> Identity(size_t n) {
         Matrix<T> ret = Matrix<T>(n, n);
         for (size_t i = 0; i < n; i++) ret.At(i, i) = 1;
@@ -34,37 +36,35 @@ struct Matrix : Printable, Saveable {
     constexpr Array<T> GetValue(void) const {
         return ptr;
     }
-    constexpr Matrix<T> GetRow(size_t y) const {
+    constexpr Matrix<T> GetRow(const size_t& y) const {
         Array<T> ret = Array<T>(width);
         for (size_t x = 0; x < width; x++) ret.At(x) = At(x, y);
         return Matrix<T>(width, 1, ret);
     }
-    constexpr void Fill(T v) {
-        for (size_t y = 0; y < height; y++)
-            for (size_t x = 0; x < width; x++) At(x, y) = v;
+    constexpr void Fill(const T& v) {
+        for (T& val : ptr) val = v;
     }
-    void Random(T min, T max) {
-        for (size_t y = 0; y < height; y++)
-            for (size_t x = 0; x < width; x++) At(x, y) = RandomNumber(min, max);
+    void Random(const T& min, const T& max) {
+        for (T& val : ptr) val = RandomNumber(min, max);
     }
     /// @brief Returns data at specified position
     /// @param x X position
     /// @param y Y position
     /// @return Data at specified position
-    T& At(size_t x, size_t y) {
+    T& At(const size_t& x, const size_t& y) {
         return ptr.At(y * width + x);
     }
     /// @brief Returns data at specified position
     /// @param x X position
     /// @param y Y position
     /// @return Data at specified position
-    constexpr T At(size_t x, size_t y) const {
+    constexpr T At(const size_t& x, const size_t& y) const {
         return ptr.At(y * width + x);
     }
     /// @brief a = (a . b) / (|a| * |b|)
     /// @param other Other matrix
     /// @return Angle between 2 matrices
-    constexpr T GetAngle(Matrix<T> other) const {
+    constexpr T GetAngle(const Matrix<T>& other) const {
         return Dot(other) / (GetLength() * other.GetLength());
     }
     /// @brief |a|^2 = a . a
@@ -86,8 +86,8 @@ struct Matrix : Printable, Saveable {
     /// @brief a . b = a_0 * b_0 + ... + a_n * b_n
     /// @param other Other matrix
     /// @return Dot product of 2 vectors
-    constexpr T Dot(Matrix<T> other) const {
-        if (other.width != width || other.height != height) return NAN;
+    constexpr T Dot(const Matrix<T>& other) const {
+        if (other.width != width || other.height != height) return MakeNaN();
         T ret = 0;
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) ret += At(x, y) * other.At(x, y);
@@ -105,7 +105,7 @@ struct Matrix : Printable, Saveable {
     /// @return Exponential of matrix
     Matrix<T> Exponential(void) const {
         Matrix<T> ret = Matrix<T>(width, height);
-        for (size_t k = 0; k < 100; k++) ret += UnsignedPow(k) / Factorial<T>(k);
+        for (size_t k = 0; k < 100; k++) ret += UnsignedPow(k) / Factorial<T>(k, 1);
         return ret;
     }
     /// @brief X^n = exp(ln(X) * n)
@@ -124,7 +124,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Checks whether the matrix is multiple of another matrix
     /// @param other Another matrix
     /// @return Check status
-    bool IsMultipleOf(Matrix<T> other) const {
+    bool IsMultipleOf(const Matrix<T>& other) const {
         if (other.width != width || other.height != height) return false;
         T prev = 0;
         for (size_t y = 0; y < height; y++) {
@@ -140,7 +140,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Returns determinant of the matrix
     /// @return Determinant of the matrix
     T GetDeterminant(void) const {
-        if (width != height) return NAN;
+        if (width != height) return MakeNaN();
         const size_t dimension = width;
         if (dimension == 0) return 1;
         if (dimension == 1) return At(0, 0);
@@ -204,7 +204,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Converts matrix to string
     /// @param padding String to pad with
     /// @return String representation of matrix
-    virtual String ToString(String padding = "") const override {
+    virtual String ToString(const String& padding = "") const override {
         if (height == 1) {
             String ret = padding + "[";
             for (size_t x = 0; x < width; x++) ret += ::ToString(At(x, 0)) + (((x + 1) == width) ? "]" : ", ");
@@ -223,7 +223,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Multiplies 2 matrices
     /// @param other Another matrix
     /// @return Result of multiplication
-    constexpr Matrix<T> operator*(Matrix<T> other) const {
+    constexpr Matrix<T> operator*(const Matrix<T>& other) const {
         if (width != other.height) return Matrix<T>();
         Matrix<T> ret = Matrix<T>(other.width, height);
         for (size_t y = 0; y < ret.height; y++) {
@@ -237,37 +237,34 @@ struct Matrix : Printable, Saveable {
     /// @brief Compares current matrix with another matrix
     /// @param other Other matrix
     /// @return Data equality
-    constexpr bool operator==(Matrix<T> other) const {
+    constexpr bool operator==(const Matrix<T>& other) const {
         bool ret = other.width == width && other.height == height;
         for (size_t y = 0; y < height && ret; y++)
             for (size_t x = 0; x < width && ret; x++) ret = At(x, y) == other.At(x, y);
         return ret;
     }
     /// @brief Saves matrix data
-    /// @param fileSystem File system to save matrix data into
     /// @param file File to save matrix data into
     /// @return Status
-    virtual bool Save(FileSystem& fileSystem, size_t file) const override {
-        if (!fileSystem.Write(file, &width, sizeof(size_t)) || !fileSystem.Write(file, &height, sizeof(size_t))) return false;
+    virtual bool Save(ByteDevice& file) const override {
+        if (!file.Write<size_t>(width) || !file.Write<size_t>(height)) return false;
         const size_t size = ptr.GetSize();
         for (size_t i = 0; i < size; i++) {
             const T tmp = ptr.At(i);
-            if (!fileSystem.Write(file, &tmp, sizeof(T))) return false;
+            if (!file.Write<T>(tmp)) return false;
         }
         return true;
     }
     /// @brief Loads matrix data
-    /// @param fileSystem File system to load matrix data from
     /// @param file File to load matrix data from
     /// @return Status
-    virtual bool Load(FileSystem& fileSystem, size_t file) override {
-        if (!fileSystem.Read(file, &width, sizeof(size_t))) return false;
-        if (!fileSystem.Read(file, &height, sizeof(size_t))) return false;
+    virtual bool Load(ByteDevice& file) override {
+        if (!file.Read<size_t>(width) || !file.Read<size_t>(height)) return false;
         ptr = Array<T>(width * height);
         const size_t size = ptr.GetSize();
         for (size_t i = 0; i < size; i++) {
             T tmp;
-            if (!fileSystem.Read(file, &tmp, sizeof(T))) return false;
+            if (!file.Read<T>(tmp)) return false;
             ptr.At(i) = tmp;
         }
         return true;
@@ -276,21 +273,21 @@ struct Matrix : Printable, Saveable {
     private:
     /// @brief a + b = [a_0 + b_0, ..., a_n + b_n]
     /// @param other Matrix to add
-    void Add(Matrix<T> other) {
+    void Add(const Matrix<T>& other) {
         if (other.width != width || other.height != height) Panic("Invalid width or height of matrixes for addition");
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) At(x, y) += other.At(x, y);
     }
     /// @brief a * s = [a_0 * s, ..., a_n * s]
     /// @param scalar Scalar value to multiply by
-    void Multiply(T scalar) {
+    void Multiply(const T& scalar) {
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++) At(x, y) *= scalar;
     }
     /// @brief X^n = X * ... * X
     /// @param n Exponent
     /// @return Unsigned power of matrix
-    Matrix<T> UnsignedPow(size_t n) const {
+    Matrix<T> UnsignedPow(const size_t& n) const {
         if (width != height) Panic("Matrix is not quadratic");
         if (n == 0) return Matrix<T>::Identity(width);
         Matrix<T> ret = *this;
@@ -313,7 +310,7 @@ struct Matrix : Printable, Saveable {
 /// @param matrix Matrix to convert
 /// @return Converted matrix
 template <typename T, typename F>
-Matrix<F> ConvertMatrix(Matrix<T> matrix) {
+Matrix<F> ConvertMatrix(const Matrix<T>& matrix) {
     Matrix<F> ret = Matrix<F>(matrix.GetWidth(), matrix.GetHeight());
     for (size_t y = 0; y < matrix.GetHeight(); y++)
         for (size_t x = 0; x < matrix.GetWidth(); x++) ret.At(x, y) = (F)matrix.At(x, y);

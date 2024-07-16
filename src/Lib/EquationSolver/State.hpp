@@ -1,16 +1,17 @@
-#ifndef State_H
-#define State_H
+#ifndef EquationSolverState_H
+#define EquationSolverState_H
 #include "BuiltinFunction.hpp"
-#include "Function.hpp"
-#include "Variable.hpp"
+#include "FunctionNode.hpp"
 
-struct State {
+struct EquationSolverState : Allocatable {
     Array<BuiltinFunction> builtinFunctions;
-    Array<Function> functions;
+    Array<FunctionNode> functions;
     Array<Variable> variables;
+    bool runtime;
 
-    State(Array<BuiltinFunction> builtinFuncs = Array<BuiltinFunction>(), Array<Function> funcs = Array<Function>(), Array<Variable> vars = Array<Variable>());
-    Function GetFunction(String name) const;
+    EquationSolverState(const Array<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Array<Variable>& vars = Array<Variable>());
+    void Destroy(void);
+    FunctionNode GetFunction(const String& name) const;
 };
 
 #endif

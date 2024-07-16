@@ -7,7 +7,7 @@
 /// @param x Radians
 /// @return Cosine of x
 template <typename T>
-T Cos(T x) {
+T Cos(const T& x) {
     const T tmp = pi / 2;
     return Sin(tmp - x);
 }
@@ -16,7 +16,7 @@ T Cos(T x) {
 /// @param x Radians
 /// @return Tangent of x
 template <typename T>
-T Tan(T x) {
+T Tan(const T& x) {
     return Sin(x) / Cos<T>(x);
 }
 /// @brief cot(x) = cos(x) / sin(x)
@@ -24,7 +24,7 @@ T Tan(T x) {
 /// @param x Radians
 /// @return Cotangent of x
 template <typename T>
-constexpr T Cot(T x) {
+constexpr T Cot(const T& x) {
     return Cos<T>(x) / Sin(x);
 }
 /// @brief sec(x) = 1 / cos(x)
@@ -32,7 +32,7 @@ constexpr T Cot(T x) {
 /// @param x Radians
 /// @return Secant of x
 template <typename T>
-constexpr T Sec(T x) {
+constexpr T Sec(const T& x) {
     const T one = 1;
     return one / Cos<T>(x);
 }
@@ -41,7 +41,7 @@ constexpr T Sec(T x) {
 /// @param x Radians
 /// @return Cosecant of x
 template <typename T>
-constexpr T Csc(T x) {
+constexpr T Csc(const T& x) {
     const T one = 1;
     return one / Sin(x);
 }
@@ -50,7 +50,7 @@ constexpr T Csc(T x) {
 /// @param x Radians
 /// @return Chord of x
 template <typename T>
-constexpr T Crd(T x) {
+constexpr T Crd(const T& x) {
     const T two = 2;
     return Sin(x / two) * two;
 }
@@ -59,7 +59,7 @@ constexpr T Crd(T x) {
 /// @param x Radians
 /// @return Versed sine of x
 template <typename T>
-constexpr T Versin(T x) {
+constexpr T Versin(const T& x) {
     const T one = 1;
     return one - Cos<T>(x);
 }
@@ -68,7 +68,7 @@ constexpr T Versin(T x) {
 /// @param x Radians
 /// @return Coversed sine of x
 template <typename T>
-constexpr T Coversin(T x) {
+constexpr T Coversin(const T& x) {
     const T one = 1;
     return one - Sin(x);
 }
@@ -77,7 +77,7 @@ constexpr T Coversin(T x) {
 /// @param x Radians
 /// @return Versed cosine of x
 template <typename T>
-constexpr T Vercos(T x) {
+constexpr T Vercos(const T& x) {
     const T one = 1;
     return one + Cos<T>(x);
 }
@@ -86,7 +86,7 @@ constexpr T Vercos(T x) {
 /// @param x Radians
 /// @return Coversed cosine of x
 template <typename T>
-constexpr T Covercos(T x) {
+constexpr T Covercos(const T& x) {
     const T one = 1;
     return one + Sin(x);
 }
@@ -95,7 +95,7 @@ constexpr T Covercos(T x) {
 /// @param x Radians
 /// @return Haversed sine of x
 template <typename T>
-constexpr T Haversin(T x) {
+constexpr T Haversin(const T& x) {
     const T one = 1;
     const T two = 2;
     return (one - Cos<T>(x)) / two;
@@ -105,7 +105,7 @@ constexpr T Haversin(T x) {
 /// @param x Radians
 /// @return Hacoversed sine of x
 template <typename T>
-constexpr T Hacoversin(T x) {
+constexpr T Hacoversin(const T& x) {
     const T one = 1;
     const T two = 2;
     return (one - Sin(x)) / two;
@@ -115,7 +115,7 @@ constexpr T Hacoversin(T x) {
 /// @param x Radians
 /// @return Haversed cosine of x
 template <typename T>
-constexpr T Havercos(T x) {
+constexpr T Havercos(const T& x) {
     const T one = 1;
     const T two = 2;
     return (one + Cos<T>(x)) / two;
@@ -125,7 +125,7 @@ constexpr T Havercos(T x) {
 /// @param x Radians
 /// @return Hacoversed cosine of x
 template <typename T>
-constexpr T Hacovercos(T x) {
+constexpr T Hacovercos(const T& x) {
     const T one = 1;
     const T two = 2;
     return (one + Sin(x)) / two;
@@ -135,7 +135,7 @@ constexpr T Hacovercos(T x) {
 /// @param x Radians
 /// @return Exsecant of x
 template <typename T>
-constexpr T Exsec(T x) {
+constexpr T Exsec(const T& x) {
     return Versin<T>(x) / Cos<T>(x);
 }
 /// @brief excsc(x) = coversin(x) / sin(x)
@@ -143,7 +143,7 @@ constexpr T Exsec(T x) {
 /// @param x Radians
 /// @return Excosecant of x
 template <typename T>
-constexpr T Excsc(T x) {
+constexpr T Excsc(const T& x) {
     return Coversin<T>(x) / Sin(x);
 }
 /// @brief sinh(x) = (exp(x) - exp(-x)) / 2
@@ -151,7 +151,7 @@ constexpr T Excsc(T x) {
 /// @param x Radians
 /// @return Hyperbolic sine of x
 template <typename T>
-T HyperbolicSin(T x) {
+T HyperbolicSin(const T& x) {
     const T two = 2;
     return (Exp(x) - Exp(-x)) / two;
 }
@@ -160,7 +160,7 @@ T HyperbolicSin(T x) {
 /// @param x Radians
 /// @return Hyperbolic cosine of x
 template <typename T>
-T HyperbolicCos(T x) {
+T HyperbolicCos(const T& x) {
     const T two = 2;
     return (Exp(x) + Exp(-x)) / two;
 }
@@ -169,7 +169,7 @@ T HyperbolicCos(T x) {
 /// @param x Radians
 /// @return Hyperbolic tangent of x
 template <typename T>
-T HyperbolicTan(T x) {
+T HyperbolicTan(const T& x) {
     return HyperbolicSin<T>(x) / HyperbolicCos<T>(x);
 }
 /// @brief coth(x) = (exp(2x) + 1) / (exp(2x) - 1)
@@ -177,7 +177,7 @@ T HyperbolicTan(T x) {
 /// @param x Radians
 /// @return Hyperbolic cotangent of x
 template <typename T>
-constexpr T HyperbolicCot(T x) {
+constexpr T HyperbolicCot(const T& x) {
     const T one = 1;
     const T two = 2;
     return (Exp(x * two) + one) / (Exp(x * two) - one);
@@ -187,7 +187,7 @@ constexpr T HyperbolicCot(T x) {
 /// @param x Radians
 /// @return Hyperbolic secant of x
 template <typename T>
-constexpr T HyperbolicSec(T x) {
+constexpr T HyperbolicSec(const T& x) {
     const T one = 1;
     const T two = 2;
     return (Exp(x) * two) / (Exp(x * two) + one);
@@ -197,7 +197,7 @@ constexpr T HyperbolicSec(T x) {
 /// @param x Radians
 /// @return Hyperbolic cosecant of x
 template <typename T>
-constexpr T HyperbolicCsc(T x) {
+constexpr T HyperbolicCsc(const T& x) {
     const T one = 1;
     const T two = 2;
     return (Exp(x) * two) / (Exp(x * two) - one);
@@ -207,7 +207,7 @@ constexpr T HyperbolicCsc(T x) {
 /// @param x Radians
 /// @return Inversed sine of x
 template <typename T>
-constexpr T InversedCos(T x) {
+constexpr T InversedCos(const T& x) {
     const T tmp = pi / 2;
     return tmp - InversedSin(x);
 }
@@ -216,7 +216,7 @@ constexpr T InversedCos(T x) {
 /// @param x Radians
 /// @return Inversed cotangent of x
 template <typename T>
-constexpr T InversedTan(T x) {
+constexpr T InversedTan(const T& x) {
     const T one = 1;
     return InversedSin(x / Sqrt(one + Pow(x, 2)));
 }
@@ -225,7 +225,7 @@ constexpr T InversedTan(T x) {
 /// @param x Radians
 /// @return Inversed cotangent of x
 template <typename T>
-constexpr T InversedCot(T x) {
+constexpr T InversedCot(const T& x) {
     const T tmp = pi / 2;
     return tmp - InversedTan<T>(x);
 }
@@ -234,7 +234,7 @@ constexpr T InversedCot(T x) {
 /// @param x Radians
 /// @return Inversed secant of x
 template <typename T>
-constexpr T InversedSec(T x) {
+constexpr T InversedSec(const T& x) {
     const T one = 1;
     return InversedCos<T>(one / x);
 }
@@ -243,7 +243,7 @@ constexpr T InversedSec(T x) {
 /// @param x Radians
 /// @return Inversed cosecant of x
 template <typename T>
-constexpr T InversedCsc(T x) {
+constexpr T InversedCsc(const T& x) {
     const T one = 1;
     return InversedSin(one / x);
 }
@@ -252,7 +252,7 @@ constexpr T InversedCsc(T x) {
 /// @param x Radians
 /// @return Inversed chord of x
 template <typename T>
-constexpr T InversedCrd(T x) {
+constexpr T InversedCrd(const T& x) {
     const T two = 2;
     return InversedSin(x / two) * two;
 }
@@ -261,7 +261,7 @@ constexpr T InversedCrd(T x) {
 /// @param x Radians
 /// @return Inversed exsecant of x
 template <typename T>
-constexpr T InversedExsec(T x) {
+constexpr T InversedExsec(const T& x) {
     const T one = 1;
     return InversedSec<T>(x + one);
 }
@@ -270,7 +270,7 @@ constexpr T InversedExsec(T x) {
 /// @param x Radians
 /// @return Inversed excosecant of x
 template <typename T>
-constexpr T InversedExcsc(T x) {
+constexpr T InversedExcsc(const T& x) {
     const T one = 1;
     return InversedCsc<T>(x + one);
 }
@@ -279,7 +279,7 @@ constexpr T InversedExcsc(T x) {
 /// @param x Radians
 /// @return Inversed versed sine of x
 template <typename T>
-constexpr T InversedVersin(T x) {
+constexpr T InversedVersin(const T& x) {
     const T one = 1;
     return InversedCos<T>(one - x);
 }
@@ -288,7 +288,7 @@ constexpr T InversedVersin(T x) {
 /// @param x Radians
 /// @return Inversed coversed sine of x
 template <typename T>
-constexpr T InversedCoversin(T x) {
+constexpr T InversedCoversin(const T& x) {
     const T one = 1;
     return InversedSin(one - x);
 }
@@ -297,7 +297,7 @@ constexpr T InversedCoversin(T x) {
 /// @param x Radians
 /// @return Inversed versed cosine of x
 template <typename T>
-constexpr T InversedVercos(T x) {
+constexpr T InversedVercos(const T& x) {
     const T one = 1;
     return InversedCos<T>(x - one);
 }
@@ -306,7 +306,7 @@ constexpr T InversedVercos(T x) {
 /// @param x Radians
 /// @return Inversed coversed cosine of x
 template <typename T>
-constexpr T InversedCovercos(T x) {
+constexpr T InversedCovercos(const T& x) {
     const T one = 1;
     return InversedSin(x - one);
 }
@@ -315,7 +315,7 @@ constexpr T InversedCovercos(T x) {
 /// @param x Radians
 /// @return Inversed haversed sine of x
 template <typename T>
-constexpr T InversedHaversin(T x) {
+constexpr T InversedHaversin(const T& x) {
     const T one = 1;
     const T two = 2;
     return InversedCos<T>(one - x * two);
@@ -325,7 +325,7 @@ constexpr T InversedHaversin(T x) {
 /// @param x Radians
 /// @return Inversed hacoversed sine of x
 template <typename T>
-constexpr T InversedHacoversin(T x) {
+constexpr T InversedHacoversin(const T& x) {
     const T one = 1;
     const T two = 2;
     return InversedSin(one - x * two);
@@ -335,7 +335,7 @@ constexpr T InversedHacoversin(T x) {
 /// @param x Radians
 /// @return Inversed haversed cosine of x
 template <typename T>
-constexpr T InversedHavercos(T x) {
+constexpr T InversedHavercos(const T& x) {
     const T one = 1;
     const T two = 2;
     return InversedCos<T>(x * two - one);
@@ -345,7 +345,7 @@ constexpr T InversedHavercos(T x) {
 /// @param x Radians
 /// @return Inversed hacoversed cosine of x
 template <typename T>
-constexpr T InversedHacovercos(T x) {
+constexpr T InversedHacovercos(const T& x) {
     const T one = 1;
     const T two = 2;
     return InversedSin(x * two - one);
@@ -355,7 +355,7 @@ constexpr T InversedHacovercos(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic sine of x
 template <typename T>
-T InversedHyperbolicSin(T x) {
+T InversedHyperbolicSin(const T& x) {
     const T one = 1;
     return NaturalLog(x + Sqrt(Pow(x, 2) + one));
 }
@@ -364,7 +364,7 @@ T InversedHyperbolicSin(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic cosine of x
 template <typename T>
-T InversedHyperbolicCos(T x) {
+T InversedHyperbolicCos(const T& x) {
     const T one = 1;
     return NaturalLog(x + Sqrt(Pow(x, 2) - one));
 }
@@ -373,7 +373,7 @@ T InversedHyperbolicCos(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic tangent of x
 template <typename T>
-T InversedHyperbolicTan(T x) {
+T InversedHyperbolicTan(const T& x) {
     const T one = 1;
     const T two = 2;
     return NaturalLog((one + x) / (one - x)) / two;
@@ -383,7 +383,7 @@ T InversedHyperbolicTan(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic cotangent of x
 template <typename T>
-constexpr T InversedHyperbolicCot(T x) {
+constexpr T InversedHyperbolicCot(const T& x) {
     const T one = 1;
     const T two = 2;
     return NaturalLog((x + one) / (x - one)) / two;
@@ -393,7 +393,7 @@ constexpr T InversedHyperbolicCot(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic secant of x
 template <typename T>
-constexpr T InversedHyperbolicSec(T x) {
+constexpr T InversedHyperbolicSec(const T& x) {
     const T one = 1;
     return InversedHyperbolicCos<T>(one / x);
 }
@@ -402,7 +402,7 @@ constexpr T InversedHyperbolicSec(T x) {
 /// @param x Radians
 /// @return Inversed hyperbolic cosecant of x
 template <typename T>
-constexpr T InversedHyperbolicCsc(T x) {
+constexpr T InversedHyperbolicCsc(const T& x) {
     const T one = 1;
     return NaturalLog(one / x + Sqrt(one / Pow(x, 2) + one));
 }

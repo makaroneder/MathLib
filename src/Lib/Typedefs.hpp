@@ -1,9 +1,20 @@
 #ifndef Typedefs_H
 #define Typedefs_H
+#ifdef Freestanding
+#include "CharBuffer.hpp"
+#include <stdint.h>
+
+/// @brief Signed version of size_t
+typedef int64_t ssize_t;
+/// @brief Default collection implementation
+/// @tparam T Type of data stored in the collection
+template <typename T>
+using Array = Buffer<T>;
+/// @brief Default char collection implementation
+using String = CharBuffer;
+#else
 #include "Libc/HostString.hpp"
 #include "Libc/HostCollection.hpp"
-#include <functional>
-#include <complex>
 
 /// @brief Default collection implementation
 /// @tparam T Type of data stored in the collection
@@ -11,22 +22,23 @@ template <typename T>
 using Array = HostCollection<T>;
 /// @brief Default char collection implementation
 using String = HostString;
+#endif
 
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IsBetween(x, a, b) ((x) >= (a) && (x) <= (b))
 
 /// @brief Default type for real numbers
 typedef long double num_t;
-/// @brief Default type for complex numbers
-typedef std::complex<num_t> complex_t;
 /// @brief Default error tolerance
 constexpr num_t eps = 1e-3;
 
 num_t Abs(num_t x);
+num_t Sqrt(num_t x);
 num_t Exp(num_t x);
-complex_t Exp(complex_t x);
-num_t RandomFloat(void);
+num_t Pow(num_t x, num_t y);
+num_t InversedTan2(num_t y, num_t x);
 String ToString(num_t x);
+num_t RandomFloat(void);
 
 /// @brief |a - b| < eps
 /// @tparam T Type of number
@@ -35,33 +47,26 @@ String ToString(num_t x);
 /// @param eps_ Maximum error tolerance
 /// @return Equality
 template <typename T>
-constexpr bool FloatsEqual(T a, T b, T eps_ = eps) {
+constexpr bool FloatsEqual(const T& a, const T& b, const T& eps_ = eps) {
     return Abs(a - b) < eps_;
 }
-/// @brief Converts complex number to string
-/// @tparam T Type of number
-/// @param z Complex number
-/// @return String representation
 template <typename T>
-constexpr String ComplexToString(std::complex<T> z) {
-    return String('(') + ToString(z.real()) + ", " + ToString(z.imag()) + ')';
+T Sign(const T& x) {
+    if (x < 0) return -1;
+    else if (x > 0) return 1;
+    else return 0;
 }
-/// @brief 1 / (1 + e^-x)
-/// @tparam T Type of number
-/// @param x Sigmoid input
-/// @return Return value
 template <typename T>
-constexpr T Sigmoid(T x) {
-    const T one = 1;
-    return one / (Exp(-x) + one);
+T LinearToGamma(const T& x) {
+    return x > 0 ? Sqrt(x) : 0;
 }
-/// @brief Random number in range [min, max]
+/// @brief Random number in range [min, max)
 /// @tparam T Type of number
 /// @param min Minimal value
 /// @param max Maximal value
 /// @return Random number
 template <typename T>
-T RandomNumber(T min, T max) {
+T RandomNumber(const T& min, const T& max) {
     return RandomFloat() * (max - min) + min;
 }
 

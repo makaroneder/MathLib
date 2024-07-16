@@ -1,12 +1,13 @@
 #include "SDL2.hpp"
 
-SDL2Renderer::SDL2Renderer(const char* title, size_t w, size_t h) : Renderer(w, h) {
-    if (SDL_Init(SDL_INIT_VIDEO)) Panic("Failed to initialize SDL2");
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
-    if (window == nullptr) Panic("Failed to initialize window");
+SDL2Renderer::SDL2Renderer(const String& title, const size_t& w, const size_t& h) : Renderer(w, h) {
+    if (SDL_Init(SDL_INIT_VIDEO)) Panic(SDL_GetError());
+    window = SDL_CreateWindow(title.GetValue(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+    if (!window) Panic(SDL_GetError());
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == nullptr) Panic("Failed to initialize renderer");
+    if (!renderer) Panic(SDL_GetError());
     texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    if (!texture) Panic(SDL_GetError());
 }
 SDL2Renderer::~SDL2Renderer(void) {
     SDL_DestroyRenderer(renderer);
@@ -15,7 +16,7 @@ SDL2Renderer::~SDL2Renderer(void) {
     SDL_Quit();
 }
 bool SDL2Renderer::Update(void) {
-    if (SDL_UpdateTexture(texture, nullptr, GetPixels().GetValue().GetValue(), GetWidth() * sizeof(uint32_t))) return false;
+    if (SDL_UpdateTexture(texture, nullptr, pixels.GetValue().GetValue(), GetWidth() * sizeof(uint32_t))) return false;
     if (SDL_RenderClear(renderer)) return false;
     if (SDL_RenderCopy(renderer, texture, nullptr, nullptr)) return false;
     SDL_RenderPresent(renderer);

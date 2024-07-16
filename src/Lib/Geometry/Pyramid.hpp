@@ -7,12 +7,12 @@ template <typename T>
 struct Pyramid : LineShape<T> {
     Matrix<T> sizes;
 
-    Pyramid(Matrix<T> pos, Matrix<T> s) : LineShape<T>(pos), sizes(s) {}
+    Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {}
     virtual bool CollidesWith(const Shape<T>&) const override {
         // TODO:
         return false;
     }
-    virtual Array<Line<T>> ToLines(Matrix<T> rotation) const override {
+    virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
         const T sizeX = GetX(sizes) / 2;
         const T sizeY = GetY(sizes) / 2;
         const T sizeZ = GetZ(sizes) / 2;

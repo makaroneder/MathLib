@@ -1,7 +1,6 @@
 #include "Disk.hpp"
 
-Disk::~Disk(void) {}
-bool Disk::Read(void* buffer, size_t size) {
+bool Disk::ReadBuffer(void* buffer, const size_t& size) {
     const size_t sectorSize = GetSectorSize();
     const size_t start = position % sectorSize;
     const size_t count = size / sectorSize + (size % sectorSize != 0) + (start != 0);
@@ -12,7 +11,7 @@ bool Disk::Read(void* buffer, size_t size) {
     position += size;
     return true;
 }
-bool Disk::Write(const void* buffer, size_t size) {
+bool Disk::WriteBuffer(const void* buffer, const size_t& size) {
     const size_t sectorSize = GetSectorSize();
     const size_t start = position % sectorSize;
     const size_t count = size / sectorSize + (size % sectorSize != 0) + (start != 0);
@@ -23,26 +22,4 @@ bool Disk::Write(const void* buffer, size_t size) {
     if (!WriteSectors(position / sectorSize, tmp, count)) return false;
     position += size;
     return true;
-}
-bool Disk::Seek(ssize_t offset, SeekMode mode) {
-    switch (mode) {
-        case SeekMode::Set: {
-            if (offset < 0) return false;
-            position = offset;
-            break;
-        }
-        case SeekMode::Current: {
-            position += offset;
-            break;
-        }
-        case SeekMode::End: {
-            if (offset < 0) return false;
-            position = GetSize() - offset;
-            break;
-        }
-    }
-    return true;
-}
-size_t Disk::Tell(void) {
-    return position;
 }

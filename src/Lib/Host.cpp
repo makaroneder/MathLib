@@ -27,7 +27,7 @@ bool IsAlphaDigit(char chr) {
     return IsAlpha(chr) || IsDigit(chr);
 }
 num_t Abs(num_t x) {
-    return Abs(complex_t(x, 0));
+    return x < 0 ? -x : x;
 }
 num_t Max(num_t x, num_t y) {
     return (x < y) ? y : x;
@@ -58,11 +58,8 @@ bool IsNaN(complex_t x) {
 bool IsInf(complex_t x) {
     return IsInf(x.GetReal()) || IsInf(x.GetImaginary());
 }
-num_t Exp(num_t x) {
-    ComplexToReal(Exp(complex_t(x, 0)));
-}
 complex_t Exp(complex_t x) {
-    return Pow(e, x);
+    return (complex_t(0, Sin(x.GetImaginary())) + Cos<num_t>(x.GetImaginary())) * Exp(x.GetReal());
 }
 num_t Ceil(num_t x) {
     return Floor(x) + 1;

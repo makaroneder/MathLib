@@ -44,13 +44,11 @@ bool HandleEvents(Renderer& renderer, const Function<bool>& func, size_t& state,
                     break;
                 }
                 case 'q': {
-                    if (renderer.pointMultiplier > (9 + speed) && FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0))
-                        renderer.pointMultiplier -= speed;
+                    renderer.pointMultiplier -= speed;
                     break;
                 }
                 case 'e': {
-                    if (FloatsEqual<T>(GetX(renderer.position), 0) && FloatsEqual<T>(GetY(renderer.position), 0))
-                        renderer.pointMultiplier += speed;
+                    renderer.pointMultiplier += speed;
                     break;
                 }
                 case 'z': {

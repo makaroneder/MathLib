@@ -3,6 +3,8 @@
 #include "Printable.hpp"
 #include "MathObject.hpp"
 
+String ToString(num_t x);
+num_t Pow(num_t x, num_t y);
 template <typename T>
 struct Complex : Printable {
     CreateOperators(Complex<T>, T)

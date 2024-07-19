@@ -1,6 +1,6 @@
 ENTRY(Entry)
 SECTIONS {
-    . = 0;
+    . = 2M;
     start = .;
     .multibootHeader ALIGN(4K) : {
         *(.multibootHeader)

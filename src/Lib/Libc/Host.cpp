@@ -66,6 +66,9 @@ bool IsNaN(num_t x) {
 bool IsInf(num_t x) {
     return std::isinf(x);
 }
+num_t Exp(num_t x) {
+    return std::exp(x);
+}
 num_t Round(num_t x) {
     return std::round(x);
 }

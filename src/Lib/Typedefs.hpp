@@ -34,10 +34,6 @@ constexpr num_t eps = 1e-3;
 
 num_t Abs(num_t x);
 num_t Sqrt(num_t x);
-num_t Exp(num_t x);
-num_t Pow(num_t x, num_t y);
-num_t InversedTan2(num_t y, num_t x);
-String ToString(num_t x);
 num_t RandomFloat(void);
 
 /// @brief |a - b| < eps

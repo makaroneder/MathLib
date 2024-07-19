@@ -2,7 +2,10 @@
 #define IO_H
 #include <stdint.h>
 
-uint8_t ReadPort8(uint16_t port);
-void WritePort8(uint16_t port, uint8_t val);
+template <typename T>
+void WritePort(uint16_t port, T value);
+template <typename T>
+T ReadPort(uint16_t port);
+void IOWait(void);
 
 #endif

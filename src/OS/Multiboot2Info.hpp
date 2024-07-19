@@ -2,29 +2,54 @@
 #define Multiboot2Info_H
 #include <stdint.h>
 
-enum class Multiboot2TagType {
-    End = 0,
-    CMDLine = 1,
-    BootloaderName = 2,
-    Module = 3,
-    BasicMemoryInfo = 4,
-    BIOSBootDevice = 5,
-    MemoryMap = 6,
-    VBE = 7,
-    Framebuffer = 8,
-    ELFSections = 9,
-    APM = 10,
-    EFI32 = 11,
-    EFI64 = 12,
-    SMBIOS = 13,
-    OldACPI = 14,
-    NewACPI = 15,
-    Network = 16,
-    EFIMemoryMap = 17,
-    EFIBootSector = 18,
-    EFI32ImgHandle = 19,
-    EFI64ImgHandle = 20,
-    BaseLoadAddr = 21,
+enum class Multiboot2TagType : uint32_t {
+    FinalTag = 0,
+    CMDLine,
+    BootloaderName,
+    Module,
+    BasicMemoryInfo,
+    BIOSBootDevice,
+    MemoryMap,
+    VBE,
+    Framebuffer,
+    ELFSections,
+    APM,
+    EFISystemTable32,
+    EFISystemTable64,
+    SMBIOS,
+    OldACPI,
+    NewACPI,
+    Network,
+    EFIMemoryMap,
+    EFIBootServicesNotTerminated,
+    EFIImageHandle32,
+    EFIImageHandle64,
+    BaseLoadAddr,
+    End,
+};
+static constexpr const char* multiboot2TagNames[(uint32_t)Multiboot2TagType::End] = {
+    "Final tag",
+    "Command line",
+    "Bootloader name",
+    "Module",
+    "Memory info",
+    "BIOS boot device",
+    "Memory map",
+    "VBE",
+    "Framebuffer",
+    "ELF sections",
+    "APM",
+    "EFI system table 32",
+    "EFI system table 64",
+    "SMBIOS",
+    "ACPI 1.0",
+    "ACPI 2.0",
+    "Network",
+    "EFI memory map",
+    "EFI boot services not terminated",
+    "EFI image handle 32",
+    "EFI image handle 64",
+    "Base load address",
 };
 
 struct Multiboot2Color {
@@ -47,29 +72,24 @@ struct Multiboot2Info {
     uint32_t resv;
     Multiboot2Tag tags[0];
 };
-struct Multiboot2TagString {
-    Multiboot2Tag tag;
+struct Multiboot2TagString : Multiboot2Tag {
     char str[0];
 };
-struct Multiboot2TagModule {
-    Multiboot2Tag tag;
+struct Multiboot2TagModule : Multiboot2Tag {
     uint32_t start;
     uint32_t end;
-    char arg[0];
+    char path[0];
 };
-struct Multiboot2TagMemoryInfo {
-    Multiboot2Tag tag;
+struct Multiboot2TagMemoryInfo : Multiboot2Tag {
     uint32_t lowerMem;
     uint32_t upperMem;
 };
-struct Multiboot2TagBIOSBootDevice {
-    Multiboot2Tag tag;
+struct Multiboot2TagBIOSBootDevice : Multiboot2Tag {
     uint32_t id;
     uint32_t partition;
     uint32_t subPartition;
 };
-struct Multiboot2TagMemoryMap {
-    Multiboot2Tag tag;
+struct Multiboot2TagMemoryMap : Multiboot2Tag {
     uint32_t entrySize;
     uint32_t entryVersion;
     Multiboot2MemoryMapEntry entries[0];  
@@ -118,8 +138,7 @@ struct Multiboot2VBEModeInfo {
 	uint32_t offScreenMemorySize;
 	uint8_t resv0[206];
 } __attribute__((packed));
-struct Multiboot2TagVBE {
-    Multiboot2Tag tag;
+struct Multiboot2TagVBE : Multiboot2Tag {
     uint16_t vbeMode;
     uint16_t vbeInterfaceSeg;
     uint16_t vbeInterfaceOff;
@@ -127,8 +146,7 @@ struct Multiboot2TagVBE {
     Multiboot2VBEInfo vbeInfo;
     Multiboot2VBEModeInfo vbeModeInfo;
 };
-struct Multiboot2TagFramebuffer {
-    Multiboot2Tag tag;
+struct Multiboot2TagFramebuffer : Multiboot2Tag {
     uint64_t addr;
     uint32_t pitch;
     uint32_t width;
@@ -151,15 +169,13 @@ struct Multiboot2TagFramebuffer {
         };
     };
 };
-struct Multiboot2TagELF {
-    Multiboot2Tag tag;
+struct Multiboot2TagELF : Multiboot2Tag {
     uint32_t num;
     uint32_t entrySize;
     uint32_t shndx;
     char sections[0];
 };
-struct Multiboot2TagAPM {
-    Multiboot2Tag tag;
+struct Multiboot2TagAPM : Multiboot2Tag {
     uint16_t version;
     uint16_t cseg;
     uint32_t offset;
@@ -171,33 +187,27 @@ struct Multiboot2TagAPM {
     uint16_t dsegLen;
 };
 template<typename T>
-struct Multiboot2TagEFI {
-    Multiboot2Tag tag;
+struct Multiboot2TagEFI : Multiboot2Tag {
     T ptr;
 };
-struct Multiboot2TagSMBIOS {
-    Multiboot2Tag tag;
+struct Multiboot2TagSMBIOS : Multiboot2Tag {
     uint8_t major;
     uint8_t minor;
     uint8_t resv[6];
     uint8_t tables[0];
 };
-struct Multiboot2TagACPI {
-    Multiboot2Tag tag;
+struct Multiboot2TagACPI : Multiboot2Tag {
     uint8_t rsdp[0];
 };
-struct Multiboot2TagNetwork {
-    Multiboot2Tag tag;
+struct Multiboot2TagNetwork : Multiboot2Tag {
     uint8_t dhcPack[0];
 };
-struct Multiboot2TagEFIMemoryMap {
-    Multiboot2Tag tag;
+struct Multiboot2TagEFIMemoryMap : Multiboot2Tag {
     uint32_t descrSize;
     uint32_t descrVers;
     uint8_t map[0];
 };
-struct Multiboot2TagLoadBaseAddr {
-    Multiboot2Tag tag;
+struct Multiboot2TagLoadBaseAddr : Multiboot2Tag {
     uint32_t addr;
 };
 

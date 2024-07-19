@@ -27,7 +27,12 @@ if __name__ == "__main__":
                 else:
                     print(f"Too little arguments for mode {parts[0]} on line: {line}")
                     exit(1)
-                pass
+            # mode runName dependencies runCommand
+            elif parts[0] == "misc":
+                if len(parts) == 4: targets.append((parts[0], (parts[1], parts[2], parts[3])))
+                else:
+                    print(f"Too little arguments for mode {parts[0]} on line: {line}")
+                    exit(1)
             else:
                 print(f"Unknown mode ({parts[0]}) on line: {line}")
                 exit(1)
@@ -78,6 +83,10 @@ if __name__ == "__main__":
                 f.write(f"$(eval $(call AddTarget,$(BUILDDIR)/{args[0]},$(OBJS{i}),{args[6]},{args[7]},{args[2]},{args[3]},{args[4]},{args[5]},{args[1]}))\n")
                 f.write(f"run{args[8]}: $(BUILDDIR)/{args[0]}\n")
                 f.write(f"\t@{args[9]}")
+            elif mode == "misc":
+                f.write(f"{args[0]}: {args[1]}\n")
+                f.write(f"\t@{args[2]}")
+                pass
             else:
                 print(f"Unknown mode: {mode}")
                 exit(1)

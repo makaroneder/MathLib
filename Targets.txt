@@ -11,4 +11,7 @@
 "host" "Music.out" "Music" "" "Music" "$(BUILDDIR)/Music.wav"
 "host" "Server.out" "Server" "" "Server" "$(SERVERPORT)"
 "host" "Tests.out" "Tests" "" "Test" ""
-"freestanding" "Kernel.elf" "OS" "$(OSCXX)" "$(OSCXXFLAGS)" "$(AS)" "$(ASFLAGS)" "-T $(SRCDIR)/OS/Linker.ld -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map -l gcc" "$(SRCDIR)/OS/Linker.ld" "OS" "cp $(BUILDDIR)/Kernel.elf $(OSROOT)/boot/ && grub-mkrescue -o $(BUILDDIR)/OS.img $(OSROOT) && rm $(OSROOT)/boot/Kernel.elf && qemu-system-x86_64 -cdrom $(BUILDDIR)/OS.img -debugcon stdio"
+"freestanding" "Kernel.elf" "OS" "$(OSCXX)" "$(OSCXXFLAGS)" "$(AS)" "$(ASFLAGS)" "-T $(SRCDIR)/OS/Linker.ld -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map -l gcc" "$(SRCDIR)/OS/Linker.ld" "Kernel" "echo Use runOS instead"
+"misc" "$(BUILDDIR)/OS.img" "$(BUILDDIR)/Kernel.elf $(OSROOT)/*" "cp $(BUILDDIR)/Kernel.elf $(OSROOT)/boot/ && grub-mkrescue -o $(BUILDDIR)/OS.img $(OSROOT) && rm $(OSROOT)/boot/Kernel.elf"
+"misc" "runOS" "$(BUILDDIR)/OS.img" "qemu-system-x86_64 -cdrom $(BUILDDIR)/OS.img -debugcon stdio"
+"misc" "debugOS" "$(BUILDDIR)/OS.img $(SRCDIR)/OS/Debug.gdb" "gdb -x $(SRCDIR)/OS/Debug.gdb"

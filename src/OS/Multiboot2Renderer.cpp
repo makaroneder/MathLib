@@ -1,5 +1,6 @@
 #include "Multiboot2Renderer.hpp"
 
+// FIXME: This constructor has undefined behavior somewhere
 Multiboot2Renderer::Multiboot2Renderer(Multiboot2TagFramebuffer* framebuffer) : Renderer(framebuffer->width, framebuffer->height), framebuffer(framebuffer) {}
 bool Multiboot2Renderer::Update(void) {
     uint32_t* dst = (uint32_t*)framebuffer->addr;

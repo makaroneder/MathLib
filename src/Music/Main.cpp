@@ -1,5 +1,4 @@
 #include "Music.hpp"
-#include <Libc/HostFileSystem.hpp>
 #include <MathLib.hpp>
 #include <iostream>
 
@@ -9,6 +8,13 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <output file>");
         HostFileSystem fs;
         Music<num_t> music = Music<num_t>(44100, 32767, std::vector<MusicNote<num_t>> {

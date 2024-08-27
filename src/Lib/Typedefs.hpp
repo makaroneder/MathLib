@@ -1,11 +1,11 @@
 #ifndef Typedefs_H
 #define Typedefs_H
+#include <stdint.h>
 #ifdef Freestanding
 #include "CharBuffer.hpp"
-#include <stdint.h>
 
 /// @brief Signed version of size_t
-typedef int64_t ssize_t;
+typedef intptr_t ssize_t;
 /// @brief Default collection implementation
 /// @tparam T Type of data stored in the collection
 template <typename T>
@@ -64,6 +64,17 @@ T LinearToGamma(const T& x) {
 template <typename T>
 T RandomNumber(const T& min, const T& max) {
     return RandomFloat() * (max - min) + min;
+}
+/// @brief Reverses bits of x
+/// @tparam T Type of number
+/// @param x Value to use
+/// @return Value with reversed bits
+template <typename T>
+T BitReverse(const T& x, const uint8_t& bits = sizeof(T) * 8) {
+    T ret = 0;
+    for (uint8_t i = 0; i < bits; i++)
+        ret |= !!(x & 1 << i) << (bits - i - 1);
+    return ret;
 }
 
 #endif

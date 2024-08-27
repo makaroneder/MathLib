@@ -1,2 +1,2 @@
-f(x) : R -> R = cot(x)
-a = f(pi / 2)
+f(x : R) : R = cot(x)
+a : R = f(pi / 2)

@@ -52,9 +52,15 @@ MATHPROGRAMS ?= $(shell find $(SRCDIR)/TestPrograms/Math -type f -name "*.txt")
 CRYPTMSG ?= $(SRCDIR)/TestPrograms/Cryptography/CaesarCipher.txt
 MLITERS ?= 20000
 SERVERPORT ?= 8080
+INTERPRETERPROGRAM ?= $(SRCDIR)/TestPrograms/Interpreter/Main.txt
+DISKSIZE ?= 2K
+DISKOUTPUT ?= $(BUILDDIR)/Disk.img
+DISKTYPE ?= MBR
+DISKARGS = -diskSize $(DISKSIZE) -diskType $(DISKTYPE) -output $(DISKOUTPUT)
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
-OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -fno-exceptions -fno-rtti -fstack-protector-all -mno-red-zone
+OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 2048 -cdrom $(BUILDDIR)/OS.img
 
 include $(BUILDDIR)/Targets.mk
 

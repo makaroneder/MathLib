@@ -1,9 +1,3 @@
-#include <EquationSolver/Preprocesor.hpp>
-#include <Cryptography/AtbashCipher.hpp>
-#include <EquationSolver/Tokenizer.hpp>
-#include <EquationSolver/Optimizer.hpp>
-#include <Cryptography/ROT13.hpp>
-#include <Libc/HostFileSystem.hpp>
 #include <MathLib.hpp>
 #include <iostream>
 
@@ -39,6 +33,13 @@ Node* Print(const void*, const Array<const Node*>& args) {
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input file>");
         HostFileSystem fs;
         Node* root = Tokenize(Preproces(fs, argv[1]));

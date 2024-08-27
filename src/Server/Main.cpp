@@ -1,8 +1,6 @@
-#include "Socket.hpp"
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include <MathLib.hpp>
-#include <Host.hpp>
 #include <iostream>
 
 Array<HTTPHeader> resources = std::vector<HTTPHeader> {
@@ -19,22 +17,29 @@ HTTPHeader* GetResource(String name) {
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <port>");
-        Socket server = Socket();
+        HostSocket server = HostSocket();
         if (!server.Bind(atoi(argv[1]))) Panic("Failed to bind socket to local address");
         std::cout << "Waiting for a client to connect on http://localhost:" << argv[1] << std::endl;
-        Socket client = server.GetConnection();
+        Socket* client = server.GetConnection();
+        if (!client) Panic("Failed to get client connection");
         while (true) {
-            String msg;
-            const ssize_t read = client.Read(msg);
-            if (read == -1) Panic("Failed to read client data");
-            else if (read == 0) {
-                std::cout << "User disconnected" << std::endl;
-                break;
+            char buff[1025] = { '\0', };
+            if (!client->ReadSizedBuffer(buff, 1024)) {
+                delete client;
+                Panic("Failed to read data from client");
             }
+            String msg = String(buff);
             HTTPRequest request = HTTPRequest(msg);
             std::cout << request << std::endl;
-            HTTPResponse response = HTTPResponse();
+            HTTPResponse response;
             if (request.method == "GET") {
                 HTTPHeader* resource = GetResource(request.target);
                 response = resource ? HTTPResponse::FromHTML(resource->value) : HTTPResponse::FromStatus(HTTPStatus::NotFound, String("Requested resource does not exist: ") + request.target);
@@ -54,11 +59,9 @@ int main(int argc, char** argv) {
             }
             else response = HTTPResponse::FromStatus(HTTPStatus::NotImplemented, String("Unknown request: ") + request.method);
             std::cout << response << std::flush;
-            const ssize_t write = client.Write(response.Raw());
-            if (write == -1) Panic("Failed to write data to client");
-            else if (write == 0) {
-                std::cout << "User disconnected" << std::endl;
-                break;
+            if (!client->Puts(response.Raw())) {
+                delete client;
+                Panic("Failed to write data to client");
             }
         }
         return EXIT_SUCCESS;

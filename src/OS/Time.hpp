@@ -2,7 +2,7 @@
 #define Time_H
 #include <Typedefs.hpp>
 
-struct Timer {
+struct Timer : Allocatable {
     Timer(void);
     num_t GetTime(void) const;
     void Sleep(num_t duration);

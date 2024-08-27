@@ -1,2 +1,2 @@
-f(x) : R -> R = excsc(x)
-a = f(pi / 2)
+f(x : R) : R = excsc(x)
+a : R = f(pi / 2)

@@ -1,10 +1,6 @@
 #define FillGapsInFunctions
 #include <MathLib.hpp>
 #include <Libc/HostFunction.hpp>
-#include <Libc/HostFileSystem.hpp>
-#include <EquationSolver/Optimizer.hpp>
-#include <EquationSolver/Tokenizer.hpp>
-#include <EquationSolver/Preprocesor.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -73,6 +69,13 @@ bool HandleEvents(Renderer& renderer, const Function<bool>& func, size_t& state,
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input file>");
         HostFileSystem fs;
         SDL2Renderer renderer = SDL2Renderer("Math graph", 800, 800);
@@ -96,20 +99,20 @@ int main(int argc, char** argv) {
         const HostFunction<Array<num_t>, num_t> func = HostFunction<Array<num_t>, num_t>(nullptr, [&states, &state](const void*, num_t x) -> Array<num_t> {
             const FunctionNode funcNode = states.At(state).GetFunction("f");
             EquationSolverState tmp = states.At(state);
-            Variable var = Variable(funcNode.arguments[0].name, ToString(x), true);
+            Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, ToString(x), true);
             tmp.variables.Add(var);
             Node* n = Optimize(funcNode.body, tmp);
             delete var.value;
             const Array<complex_t> complexRet = n->ToNumber();
             delete n;
             Array<num_t> ret = Array<num_t>(complexRet.GetSize());
-            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).GetImaginary() == 0 ? complexRet.At(i).GetReal() : MakeNaN();
+            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = !complexRet.At(i).GetImaginary() ? complexRet.At(i).GetReal() : MakeNaN();
             return ret;
         });
         const HostFunction<complex_t, complex_t> complexFunc = HostFunction<complex_t, complex_t>(nullptr, [&states, &state](const void*, complex_t z) -> complex_t {
             const FunctionNode funcNode = states.At(state).GetFunction("f");
             EquationSolverState tmp = states.At(state);
-            Variable var = Variable(funcNode.arguments[0].name, z.ToString(), true);
+            Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
             tmp.variables.Add(var);
             Node* n = Optimize(funcNode.body, tmp);
             delete var.value;
@@ -121,9 +124,9 @@ int main(int argc, char** argv) {
             renderer.Fill(0);
             renderer.DrawAxis(0xffffffff, 0x808080ff);
             const FunctionNode funcNode = states.At(state).GetFunction("f");
-            if (funcNode.domain == "C" && funcNode.codomain == "C")
+            if (funcNode.dataType == "C")
                 renderer.DrawComplexFunction<num_t>(renderer.GenerateComplexFunction<num_t>(complexFunc));
-            else if (funcNode.domain == "R" && funcNode.codomain == "R")
+            else if (funcNode.dataType == "R")
                 renderer.DrawFunction<num_t>(renderer.GenerateMultiFunction<num_t>(func), 0xff0000ff);
             else return false;
             return renderer.Update();

@@ -2,7 +2,6 @@
 #define Physics_SIUnits_H
 #include "../MathObject.hpp"
 #include "../Constants.hpp"
-#include "../Printable.hpp"
 
 template <typename T>
 struct Unit : Printable {
@@ -42,7 +41,7 @@ struct Unit : Printable {
         return baseUnits[i];
     }
     virtual String ToString(const String& padding = "") const override {
-        if (count == 0) return padding + "0";
+        if (!count) return padding + "0";
         String str = count == 1 ? "" : ::ToString(count);
         bool first = true;
         for (size_t i = 0; i < BaseUnit::End; i++) {

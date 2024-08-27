@@ -1,0 +1,18 @@
+#include "CRC32.hpp"
+
+CRC32::CRC32(const uint32_t& magic) {
+    Fill(magic);
+}
+void CRC32::Fill(const uint32_t& magic) {
+    uint8_t i = 0;
+    const uint32_t reversedMagic = BitReverse<uint32_t>(magic);
+    do{
+        table[i] = i;
+        for (uint8_t z = 8; z; z--) table[i]= (table[i] & 1) ? (table[i] >> 1) ^ reversedMagic : table[i] >> 1;
+    } while(++i);
+}
+uint32_t CRC32::Calculate(const Array<uint8_t>& data) const {
+    uint32_t crc = 0xffffffff;
+	for (const uint8_t& x : data) crc = table[((uint8_t)crc ^ x)] ^ (crc >> 8);
+	return (crc ^ 0xffffffff);
+}

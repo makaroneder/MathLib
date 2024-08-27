@@ -1,6 +1,6 @@
 #ifndef Complex_H
 #define Complex_H
-#include "Printable.hpp"
+#include "Interfaces/Printable.hpp"
 #include "MathObject.hpp"
 
 String ToString(num_t x);

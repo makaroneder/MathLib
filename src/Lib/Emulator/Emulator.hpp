@@ -1,11 +1,26 @@
 #ifndef Emulator_Emulator_H
 #define Emulator_Emulator_H
-#include "../Printable.hpp"
+#include "../Interfaces/Printable.hpp"
+#include "../Interfaces/ByteDevice.hpp"
 
-struct Emulator : Printable {
+struct Emulator : ByteDevice, Printable {
     Emulator(const Array<uint8_t>& mem);
-    virtual bool Step(void) = 0;
-    size_t GetSize(void) const;
+    virtual bool Run(void) = 0;
+    /// @brief Returns size
+    /// @return Size
+    virtual size_t GetSize(void) const override;
+    /// @brief Reads data from the buffer
+    /// @param buffer Buffer to read data from
+    /// @param size Size of the buffer
+    /// @param position Position to read from
+    /// @return Size of bytes read
+    virtual size_t ReadPositionedSizedBuffer(void* buffer, const size_t& size, const size_t& position) override;
+    /// @brief Writes data to the buffer
+    /// @param buffer Buffer to write data to
+    /// @param size Size of the buffer
+    /// @param position Position to write to
+    /// @return Size of written bytes
+    virtual size_t WritePositionedSizedBuffer(const void* buffer, const size_t& size, const size_t& position) override;
 
     protected:
     Array<uint8_t> memory;

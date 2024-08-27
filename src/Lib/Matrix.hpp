@@ -1,21 +1,21 @@
 #ifndef Matrix_H
 #define Matrix_H
+#include "Interfaces/Printable.hpp"
+#include "Interfaces/Saveable.hpp"
 #include "MathObject.hpp"
 #include "Factorial.hpp"
-#include "Printable.hpp"
-#include "Saveable.hpp"
 #include "Host.hpp"
 
 /// @brief Structure representing mathematic matrixes
 /// @tparam T Type of number
 template <typename T>
-struct Matrix : Printable, Saveable {
+struct Matrix : Iteratable<T>, Printable, Saveable {
     CreateOperators(Matrix<T>, T)
     /// @brief Creates a new matrix
     /// @param w Width of matrix
     /// @param h Height of matrix
     constexpr Matrix(const size_t& w = 0, const size_t& h = 0) : width(w), height(h), ptr(Array<T>(w * h)) {
-        for (T& val : ptr) val = 0;
+        Fill(0);
     }
     /// @brief Creates a new matrix
     /// @param w Width of matrix
@@ -111,9 +111,9 @@ struct Matrix : Printable, Saveable {
     /// @brief X^n = exp(ln(X) * n)
     /// @param n Exponent
     /// @return Power of matrix
-    Matrix<T> Pow(T n) const {
+    Expected<Matrix<T>> Pow(T n) const {
         if (n < 0) return GetInverse().Pow(Abs(n));
-        return (Log() * n).Exponential();
+        return Expected<Matrix<T>>((Log() * n).Exponential());
     }
     /// @brief X^n = exp(ln(X) * n)
     /// @param n Exponent matrix
@@ -141,25 +141,20 @@ struct Matrix : Printable, Saveable {
     /// @return Determinant of the matrix
     T GetDeterminant(void) const {
         if (width != height) return MakeNaN();
-        const size_t dimension = width;
-        if (dimension == 0) return 1;
-        if (dimension == 1) return At(0, 0);
-        if (dimension == 2) return At(0, 0) * At(1, 1) - At(0, 1) * At(1, 0);
+        else if (!width) return 1;
+        else if (width == 1) return At(0, 0);
+        else if (width == 2) return At(0, 0) * At(1, 1) - At(0, 1) * At(1, 0);
         T ret = 0;
         int sign = 1;
-        for (size_t i = 0; i < dimension; i++) {
-            Matrix<T> sub = Matrix<T>(dimension - 1, dimension - 1);
-            for (size_t m = 1; m < dimension; m++) {
+        for (size_t i = 0; i < width; i++) {
+            Matrix<T> sub = Matrix<T>(width - 1, width - 1);
+            for (size_t m = 1; m < width; m++) {
                 size_t z = 0;
-                for (size_t n = 0; n < dimension; n++) {
-                    if (n != i) {
-                        sub.At(m - 1, z) = At(m, n);
-                        z++;
-                    }
-                }
+                for (size_t n = 0; n < width; n++)
+                    if (n != i) sub.At(m - 1, z++) = At(m, n);
             }
             ret += sign * At(0, i) * sub.GetDeterminant();
-            sign = -sign;
+            sign *= -1;
         }
         return ret;
     }
@@ -173,8 +168,8 @@ struct Matrix : Printable, Saveable {
     }
     /// @brief Returns cofactor of the matrix
     /// @return Cofactor of the matrix
-    Matrix<T> GetCofactor(void) const {
-        if (width != height) return Matrix<T>(0, 0);
+    Expected<Matrix<T>> GetCofactor(void) const {
+        if (width != height) return Expected<Matrix<T>>();
         Matrix<T> ret = Matrix<T>(width, width);
         Matrix<T> sub = Matrix<T>(width - 1, width - 1);
         for (size_t i = 0; i < width; i++) {
@@ -193,13 +188,14 @@ struct Matrix : Printable, Saveable {
                 ret.At(i, j) = ::Pow(-1, i + j) * sub.GetDeterminant();
             }
         }
-        return ret;
+        return Expected<Matrix<T>>(ret);
     }
     /// @brief Returns inverse of the matrix
     /// @return Inverse of the matrix
-    Matrix<T> GetInverse(void) const {
-        if (GetDeterminant() == 0) return Matrix<T>(0, 0);
-        return GetCofactor().GetTranspose() / GetDeterminant();
+    Expected<Matrix<T>> GetInverse(void) const {
+        const Expected<Matrix<T>> tmp = GetCofactor();
+        if (!GetDeterminant() || !tmp.HasValue()) return Expected<Matrix<T>>();
+        return Expected<Matrix<T>>(tmp.Get().GetTranspose() / GetDeterminant());
     }
     /// @brief Converts matrix to string
     /// @param padding String to pad with
@@ -223,8 +219,8 @@ struct Matrix : Printable, Saveable {
     /// @brief Multiplies 2 matrices
     /// @param other Another matrix
     /// @return Result of multiplication
-    constexpr Matrix<T> operator*(const Matrix<T>& other) const {
-        if (width != other.height) return Matrix<T>();
+    constexpr Expected<Matrix<T>> operator*(const Matrix<T>& other) const {
+        if (width != other.height) return Expected<Matrix<T>>();
         Matrix<T> ret = Matrix<T>(other.width, height);
         for (size_t y = 0; y < ret.height; y++) {
             for (size_t x = 0; x < ret.width; x++) {
@@ -232,7 +228,7 @@ struct Matrix : Printable, Saveable {
                 for (size_t x2 = 0; x2 < width; x2++) ret.At(x, y) += At(x2, y) * other.At(x, x2);
             }
         }
-        return ret;
+        return Expected<Matrix<T>>(ret);
     }
     /// @brief Compares current matrix with another matrix
     /// @param other Other matrix
@@ -246,7 +242,7 @@ struct Matrix : Printable, Saveable {
     /// @brief Saves matrix data
     /// @param file File to save matrix data into
     /// @return Status
-    virtual bool Save(ByteDevice& file) const override {
+    virtual bool Save(Writeable& file) const override {
         if (!file.Write<size_t>(width) || !file.Write<size_t>(height)) return false;
         const size_t size = ptr.GetSize();
         for (size_t i = 0; i < size; i++) {
@@ -258,16 +254,28 @@ struct Matrix : Printable, Saveable {
     /// @brief Loads matrix data
     /// @param file File to load matrix data from
     /// @return Status
-    virtual bool Load(ByteDevice& file) override {
+    virtual bool Load(Readable& file) override {
         if (!file.Read<size_t>(width) || !file.Read<size_t>(height)) return false;
         ptr = Array<T>(width * height);
         const size_t size = ptr.GetSize();
         for (size_t i = 0; i < size; i++) {
-            T tmp;
-            if (!file.Read<T>(tmp)) return false;
-            ptr.At(i) = tmp;
+            Expected<T> tmp = file.Read<T>();
+            if (!tmp.HasValue()) return false;
+            ptr.At(i) = tmp.Get();
         }
         return true;
+    }
+    virtual Iterator<const T> begin(void) const override {
+        return ptr.begin();
+    }
+    virtual Iterator<const T> end(void) const override {
+        return ptr.end();
+    }
+    virtual Iterator<T> begin(void) override {
+        return ptr.begin();
+    }
+    virtual Iterator<T> end(void) override {
+        return ptr.end();
     }
 
     private:
@@ -287,12 +295,12 @@ struct Matrix : Printable, Saveable {
     /// @brief X^n = X * ... * X
     /// @param n Exponent
     /// @return Unsigned power of matrix
-    Matrix<T> UnsignedPow(const size_t& n) const {
-        if (width != height) Panic("Matrix is not quadratic");
-        if (n == 0) return Matrix<T>::Identity(width);
+    Expected<Matrix<T>> UnsignedPow(const size_t& n) const {
+        if (width != height) Expected<Matrix<T>>();
+        if (!n) return Matrix<T>::Identity(width);
         Matrix<T> ret = *this;
         for (size_t i = 1; i < n; i++) ret = ret * *this;
-        return ret;
+        return Expected<Matrix<T>>(ret);
     }
 
     /// @brief Width of matrix

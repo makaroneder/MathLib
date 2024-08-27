@@ -1,2 +1,2 @@
-f(z) : C -> C = e^z
-a = re(f(pi * i))
+f(z : C) : C = e^z
+a : R = re(f(pi * i))

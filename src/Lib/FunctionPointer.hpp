@@ -1,6 +1,6 @@
 #ifndef FunctionPointer_H
 #define FunctionPointer_H
-#include "Function.hpp"
+#include "Interfaces/Function.hpp"
 
 template <typename Ret, typename... Args>
 struct FunctionPointer : Function<Ret, Args...> {

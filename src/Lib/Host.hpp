@@ -1,6 +1,5 @@
 #ifndef Host_H
 #define Host_H
-#include "Printable.hpp"
 #include "Complex.hpp"
 
 #ifndef Freestanding
@@ -32,8 +31,19 @@ bool IsUpper(char chr);
 bool IsLower(char chr);
 bool IsAlpha(char chr);
 bool IsDigit(char chr);
+/// @brief Checks if character is white space
+/// @param chr Character to check
+/// @return Is character white space
+bool IsWhiteSpace(const char& chr);
 bool IsHexDigit(char chr);
 bool IsAlphaDigit(char chr);
+size_t BitwiseAnd(size_t x, size_t y);
+size_t BitwiseOr(size_t x, size_t y);
+size_t BitwiseXor(size_t x, size_t y);
+size_t BitwiseNot(size_t x);
+size_t BitwiseNand(size_t x, size_t y);
+size_t BitwiseNor(size_t x, size_t y);
+size_t BitwiseXnor(size_t x, size_t y);
 num_t RandomFloat(void);
 num_t Abs(num_t x);
 num_t Abs(complex_t x);

@@ -3,8 +3,8 @@
 
 HTTPRequest::HTTPRequest(String str) {
     if (!str.IsEmpty()) {
-        Array<String> lines = Split(str, "\r\n");
-        Array<String> requestLine = Split(lines.At(0), " ");
+        Array<String> lines = Split(str, "\r\n", true);
+        Array<String> requestLine = Split(lines.At(0), " ", true);
         method = SubString(requestLine.At(0), 0, requestLine.At(0).GetSize() - 1);
         target = SubString(requestLine.At(1), 0, requestLine.At(1).GetSize() - 1);
         version = SubString(requestLine.At(2), 0, requestLine.At(2).GetSize() - 1);
@@ -21,7 +21,7 @@ HTTPRequest::HTTPRequest(String str) {
                 }
                 break;
             }
-            Array<String> tmp = Split(line, ":");
+            Array<String> tmp = Split(line, ":", true);
             size_t off = 0;
             while (tmp.At(1).At(off) == ' ') off++;
             headers.Add(HTTPHeader(SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)));

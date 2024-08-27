@@ -4,9 +4,18 @@
 #include <iostream>
 
 /// @brief Entry point for this program
+/// @param argc Number of command line arguments
+/// @param argv Array of command line arguments
 /// @return Status
 int main(int, char**) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         SDL2Renderer renderer = SDL2Renderer("Physics simulation", 800, 800);
         Array<Matrix<num_t>> points;
         for (num_t i = 0; i <= 5; i += 0.1) points.Add(CreateVector<num_t>(i, 3, 0));

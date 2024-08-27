@@ -7,6 +7,7 @@ String Erase(String str, size_t pos, size_t len) {
     return ret;
 }
 size_t Find(String str, String delim) {
+    if (str.GetSize() < delim.GetSize()) return SIZE_MAX;
     for (size_t i = 0; i < str.GetSize() - delim.GetSize(); i++) {
         bool found = true;
         for (size_t j = 0; j < delim.GetSize() && found; j++)
@@ -20,19 +21,19 @@ String SubString(String str, size_t pos, size_t len) {
     for (size_t i = 0; i < len; i++) ret += str.At(pos + i);
     return ret;
 }
-Array<String> Split(String str, String delim) {
+Array<String> Split(String str, String delim, bool preserveDelim) {
     Array<String> ret;
     size_t pos = 0;
     String token;
     while ((pos = Find(str, delim)) != SIZE_MAX) {
-        token = SubString(str, 0, pos + delim.GetSize());
+        token = SubString(str, 0, pos + delim.GetSize() * preserveDelim);
         ret.Add(token);
         str = Erase(str, 0, pos + delim.GetSize());
     }
     ret.Add(str);
     return ret;
 }
-String ToString(size_t x, size_t base) {
+String ToString(size_t x, size_t base, size_t size) {
     if (!x) return "0";
     String buff;
     while (x) {
@@ -42,7 +43,8 @@ String ToString(size_t x, size_t base) {
         else if (n < 16) buff += n - 10 + 'a';
     }
     String ret;
-    for (size_t j = buff.GetSize() - 1; j > 0; j--) ret += buff.At(j);
+    for (size_t i = buff.GetSize(); i < size; i++) ret += '0';
+    for (size_t i = buff.GetSize() - 1; i > 0; i--) ret += buff.At(i);
     ret += buff[0];
     return ret;
 }

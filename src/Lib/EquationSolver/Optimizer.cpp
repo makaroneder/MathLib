@@ -71,6 +71,16 @@ Node* OptimizeInternal(const Node* node, EquationSolverState& state) {
     else if (node->type == Node::Type::Variable) return OptimizeVariable(node, state);
     else if (node->type == Node::Type::Function) return OptimizeFunction(node, state);
     else if (node->type == Node::Type::Array) return new Node(Node::Type::Array, "", OptimizeComma(node->left, state));
+    else if (node->type == Node::Type::Program) {
+        if (node->value == "1" && !state.runtime) return node->Recreate();
+        const Array<const Node*> body = CommaToArray(node->left);
+        for (const Node* const instruction : body) {
+            if (instruction->type == Node::Type::Function && instruction->value == "return")
+                return OptimizeInternal(instruction->left, state);
+            else delete OptimizeInternal(instruction, state);
+        }
+        return node->Recreate();
+    }
     else if (node->type == Node::Type::Index) {
         Node* l = OptimizeInternal(node->left, state);
         Node* r = OptimizeInternal(node->right, state);
@@ -95,16 +105,15 @@ Node* OptimizeInternal(const Node* node, EquationSolverState& state) {
         Node* l = OptimizeInternal(node->left, state);
         Node* r = OptimizeInternal(node->right, state);
         if (l->type == Node::Type::Variable && (r->type == Node::Type::Constant || r->type == Node::Type::Array || r->type == Node::Type::String)) {
-            state.variables.Add(Variable(l->value, r->Recreate(), true));
+            state.variables.Add(Variable(l->value, l->left->value, r->Recreate(), true));
             delete l;
             return r;
         }
         else if (l->type == Node::Type::Function && l->right != nullptr) {
             Array<Variable> args;
             Array<const Node*> nodeArgs = CommaToArray(l->left);
-            Array<const Node*> sets = CommaToArray(l->right);
-            for (const Node*& arg : nodeArgs) args.Add(Variable(arg->value, "0", true));
-            state.functions.Add(FunctionNode(l->value, args, r->Recreate(), sets.At(0)->value, sets.At(1)->value));
+            for (const Node*& arg : nodeArgs) args.Add(Variable(arg->value, arg->left->value, "0", true));
+            state.functions.Add(FunctionNode(l->value, args, r->Recreate(), l->right->value));
         }
         return new Node(Node::Type::Equal, "", l, r);
     }
@@ -119,7 +128,7 @@ Node* OptimizeInternal(const Node* node, EquationSolverState& state) {
                 return value;
             }
         }
-        state.variables.Add(Variable(node->left->value, value->Recreate(), false));
+        state.variables.Add(Variable(node->left->value, node->left->left->value, value->Recreate(), false));
         return value;
     }
     else if (node->type == Node::Type::Absolute) {

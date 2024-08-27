@@ -1,2 +1,2 @@
-f(z) : C -> C = z!
-a = re(f(0))
+f(z : C) : C = z!
+a : R = re(f(0))

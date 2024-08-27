@@ -5,11 +5,11 @@
 #include "Event.hpp"
 #include "Color.hpp"
 #include "Threads.hpp"
-#include "Function.hpp"
-#include "Saveable.hpp"
 #include "Quaternion.hpp"
 #include "ComplexPosition.hpp"
 #include "Geometry/LineShape.hpp"
+#include "Interfaces/Saveable.hpp"
+#include "Interfaces/Function.hpp"
 
 struct Renderer : Image {
     /// @brief Creates a new renderer
@@ -254,11 +254,11 @@ struct Renderer : Image {
     /// @brief Saves data as image
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(ByteDevice& file) const override;
+    virtual bool Save(Writeable& file) const override;
     /// @brief Loads data from image
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(ByteDevice& file) override;
+    virtual bool Load(Readable& file) override;
 
     /// @brief Current position
     Matrix<num_t> position;

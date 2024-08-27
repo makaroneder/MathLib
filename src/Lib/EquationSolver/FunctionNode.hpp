@@ -10,18 +10,17 @@ struct FunctionNode : Allocatable {
     Array<Variable> arguments;
     /// @brief Code of the function
     Node* body;
-    /// @brief Domain of the function
-    String domain;
-    /// @brief Codomain of the function
-    String codomain;
+    /// @brief Data type of the function
+    String dataType;
 
     /// @brief Creates empty function
     FunctionNode(void);
     /// @brief Creates new function
-    /// @param n Name of the function
+    /// @param name Name of the function
     /// @param args Arguments of the function
-    /// @param b Code of the function
-    FunctionNode(const String& n, const Array<Variable>& args, Node* b, const String& d, const String& c);
+    /// @param body Code of the function
+    /// @param dataType Data type of the function
+    FunctionNode(const String& name, const Array<Variable>& args, Node* body, const String& dataType);
 };
 
 #endif

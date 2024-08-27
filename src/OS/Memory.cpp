@@ -1,6 +1,9 @@
+#include "MemoryBuffer.hpp"
 #include "Memory.hpp"
 #include <Host.hpp>
 
+MemoryBuffer<1000 * 4096> tmpMemoryManager;
+MemoryManager* memoryManager = &tmpMemoryManager;
 struct AllocationHeader {
     static constexpr uint8_t expectedSignature = '!';
     uint8_t signature;
@@ -8,23 +11,29 @@ struct AllocationHeader {
     size_t size;
 
     AllocationHeader(size_t size);
+    bool IsValid(void) const {
+        return signature == expectedSignature;
+    }
 } __attribute__((packed));
 AllocationHeader::AllocationHeader(size_t size) : signature(expectedSignature), free(false), size(size) {}
 
-MemoryBuffer<1000 * 4096> memoryManager;
 void* Alloc(size_t size) {
+    if (!memoryManager) return nullptr;
     size_t pos = 0;
-    const size_t memorySize = memoryManager.GetSize();
+    const size_t memorySize = memoryManager->GetSize();
     while (pos < memorySize) {
-        AllocationHeader* header = (AllocationHeader*)memoryManager.At(pos);
+        AllocationHeader* header = (AllocationHeader*)memoryManager->At(pos);
         pos += sizeof(AllocationHeader);
-        if (header->signature != AllocationHeader::expectedSignature) {
+        uint8_t* buff = (uint8_t*)((uintptr_t)header + sizeof(AllocationHeader));
+        if (!header->IsValid()) {
             *header = AllocationHeader(size);
-            return memoryManager.At(pos);
+            for (size_t i = 0; i < size; i++) buff[i] = 0;
+            return buff;
         }
         else if (header->free && header->size >= size) {
             header->free = false;
-            return memoryManager.At(pos);
+            for (size_t i = 0; i < header->size; i++) buff[i] = 0;
+            return buff;
         }
         pos += header->size;
     }
@@ -32,7 +41,7 @@ void* Alloc(size_t size) {
 }
 void Dealloc(void* ptr) {
     AllocationHeader* header = (AllocationHeader*)((uintptr_t)ptr - sizeof(AllocationHeader));
-    if (header->signature != AllocationHeader::expectedSignature) Panic("Invalid allocation signature");
+    if (!header->IsValid()) Panic("Allocation header is not valid");
     if (header->free) Panic("Double deallocation detected");
     header->free = true;
 }

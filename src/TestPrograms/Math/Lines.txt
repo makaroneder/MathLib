@@ -1,6 +1,6 @@
-f(x) : R -> R = {
+f(x : R) : R = {
     ceil(x),
     floor(x),
     x
 }
-a = f(pi)[floor(e)]
+a : R = f(pi)[floor(e)]

@@ -1,2 +1,2 @@
-f(x) : R -> R = arccoth(x)
-a = f(2)
+f(x : R) : R = arccoth(x)
+a : R = f(2)

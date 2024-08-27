@@ -27,8 +27,8 @@ union Flags {
         bool virtualInterruptPending : 1;
         bool id : 1;
         uint64_t resv4 : 42;
-    };
+    } __attribute__((packed));
     Flags(uint64_t value = 0);
-};
+} __attribute__((packed));
 
 #endif

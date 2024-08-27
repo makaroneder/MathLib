@@ -1,4 +1,4 @@
-fa = 1
-fb = 1
-f(x) : R -> R = fa * x + fb
-a = f(5)
+fa : R = 1
+fb : R = 1
+f(x : R) : R = fa * x + fb
+a : R = f(5)

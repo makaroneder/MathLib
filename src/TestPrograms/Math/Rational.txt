@@ -1,4 +1,4 @@
-p(x) : R -> R = ln(x)
-q(x) : R -> R = e * pi
-f(x) : R -> R = p(x) / q(x)
-a = f(e)
+p(x : R) : R = ln(x)
+q(x : R) : R = e * pi
+f(x : R) : R = p(x) / q(x)
+a : R = f(e)

@@ -1,6 +1,6 @@
 #ifndef Thread_H
 #define Thread_H
-#include "Function.hpp"
+#include "Interfaces/Function.hpp"
 #include "Interval.hpp"
 
 struct Thread : Allocatable {

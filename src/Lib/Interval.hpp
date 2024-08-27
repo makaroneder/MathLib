@@ -1,7 +1,6 @@
 #ifndef Interval_H
 #define Interval_H
 #include "Typedefs.hpp"
-#include "Allocatable.hpp"
 
 template <typename T>
 struct Interval : Allocatable {

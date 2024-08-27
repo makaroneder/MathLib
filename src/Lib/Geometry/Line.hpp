@@ -5,7 +5,7 @@
 /// @brief Line
 /// @tparam T Type of number
 template <typename T>
-struct Line {
+struct Line : Allocatable {
     /// @brief Starting point of line
     Matrix<T> start;
     /// @brief Ending point of line

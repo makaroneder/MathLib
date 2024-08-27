@@ -1,6 +1,6 @@
 #ifndef Chemistry_Elements_H
 #define Chemistry_Elements_H
-#include "../Printable.hpp"
+#include "../Host.hpp"
 
 template <typename T>
 struct ChemicalElement : Printable {

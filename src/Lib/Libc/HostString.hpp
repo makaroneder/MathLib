@@ -1,12 +1,13 @@
 #ifndef Freestanding
 #ifndef HostString_H
 #define HostString_H
-#include "../Collection.hpp"
+#include "../Interfaces/Collection.hpp"
 #include <string>
 
 struct HostString : Collection<char> {
     HostString(void) {}
     HostString(const char* str) : string(str) {}
+    HostString(const char* str, size_t size) : string(str, size) {}
     HostString(const std::string& str) : string(str) {}
     HostString(const char& chr) : HostString((HostString() + chr).GetValue()) {}
     virtual char At(const size_t& index) const override {

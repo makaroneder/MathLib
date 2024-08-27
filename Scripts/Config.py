@@ -12,23 +12,24 @@ if __name__ == "__main__":
             parts = line[1 : -1].split('" "')
             if len(parts) < 2:
                 print(f"Error on line: {line}")
-                print(f"{len(parts)}")
                 exit(1)
-            targetNames += " $(BUILDDIR)/" + parts[1]
-            # mode, target, directory, flags, runName, arguments
+            # mode, target, directory, flags, runName, arguments, runDependencies
             if parts[0] == "host":
-                if len(parts) == 6: targets.append((parts[0], (parts[1], parts[2], parts[3], parts[4], parts[5])))
+                targetNames += " $(BUILDDIR)/" + parts[1]
+                if len(parts) == 7: targets.append((parts[0], (parts[1], parts[2], parts[3], parts[4], parts[5], parts[6])))
                 else:
                     print(f"Too little arguments for mode {parts[0]} on line: {line}")
                     exit(1)
-            # mode, target, directory, cxx, cxxFlags, as, asFlags, extraLinkerFlags, dependencies, runName, runCommand
+            # mode, target, directory, cxx, cxxFlags, as, asFlags, extraLinkerFlags, dependencies
             elif parts[0] == "freestanding":
-                if len(parts) == 11: targets.append((parts[0], (parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8], parts[9], parts[10])))
+                targetNames += " $(BUILDDIR)/" + parts[1]
+                if len(parts) == 9: targets.append((parts[0], (parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], parts[7], parts[8])))
                 else:
                     print(f"Too little arguments for mode {parts[0]} on line: {line}")
                     exit(1)
             # mode runName dependencies runCommand
-            elif parts[0] == "misc":
+            elif parts[0] == "misc" or parts[0] == "miscFile":
+                if parts[0] == "miscFile": targetNames += " " + parts[1]
                 if len(parts) == 4: targets.append((parts[0], (parts[1], parts[2], parts[3])))
                 else:
                     print(f"Too little arguments for mode {parts[0]} on line: {line}")
@@ -58,9 +59,9 @@ if __name__ == "__main__":
         f.write("endef\n")
         f.write("# runName, target, args\n")
         f.write("define RunHostTarget\n")
-        f.write("run$(1): $(2) test\n")
+        f.write("run$(1): $(2)\n")
         f.write("\t@./$$< $(3)\n")
-        f.write("debug$(1): $(2) test\n")
+        f.write("debug$(1): $(2)\n")
         f.write("\t@$(VALGRIND) $(VALGRINDFLAGS) ./$$< $(3)\n")
         f.write(".PHONY: run$(1) debug$(1)\n")
         f.write("endef")
@@ -72,7 +73,7 @@ if __name__ == "__main__":
                 f.write(f"OBJS{i} = $(patsubst $(SRCDIR)/{args[1]}/%.cpp, $(BUILDDIR)/Objects/{args[1]}/%.o, $(SRCXX{i}))\n")
                 f.write(f"OBJS{i} += $(patsubst $(SRCDIR)/{args[1]}/%.asm, $(BUILDDIR)/Objects/{args[1]}/%Asm.o, $(SRCAS{i}))\n")
                 f.write(f"$(eval $(call AddTarget,$(BUILDDIR)/{args[0]},$(OBJS{i}),{args[2]},,$(CXX),$(CXXFLAGS),$(AS),$(ASFLAGS),{args[1]}))\n")
-                f.write(f"$(eval $(call RunHostTarget,{args[3]},$(BUILDDIR)/{args[0]},{args[4]}))")
+                f.write(f"$(eval $(call RunHostTarget,{args[3]},$(BUILDDIR)/{args[0]} {args[5]},{args[4]}))")
             elif mode == "freestanding":
                 f.write(f"SRCXX{i} = $(shell find $(SRCDIR)/{args[1]} -type f -name \"*.cpp\")\n")
                 f.write(f"SRCAS{i} = $(shell find $(SRCDIR)/{args[1]} -type f -name \"*.asm\")\n")
@@ -81,11 +82,10 @@ if __name__ == "__main__":
                 f.write(f"OBJS{i} += $(patsubst $(SRCDIR)/{args[1]}/%.asm, $(BUILDDIR)/Objects/{args[1]}/%Asm.o, $(SRCAS{i}))\n")
                 f.write(f"OBJS{i} += $(shell {args[2]} {args[3]} -print-file-name=crtend.o) $(BUILDDIR)/Objects/{args[1]}/crtn.o\n")
                 f.write(f"$(eval $(call AddTarget,$(BUILDDIR)/{args[0]},$(OBJS{i}),{args[6]},{args[7]},{args[2]},{args[3]},{args[4]},{args[5]},{args[1]}))\n")
-                f.write(f"run{args[8]}: $(BUILDDIR)/{args[0]}\n")
-                f.write(f"\t@{args[9]}")
-            elif mode == "misc":
+            elif mode == "misc" or mode == "miscFile":
                 f.write(f"{args[0]}: {args[1]}\n")
                 f.write(f"\t@{args[2]}")
+                if mode == "misc": f.write(f"\n.PHONY: {args[0]}")
                 pass
             else:
                 print(f"Unknown mode: {mode}")

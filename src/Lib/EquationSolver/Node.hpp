@@ -1,6 +1,5 @@
 #ifndef Node_H
 #define Node_H
-#include "../Printable.hpp"
 #include "../Complex.hpp"
 
 /// @brief Contains mathematical operations, constants, functions and variables
@@ -9,6 +8,7 @@ struct Node : Printable {
     enum class Type {
         None,
         Function, Variable, Constant, Array, String,
+        Program,
         Comma,
         Equal, DynamicEqual,
         Add, Sub,

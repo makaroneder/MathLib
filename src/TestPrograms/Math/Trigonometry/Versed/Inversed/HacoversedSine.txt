@@ -1,2 +1,2 @@
-f(x) : R -> R = archacoversin(x)
-a = f(0)
+f(x : R) : R = archacoversin(x)
+a : R = f(0)

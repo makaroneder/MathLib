@@ -10,11 +10,11 @@ struct TGA : Image {
     /// @brief Saves data as TGA image
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(ByteDevice& file) const override;
+    virtual bool Save(Writeable& file) const override;
     /// @brief Loads data from TGA image
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(ByteDevice& file) override;
+    virtual bool Load(Readable& file) override;
 };
 
 #endif

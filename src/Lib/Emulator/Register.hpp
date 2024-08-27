@@ -1,6 +1,6 @@
 #ifndef Emulator_Register_H
 #define Emulator_Register_H
-#include "../Printable.hpp"
+#include "../Interfaces/Printable.hpp"
 
 struct Register : Printable {
     Register(const uint64_t& val = 0);

@@ -118,20 +118,18 @@ String Node::ToString(const String& padding) const {
             Array<const Node*> params = CommaToArray(left);
             for (size_t i = 0; i < params.GetSize(); i++)
                 ret += params[i]->ToString() + (i + 1 == params.GetSize() ? ")" : ", ");
-            if (right != nullptr) {
-                Array<const Node*> sets = CommaToArray(right);
-                ret += String(" : ") + sets.At(0)->ToString() + " -> " + sets.At(1)->ToString();
-            }
+            if (right != nullptr) ret += String(" : ") + right->value;
             return ret;
         }
-        case Type::Variable: return padding + value;
+        case Type::Variable: return padding + value + (left ? (String(" : ") + left->value) : "");
         case Type::String: return padding + '"' + value + '"';
         case Type::Constant: {
             const complex_t val = ToNumber().At(0);
             const String r = ::ToString(val.GetReal());
             const String i = ::ToString(val.GetImaginary());
-            if (val.GetReal() == 0) return padding + (val.GetImaginary() == 1 ? "" : i) + 'i';
-            else if (val.GetImaginary() == 0) return padding + r;
+            if (!val.GetReal() && !val.GetImaginary()) return padding + '0';
+            else if (!val.GetReal()) return padding + (val.GetImaginary() == 1 ? "" : i) + 'i';
+            else if (!val.GetImaginary()) return padding + r;
             return padding + '(' + r + " + " + (val.GetImaginary() == 1 ? "" : i) + "i)";
         }
         case Type::Index: {
@@ -148,6 +146,13 @@ String Node::ToString(const String& padding) const {
             Array<const Node*> params = CommaToArray(left);
             for (size_t i = 0; i < params.GetSize(); i++)
                 ret += params[i]->ToString() + (i + 1 == params.GetSize() ? "}" : ", ");
+            return ret;
+        }
+        case Type::Program: {
+            String ret = padding + '[';
+            Array<const Node*> params = CommaToArray(left);
+            for (size_t i = 0; i < params.GetSize(); i++)
+                ret += params[i]->ToString() + (i + 1 == params.GetSize() ? "]" : ", ");
             return ret;
         }
         case Type::Equal: return padding + left->ToString() + " = " + right->ToString();

@@ -1,24 +1,6 @@
 #ifndef Memory_H
 #define Memory_H
-#include <stddef.h>
-#include <stdint.h>
-
-struct MemoryManager {
-    virtual void* At(size_t pos) = 0;
-    virtual size_t GetSize(void) const = 0;
-};
-template <size_t size>
-struct MemoryBuffer : MemoryManager {
-    virtual void* At(size_t pos) override {
-        return pos < size ? &buffer[pos] : nullptr;
-    }
-    virtual size_t GetSize(void) const override {
-        return size;
-    }
-
-    private:
-    uint8_t buffer[size];
-};
+#include "MemoryManager.hpp"
 
 void* Alloc(size_t size);
 void Dealloc(void* ptr);

@@ -1,7 +1,7 @@
 #ifndef Freestanding
 #ifndef HostFunction_H
 #define HostFunction_H
-#include "../Function.hpp"
+#include "../Interfaces/Function.hpp"
 #include <functional>
 
 template <typename Ret, typename... Args>

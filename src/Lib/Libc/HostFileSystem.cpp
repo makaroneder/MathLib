@@ -1,6 +1,9 @@
 #ifndef Freestanding
 #include "HostFileSystem.hpp"
-#include <stdarg.h>
+#include <experimental/filesystem>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 size_t HostFileSystem::OpenInternal(const String& path, const OpenMode& mode) {
     const char* modeStr = "";
@@ -23,8 +26,7 @@ size_t HostFileSystem::OpenInternal(const String& path, const OpenMode& mode) {
             return i;
         }
     }
-    files.Add(file);
-    return files.GetSize() - 1;
+    return files.Add(file) ? files.GetSize() - 1 : SIZE_MAX;
 }
 bool HostFileSystem::Close(const size_t& file) {
     FILE* raw = GetFile(file);
@@ -32,36 +34,15 @@ bool HostFileSystem::Close(const size_t& file) {
     files[file] = nullptr;
     return true;
 }
-bool HostFileSystem::Read(const size_t& file, void* buffer, const size_t& size) {
+size_t HostFileSystem::Read(const size_t& file, void* buffer, const size_t& size, const size_t& position) {
     FILE* raw = GetFile(file);
-    return raw && fread(buffer, sizeof(uint8_t), size, raw) == size;
+    if (!raw || fseek(raw, position, SEEK_SET)) return 0;
+    return fread(buffer, sizeof(uint8_t), size, raw);
 }
-bool HostFileSystem::Write(const size_t& file, const void* buffer, const size_t& size) {
+size_t HostFileSystem::Write(const size_t& file, const void* buffer, const size_t& size, const size_t& position) {
     FILE* raw = GetFile(file);
-    return raw && fwrite(buffer, sizeof(uint8_t), size, raw) == size;
-}
-bool HostFileSystem::Seek(const size_t& file, const ssize_t& offset, const SeekMode& mode) {
-    FILE* raw = GetFile(file);
-    int seek;
-    switch (mode) {
-        case SeekMode::Set: {
-            seek = SEEK_SET;
-            break;
-        }
-        case SeekMode::Current: {
-            seek = SEEK_CUR;
-            break;
-        }
-        case SeekMode::End: {
-            seek = SEEK_END;
-            break;
-        }
-    }
-    return raw && !fseek(raw, offset, seek);
-}
-size_t HostFileSystem::Tell(const size_t& file) {
-    FILE* raw = GetFile(file);
-    return raw ? ftell(raw) : SIZE_MAX;
+    if (!raw || fseek(raw, position, SEEK_SET)) return 0;
+    return fwrite(buffer, sizeof(uint8_t), size, raw);
 }
 size_t HostFileSystem::GetSize(const size_t& file) {
     FILE* raw = GetFile(file);
@@ -70,6 +51,17 @@ size_t HostFileSystem::GetSize(const size_t& file) {
     if (fseek(raw, 0, SEEK_END)) return 0;
     const size_t ret = ftell(raw);
     if (fseek(raw, pos, SEEK_SET)) return 0;
+    return ret;
+}
+Array<FileInfo> HostFileSystem::ReadDirectory(const String& path) {
+    if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) return Array<FileInfo>();
+    Array<FileInfo> ret;
+    for (const auto& entry : fs::directory_iterator(path.GetValue())) {
+        FileInfo::Type type = FileInfo::Type::Unknown;
+        if (fs::is_directory(entry.status())) type = FileInfo::Type::Directory;
+        else if (fs::is_regular_file(entry.status())) type = FileInfo::Type::File;
+        if (!ret.Add(FileInfo(type, entry.path().string()))) return Array<FileInfo>();
+    }
     return ret;
 }
 FILE* HostFileSystem::GetFile(const size_t& file) {

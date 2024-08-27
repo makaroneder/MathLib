@@ -6,7 +6,7 @@
 
 const String identifier = "MathLib";
 TGA::TGA(const size_t& w, const size_t& h) : Image(w, h) {}
-bool TGA::Save(ByteDevice& file) const {
+bool TGA::Save(Writeable& file) const {
     TGAHeader header = {};
     header.idLength = identifier.GetSize();
     header.imageType = 2;
@@ -47,7 +47,7 @@ bool TGA::Save(ByteDevice& file) const {
     file.Write<TGAFooter>(footer);
     return true;
 }
-bool TGA::Load(ByteDevice& file) {
+bool TGA::Load(Readable& file) {
     TGAHeader header;
     if (!file.Read<TGAHeader>(header)) return false;
     if (header.imageType != 2) return false;
@@ -71,23 +71,19 @@ bool TGA::Load(ByteDevice& file) {
             pixels.At(x, y) = pixel.hex;
         }
     }
-    uint16_t tmp;
-    if (file.Read<uint16_t>(tmp) && tmp == sizeof(TGAExtensionArea)) {
-        file.Seek(-sizeof(uint16_t), SeekMode::Current);
+    if (createdByMathLib) {
         TGAExtensionArea extension;
         if (!file.Read<TGAExtensionArea>(extension)) return false;
         if (extension.extensionSize != sizeof(TGAExtensionArea)) return false;
         if (extension.attributesType != 3) return false;
-        if (createdByMathLib) {
-            if (String(extension.authorName) != identifier) return false;
-            if (String(extension.softwareId) != identifier) return false;
-            if (String(extension.jobName) != identifier) return false;
+        if (String(extension.authorName) != identifier) return false;
+        if (String(extension.softwareId) != identifier) return false;
+        if (String(extension.jobName) != identifier) return false;
 
-            TGAFooter footer;
-            if (!file.Read<TGAFooter>(footer)) return false;
-            if (String(footer.signature) != String(footer.expectedSignature)) return false;
-            if (footer.extensionOffset != sizeof(TGAHeader) + header.width * header.height * sizeof(uint32_t)) return false;
-        }
+        TGAFooter footer;
+        if (!file.Read<TGAFooter>(footer)) return false;
+        if (String(footer.signature) != String(footer.expectedSignature)) return false;
+        if (footer.extensionOffset != sizeof(TGAHeader) + header.width * header.height * sizeof(uint32_t)) return false;
     }
     return true;
 }

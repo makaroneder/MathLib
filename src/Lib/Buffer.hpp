@@ -1,12 +1,15 @@
 #ifndef Buffer_H
 #define Buffer_H
-#include "Collection.hpp"
+#include "Interfaces/Collection.hpp"
 
 [[noreturn]] void Panic(const char*);
 template <typename T>
 struct Buffer : Collection<T> {
     Buffer(void) : buffer(nullptr), size(0) {}
     Buffer(const size_t& size_) : buffer(new T[size_]), size(size_) {}
+    Buffer(const T* arr, const size_t& size) : Buffer(size) {
+        for (size_t i = 0; i < size; i++) At(i) = arr[i];
+    }
     Buffer(const Buffer<T>& other) : buffer(new T[other.size]), size(other.size) {
         if (other.size != 0) {
             if (!buffer || !other.buffer) Panic("Buffer allocation failed");

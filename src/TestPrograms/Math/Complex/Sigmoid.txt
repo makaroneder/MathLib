@@ -1,2 +1,2 @@
-f(z) : C -> C = sigmoid(z)
-a = re(f(0))
+f(z : C) : C = sigmoid(z)
+a : R = re(f(0))

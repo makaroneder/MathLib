@@ -3,7 +3,6 @@
 #else
 #include "LogicGates.hpp"
 #endif
-#include <Libc/HostFileSystem.hpp>
 #include <MathLib.hpp>
 #include <iostream>
 #include <unistd.h>
@@ -14,12 +13,17 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 3) Panic(String("Usage: ") + argv[0] + " <file> <iteration count>");
         #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
         const num_t start = GetTime();
         #else
         srand(time(nullptr));
         #endif
+        if (argc < 3) Panic(String("Usage: ") + argv[0] + " <file> <iteration count>");
         HostFileSystem fs;
         const size_t printStatements = 10;
         const size_t limit = (size_t)StringToNumber(argv[2]);
@@ -38,12 +42,11 @@ int main(int argc, char** argv) {
             #ifdef UseFiniteDiff
             const NeuralNetwork<num_t> diff = state.FiniteDiff();
             #else
-            const NeuralNetwork<num_t> diff = state.Backprop();
+            const NeuralNetwork<num_t> diff = state.Backprop().Get("Backprop algorithm failed");
             #endif
-            if (diff.GetCount() == 0) Panic("Failed to update neural network");
             state.Learn(diff);
             #ifdef Debug
-            if (i % (limit / printStatements) == 0) {
+            if (!(i % (limit / printStatements))) {
                 std::cout << i << ":\n";
                 std::cout << "Cost = " << state.Cost() << std::endl;
                 std::cout << "Neural network:\n" << state.neuralNetwork << std::endl;

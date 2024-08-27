@@ -19,7 +19,7 @@ union Color {
         uint8_t g;
         /// @brief Red channel
         uint8_t r;
-    } rgba;
+    } __attribute__((packed)) rgba;
 
     /// @brief Creates a new color union from a 32 bit color
     /// @param h 32 bit color

@@ -2,10 +2,6 @@
 #define Tokenizer_H
 #include "Node.hpp"
 
-/// @brief Checks if character is white space
-/// @param chr Character to check
-/// @return Is character white space
-bool IsWhiteSpace(const char& chr);
 /// @brief Skips whitespace characters
 /// @param str String to skip
 /// @param i Current position in the string

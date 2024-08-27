@@ -31,7 +31,7 @@ size_t GetThreadCount(void) {
     return threadCount;
 }
 Thread* AllocThread(void) {
-    if (threadCount == 0) return nullptr;
+    if (!threadCount) return nullptr;
     threadCount--;
     return new HostThread();
 }

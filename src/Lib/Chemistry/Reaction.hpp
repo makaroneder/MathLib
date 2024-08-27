@@ -5,8 +5,9 @@
 
 template <typename T>
 struct ChemicalReaction : Printable  {
+    ChemicalReaction<T>(void) {}
     ChemicalReaction<T>(const Array<ChemicalMolecule<T>>& l, const Array<ChemicalMolecule<T>>& r) : left(l), right(r) {}
-    static constexpr ChemicalReaction<T> Create(const Array<ChemicalMolecule<T>>& l) {
+    static constexpr Expected<ChemicalReaction<T>> Create(const Array<ChemicalMolecule<T>>& l) {
         Array<ChemicalMolecule<T>> ret;
         if (l.GetSize() == 2) {
             Array<ChemicalElement<T>> l0 = l.At(0).GetElements();
@@ -32,7 +33,7 @@ struct ChemicalReaction : Printable  {
                 ret.Add(ChemicalMolecule<T>(arr, 1));
             }
         }
-        return ChemicalReaction<T>(l, ret);
+        return ret.GetSize() ? Expected<ChemicalReaction<T>>(ChemicalReaction<T>(l, ret)) : Expected<ChemicalReaction<T>>();
     }
     constexpr Array<Array<ChemicalElement<T>>> GetLeftList(void) const {
         Array<Array<ChemicalElement<T>>> ret;
@@ -72,7 +73,7 @@ struct ChemicalReaction : Printable  {
         }
         return elements;
     }
-    constexpr ChemicalReaction<T> Balance(void) const {
+    constexpr Expected<ChemicalReaction<T>> Balance(void) const {
         const Array<ChemicalReactionElement> l = GetReactionElements(left);
         const Array<ChemicalReactionElement> r = GetReactionElements(right);
         const size_t size = left.GetSize() + right.GetSize() - 1;
@@ -103,21 +104,27 @@ struct ChemicalReaction : Printable  {
                 }
             }
         }
-        const Matrix<T> x = a.GetInverse() * b;
+        Expected<Matrix<T>> tmp = a.GetInverse();
+        if (!tmp.HasValue()) return Expected<ChemicalReaction<T>>();
+        tmp = tmp.Get() * b;
+        if (!tmp.HasValue()) return Expected<ChemicalReaction<T>>();
+        const Matrix<T> x = tmp.Get();
         for (T i = 1; true; i++) {
-            const Matrix<T> tmp = x * i;
+            tmp = x * i;
+            if (!tmp.HasValue()) return Expected<ChemicalReaction<T>>();
+            const Matrix<T> tmpMat = tmp.Get();
             bool ok = true;
-            for (size_t y = 0; y < tmp.GetHeight() && ok; y++)
-                if (!FloatsEqual<T>(tmp.At(0, y), Round(tmp.At(0, y)))) ok = false;
+            for (size_t y = 0; y < tmpMat.GetHeight() && ok; y++)
+                if (!FloatsEqual<T>(tmpMat.At(0, y), Round(tmpMat.At(0, y)))) ok = false;
             if (ok) {
                 ChemicalReaction<T> ret = *this;
-                for (size_t j = 0; j < ret.left.GetSize(); j++) ret.left.At(j).count = Round(tmp.At(0, j));
-                for (size_t j = 0; j < ret.right.GetSize() - 1; j++) ret.right.At(j).count = Round(tmp.At(0, j + ret.left.GetSize()));
+                for (size_t j = 0; j < ret.left.GetSize(); j++) ret.left.At(j).count = Round(tmpMat.At(0, j));
+                for (size_t j = 0; j < ret.right.GetSize() - 1; j++) ret.right.At(j).count = Round(tmpMat.At(0, j + ret.left.GetSize()));
                 ret.right.At(ret.right.GetSize() - 1).count = Round(i);
-                return ret;
+                return Expected<ChemicalReaction<T>>(ret);
             }
         }
-        return ChemicalReaction<T>({}, {});
+        return Expected<ChemicalReaction<T>>();
     }
     virtual String ToString(const String& padding = "") const override {
         String ret = padding;

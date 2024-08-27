@@ -1,13 +1,12 @@
+#include "Arch/Arch.hpp"
 #include "Time.hpp"
-#include "Halt.hpp"
-#include "E9.hpp"
 #include <Host.hpp>
+#include <Logger.hpp>
 #include <String.hpp>
 
 [[noreturn]] void Panic(const char* str) {
-    asm volatile("cli");
-    E9().Write(str);
-    Halt();
+    if (LogString(str)) LogChar('\n');
+    ArchPanic();
 }
 num_t StringToNumber(String str) {
     // TODO: important
@@ -52,9 +51,10 @@ num_t MakeNaN(void) {
 num_t MakeInf(void) {
     return __builtin_infl();
 }
+uint32_t rand = 1;
 num_t RandomFloat(void) {
-    // TODO: almost not used in library
-    return 0;
+    rand = rand * 1103515245 + 12345;
+    return (num_t)((rand / (UINT16_MAX + 1)) % ((UINT16_MAX + 1) / 2)) / ((UINT16_MAX + 1) / 2);
 }
 num_t Abs(complex_t x) {
     return Sqrt(Pow(x.GetReal(), 2) + Pow(x.GetImaginary(), 2));

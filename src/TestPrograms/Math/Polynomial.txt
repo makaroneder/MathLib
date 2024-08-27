@@ -1,5 +1,5 @@
-fa = 1
-fb = 1
-fc = 1
-f(x) : R -> R = fa * x^2 + fb * x + fc
-a = f(1)
+fa : R = 1
+fb : R = 1
+fc : R = 1
+f(x : R) : R = fa * x^2 + fb * x + fc
+a : R = f(1)

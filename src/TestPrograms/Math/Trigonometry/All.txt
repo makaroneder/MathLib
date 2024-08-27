@@ -1,4 +1,4 @@
-f(x) : R -> R = {
+f(x : R) : R = {
     csc(x),
     cos(x),
     cot(x),
@@ -46,4 +46,4 @@ f(x) : R -> R = {
     crd(x),
     arccrd(x)
 }
-a = f(pi)[2]
+a : R = f(pi)[2]

@@ -1,7 +1,7 @@
 #ifndef Freestanding
 #ifndef HostFileSystem_H
 #define HostFileSystem_H
-#include "../FileSystem.hpp"
+#include "../FileSystems/FileSystem.hpp"
 
 /// @brief File system implementation using libc file system
 struct HostFileSystem : FileSystem {
@@ -18,28 +18,21 @@ struct HostFileSystem : FileSystem {
     /// @param file File index
     /// @param buffer Buffer to read data into
     /// @param size Size of the buffer
-    /// @return Status
-    virtual bool Read(const size_t& file, void* buffer, const size_t& size) override;
-    /// @brief Writes data from the buffer
+    /// @param position Position to read from
+    /// @return Size of bytes read
+    virtual size_t Read(const size_t& file, void* buffer, const size_t& size, const size_t& position) override;
+    /// @brief Writes data to the buffer
     /// @param file File index
-    /// @param buffer Buffer to write data from
+    /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
-    /// @return Status
-    virtual bool Write(const size_t& file, const void* buffer, const size_t& size) override;
-    /// @brief Sets file position
-    /// @param file File index
-    /// @param offset Offset to set
-    /// @param mode Mode to use when setting position
-    /// @return Status
-    virtual bool Seek(const size_t& file, const ssize_t& offset, const SeekMode& mode) override;
-    /// @brief Returns current file position
-    /// @param file File index
-    /// @return Current file position
-    virtual size_t Tell(const size_t& file) override;
+    /// @param position Position to write to
+    /// @return Size of written bytes
+    virtual size_t Write(const size_t& file, const void* buffer, const size_t& size, const size_t& position) override;
     /// @brief Returns file size
     /// @param file File index
     /// @return File size
     virtual size_t GetSize(const size_t& file) override;
+    virtual Array<FileInfo> ReadDirectory(const String& path) override;
     /// @brief Returns libc file from index
     /// @param file File index
     /// @return Libc file

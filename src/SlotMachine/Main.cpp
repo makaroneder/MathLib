@@ -1,15 +1,22 @@
 #include "Symbol.hpp"
 #include "Consumable.hpp"
-#include <Libc/HostFileSystem.hpp>
 #include <MathLib.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
 /// @brief Entry point for this program
+/// @param argc Number of command line arguments
+/// @param argv Array of command line arguments
 /// @return Status
 int main(int, char**) {
     try {
-        #ifndef Debug
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #else
         srand(time(nullptr));
         #endif
         HostFileSystem fs;
@@ -100,7 +107,7 @@ int main(int, char**) {
                             }
                             case Consumable::Type::BetIncreaser: {
                                 ssize_t tmp = bet + consumables[index].value;
-                                if (tmp == 0) tmp = bet;
+                                if (!tmp) tmp = bet;
                                 if (tmp > 10000) tmp = 10000;
                                 bet = tmp;
                                 break;

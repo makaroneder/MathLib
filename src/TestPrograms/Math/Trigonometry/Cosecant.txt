@@ -1,2 +1,2 @@
-f(x) : R -> R = csc(x)
-a = f(pi / 2)
+f(x : R) : R = csc(x)
+a : R = f(pi / 2)

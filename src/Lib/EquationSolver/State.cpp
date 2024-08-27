@@ -1,9 +1,8 @@
 #include "State.hpp"
 
-EquationSolverState::EquationSolverState(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(builtinFuncs), functions(funcs), variables(CreateDefaultVariables()), runtime(false) {
-    for (size_t i = 0; i < SizeOfArray(defaultBuiltinFuncs); i++)
-        builtinFunctions.Add(defaultBuiltinFuncs[i]);
-    for (size_t i = 0; i < vars.GetSize(); i++) variables.Add(vars.At(i));
+EquationSolverState::EquationSolverState(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false) {
+    for (const BuiltinFunction& func : builtinFuncs) builtinFunctions.Add(func);
+    for (const Variable& var : vars) variables.Add(var);
 }
 void EquationSolverState::Destroy(void) {
     for (FunctionNode& function : functions) {
@@ -19,5 +18,5 @@ void EquationSolverState::Destroy(void) {
 FunctionNode EquationSolverState::GetFunction(const String& name) const {
     for (const FunctionNode& function : functions)
         if (function.name == name) return function;
-    return FunctionNode("", Array<Variable>(), nullptr, "", "");
+    return FunctionNode("", Array<Variable>(), nullptr, "");
 }

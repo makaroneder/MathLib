@@ -1,7 +1,7 @@
 #ifndef Freestanding
 #ifndef HostCollection_H
 #define HostCollection_H
-#include "../Collection.hpp"
+#include "../Interfaces/Collection.hpp"
 #include <vector>
 
 template <typename T>

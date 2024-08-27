@@ -1,6 +1,6 @@
-msg = "Skibidi dap dap dap yes yes"
-key = "-25"
-protocol = "CaesarCipher"
+msg : String = "Tljcjej ebq ebq ebq zft zft"
+key : String = "-25"
+protocol : String = "CaesarCipher"
 
 Print("Message: ", msg)
 Print("Key: ", key)

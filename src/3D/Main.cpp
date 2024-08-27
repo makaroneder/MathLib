@@ -5,9 +5,18 @@
 #include <iostream>
 
 /// @brief Entry point for this program
+/// @param argc Number of command line arguments
+/// @param argv Array of command line arguments
 /// @return Status
 int main(int, char**) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         SDL2Renderer renderer = SDL2Renderer("3D viewer", 800, 800);
         Cuboid<num_t> cuboid = Cuboid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(2, 2, 2));
         Pyramid<num_t> triangle = Pyramid<num_t>(CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(2, 2, 2));

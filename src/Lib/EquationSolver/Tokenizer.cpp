@@ -1,9 +1,6 @@
 #include "Tokenizer.hpp"
 #include "../Host.hpp"
 
-bool IsWhiteSpace(const char& chr) {
-    return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';
-}
 void SkipWhiteSpace(const String& str, size_t& i) {
     while (i < str.GetSize() && IsWhiteSpace(str[i])) i++;
 }
@@ -61,6 +58,10 @@ Node* TokenizeData(const String& str, size_t& i) {
         String name = "";
         while (IsAlphaDigit(str[i])) name += str[i++];
         SkipWhiteSpace(str, i);
+        if (str[i] == ':') {
+            i++;
+            return new Node(Node::Type::Variable, name, TokenizeData(str, i));
+        }
         if (str[i] == '(') {
             i++;
             Node* ret = TokenizeComma(str, i);
@@ -78,25 +79,7 @@ Node* TokenizeData(const String& str, size_t& i) {
                 SkipWhiteSpace(str, i);
                 if (i < str.GetSize() && str[i] == ':') {
                     i++;
-                    Node* inputSet = TokenizeData(str, i);
-                    if (inputSet == nullptr) {
-                        delete ret;
-                        return nullptr;
-                    }
-                    SkipWhiteSpace(str, i);
-                    if (str[i] != '-' || str[i + 1] != '>') {
-                        delete inputSet;
-                        delete ret;
-                        return nullptr;
-                    }
-                    i += 2;
-                    Node* outputSet = TokenizeData(str, i);
-                    if (outputSet == nullptr) {
-                        delete inputSet;
-                        delete ret;
-                        return nullptr;
-                    }
-                    return new Node(Node::Type::Function, name, ret, new Node(Node::Type::Comma, "", inputSet, outputSet));
+                    return new Node(Node::Type::Function, name, ret, TokenizeData(str, i));
                 }
                 else return new Node(Node::Type::Function, name, ret);
             }
@@ -122,6 +105,24 @@ Node* TokenizeData(const String& str, size_t& i) {
         }
         i++;
         return new Node(Node::Type::Array, "", ret);
+    }
+    else if (str[i] == '[') {
+        i++;
+        SkipWhiteSpace(str, i);
+        bool runtime = false;
+        if (str[i] == '!') {
+            runtime = true;
+            i++;
+        }
+        Node* ret = TokenizeComma(str, i);
+        if (ret == nullptr) return nullptr;
+        SkipWhiteSpace(str, i);
+        if (str[i] != ']') {
+            delete ret;
+            return nullptr;
+        }
+        i++;
+        return new Node(Node::Type::Program, ToString(runtime), ret);
     }
     else if (str[i] == '(') {
         i++;

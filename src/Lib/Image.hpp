@@ -15,7 +15,7 @@ struct Image : Saveable {
     size_t GetHeight(void) const;
     /// @brief Fills image
     /// @param color Color to fill the image with
-    void Fill(const uint32_t& color);
+    inline void Fill(const uint32_t& color);
 
     /// @brief Pixels
     Matrix<uint32_t> pixels;

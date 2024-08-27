@@ -1,2 +1,2 @@
-f(x) : R -> R = arg(x + x * i)
-a = f(0)
+f(x : R) : R = arg(x + x * i)
+a : R = f(0)

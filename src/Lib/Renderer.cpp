@@ -26,12 +26,12 @@ void Renderer::DrawAxis(const uint32_t& axisColor, const uint32_t& cellColor) {
     DrawLine<num_t>(Line<num_t>(CreateVector<num_t>(GetX(start) + GetX(position), 0, 0), CreateVector<num_t>(GetX(end) + GetX(position), 0, 0)), axisColor);
     DrawLine<num_t>(Line<num_t>(CreateVector<num_t>(0, GetY(start) + GetY(position), 0), CreateVector<num_t>(0, GetY(end) + GetY(position), 0)), axisColor);
 }
-bool Renderer::Save(ByteDevice& file) const {
+bool Renderer::Save(Writeable& file) const {
     if (!image) return false;
     image->pixels = pixels;
     return image->Save(file);
 }
-bool Renderer::Load(ByteDevice& file) {
+bool Renderer::Load(Readable& file) {
     if (!image || !image->Load(file)) return false;
     pixels = image->pixels;
     return true;

@@ -1,2 +1,2 @@
-f(x) : R -> R = sign(x)
-a = f(-4)
+f(x : R) : R = sign(x)
+a : R = f(-4)

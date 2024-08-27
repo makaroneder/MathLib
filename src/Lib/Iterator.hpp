@@ -1,6 +1,6 @@
 #ifndef Iterator_H
 #define Iterator_H
-#include "Allocatable.hpp"
+#include "Interfaces/Allocatable.hpp"
 
 template <typename T>
 struct Iterator : Allocatable {
@@ -29,6 +29,13 @@ struct Iterator : Allocatable {
 
     private:
     T* data;
+};
+template <typename T>
+struct Iteratable : Allocatable {
+    virtual Iterator<const T> begin(void) const = 0;
+    virtual Iterator<const T> end(void) const = 0;
+    virtual Iterator<T> begin(void) = 0;
+    virtual Iterator<T> end(void) = 0;
 };
 
 #endif

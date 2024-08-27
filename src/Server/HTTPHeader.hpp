@@ -1,6 +1,6 @@
 #ifndef HTTPHeader_H
 #define HTTPHeader_H
-#include <Printable.hpp>
+#include <Interfaces/Printable.hpp>
 
 struct HTTPHeader : Printable {
     String name;

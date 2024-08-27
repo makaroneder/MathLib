@@ -1,2 +1,2 @@
-f(z) : C -> C = z
-a = im(f(2 + i))
+f(z : C) : C = z
+a : R = im(f(2 + i))

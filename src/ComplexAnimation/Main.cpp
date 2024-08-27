@@ -1,10 +1,5 @@
-#include <P6.hpp>
 #include <MathLib.hpp>
 #include <Libc/HostFunction.hpp>
-#include <Libc/HostFileSystem.hpp>
-#include <EquationSolver/Optimizer.hpp>
-#include <EquationSolver/Tokenizer.hpp>
-#include <EquationSolver/Preprocesor.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -14,6 +9,13 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
+        #ifdef Debug
+        const Test test = TestSelf();
+        const size_t tests = test.GetRecordCount();
+        const size_t passed = test.GetPassed();
+        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
+        if (passed != tests) Panic("Some tests failed");
+        #endif
         if (argc < 4) Panic(String("Usage: ") + argv[0] + " <input file> <output image directory> <output file>");
         SDL2Renderer renderer = SDL2Renderer("Complex animation", 800, 800);
         if (!renderer.SetImage<P6>()) Panic("Failed to set image interface in renderer");
@@ -33,18 +35,18 @@ int main(int argc, char** argv) {
         const FunctionNode funcNode = state.GetFunction("f");
         Array<complex_t> domain;
         HostFunction<complex_t, complex_t> func;
-        if (funcNode.domain == "R" && funcNode.codomain == "R") {
+        if (funcNode.dataType == "R") {
             for (num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(complex_t(x, 0));
             func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, state](const void*, complex_t z) -> complex_t {
                 EquationSolverState tmp = state;
-                tmp.variables.Add(Variable(funcNode.arguments[0].name, ToString(z.GetReal()), true));
+                tmp.variables.Add(Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, ToString(z.GetReal()), true));
                 Node* n = Optimize(funcNode.body, tmp);
                 const Array<complex_t> complexRet = n->ToNumber();
                 delete n;
                 return complex_t(z.GetReal(), (complexRet.GetSize() != 1 || complexRet.At(0).GetImaginary() != 0) ? MakeNaN() : complexRet.At(0).GetReal());
             });
         }
-        else if (funcNode.domain == "C" && funcNode.codomain == "C") {
+        else if (funcNode.dataType == "C") {
             for (num_t y = -4; y <= 4; y += 1 / renderer.pointMultiplier) {
                 if (FloatsEqual<num_t>(y, Round(y)))
                     for (num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(complex_t(x, y));
@@ -52,14 +54,14 @@ int main(int argc, char** argv) {
             }
             func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, state](const void*, complex_t z) -> complex_t {
                 EquationSolverState tmp = state;
-                tmp.variables.Add(Variable(funcNode.arguments[0].name, z.ToString(), true));
+                tmp.variables.Add(Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true));
                 Node* n = Optimize(funcNode.body, tmp);
                 const complex_t ret = n->ToNumber().At(0);
                 delete n;
                 return ret;
             });
         }
-        else Panic("Unsupported domain and codomain pair");
+        else Panic("Unsupported function domain");
         const num_t iter = 100;
         Array<complex_t> directions = Array<complex_t>(domain.GetSize());
         for (size_t i = 0; i < domain.GetSize(); i++) directions.At(i) = (func(domain.At(i)) - domain.At(i)) / iter;

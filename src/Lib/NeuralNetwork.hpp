@@ -21,7 +21,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @param arch Architecture of the neural network
     NeuralNetwork<T>(ActivationFunction activation, const Array<size_t>& arch) : activation(activation) {
         const size_t c = arch.GetSize();
-        if (c == 0) Panic("Invalid architecture size");
+        if (!c) Panic("Invalid architecture size");
         count = c - 1;
         if (!as.Add(Matrix<T>(arch.At(0), 1))) Panic("Failed to allocate input neuron");
         for (size_t i = 1; i < c; i++) {
@@ -75,14 +75,17 @@ struct NeuralNetwork : Printable, Saveable {
         }
     }
     /// @brief Applies weights and biases to neurons
-    /// @param  
-    constexpr void Forward(void) {
+    /// @return Status 
+    constexpr bool Forward(void) {
         for (size_t i = 0; i < count; i++) {
-            as.At(i + 1) = as.At(i) * ws.At(i) + bs.At(i);
+            const Expected<Matrix<T>> tmp = as.At(i) * ws.At(i);
+            if (!tmp.HasValue()) return false;
+            as.At(i + 1) = tmp.Get() + bs.At(i);
             for (size_t y = 0; y < as.At(i + 1).GetHeight(); y++)
                 for (size_t x = 0; x < as.At(i + 1).GetWidth(); x++)
                     as.At(i + 1).At(x, y) = Activation(as.At(i + 1).At(x, y));
         }
+        return true;
     }
     /// @brief Calculates average error
     /// @param input Input data
@@ -94,7 +97,7 @@ struct NeuralNetwork : Printable, Saveable {
         T ret = 0;
         for (size_t y = 0; y < input.GetHeight(); y++) {
             GetInput() = input.GetRow(y);
-            Forward();
+            if (!Forward()) return MakeNaN();
             for (size_t x = 0; x < output.GetWidth(); x++) ret += Pow(GetOutput().At(x, 0) - output.At(x, y), 2);
         }
         return ret / input.GetHeight();
@@ -131,14 +134,14 @@ struct NeuralNetwork : Printable, Saveable {
     /// @param input Input data
     /// @param output Output data
     /// @return Difference
-    constexpr NeuralNetwork<T> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
-        if (input.GetHeight() != output.GetHeight()) return NeuralNetwork<T>();
-        if (GetOutput().GetWidth() != output.GetWidth()) return NeuralNetwork<T>();
+    constexpr Expected<NeuralNetwork<T>> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
+        if (input.GetHeight() != output.GetHeight()) return Expected<NeuralNetwork<T>>();
+        if (GetOutput().GetWidth() != output.GetWidth()) return Expected<NeuralNetwork<T>>();
         NeuralNetwork<T> ret = *this;
         ret.Fill(0);
         for (size_t i = 0; i < input.GetHeight(); i++) {
             GetInput() = input.GetRow(i);
-            Forward();
+            if (!Forward()) return Expected<NeuralNetwork<T>>();
             for (size_t j = 0; j <= count; j++) ret.as.At(j).Fill(0);
             for (size_t j = 0; j < output.GetWidth(); j++) ret.GetOutput().At(j, 0) = GetOutput().At(j, 0) - output.At(j, i);
             for (size_t l = count; l > 0; l--) {
@@ -159,7 +162,7 @@ struct NeuralNetwork : Printable, Saveable {
             ret.ws.At(i) /= input.GetHeight();
             ret.bs.At(i) /= input.GetHeight();
         }
-        return ret;
+        return Expected<NeuralNetwork<T>>(ret);
     }
     /// @brief Learns
     /// @param diff Difference between expected and actual results
@@ -182,7 +185,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Saves neural network data
     /// @param file File to save neural network data into
     /// @return Status
-    virtual bool Save(ByteDevice& file) const override {
+    virtual bool Save(Writeable& file) const override {
         if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) return false;
         for (size_t i = 0; i < count; i++) {
             if (!as.At(i + 1).Save(file)) return false;
@@ -194,7 +197,7 @@ struct NeuralNetwork : Printable, Saveable {
     /// @brief Loads neural network data
     /// @param file File to load neural network data from
     /// @return Status
-    virtual bool Load(ByteDevice& file) override {
+    virtual bool Load(Readable& file) override {
         if (!file.Read<ActivationFunction>(activation) || !file.Read<size_t>(count) || !as.Add(Matrix<T>()) || !GetInput().Load(file)) return false;
         for (size_t i = 0; i < count; i++) {
             if (!as.Add(Matrix<T>())) return false;

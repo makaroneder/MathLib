@@ -10,6 +10,11 @@ struct CharBuffer : Buffer<char> {
         for (size_t i = 0; i < size; i++) buffer[i] = str[i];
         buffer[size] = '\0';
     }
+    CharBuffer(const char* str, size_t size) : Buffer<char>() {
+        buffer = new char[size + 1];
+        for (size_t i = 0; i < size; i++) buffer[i] = str[i];
+        buffer[size] = '\0';
+    }
     CharBuffer(const char& chr) : CharBuffer((CharBuffer() + chr).GetValue()) {}
     CharBuffer& operator+=(const CharBuffer& other) {
         char* ptr = new char[size + other.size + 1];

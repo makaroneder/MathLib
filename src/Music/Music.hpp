@@ -1,7 +1,7 @@
 #ifndef Music_H
 #define Music_H
 #include "MusicNote.hpp"
-#include <Saveable.hpp>
+#include <Interfaces/Saveable.hpp>
 
 template <typename T>
 struct Music : Saveable {
@@ -17,7 +17,7 @@ struct Music : Saveable {
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(ByteDevice& file) const override {
+    virtual bool Save(Writeable& file) const override {
         return (
             file.WriteBuffer("RIFF", 4) &&
             file.Write<uint32_t>(36 + samples.GetSize() * sizeof(int16_t)) &&
@@ -38,7 +38,7 @@ struct Music : Saveable {
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(ByteDevice& file) override {
+    virtual bool Load(Readable& file) override {
         char buff[5] = { '\0', };
         uint32_t size;
         uint32_t tmp32;

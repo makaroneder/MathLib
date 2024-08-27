@@ -1,0 +1,11 @@
+#ifndef Cascade_H
+#define Cascade_H
+#include "Interrupts.hpp"
+
+struct Cascade : InterruptDevice {
+    Cascade(void);
+    virtual ~Cascade(void) override;
+    virtual void OnInterrupt(uintptr_t, Registers*, uintptr_t) override;
+};
+
+#endif

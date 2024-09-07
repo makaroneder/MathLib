@@ -24,23 +24,23 @@ int main(int argc, char** argv) {
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
-        EquationSolverState state = EquationSolverState();
-        Node* optimizedRoot = Optimize(root, state);
+        Optimizer optimizer = Optimizer();
+        Node* optimizedRoot = optimizer.Optimize(root);
         delete root;
         #ifdef Debug
         std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
         #endif
         delete optimizedRoot;
-        state.runtime = true;
-        const FunctionNode funcNode = state.GetFunction("f");
+        optimizer.runtime = true;
+        const FunctionNode funcNode = optimizer.GetFunction("f");
         Array<complex_t> domain;
         HostFunction<complex_t, complex_t> func;
         if (funcNode.dataType == "R") {
             for (num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(complex_t(x, 0));
-            func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, state](const void*, complex_t z) -> complex_t {
-                EquationSolverState tmp = state;
+            func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, optimizer](const void*, complex_t z) -> complex_t {
+                Optimizer tmp = optimizer;
                 tmp.variables.Add(Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, ToString(z.GetReal()), true));
-                Node* n = Optimize(funcNode.body, tmp);
+                Node* n = tmp.Optimize(funcNode.body);
                 const Array<complex_t> complexRet = n->ToNumber();
                 delete n;
                 return complex_t(z.GetReal(), (complexRet.GetSize() != 1 || complexRet.At(0).GetImaginary() != 0) ? MakeNaN() : complexRet.At(0).GetReal());
@@ -52,10 +52,10 @@ int main(int argc, char** argv) {
                     for (num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(complex_t(x, y));
                 else for (num_t x = -4; x <= 4; x++) domain.Add(complex_t(x, y));
             }
-            func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, state](const void*, complex_t z) -> complex_t {
-                EquationSolverState tmp = state;
+            func = HostFunction<complex_t, complex_t>(nullptr, [funcNode, optimizer](const void*, complex_t z) -> complex_t {
+                Optimizer tmp = optimizer;
                 tmp.variables.Add(Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true));
-                Node* n = Optimize(funcNode.body, tmp);
+                Node* n = tmp.Optimize(funcNode.body);
                 const complex_t ret = n->ToNumber().At(0);
                 delete n;
                 return ret;
@@ -65,6 +65,7 @@ int main(int argc, char** argv) {
         const num_t iter = 100;
         Array<complex_t> directions = Array<complex_t>(domain.GetSize());
         for (size_t i = 0; i < domain.GetSize(); i++) directions.At(i) = (func(domain.At(i)) - domain.At(i)) / iter;
+        optimizer.Destroy();
         for (num_t i = 0; i <= iter; i++) {
             renderer.Fill(0);
             renderer.DrawAxis(0xffffffff, 0x808080ff);

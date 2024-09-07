@@ -3,15 +3,58 @@
 #include <Host.hpp>
 #include <Logger.hpp>
 #include <String.hpp>
+#include <Trigonometry.hpp>
 
+num_t RealNaturalLog(num_t x) {
+    if (x <= 0) return MakeNaN();
+    num_t logx = 0;
+    while (x >= 2) {
+        x /= 2;
+        logx += ln2;
+    }
+    num_t result = (x - 1) / (x + 1);
+    num_t numerator = result;
+    const num_t tmp = result * result;
+    size_t i = 1;
+    while (Abs(numerator) > eps) {
+        numerator *= tmp;
+        i += 2;
+        result += numerator / i;
+    }
+    return logx + result * 2;
+}
+num_t RealSqrt(num_t x) {
+    if (x < 0) return MakeNaN();
+    if (!x) return 0;
+    num_t guess = x;
+    num_t prev_guess;
+    do {
+        prev_guess = guess;
+        guess = (guess + x / guess) / 2;
+    } while (Abs(guess - prev_guess) > eps);
+    return guess;
+}
 [[noreturn]] void Panic(const char* str) {
     if (LogString(str)) LogChar('\n');
     ArchPanic();
 }
 num_t StringToNumber(String str) {
-    // TODO: important
-    (void)str;
-    return 0;
+    size_t i = 0;
+    num_t ret = 0;
+    size_t mult = 1;
+    while (i < str.GetSize() && str.At(i) != '.') {
+        ret = ret * mult + str.At(i++) - '0';
+        mult *= 10;
+    }
+    if (i < str.GetSize() && str.At(i) == '.') {
+        i++;
+        mult = 10;
+        while (i < str.GetSize()) {
+            ret += num_t(str.At(i++) - '0') / mult;
+            mult *= 10;
+        }
+    }
+    return ret;
 }
 String ToString(num_t x) {
     bool neg = false;
@@ -34,15 +77,12 @@ num_t GetTime(void) {
     return mainTimer ? mainTimer->GetTime() : 0;
 }
 size_t GetThreadCount(void) {
-    // TODO: not used in library
     return 0;
 }
 Thread* AllocThread(void) {
-    // TODO: not used in library
     return nullptr;
 }
 void DeallocThread(Thread* thread) {
-    // TODO: not used in library
     (void)thread;
 }
 num_t MakeNaN(void) {
@@ -63,9 +103,7 @@ complex_t Pow(complex_t x, complex_t y) {
     return Exp(y * NaturalLog(x));
 }
 complex_t NaturalLog(complex_t x) {
-    // TODO: important
-    (void)x;
-    return complex_t();
+    return complex_t(RealNaturalLog(RealSqrt(x.GetReal() * x.GetReal() + x.GetImaginary() * x.GetImaginary())), x.GetArgument());
 }
 bool IsNaN(num_t x) {
     return x != x;
@@ -84,7 +122,13 @@ num_t Exp(num_t x) {
     }
     return sum;
 }
+
+
+// TODO:
+bool panicOnHost = false;
+
 num_t Round(num_t x) {
+    if (panicOnHost) Panic(__func__);
     // TODO: almost not used in library
     (void)x;
     return 0;
@@ -94,18 +138,24 @@ num_t Floor(num_t x) {
     return x == ix ? ix : (ix - 1);
 }
 complex_t Sin(complex_t x) {
+    if (panicOnHost) Panic(__func__);
     // TODO: important
     (void)x;
     return complex_t();
 }
 complex_t InversedSin(complex_t x) {
+    if (panicOnHost) Panic(__func__);
     // TODO: important
     (void)x;
     return complex_t();
 }
 num_t InversedTan2(num_t y, num_t x) {
-    // TODO: almost not used in library
-    (void)y;
-    (void)x;
-    return 0;
+    if (x > 0) return InversedTan(y / x);
+    else if (x < 0) {
+        if (y >= 0) return InversedTan(y / x) + pi;
+        else return InversedTan(y / x) - pi;
+    }
+    else if (y > 0) return pi / 2;
+    else if (y < 0) return -pi / 2;
+    else return MakeNaN();
 }

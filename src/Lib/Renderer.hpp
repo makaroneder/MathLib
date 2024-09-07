@@ -107,9 +107,24 @@ struct Renderer : Image {
         const Array<Line<T>> lines = shape.ToLines(rotation);
         for (size_t i = 0; i < lines.GetSize(); i++) DrawLine<T>(Line<T>(lines.At(i).start, lines.At(i).end), color);
     }
+    /// @brief Renders string
+    /// @tparam T Type of number
+    /// @param str String to render
+    /// @param font Font to renderer string with
+    /// @param pos Position of the string
+    /// @param rotation Vector containing axis to rotate around
+    /// @param scale Scale of the string
+    /// @param color Color to render string with
+    /// @return Status
+    template <typename T>
+    bool Puts(const String& str, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, const uint32_t& color) {
+        Array<String> strs = Array<String>(1);
+        strs.At(0) = str;
+        return Puts<T>(strs, font, pos, rotation, scale, color);
+    }
     /// @brief Renders strings
     /// @tparam T Type of number
-    /// @param str Strings to render
+    /// @param strs Strings to render
     /// @param font Font to renderer strings with
     /// @param pos Position of the strings
     /// @param rotation Vector containing axis to rotate around
@@ -124,11 +139,11 @@ struct Renderer : Image {
         const size_t sx = GetX(scale);
         const size_t sy = GetY(scale);
         const size_t sz = GetZ(scale);
-        GetY(pos) -= strs.GetSize() * font->GetHeight() * sy / (pointMultiplier * 2);
+        GetY(pos) -= strs.GetSize() * h * sy / pointMultiplier;
         Matrix<T> tmp = pos;
         for (size_t i = 0; i < strs.GetSize(); i++) {
             pos = tmp;
-            GetX(pos) -= strs.At(i).GetSize() * font->GetWidth() * sx / (pointMultiplier * 2);
+            GetX(pos) -= strs.At(i).GetSize() * w * sx / pointMultiplier;
             const Matrix<T> center = pos;
             for (size_t j = 0; j < strs.At(i).GetSize(); j++) {
                 const uint8_t* fontPtr = font->GetGlyph(strs.At(i).At(j));
@@ -141,9 +156,9 @@ struct Renderer : Image {
                                         SetPixel<T>(RotateVector<T>(CreateVector<T>(nx + x, ny - y, nz) / pointMultiplier + pos, center, rotation), color);
                     fontPtr++;
                 }
-                GetX(pos) += font->GetWidth() * sx / pointMultiplier;
+                GetX(pos) += w * 2 * sx / pointMultiplier;
             }
-            GetY(tmp) -= font->GetHeight() * sy / pointMultiplier;
+            GetY(tmp) -= h * 2 * sy / pointMultiplier;
         }
         return true;
     }

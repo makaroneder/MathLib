@@ -5,8 +5,8 @@
 
 template <size_t size>
 struct MemoryBuffer : MemoryManager {
-    virtual void* At(size_t pos) override {
-        return pos < size ? &buffer[pos] : nullptr;
+    virtual void* At(size_t pos, size_t size_) override {
+        return pos + size_ < size ? &buffer[pos] : nullptr;
     }
     virtual size_t GetSize(void) const override {
         return size;

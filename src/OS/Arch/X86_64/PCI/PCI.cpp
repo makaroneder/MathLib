@@ -1,5 +1,6 @@
 #include "PCI.hpp"
 #include "PCIHeader.hpp"
+#include "../USB/UHCI.hpp"
 #include "../AHCI/AHCI.hpp"
 #include <Logger.hpp>
 #include <String.hpp>
@@ -654,6 +655,7 @@ bool InitPCI(const MCFG* mcfg) {
                             case 0x03: switch (functionEntry->programInterface) {
                                 case 0x00: {
                                     LogString(String("Found UHCI controller on ") + PCIAddressToString(mcfg->entries[i].pciSegment, bus, device, function) + '\n');
+                                    new UHCI(functionEntry);
                                     break;
                                 }
                                 case 0x10: {

@@ -6,6 +6,7 @@
 struct PhysicalFileSystem : FileSystem {
     PhysicalFileSystem(ByteDevice& disk);
     ByteDevice& GetDisk(void);
+    virtual bool Create(void) = 0;
 
     protected:
     ByteDevice& disk;

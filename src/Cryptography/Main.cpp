@@ -4,19 +4,19 @@
 Node* Encrypt(const void*, const Array<const Node*>& args) {
     for (const Node* const& arg : args)
         if (arg->type != Node::Type::String) return nullptr;
-    if (args.At(0)->value == "CaesarCipher") return new Node(Node::Type::String, CaesarCipher().Encrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "AffineCipher") return new Node(Node::Type::String, AffineCipher().Encrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "AtbashCipher") return new Node(Node::Type::String, AtbashCipher().Encrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "ROT13") return new Node(Node::Type::String, ROT13().Encrypt(args.At(1)->value, args.At(2)->value));
+    if (args.At(0)->value == "CaesarCipher") return new Node(Node::Type::String, CaesarCipher().EncryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "AffineCipher") return new Node(Node::Type::String, AffineCipher().EncryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "AtbashCipher") return new Node(Node::Type::String, AtbashCipher().EncryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "ROT13") return new Node(Node::Type::String, ROT13().EncryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
 Node* Decrypt(const void*, const Array<const Node*>& args) {
     for (const Node* const& arg : args)
         if (arg->type != Node::Type::String) return nullptr;
-    if (args.At(0)->value == "CaesarCipher") return new Node(Node::Type::String, CaesarCipher().Decrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "AffineCipher") return new Node(Node::Type::String, AffineCipher().Decrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "AtbashCipher") return new Node(Node::Type::String, AtbashCipher().Decrypt(args.At(1)->value, args.At(2)->value));
-    else if (args.At(0)->value == "ROT13") return new Node(Node::Type::String, ROT13().Decrypt(args.At(1)->value, args.At(2)->value));
+    if (args.At(0)->value == "CaesarCipher") return new Node(Node::Type::String, CaesarCipher().DecryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "AffineCipher") return new Node(Node::Type::String, AffineCipher().DecryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "AtbashCipher") return new Node(Node::Type::String, AtbashCipher().DecryptString(args.At(1)->value, args.At(2)->value));
+    else if (args.At(0)->value == "ROT13") return new Node(Node::Type::String, ROT13().DecryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
 Node* Print(const void*, const Array<const Node*>& args) {
@@ -46,14 +46,14 @@ int main(int argc, char** argv) {
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
-        EquationSolverState state = EquationSolverState(std::vector<BuiltinFunction> {
+        Optimizer optimizer = Optimizer(std::vector<BuiltinFunction> {
             BuiltinFunction("Encrypt", BuiltinFunctionPointer(nullptr, &Encrypt)),
             BuiltinFunction("Decrypt", BuiltinFunctionPointer(nullptr, &Decrypt)),
             BuiltinFunction("Print", BuiltinFunctionPointer(nullptr, &Print)),
         });
-        Node* optimizedRoot = Optimize(root, state);
+        Node* optimizedRoot = optimizer.Optimize(root);
         delete root;
-        state.Destroy();
+        optimizer.Destroy();
         #ifdef Debug
         std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
         #endif

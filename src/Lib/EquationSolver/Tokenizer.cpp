@@ -56,13 +56,13 @@ Node* TokenizeData(const String& str, size_t& i) {
     }
     else if (IsAlpha(str[i])) {
         String name = "";
-        while (IsAlphaDigit(str[i])) name += str[i++];
+        while (i < str.GetSize() && IsAlphaDigit(str[i])) name += str[i++];
         SkipWhiteSpace(str, i);
-        if (str[i] == ':') {
+        if (i < str.GetSize() && str[i] == ':') {
             i++;
             return new Node(Node::Type::Variable, name, TokenizeData(str, i));
         }
-        if (str[i] == '(') {
+        else if (i < str.GetSize() && str[i] == '(') {
             i++;
             Node* ret = TokenizeComma(str, i);
             if (ret == nullptr) return nullptr;

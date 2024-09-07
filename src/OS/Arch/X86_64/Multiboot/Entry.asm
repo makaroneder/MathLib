@@ -8,6 +8,7 @@ Multiboot1Magic equ 0x1badb002
 Multiboot1AlignModules equ 0
 Multiboot1MemoryInfo equ 1
 Multiboot1VideoInfo equ 2
+Multiboot1AoutKludge equ 16
 Multiboot1Flags equ 1 << Multiboot1VideoInfo | 1 << Multiboot1MemoryInfo | 1 << Multiboot1AlignModules
 Multiboot2Magic equ 0xe85250d6
 Multiboot2Length equ Multiboot2Header.end - Multiboot2Header
@@ -36,16 +37,21 @@ Multiboot2Header:
     .checksum: dd -(Multiboot2Magic + Multiboot2Length)
     align 8
         .entryTagType: dw 3
-        .entryTagFlags: dw 3
+        .entryTagFlags: dw 0
         .entryTagSize: dd 12
-        .entryAddr: dd Entry
+        .entryTagAddress: dd Entry
+    align 8
+        .flagsTagType: dw 4
+        .flagsTagFlags: dw 0
+        .flagsTagSize: dd 12
+        .flagsTagConsoleFlags: dd 1 << 1
     align 8
         .framebufferTagType: dw 5
         .framebufferTagFlags: dw 0
         .framebufferTagSize: dd 20
-        .framebufferWidth: dd 0
-        .framebufferHeight: dd 0
-        .framebufferDepth: dd 32
+        .framebufferTagWidth: dd 0
+        .framebufferTagHeight: dd 0
+        .framebufferTagDepth: dd 32
     align 8
         .moduleAlignmentTagType: dw 6
         .moduleAlignmentTagFlags: dw 0
@@ -55,7 +61,6 @@ Multiboot2Header:
         .lastTagFlags: dw 0
         .lastTagSize: dd 8
     .end:
-; TODO: Add multiboot1 header
 
 section .bss
 PreserveBSSStart:
@@ -65,7 +70,7 @@ P3Table: resb 4096
 P2Tables: resb 4096 * P2TableCount
 align 16
 Stack:
-    .bottom: resb 4096
+    .bottom: resb 2 * 4096
     .top:
 PreserveBSSEnd:
 
@@ -95,8 +100,8 @@ GDT:
 
 section .text
 
-; eax = 0x2badb002 | eax = 0x36d76289
-; ebx -> MB1Info | ebx -> MB2Info
+; eax = 0x2badb002 | 0x36d76289
+; ebx -> MB1Info | MB2Info
 global Entry
 Entry:
     cli

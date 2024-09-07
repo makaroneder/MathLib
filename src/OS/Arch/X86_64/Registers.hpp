@@ -1,8 +1,13 @@
 #ifndef Registers_H
 #define Registers_H
-#include <Emulator/X86.hpp>
+#include <Emulator/X86/X86State.hpp>
 
 struct Registers {
+    uintptr_t ds;
+    uintptr_t es;
+    uintptr_t fs;
+    uintptr_t gs;
+    uintptr_t ss;
     uintptr_t a;
     uintptr_t b;
     uintptr_t c;

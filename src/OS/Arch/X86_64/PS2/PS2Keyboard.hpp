@@ -9,8 +9,16 @@ struct PS2Keyboard : PS2Device, InterruptDevice {
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;
 
     private:
-    char ToKey(const uint8_t& code);
+    bool leftShift;
+    bool rightShift;
+    bool capslock;
 
+    enum class SpecialCodes : uint8_t {
+        Enter = 0x1c,
+        LeftShift = 0x2a,
+        RightShift = 0x36,
+        Capslock = 0x3a,
+    };
     static constexpr const char scanCodeSet1[] = {
         '\0', '\0', '1', '2',
         '3', '4', '5', '6',

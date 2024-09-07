@@ -1,11 +1,39 @@
 #ifndef Optimizer_H
 #define Optimizer_H
-#include "State.hpp"
+#include "BuiltinFunction.hpp"
+#include "FunctionNode.hpp"
 
-/// @brief Optimizes given node based on the given variables and creates new variables
-/// @param node Node to optimize
-/// @param state Current state
-/// @return Optimized node and new variables
-Node* Optimize(const Node* node, EquationSolverState& state);
+struct Optimizer : Allocatable {
+    Array<BuiltinFunction> builtinFunctions;
+    Array<FunctionNode> functions;
+    Array<Variable> variables;
+    bool runtime;
+
+    Optimizer(const Array<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Array<Variable>& vars = Array<Variable>());
+    void Destroy(void);
+    FunctionNode GetFunction(const String& name) const;
+    /// @brief Optimizes given node based on the given variables and creates new variables
+    /// @param node Node to optimize
+    /// @return Optimized node
+    Node* Optimize(const Node* node);
+
+    private:
+    /// @brief Optimizes given node based on the given variables and creates new variables
+    /// @param node Node to optimize
+    /// @return Optimized node
+    Node* OptimizeComma(const Node* node);
+    /// @brief Optimizes given node based on the given variables and creates new variables
+    /// @param node Node to optimize
+    /// @return Optimized node
+    Node* OptimizeVariable(const Node* node);
+    /// @brief Optimizes given node based on the given variables and creates new variables
+    /// @param node Node to optimize
+    /// @return Optimized node
+    Node* OptimizeFunction(const Node* node);
+    /// @brief Optimizes given node based on the given variables and creates new variables
+    /// @param node Node to optimize
+    /// @return Optimized node
+    Node* OptimizeInternal(const Node* node);
+};
 
 #endif

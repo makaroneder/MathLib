@@ -6,12 +6,12 @@
 template <typename T>
 struct Buffer : Collection<T> {
     Buffer(void) : buffer(nullptr), size(0) {}
-    Buffer(const size_t& size_) : buffer(new T[size_]), size(size_) {}
+    Buffer(const size_t& size_) : buffer(size_ ? new T[size_] : nullptr), size(size_) {}
     Buffer(const T* arr, const size_t& size) : Buffer(size) {
         for (size_t i = 0; i < size; i++) At(i) = arr[i];
     }
-    Buffer(const Buffer<T>& other) : buffer(new T[other.size]), size(other.size) {
-        if (other.size != 0) {
+    Buffer(const Buffer<T>& other) : Buffer(other.size) {
+        if (size) {
             if (!buffer || !other.buffer) Panic("Buffer allocation failed");
             for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
         }
@@ -47,9 +47,12 @@ struct Buffer : Collection<T> {
     Buffer<T>& operator=(const Buffer<T>& other) {
         delete [] buffer;
         size = other.size;
-        buffer = new T[size];
-        if (!buffer || !other.buffer) Panic("Buffer allocation failed");
-        for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+        if (size) {
+            buffer = new T[size];
+            if (!buffer || !other.buffer) Panic("Buffer allocation failed");
+            for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+        }
+        else buffer = nullptr;
         return *this;
     }
 

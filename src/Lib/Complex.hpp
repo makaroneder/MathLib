@@ -5,6 +5,7 @@
 
 String ToString(num_t x);
 num_t Pow(num_t x, num_t y);
+num_t InversedTan2(num_t y, num_t x);
 template <typename T>
 struct Complex : Printable {
     CreateOperators(Complex<T>, T)

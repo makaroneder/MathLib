@@ -1,13 +1,14 @@
 #ifndef ISO9660_H
 #define ISO9660_H
 #include "ISO9660File.hpp"
-#include "PrimaryVolumeDescriptor.hpp"
 #include "../PhysicalFileSystem.hpp"
+#include "PrimaryVolumeDescriptor.hpp"
 
 // TODO: Add extensions like SUSP, Rock Ridge, El Torito, Joilet, Romeo, etc.
 struct ISO9660 : PhysicalFileSystem {
     ISO9660(ByteDevice& disk);
     bool IsValid(void) const;
+    virtual bool Create(void) override;
     /// @brief Opens file
     /// @param path Path to file
     /// @param mode Mode to open file in

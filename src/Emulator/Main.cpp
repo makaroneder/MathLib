@@ -2,8 +2,6 @@
 #include <MathLib.hpp>
 #include <iostream>
 
-// TODO: sbb imul idiv in out rep lgdt int
-
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
 /// @param argv Array of command line arguments

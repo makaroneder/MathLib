@@ -28,7 +28,7 @@
 #include "PIC8259.hpp"
 #include "Cascade.hpp"
 #include "../CPU.hpp"
-#include <Emulator/Flags.hpp>
+#include <Host.hpp>
 
 bool initialized = false;
 size_t interruptDisabledCount = 1;
@@ -93,8 +93,7 @@ bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment) {
     for (uintptr_t i = 0; i < 256; i++)
         idt.descriptors[i] = InterruptDescriptor(isrFunctionTable[i], codeSegment, 1 << 7 | (uint8_t)InterruptDescriptor::GateType::Interrupt);
     asm volatile("lidt %0" : : "m"(idtr));
-    AlignmentCheck::Enable();
-    MachineCheck::Enable();
+    if (!AlignmentCheck::Enable() || !MachineCheck::Enable()) return false;
     SetInterrupts(true);
     initialized = true;
     return true;

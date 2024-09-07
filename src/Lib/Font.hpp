@@ -18,25 +18,17 @@ struct PSF1 {
 
     /// @brief Checks whether the font is valid
     /// @return Validation status
-    bool IsValid(void) const {
-        return signature == expectedSignature;
-    }
+    bool IsValid(void) const;
     /// @brief Returns width of each glyph in the font
     /// @return Width of each glyph in the font
-    size_t GetWidth(void) const {
-        return 8;
-    }
+    size_t GetWidth(void) const;
     /// @brief Returns height of each glyph in the font
     /// @return Height of each glyph in the font
-    size_t GetHeight(void) const {
-        return charSize;
-    }
+    size_t GetHeight(void) const;
     /// @brief Returns glyph
     /// @param chr Character to return glyph of
     /// @return Glyph
-    const uint8_t* GetGlyph(const char& chr) const {
-        return &buffer[chr * charSize];
-    }
+    const uint8_t* GetGlyph(const char& chr) const;
 } __attribute__((packed));
 
 /// @brief src/Lib/zap-light16.psf

@@ -1,7 +1,10 @@
 #include "X86.hpp"
 #include "ModRM.hpp"
 
-#define MathOperation(op, operation, cf, of)                                        \
+// TODO: xlatb daa das cmps scas test xchg div idiv imul lds lea les loop loope loopne loopnz
+// TODO: loopz mul neg not rcl rcr rol ror sal sar rep repe repne repnz repz in out int into
+
+#define MathOperation(op, operation, cf, of, arg)                                   \
 case op: {                                                                          \
     const Expected<uint8_t> tmp = Fetch<uint8_t>();                                 \
     if (!tmp.HasValue()) return false;                                              \
@@ -16,8 +19,8 @@ case op: {                                                                      
             Register* dst = GetRegister(modrm.dst);                                 \
             if (!dst) return false;                                                 \
             a = dst->value;                                                         \
-            b = src->value;                                                         \
-            dst->value operation##= src->value;                                     \
+            b = src->value + arg;                                                   \
+            dst->value operation##= b;                                              \
             result = dst->value;                                                    \
             break;                                                                  \
         }                                                                           \
@@ -35,53 +38,16 @@ case op: {                                                                      
     if (req) state.ip.Set##size(state.ip.Get##size(false) + value.Get(), false);    \
     return true;                                                                    \
 }
-X86State::X86State(Flags flags, Register ip) : flags(flags), ip(ip), a(0), b(0), c(0), d(0), si(0), di(0), sp(0), bp(0), r8(0), r9(0), r10(0), r11(0), r12(0), r13(0), r14(0), r15(0) {}
-String X86State::ToString(const String& padding) const {
-    String ret = flags.carry ? "CF" : "";
-    ret += flags.parity ? (String(ret.IsEmpty() ? "" : ", ") + "PF") : "";
-    ret += flags.auxiliaryCarry ? (String(ret.IsEmpty() ? "" : ", ") + "AF") : "";
-    ret += flags.zero ? (String(ret.IsEmpty() ? "" : ", ") + "ZF") : "";
-    ret += flags.sign ? (String(ret.IsEmpty() ? "" : ", ") + "SF") : "";
-    ret += flags.trap ? (String(ret.IsEmpty() ? "" : ", ") + "TF") : "";
-    ret += flags.interruptEnable ? (String(ret.IsEmpty() ? "" : ", ") + "IF") : "";
-    ret += flags.direction ? (String(ret.IsEmpty() ? "" : ", ") + "DF") : "";
-    ret += flags.overflow ? (String(ret.IsEmpty() ? "" : ", ") + "OF") : "";
-    ret += flags.resume ? (String(ret.IsEmpty() ? "" : ", ") + "RF") : "";
-    ret += flags.virtual8086 ? (String(ret.IsEmpty() ? "" : ", ") + "VM") : "";
-    ret += flags.alignmentCheck ? (String(ret.IsEmpty() ? "" : ", ") + "AC") : "";
-    ret += flags.virtualInterrupt ? (String(ret.IsEmpty() ? "" : ", ") + "VIF") : "";
-    ret += flags.virtualInterruptPending ? (String(ret.IsEmpty() ? "" : ", ") + "VIP") : "";
-    ret += flags.id ? (String(ret.IsEmpty() ? "" : ", ") + "ID") : "";
-    ret = padding + "{\n" + padding + "\tFlags: " + (ret.IsEmpty() ? "none" : ret) + '\n';
-    ret += padding + "\tIP = " + ip.ToString() + '\n';
-    ret += padding + "\tSP = " + sp.ToString() + '\n';
-    ret += padding + "\tBP = " + bp.ToString() + '\n';
-    ret += padding + "\tA = " + a.ToString() + '\n';
-    ret += padding + "\tB = " + b.ToString() + '\n';
-    ret += padding + "\tC = " + c.ToString() + '\n';
-    ret += padding + "\tD = " + d.ToString() + '\n';
-    ret += padding + "\tSI = " + si.ToString() + '\n';
-    ret += padding + "\tDI = " + di.ToString() + '\n';
-    ret += padding + "\tR8 = " + r8.ToString() + '\n';
-    ret += padding + "\tR9 = " + r9.ToString() + '\n';
-    ret += padding + "\tR10 = " + r10.ToString() + '\n';
-    ret += padding + "\tR11 = " + r11.ToString() + '\n';
-    ret += padding + "\tR12 = " + r12.ToString() + '\n';
-    ret += padding + "\tR13 = " + r13.ToString() + '\n';
-    ret += padding + "\tR14 = " + r14.ToString() + '\n';
-    ret += padding + "\tR15 = " + r15.ToString() + '\n';
-    return ret + padding + '}';
-}
 X86::X86(const Array<uint8_t>& mem, const X86State& state) : Emulator(mem), state(state) {}
 void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
     state.flags.zero = !val;
-    state.flags.sign = val & 0x8000;
+    state.flags.sign = val & 1 << 15;
     uint8_t parity = val & UINT8_MAX;
     parity ^= parity >> 4;
     parity ^= parity >> 2;
     parity ^= parity >> 1;
     state.flags.parity = !(parity & 1);
-    state.flags.auxiliaryCarry = (a ^ b ^ val) & 0x10;
+    state.flags.auxiliaryCarry = (a ^ b ^ val) & 1 << 4;
 }
 Register* X86::GetRegister(const uint8_t& code) {
     switch (code) {
@@ -104,12 +70,42 @@ bool X86::Run(void) {
         if (!Step()) return false;
     return true;
 }
+uint64_t X86::ToLinear(uint64_t segment, uint64_t offset) {
+    return segment * 16 + offset;
+}
 bool X86::Step(void) {
     const Expected<uint8_t> opcode = Fetch<uint8_t>();
     if (!opcode.HasValue()) return false;
     switch (opcode.Get()) {
         // nop
         case 0x90: return true;
+        // hlt
+        case 0xf4: {
+            state.ip.value--;
+            return true;
+        }
+        // sahf
+        case 0x9e: {
+            Register tmp = state.flags.value;
+            tmp.Set8(state.a.Get8(true), false);
+            state.flags.value = tmp.value;
+            return true;
+        }
+        // lahf
+        case 0x9f: {
+            state.a.Set8(state.flags.value, true);
+            return true;
+        }
+        // cbw
+        case 0x98: {
+            state.a.Set8(state.a.Get8(false) & 1 << 7 ? UINT8_MAX : 0, true);
+            return true;
+        }
+        // cwd
+        case 0x99: {
+            state.d.Set16(state.a.Get16(false) & 1 << 15 ? UINT16_MAX : 0, true);
+            return true;
+        }
         // mov8
         case 0xb0 ... 0xb7: {
             uint8_t tmp = opcode.Get() - 0xb0;
@@ -139,6 +135,7 @@ bool X86::Step(void) {
             if (!reg) return false;
             reg->value++;
             UpdateFlags(reg->value, reg->value - 1, 1);
+            if (!reg->value) state.flags.overflow = true;
             return true;
         }
         // dec
@@ -147,6 +144,7 @@ bool X86::Step(void) {
             if (!reg) return false;
             reg->value--;
             UpdateFlags(reg->value, reg->value + 1, 1);
+            if (reg->value == UINT64_MAX) state.flags.overflow = true;
             return true;
         }
         // push16
@@ -158,18 +156,70 @@ bool X86::Step(void) {
         case 0x58 ... 0x5f: {
             Register* reg = GetRegister(opcode.Get() - 0x58);
             if (!reg) return false;
-            Expected<uint16_t> tmp = Pop<uint16_t>();
+            const Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             reg->Set16(tmp.Get(), false);
+            return true;
+        }
+        // pusha16
+        case 0x60: {
+            const Register tmp = state.sp;
+            return (
+                Push<uint16_t>(state.a.Get16(false)) &&
+                Push<uint16_t>(state.c.Get16(false)) &&
+                Push<uint16_t>(state.d.Get16(false)) &&
+                Push<uint16_t>(state.b.Get16(false)) &&
+                Push<uint16_t>(tmp.Get16(false)) &&
+                Push<uint16_t>(state.bp.Get16(false)) &&
+                Push<uint16_t>(state.si.Get16(false)) &&
+                Push<uint16_t>(state.di.Get16(false))
+            );
+        }
+        // popa16
+        case 0x61: {
+            Expected<uint16_t> tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.di.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.si.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.bp.Set16(tmp.Get(), false);
+            if (!Pop<uint16_t>().HasValue()) return false;
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.b.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.d.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.c.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.a.Set16(tmp.Get(), false);
+            return true;
+        }
+        // pushf16
+        case 0x9c: return Push<uint16_t>(Register(state.flags.value).Get16(false));
+        // popf16
+        case 0x9d: {
+            const Expected<uint16_t> tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            Register reg = state.flags.value;
+            reg.Set16(tmp.Get(), false);
+            state.flags.value = reg.value;
             return true;
         }
         // call16
         case 0xe8: {
             const Expected<uint16_t> val = Fetch<uint16_t>();
             if (!val.HasValue() || !Push<uint16_t>(state.ip.Get16(false))) return false;
-            state.ip.value += val.Get();
+            state.ip.Set16(state.ip.Get16(false) + val.Get(), false);
             return true;
         }
+        // TODO: Immediate ret16, iret16
         // ret16
         case 0xc3: {
             Expected<uint16_t> tmp = Pop<uint16_t>();
@@ -177,29 +227,93 @@ bool X86::Step(void) {
             state.ip.Set16(tmp.Get(), false);
             return true;
         }
-        // TODO: More jmp based instructions
-        // jmp8
-        JumpIf(0xeb, true, 8)
-        // jmp16
-        JumpIf(0xe9, true, 16)
-        // jc8
+        // immediate retf16
+        case 0xca: {
+            Expected<uint16_t> tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.ip.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.cs.Set16(tmp.Get(), false);
+            tmp = Fetch<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.sp.Set16(state.sp.Get16(false) + tmp.Get(), false);
+            return true;
+        }
+        // retf16
+        case 0xcb: {
+            Expected<uint16_t> tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.ip.Set16(tmp.Get(), false);
+            tmp = Pop<uint16_t>();
+            if (!tmp.HasValue()) return false;
+            state.cs.Set16(tmp.Get(), false);
+            return true;
+        }
+        // iret16
+        case 0xcf: {
+            uint16_t tmp[3];
+            for (uint8_t i = 0; i < SizeOfArray(tmp); i++) {
+                const Expected<uint16_t> t = Pop<uint16_t>();
+                if (!t.HasValue()) return false;
+                tmp[i] = t.Get();
+            }
+            state.ip.Set16(tmp[0], false);
+            state.cs.Set16(tmp[1], false);
+            Register reg = state.flags.value;
+            reg.Set16(tmp[2], false);
+            state.flags.value = reg.value;
+            return true;
+        }
+        // jo8
+        JumpIf(0x70, state.flags.overflow, 8)
+        // jno8
+        JumpIf(0x71, !state.flags.overflow, 8)
+        // jc8 / jb8 / jnae8
         JumpIf(0x72, state.flags.carry, 8)
-        // jnc8
+        // jnc8 / jnb8 / jae8
         JumpIf(0x73, !state.flags.carry, 8)
         // jz8 / je8
         JumpIf(0x74, state.flags.zero, 8)
         // jnz8 / jne8
         JumpIf(0x75, !state.flags.zero, 8)
+        // jbe8 / jna8
+        JumpIf(0x76, state.flags.carry || state.flags.zero, 8)
+        // ja8 / jnbe8
+        JumpIf(0x77, state.flags.carry && state.flags.zero, 8)
+        // js8
+        JumpIf(0x78, state.flags.sign, 8)
+        // jns8
+        JumpIf(0x79, !state.flags.sign, 8)
+        // jp8 / jpe8
+        JumpIf(0x7a, state.flags.parity, 8)
+        // jnp8 / jpo8
+        JumpIf(0x7b, !state.flags.parity, 8)
+        // jl8 / jnge8
+        JumpIf(0x7c, state.flags.sign != state.flags.overflow, 8)
+        // jge8 / jnl8
+        JumpIf(0x7d, state.flags.sign == state.flags.overflow, 8)
+        // jle8 / jng8
+        JumpIf(0x7e, state.flags.sign != state.flags.overflow || state.flags.zero, 8)
+        // jg8 / jnle8
+        JumpIf(0x7f, !state.flags.zero && state.flags.sign == state.flags.overflow, 8)
+        // jcxz8
+        JumpIf(0xe3, !state.c.Get16(false), 8)
+        // jmp16
+        JumpIf(0xe9, true, 16)
+        // jmp8
+        JumpIf(0xeb, true, 8)
+
         // stos8
         case 0xaa: {
-            if (!WritePositioned<uint8_t>(state.a.Get8(false), state.di.value)) return false;
+            if (!WritePositioned<uint8_t>(state.a.Get8(false), ToLinear(state.es.value, state.di.value))) return false;
             if (state.flags.direction) state.di.value--;
             else state.di.value++;
             return true;
         }
         // lods8
         case 0xac: {
-            const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(state.si.value);
+            const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(ToLinear(state.ds.value, state.si.value));
             if (!tmp.HasValue()) return false;
             state.a.Set8(tmp.Get(), false);
             if (state.flags.direction) state.si.value--;
@@ -208,8 +322,8 @@ bool X86::Step(void) {
         }
         // movs8
         case 0xa4: {
-            const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(state.si.value);
-            if (!tmp.HasValue() || !WritePositioned<uint8_t>(tmp.Get(), state.di.value)) return false;
+            const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(ToLinear(state.ds.value, state.si.value));
+            if (!tmp.HasValue() || !WritePositioned<uint8_t>(tmp.Get(), ToLinear(state.es.value, state.di.value))) return false;
             if (state.flags.direction) {
                 state.si.value--;
                 state.di.value--;
@@ -244,6 +358,11 @@ bool X86::Step(void) {
             state.flags.overflow = (a ^ b) & (a ^ (a - b)) & 0x8000;
             return true;
         }
+        // cmc
+        case 0xf5: {
+            state.flags.carry = !state.flags.carry;
+            return true;
+        }
         // clc
         case 0xf8: {
             state.flags.carry = false;
@@ -251,7 +370,7 @@ bool X86::Step(void) {
         }
         // stc
         case 0xf9: {
-            state.flags.carry = false;
+            state.flags.carry = true;
             return true;
         }
         // cli
@@ -304,15 +423,59 @@ bool X86::Step(void) {
             return true;
         }
         // or16
-        MathOperation(0x09, |, false, false)
+        MathOperation(0x09, |, false, false, 0)
         // and16
-        MathOperation(0x21, &, false, false)
+        MathOperation(0x21, &, false, false, 0)
         // xor16
-        MathOperation(0x31, ^, false, false)
+        MathOperation(0x31, ^, false, false, 0)
         // add16
-        MathOperation(0x01, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000)
+        MathOperation(0x01, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, 0)
+        // adc16
+        MathOperation(0x11, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, state.flags.carry)
         // sub16
-        MathOperation(0x29, -, a < b, (a ^ b) & (a ^ result) & 0x8000)
+        MathOperation(0x29, -, a < b, (a ^ b) & (a ^ result) & 0x8000, 0)
+        // sbb16
+        MathOperation(0x19, -, a < b, (a ^ b) & (a ^ result) & 0x8000, state.flags.carry)
+        // aaa
+        case 0x37: {
+            if ((state.a.Get8(false) & 0b1111) > 9 || state.flags.auxiliaryCarry) {
+                state.a.Set8(state.a.Get8(false) + 6, false);
+                state.a.Set8(state.a.Get8(true) + 1, true);
+                state.flags.auxiliaryCarry = state.flags.carry = true;
+            }
+            else state.flags.auxiliaryCarry = state.flags.carry = false;
+            state.a.Set8(state.a.Get8(false) & ~0b11110000, false);
+            return true;
+        }
+        // aas
+        case 0x3f: {
+            if ((state.a.Get8(false) & 0b1111) > 9 || state.flags.auxiliaryCarry) {
+                state.a.Set8(state.a.Get8(false) - 6, false);
+                state.a.Set8(state.a.Get8(true) - 1, true);
+                state.flags.auxiliaryCarry = state.flags.carry = true;
+            }
+            else state.flags.auxiliaryCarry = state.flags.carry = false;
+            state.a.Set8(state.a.Get8(false) & ~0b11110000, false);
+            return true;
+        }
+        // aam
+        case 0xd4: {
+            const Expected<uint8_t> tmp = Fetch<uint8_t>();
+            if (!tmp.HasValue()) return false;
+            // TODO: Set Z, S and P
+            state.a.Set8(state.a.Get8(false) / tmp.Get(), true);
+            state.a.Set8(state.a.Get8(false) % tmp.Get(), false);
+            return true;
+        }
+        // aad
+        case 0xd5: {
+            const Expected<uint8_t> tmp = Fetch<uint8_t>();
+            if (!tmp.HasValue()) return false;
+            // TODO: Set Z, S and P
+            state.a.Set8(state.a.Get8(true) * tmp.Get() + state.a.Get8(false), false);
+            state.a.Set8(0, true);
+            return true;
+        }
         // extended
         case 0x0f: {
             // jc16

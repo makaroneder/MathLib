@@ -11,15 +11,9 @@
 #include <stddef.h>
 
 SCI sci;
-bool InitRTC(bool nmi) {
-    RTC* rtc = new RTC(nmi);
-    if (!rtc) return false;
-    cmos = rtc;
-    if (!mainTimer) mainTimer = rtc;
-    return true;
-}
 bool NoFADTInit(bool nmi) {
-    if (!InitRTC(nmi)) return false;
+    cmos = new RTC(nmi);
+    if (!cmos) return false;
     InitPS2();
     return true;
 }
@@ -94,7 +88,6 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
         else if (String(signature) == String(MADT::expectedSignature)) {
             madt = (const MADT*)table;
             LogString(String("\tLocal APIC address: 0x") + ToString(madt->localAPIC, 16) + '\n');
-            LogString(String("\tFlags: 0x") + ToString(madt->flags, 16) + '\n');
         }
         else if (String(signature) == String(MCFG::expectedSignature)) {
             mcfg = (const MCFG*)table;
@@ -175,14 +168,11 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
     }
     if (mcfg && !InitPCI(mcfg)) return false;
     if (fadt) {
-        if (madt && !(madt->flags & (1 << (uint8_t)MADT::Flags::Dual8259))) return false;
+        if (madt && !madt->dual8259) return false;
         sci = SCI(fadt);
         if (fadt->bootArchitectureFlags & (1 << 1) || !fadt->bootArchitectureFlags) InitPS2();
-        if (fadt->bootArchitectureFlags & (1 << 5)) {
-            cmos = new CMOS(nmi);
-            if (!cmos) return false;
-        }
-        else if (!InitRTC(nmi)) return false;
+        cmos = fadt->bootArchitectureFlags & (1 << 5) ? new CMOS(nmi) : new RTC(nmi);
+        if (!cmos) return false;
     }
     else if (!NoFADTInit(nmi)) return false;
     // TODO: Parse AML

@@ -52,7 +52,7 @@ bool HBAPort::AccessPort(size_t sector, uint32_t count, void* buff, bool write) 
         fis->countHigh = count >> 8;
     }
     else if (type == Type::ATAPI) {
-        fis->featureLow = 1 << 0 | 1 << 2;
+        fis->featureLow = 1 << 2 | 1 << 0;
         fis->command = (uint8_t)Command::ATAPIPacket;
         cmdHeader->atapi = true;
         commandTable->atapiCommand[0] = (uint8_t)(write ? ATAPICommand::Write12 : ATAPICommand::Read12);

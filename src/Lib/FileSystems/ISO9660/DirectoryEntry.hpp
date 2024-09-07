@@ -23,6 +23,7 @@ struct DirectoryEntry {
     uint8_t nameLength;
     char name[1];
 
+    bool IsValid(void) const;
     String GetName(void) const;
 } __attribute__((packed));
 

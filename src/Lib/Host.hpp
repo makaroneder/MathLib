@@ -27,6 +27,7 @@ Thread* AllocThread(void);
 void DeallocThread(Thread* thread);
 num_t MakeNaN(void);
 num_t MakeInf(void);
+char ToUpper(char chr);
 bool IsUpper(char chr);
 bool IsLower(char chr);
 bool IsAlpha(char chr);

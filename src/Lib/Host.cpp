@@ -8,6 +8,10 @@
 [[noreturn]] void Panic(String str) {
     Panic(str.GetValue());
 }
+char ToUpper(char chr) {
+    if (IsLower(chr)) return chr + 'A' - 'a';
+    else return chr;
+}
 bool IsUpper(char chr) {
     return chr >= 'A' && chr <= 'Z';
 }

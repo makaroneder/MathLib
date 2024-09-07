@@ -1,6 +1,6 @@
 #ifndef ControlRegisters_H
 #define ControlRegisters_H
-#include <stdint.h>
+#include <Expected.hpp>
 
 enum class ControlRegister0 : uint8_t {
     ProtectedModeEnable = 0,
@@ -39,7 +39,7 @@ enum class ControlRegister4 : uint8_t {
     EnableControlFlowEnforcementTechnology,
     EnableSupervisorModePagesProtectionKeys,
 };
-uintptr_t GetControlRegister(uint8_t num);
+Expected<uintptr_t> GetControlRegister(uint8_t num);
 bool SetControlRegister(uint8_t num, uintptr_t value);
 
 #endif

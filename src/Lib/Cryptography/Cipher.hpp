@@ -3,13 +3,20 @@
 #include "../Interval.hpp"
 
 struct Cipher : Allocatable {
-    virtual char EncryptChar(const char& chr, const String& key) const = 0;
-    virtual char DecryptChar(const char& chr, const String& key) const = 0;
-    String Encrypt(const String& str, const String& key) const;
-    String Decrypt(const String& str, const String& key) const;
+    Cipher(void);
+    Cipher(const String& letters, const String& upperLetters, const String& digits);
+    virtual Array<uint8_t> Encrypt(const Array<uint8_t>& data, const String& key) const = 0;
+    virtual Array<uint8_t> Decrypt(const Array<uint8_t>& data, const String& key) const = 0;
+    String EncryptString(const String& str, const String& key) const;
+    String DecryptString(const String& str, const String& key) const;
 
-    protected:
-    Interval<char> GetBounds(const char& chr) const;
+    private:
+    String GetString(const String& str, const String& key, const bool& encrypt) const;
+    uint8_t GetIndex(const char& chr) const;
+
+    String letters;
+    String upperLetters;
+    String digits;
 };
 
 #endif

@@ -4,7 +4,7 @@
 
 struct MachineCheck : Exception {
     MachineCheck(void);
-    static void Enable(void);
+    static bool Enable(void);
     virtual String GetPanicMessage(uintptr_t error) const override;
 };
 

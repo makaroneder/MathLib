@@ -1,7 +1,7 @@
 #include "../../../KernelRenderer.hpp"
 #include "PS2Keyboard.hpp"
 
-PS2Keyboard::PS2Keyboard(bool second) : PS2Device(second) {
+PS2Keyboard::PS2Keyboard(bool second) : PS2Device(second), leftShift(false), rightShift(false), capslock(false) {
     Expected<uint8_t> tmp = SendCommand(0xf0);
     if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) Panic("Failed to set scan code set");
     tmp = SendCommand(0b01);
@@ -11,18 +11,21 @@ PS2Keyboard::PS2Keyboard(bool second) : PS2Device(second) {
 PS2Keyboard::~PS2Keyboard(void) {
     RegisterInterruptDevice(GetIRQBase() + 1, nullptr);
 }
-char PS2Keyboard::ToKey(const uint8_t& code) {
-    // TODO: Handle upper case letters
-    if (code < SizeOfArray(scanCodeSet1)) return scanCodeSet1[code];
-    return '\0';
-}
 void PS2Keyboard::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
+    // TODO: Register backspace
+    // TODO: Correctly convert keys with capslock
     uint8_t code = Read().Get("Failed to read keyboard scancode");
     bool pressed = true;
     if (code > 0x80) {
         pressed = false;
         code -= 0x80;
     }
-    const char key = ToKey(code);
+    char key = '\0';
+    if (code == (uint8_t)SpecialCodes::Enter) key = '\n';
+    else if (code == (uint8_t)SpecialCodes::LeftShift) leftShift = pressed;
+    else if (code == (uint8_t)SpecialCodes::RightShift) rightShift = pressed;
+    else if (code == (uint8_t)SpecialCodes::Capslock && pressed) capslock = !capslock;
+    else if (code < SizeOfArray(scanCodeSet1)) key = scanCodeSet1[code];
+    if (key && (leftShift || rightShift || capslock)) key = ToUpper(key);
     if (key && renderer && !renderer->AddEvent(Event(key, pressed))) Panic("Failed to add keyboard event");
 }

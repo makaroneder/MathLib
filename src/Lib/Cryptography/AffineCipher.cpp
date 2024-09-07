@@ -12,23 +12,19 @@ bool AffineCipher::DecodeKey(const String& key, ssize_t& a, ssize_t& b) const {
     b = StringToNumber(str);
     return true;
 }
-char AffineCipher::EncryptChar(const char& chr, const String& key) const {
-    Interval<char> interval = GetBounds(chr);
-    const char size = interval.GetSize() + 1;
+Array<uint8_t> AffineCipher::Encrypt(const Array<uint8_t>& data, const String& key) const {
     ssize_t a;
     ssize_t b;
-    if (!DecodeKey(key, a, b)) return INT8_MAX;
-    char ret = (chr - interval.GetMin()) * a + b;
-    if (ret < 0) ret += size;
-    return ret % size + interval.GetMin();
+    if (!DecodeKey(key, a, b)) return Array<uint8_t>();
+    Array<uint8_t> ret = data;
+    for (uint8_t& chr : ret) chr = chr * a + b;
+    return ret;
 }
-char AffineCipher::DecryptChar(const char& chr, const String& key) const {
-    Interval<char> interval = GetBounds(chr);
-    const char size = interval.GetSize() + 1;
+Array<uint8_t> AffineCipher::Decrypt(const Array<uint8_t>& data, const String& key) const {
     ssize_t a;
     ssize_t b;
-    if (!DecodeKey(key, a, b)) return INT8_MAX;
-    char ret = (chr - interval.GetMin() - b) / a;
-    if (ret < 0) ret += size;
-    return ret % size + interval.GetMin();
+    if (!DecodeKey(key, a, b)) return Array<uint8_t>();
+    Array<uint8_t> ret = data;
+    for (uint8_t& chr : ret) chr = (chr - b) / a;
+    return ret;
 }

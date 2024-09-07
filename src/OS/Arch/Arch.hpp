@@ -4,5 +4,6 @@
 
 bool InitArch(uintptr_t signature, void* info);
 [[noreturn]] void ArchPanic(void);
+[[noreturn]] void ShutdownArch(void);
 
 #endif

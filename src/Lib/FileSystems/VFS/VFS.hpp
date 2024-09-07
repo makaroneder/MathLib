@@ -5,7 +5,9 @@
 
 struct VFS : FileSystem {
     VFS(void);
-    size_t GetFileSystems(void) const;
+    /// @brief Adds file system to VFS
+    /// @param entry File system and it's name
+    /// @return Status
     bool AddFileSystem(const VFSEntry& entry);
     /// @brief Opens file
     /// @param path Path to file

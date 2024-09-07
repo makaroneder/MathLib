@@ -6,13 +6,16 @@
 #ifdef M_PIl
 static const num_t pi = M_PIl;
 static const num_t e = M_El;
+static const num_t ln2 = M_LN2l;
 #else
 #ifdef M_PI
 static const num_t pi = M_PI;
 static const num_t e = M_E;
+static const num_t ln2 = M_LN2;
 #else
-static const num_t pi = 3.14;
-static const num_t e = 2.71;
+static const num_t pi = 3.141592653589793;
+static const num_t e = 2.718281828459045;
+static const num_t ln2 = 0.693147180559945;
 #endif
 #endif
 
@@ -63,15 +66,15 @@ static const num_t fellerTornierConstant = 0.66131704946962233528;
 static const num_t base10ChampernowneConstant = 0.12345678910111213141;
 static const num_t salemConstant = 1.17628081825991750654;
 static const num_t khinchinConstant = 2.68545200106530644530;
-static const num_t levyConstant1 = Pow(pi, 2) / (12 * NaturalLog(2));
+static const num_t levyConstant1 = Pow(pi, 2) / (12 * ln2);
 static const num_t levyConstant2 = Exp(levyConstant1);
 static const num_t copelandErdosConstant = 0.23571113171923293137;
 static const num_t millConstant = 1.30637788386308069046;
 static const num_t gompertzConstant = 0.59634736232319407434;
-static const num_t vanDerPauwConstant = pi / NaturalLog(2);
+static const num_t vanDerPauwConstant = pi / ln2;
 static const num_t artinConstant = 0.37395581361920228805;
 static const num_t porterConstant = 1.46707807943397547289;
-static const num_t lochsConstant = (6 * NaturalLog(2) * NaturalLog(10)) / Pow(pi, 2);
+static const num_t lochsConstant = (6 * ln2 * NaturalLog(10)) / Pow(pi, 2);
 static const num_t deVicciTesseractConstant = 1.00743475688427937609;
 static const num_t liebSquareIceConstant = 8 / (3 * Sqrt(3));
 static const num_t nivenConstant = 1.70521114010536776428;

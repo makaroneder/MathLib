@@ -1,7 +1,7 @@
 #include "ISO9660.hpp"
 #include "../../String.hpp"
 
-ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), files(0) {
+ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), files(Array<ISO9660File>()) {
     if (!disk.Seek(16 * 2048, SeekMode::Set)) Panic("Failed to set disk position");
     uint8_t buff[2048];
     while (true) {
@@ -20,7 +20,13 @@ ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), files(0) {
 bool ISO9660::IsValid(void) const {
     return pvd.IsValid();
 }
+bool ISO9660::Create(void) {
+    // TODO: Create file system
+    return false;
+}
 size_t ISO9660::OpenInternal(const String& path, const OpenMode& mode) {
+    // TODO: Create file and overwrite its data
+    if (mode == OpenMode::Write) return SIZE_MAX;
     const Expected<DirectoryEntry> prev = GetDirectoryEntry(path);
     if (!prev.HasValue()) return SIZE_MAX;
     const ISO9660File ret = ISO9660File(prev.Get(), mode);
@@ -46,7 +52,7 @@ size_t ISO9660::Read(const size_t& file, void* buffer, const size_t& size, const
 size_t ISO9660::Write(const size_t& file, const void* buffer, const size_t& size, const size_t& position) {
     if (file >= files.GetSize()) return 0;
     const ISO9660File& raw = files.At(file);
-    if (raw.mode != OpenMode::Write) return 0;
+    if (raw.mode != OpenMode::Write || raw.mode != OpenMode::ReadWrite) return 0;
     // TODO: Resize file
     if (raw.entry.bytesPerExtent.little < size + position) return 0;
     if (!disk.Seek(raw.entry.extent.little * 2048 + position, SeekMode::Set)) return 0;
@@ -58,7 +64,7 @@ size_t ISO9660::GetSize(const size_t& file) {
 }
 Array<FileInfo> ISO9660::ReadDirectory(const String& path) {
     Expected<DirectoryEntry> entry = GetDirectoryEntry(path);
-    if (!entry.HasValue()) return Array<FileInfo>();
+    if (!entry.HasValue() || !entry.Get().directory) return Array<FileInfo>();
     Array<DirectoryEntry*> rawRet = ReadDirectoryEntry(entry.Get());
     Array<FileInfo> ret;
     for (DirectoryEntry*& tmp : rawRet) {
@@ -75,7 +81,7 @@ Array<DirectoryEntry*> ISO9660::ReadDirectoryEntry(const DirectoryEntry& parent)
     Array<DirectoryEntry*> ret;
     while (off != parent.bytesPerExtent.little) {
         DirectoryEntry* entry = (DirectoryEntry*)&buff[off];
-        if (!entry->length) break;
+        if (!entry->IsValid()) break;
         if (entry->nameLength && (IsAlphaDigit(entry->name[0]) || IsWhiteSpace(entry->name[0]) || entry->name[0] == '_')) {
             uint8_t* tmp = new uint8_t[entry->length];
             if (!tmp) {

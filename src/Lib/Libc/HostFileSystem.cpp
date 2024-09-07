@@ -1,9 +1,12 @@
 #ifndef Freestanding
 #include "HostFileSystem.hpp"
-#include <experimental/filesystem>
-#include <filesystem>
-
-namespace fs = std::filesystem;
+#if __cplusplus >= 201703
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#else
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#endif
 
 size_t HostFileSystem::OpenInternal(const String& path, const OpenMode& mode) {
     const char* modeStr = "";
@@ -14,6 +17,10 @@ size_t HostFileSystem::OpenInternal(const String& path, const OpenMode& mode) {
         }
         case OpenMode::Write: {
             modeStr = "wb";
+            break;
+        }
+        case OpenMode::ReadWrite: {
+            modeStr = "rb+";
             break;
         }
         default: return SIZE_MAX;
@@ -53,14 +60,15 @@ size_t HostFileSystem::GetSize(const size_t& file) {
     if (fseek(raw, pos, SEEK_SET)) return 0;
     return ret;
 }
-Array<FileInfo> HostFileSystem::ReadDirectory(const String& path) {
+Array<FileInfo> HostFileSystem::ReadDirectory(const String& path_) {
+    const String path = String(fs::current_path().c_str()) + '/' + path_;
     if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) return Array<FileInfo>();
     Array<FileInfo> ret;
-    for (const auto& entry : fs::directory_iterator(path.GetValue())) {
+    for (const fs::directory_entry& entry : fs::directory_iterator(path.GetValue())) {
         FileInfo::Type type = FileInfo::Type::Unknown;
         if (fs::is_directory(entry.status())) type = FileInfo::Type::Directory;
         else if (fs::is_regular_file(entry.status())) type = FileInfo::Type::File;
-        if (!ret.Add(FileInfo(type, entry.path().string()))) return Array<FileInfo>();
+        if (!ret.Add(FileInfo(type, entry.path().filename().string()))) return Array<FileInfo>();
     }
     return ret;
 }

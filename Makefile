@@ -53,7 +53,7 @@ CRYPTMSG ?= $(SRCDIR)/TestPrograms/Cryptography/CaesarCipher.txt
 MLITERS ?= 20000
 SERVERPORT ?= 8080
 INTERPRETERPROGRAM ?= $(SRCDIR)/TestPrograms/Interpreter/Main.txt
-DISKSIZE ?= 2K
+DISKSIZE ?= 4480
 DISKOUTPUT ?= $(BUILDDIR)/Disk.img
 DISKTYPE ?= MBR
 DISKARGS = -diskSize $(DISKSIZE) -diskType $(DISKTYPE) -output $(DISKOUTPUT)
@@ -64,12 +64,10 @@ OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 2048 -cdrom $(BUILDDIR)/OS.
 
 include $(BUILDDIR)/Targets.mk
 
-test: $(BUILDDIR)/Tests.out
-	@./$<
 clean:
 	@mkdir -p $(BUILDDIR)
 	@rm -rf $(BUILDDIR)/*
 	@touch $(SRCDIR)/Lib/MathLib.hpp
 	@rm $(SRCDIR)/Lib/MathLib.hpp
 	@echo "==> Deleted compiled files"
-.PHONY: test clean
+.PHONY: clean

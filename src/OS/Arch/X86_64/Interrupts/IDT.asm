@@ -27,8 +27,28 @@ extern InterruptHandler
     push rcx
     push rbx
     push rax
+    mov rax, ss
+    push rax
+    mov rax, gs
+    push rax
+    mov rax, fs
+    push rax
+    mov rax, es
+    push rax
+    mov rax, ds
+    push rax
 %endmacro
 %macro PopAll 0
+    pop rax
+    mov ss, rax
+    pop rax
+    mov gs, rax
+    pop rax
+    mov fs, rax
+    pop rax
+    mov es, rax
+    pop rax
+    mov ds, rax
     pop rax
     pop rbx
     pop rcx

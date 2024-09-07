@@ -22,7 +22,7 @@ void* Alloc(size_t size) {
     size_t pos = 0;
     const size_t memorySize = memoryManager->GetSize();
     while (pos < memorySize) {
-        AllocationHeader* header = (AllocationHeader*)memoryManager->At(pos);
+        AllocationHeader* header = (AllocationHeader*)memoryManager->At(pos, sizeof(AllocationHeader) + size);
         pos += sizeof(AllocationHeader);
         uint8_t* buff = (uint8_t*)((uintptr_t)header + sizeof(AllocationHeader));
         if (!header->IsValid()) {

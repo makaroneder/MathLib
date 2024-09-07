@@ -79,29 +79,29 @@ int main(int argc, char** argv) {
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input file>");
         HostFileSystem fs;
         SDL2Renderer renderer = SDL2Renderer("Math graph", 800, 800);
-        Array<EquationSolverState> states;
+        Array<Optimizer> states;
         for (int i = 1; i < argc; i++) {
             Node* root = Tokenize(Preproces(fs, argv[i]));
             #ifdef Debug
             std::cout << "Generated nodes:\n" << *root << std::endl;
             #endif
-            EquationSolverState state = EquationSolverState();
-            Node* optimizedRoot = Optimize(root, state);
+            Optimizer optimizer = Optimizer();
+            Node* optimizedRoot = optimizer.Optimize(root);
             delete root;
             #ifdef Debug
             std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
             #endif
             delete optimizedRoot;
-            state.runtime = true;
-            states.Add(state);
+            optimizer.runtime = true;
+            states.Add(optimizer);
         }
         size_t state = 0;
         const HostFunction<Array<num_t>, num_t> func = HostFunction<Array<num_t>, num_t>(nullptr, [&states, &state](const void*, num_t x) -> Array<num_t> {
             const FunctionNode funcNode = states.At(state).GetFunction("f");
-            EquationSolverState tmp = states.At(state);
+            Optimizer tmp = states.At(state);
             Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, ToString(x), true);
             tmp.variables.Add(var);
-            Node* n = Optimize(funcNode.body, tmp);
+            Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const Array<complex_t> complexRet = n->ToNumber();
             delete n;
@@ -111,10 +111,10 @@ int main(int argc, char** argv) {
         });
         const HostFunction<complex_t, complex_t> complexFunc = HostFunction<complex_t, complex_t>(nullptr, [&states, &state](const void*, complex_t z) -> complex_t {
             const FunctionNode funcNode = states.At(state).GetFunction("f");
-            EquationSolverState tmp = states.At(state);
+            Optimizer tmp = states.At(state);
             Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
             tmp.variables.Add(var);
-            Node* n = Optimize(funcNode.body, tmp);
+            Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const complex_t ret = n->ToNumber().At(0);
             delete n;
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
             else return false;
             return renderer.Update();
         }), state, states.GetSize())) Panic("Failed to render function");
-        for (EquationSolverState& state : states) state.Destroy();
+        for (Optimizer& optimizer : states) optimizer.Destroy();
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

@@ -4,11 +4,9 @@
 
 struct MADT : ACPITable {
     static constexpr const char* expectedSignature = "APIC";
-    enum class Flags : uint8_t {
-        Dual8259 = 0,
-    };
     uint32_t localAPIC;
-    uint32_t flags;
+    bool dual8259 : 1;
+    uint32_t reserved : 31;
 } __attribute__((packed));
 struct MADTEntry {
     enum class Type : uint8_t {

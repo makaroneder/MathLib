@@ -42,6 +42,7 @@ int main(int argc, char** argv) {
             if (!file.Write<MBRHeader>(mbr)) Panic("Failed to write MBR to the disk");
         }
         else if (diskType != "None") Panic("Invalid disk type provided");
+        // TODO: Create MathFS on disk
         for (size_t i = 0; i < diskSize; i++)
             if (!file.WriteBuffer(emptySector, sectorSize)) Panic("Failed to write data to the disk");
         return EXIT_SUCCESS;

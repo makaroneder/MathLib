@@ -55,7 +55,7 @@ int main(int, char**) {
                 Consumable tmp = consumables[i];
                 const num_t y = ((ssize_t)i - 1) * 1.3;
                 tmp.position = CreateVector<num_t>(-3, y, 0);
-                if (!renderer.Puts<num_t>(std::vector<String> { ToString(SizeOfArray(consumables) - i) + ")" }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(-3.5, y, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
+                if (!renderer.Puts<num_t>(ToString(SizeOfArray(consumables) - i) + ")", &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(-3.5, y, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
                 renderer.DrawShape<num_t>(tmp, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
             }
             if (!renderer.Puts<num_t>(std::vector<String> { String("Score: ") + ToString(score), String("Bet: ") + ToString(bet), }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, -0.6, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");

@@ -1,22 +1,7 @@
 #ifndef Multiboot1Info_H
 #define Multiboot1Info_H
-#include <stdint.h>
+#include "Multiboot.hpp"
 
-enum class Multiboot1InfoFlags : uint8_t {
-    MemoryInfo = 0,
-    BootDevice,
-    CommandLine,
-    Modules,
-    Aout,
-    ELF,
-    MemoryMap,
-    DriveInfo,
-    ConfigTable,
-    BootloaderName,
-    APM,
-    VBE,
-    Framebuffer,
-};
 struct Multiboot1AoutSymbolTable {
     uint32_t tabSize;
     uint32_t strSize;
@@ -24,18 +9,26 @@ struct Multiboot1AoutSymbolTable {
     uint32_t reserved;
 };
 struct Multiboot1ELFSectionHeaderTable {
-    uint32_t num;
+    uint32_t count;
     uint32_t size;
     uint32_t address;
-    uint32_t shndx;
+    uint32_t sectionIndex;
 };
 struct Multiboot1Info {
-    enum class FramebufferType : uint8_t {
-        Indexed = 0,
-        RGB,
-        EGA,
-    };
-    uint32_t flags;
+    bool hasMemoryInfo : 1;
+    bool hasBootDevice : 1;
+    bool hasCommandLine : 1;
+    bool hasModules : 1;
+    bool hasAoutInfo : 1;
+    bool hasELFInfo : 1;
+    bool hasMemoryMap : 1;
+    bool hasDriveInfo : 1;
+    bool hasConfigTable : 1;
+    bool hasBootloaderName : 1;
+    bool hasAPM : 1;
+    bool hasVBE : 1;
+    bool hasFramebuffer : 1;
+    uint32_t reserved : 19;
     uint32_t lowerMem;
     uint32_t upperMem;
     uint32_t bootDevice;
@@ -59,12 +52,7 @@ struct Multiboot1Info {
     uint16_t vbeInterfaceSegment;
     uint16_t vbeInterfaceOffset;
     uint16_t vbeInterfaceLength;
-    uint64_t framebufferAddress;
-    uint32_t framebufferPitch;
-    uint32_t framebufferWidth;
-    uint32_t framebufferHeight;
-    uint8_t framebufferBitsPerPixel;
-    FramebufferType framebufferType;
+    MultibootFramebuffer framebuffer;
     union {
         struct {
             uint32_t paletteAddress;
@@ -79,6 +67,18 @@ struct Multiboot1Info {
             uint8_t blueMaskSize;
         };
     };
+};
+struct Multiboot1MemoryMapEntry {
+    uint32_t size;
+    uint64_t address;
+    uint64_t length;
+    MultibootMemoryMapEntryType type;
+} __attribute__((packed));
+struct Multiboot1Module {
+    uint32_t start;
+    uint32_t end;
+    uint32_t path;
+    uint32_t reserved;
 };
 
 #endif

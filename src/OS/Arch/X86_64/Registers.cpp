@@ -3,6 +3,12 @@
 
 X86State Registers::ToX86State(void) const {
     X86State ret = X86State(flags, ip);
+    ret.cs = cs;
+    ret.ds = ds;
+    ret.es = es;
+    ret.fs = fs;
+    ret.gs = gs;
+    ret.ss = ss;
     ret.a = a;
     ret.b = b;
     ret.c = c;

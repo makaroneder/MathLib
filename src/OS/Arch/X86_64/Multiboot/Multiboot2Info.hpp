@@ -1,6 +1,7 @@
 #ifndef Multiboot2Info_H
 #define Multiboot2Info_H
-#include <stdint.h>
+#include "Multiboot.hpp"
+#include "../VBE.hpp"
 
 struct Multiboot2Color {
     uint8_t red;
@@ -8,16 +9,9 @@ struct Multiboot2Color {
     uint8_t blue;
 };
 struct Multiboot2MemoryMapEntry {
-    enum class Type : uint32_t {
-        Available = 1,
-        Reserved,
-        ACPIReclaimable,
-        NVS,
-        BadRAM,
-    };
     uint64_t address;
     uint64_t length;
-    Type type;
+    MultibootMemoryMapEntryType type;
     uint32_t reserved;
 };
 struct Multiboot2Tag {
@@ -100,71 +94,16 @@ struct Multiboot2TagMemoryMap : Multiboot2Tag {
     uint32_t entryVersion;
     Multiboot2MemoryMapEntry entries[0];  
 };
-struct Multiboot2VBEInfo {
-    char signature[4];
-    uint16_t version;
-    uint32_t oem;
-    uint32_t capabilities;
-    uint16_t videoModeOffset;
-    uint16_t videoModeSegment;
-    uint16_t memory;
-    uint32_t resv[123];
-} __attribute__((packed));
-struct Multiboot2VBEModeInfo {
-    uint16_t attributes;
-    uint8_t windowA;
-    uint8_t windowB;
-    uint16_t granularity;
-    uint16_t windowSize;
-    uint16_t segmentA;
-    uint16_t segmentB;
-    uint32_t windowFunction;
-    uint16_t pitch;
-    uint16_t width;
-    uint16_t height;
-    uint8_t wChr;
-    uint8_t yChr;
-    uint8_t planes;
-    uint8_t bitsPerPixel;
-    uint8_t banks;
-    uint8_t memoryModel;
-    uint8_t bankSize;
-    uint8_t imagePages;
-    uint8_t reserved1;
-    uint8_t redMask;
-    uint8_t redPosition;
-    uint8_t greenMask;
-    uint8_t greenPosition;
-    uint8_t blueMask;
-    uint8_t bluePosition;
-    uint8_t reservedMask;
-    uint8_t reservedPosition;
-    uint8_t directColorAttributes;
-    uint32_t framebuffer;
-    uint32_t offScreenMemoryOffset;
-    uint32_t offScreenMemorySize;
-    uint16_t reserved2[103];
-} __attribute__((packed));
 struct Multiboot2TagVBE : Multiboot2Tag {
     uint16_t mode;
     uint16_t interfaceSegment;
     uint16_t interfaceOffset;
     uint16_t interfaceLength;
-    Multiboot2VBEInfo info;
-    Multiboot2VBEModeInfo modeInfo;
+    VBEInfo info;
+    VBEModeInfo modeInfo;
 };
 struct Multiboot2TagFramebuffer : Multiboot2Tag {
-    enum class Type : uint8_t {
-        Indexed = 0,
-        RGB,
-        EGA,
-    };
-    uint64_t address;
-    uint32_t pitch;
-    uint32_t width;
-    uint32_t height;
-    uint8_t bitsPerPixel;
-    Type type;
+    MultibootFramebuffer framebuffer;
     uint16_t reserved;
     union {
         struct {
@@ -187,17 +126,7 @@ struct Multiboot2TagELF : Multiboot2Tag {
     uint32_t sectionIndex;
     char sections[0];
 };
-struct Multiboot2TagAPM : Multiboot2Tag {
-    uint16_t version;
-    uint16_t codeSegment;
-    uint32_t offset;
-    uint16_t codeSegment16;
-    uint16_t dataSegment;
-    uint16_t flags;
-    uint16_t codeSegmentLength;
-    uint16_t codeSegment16Length;
-    uint16_t dataSegmentLength;
-};
+struct Multiboot2TagAPM : Multiboot2Tag, MultibootAPM {};
 template<typename T>
 struct Multiboot2TagEFI : Multiboot2Tag {
     T ptr;

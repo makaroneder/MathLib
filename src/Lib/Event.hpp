@@ -25,6 +25,9 @@ struct Event : Printable {
     /// @param padding String to pad with
     /// @return String representation
     virtual String ToString(const String& padding = "") const override;
+
+    private:
+    String KeyToString(void) const;
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include <Logger.hpp>
 #include <String.hpp>
 
-RSDP* InitMultiboot2(Multiboot2Info* info) {
+RSDP* InitMultiboot2(Multiboot2Info* info, RangeMemoryManager& rangeMemoryManager) {
     RSDP* rsdp = nullptr;
     LogString("Multiboot2 signature detected\n");
     for (Multiboot2Tag* tag = info->tags; tag->type != Multiboot2Tag::Type::FinalTag; tag = (Multiboot2Tag*)((uint8_t*)tag + ((tag->size + 7) & ~7))) {
@@ -38,37 +38,15 @@ RSDP* InitMultiboot2(Multiboot2Info* info) {
             }
             case Multiboot2Tag::Type::OldACPI:
             case Multiboot2Tag::Type::NewACPI: {
-                rsdp = (RSDP*)((const Multiboot2TagACPI*)tag)->rsdp;
+                RSDP* tmp = (RSDP*)((const Multiboot2TagACPI*)tag)->rsdp;
+                if (!rsdp || rsdp->revision < tmp->revision) rsdp = tmp;
                 break;
             }
             case Multiboot2Tag::Type::Framebuffer: {
-                Multiboot2TagFramebuffer* framebuffer = (Multiboot2TagFramebuffer*)tag;
-                String type;
-                switch (framebuffer->type) {
-                    case Multiboot2TagFramebuffer::Type::Indexed: {
-                        type = "Indexed";
-                        break;
-                    }
-                    case Multiboot2TagFramebuffer::Type::RGB: {
-                        type = "RGB";
-                        break;
-                    }
-                    case Multiboot2TagFramebuffer::Type::EGA: {
-                        type = "EGA";
-                        break;
-                    }
-                    default: type = String("Unknown (0x") + ToString((uint8_t)framebuffer->type, 16) + ')';
-                }
-                LogString("Framebuffer: {\n");
-                LogString(String("\tAddress: 0x") + ToString(framebuffer->address, 16) + '\n');
-                LogString(String("\tWidth: ") + ToString(framebuffer->width) + '\n');
-                LogString(String("\tHeight: ") + ToString(framebuffer->height) + '\n');
-                LogString(String("\tDepth: ") + ToString(framebuffer->bitsPerPixel) + '\n');
-                LogString(String("\tPitch: ") + ToString(framebuffer->pitch) + '\n');
-                LogString(String("\tType: ") + type + '\n');
-                LogString("}\n");
-                if (framebuffer->type == Multiboot2TagFramebuffer::Type::RGB && framebuffer->bitsPerPixel == 32)
-                    renderer = new KernelRenderer(framebuffer->width, framebuffer->height, (uint32_t*)framebuffer->address, Color(framebuffer->redFieldPosition, framebuffer->greenFieldPosition, framebuffer->blueFieldPosition, 0));
+                const Multiboot2TagFramebuffer* framebuffer = (const Multiboot2TagFramebuffer*)tag;
+                LogString(framebuffer->framebuffer.ToString());
+                if (framebuffer->framebuffer.type == MultibootFramebuffer::Type::RGB && framebuffer->framebuffer.bitsPerPixel == 32)
+                    renderer = new KernelRenderer(framebuffer->framebuffer.width, framebuffer->framebuffer.height, (uint32_t*)framebuffer->framebuffer.address, Color(framebuffer->redFieldPosition, framebuffer->greenFieldPosition, framebuffer->blueFieldPosition, 0));
                 break;
             }
             case Multiboot2Tag::Type::MemoryMap: {
@@ -79,52 +57,19 @@ RSDP* InitMultiboot2(Multiboot2Info* info) {
                 LogString(String("\tEntry version: 0x") + ToString(map->entryVersion, 16) + '\n');
                 for (size_t i = 0; i < entries; i++) {
                     const Multiboot2MemoryMapEntry* entry = (const Multiboot2MemoryMapEntry*)((uintptr_t)map->entries + map->entrySize * i);
-                    String type;
-                    switch (entry->type) {
-                        case Multiboot2MemoryMapEntry::Type::Available: {
-                            type = "Available";
-                            break;
-                        }
-                        case Multiboot2MemoryMapEntry::Type::Reserved: {
-                            type = "Reserved";
-                            break;
-                        }
-                        case Multiboot2MemoryMapEntry::Type::ACPIReclaimable: {
-                            type = "ACPI reclaimable";
-                            break;
-                        }
-                        case Multiboot2MemoryMapEntry::Type::NVS: {
-                            type = "NVS";
-                            break;
-                        }
-                        case Multiboot2MemoryMapEntry::Type::BadRAM: {
-                            type = "Bad RAM";
-                            break;
-                        }
-                        default: type = String("Unknown (0x") + ToString((uint32_t)entry->type, 16) + ')';
-                    }
                     LogString(String("\tEntry ") + ToString(i) + ": {\n");
                     LogString(String("\t\tAddress: 0x") + ToString(entry->address, 16) + '\n');
                     LogString(String("\t\tSize: ") + ToString(entry->length) + '\n');
-                    LogString(String("\t\tType: ") + type + '\n');
+                    LogString(String("\t\tType: ") + (entry->type < MultibootMemoryMapEntryType::TypeCount ? multibootMemoryMapEntryTypeStr[(uint32_t)entry->type] : String("Unknown (0x") + ToString((uint32_t)entry->type, 16) + ')') + '\n');
                     LogString("\t}\n");
+                    if (entry->type == MultibootMemoryMapEntryType::Available)
+                        rangeMemoryManager.AddRegion(Interval<uintptr_t>(entry->address, entry->address + entry->length));
                 }
                 LogString("}\n");
                 break;
             }
             case Multiboot2Tag::Type::APM: {
-                const Multiboot2TagAPM* apm = (const Multiboot2TagAPM*)tag;
-                LogString("APM: {\n");
-                LogString(String("\tVersion: 0x") + ToString(apm->version, 16) + '\n');
-                LogString(String("\t32 bit code segment: 0x") + ToString(apm->codeSegment, 16) + '\n');
-                LogString(String("\tOffset: 0x") + ToString(apm->offset, 16) + '\n');
-                LogString(String("\t16 bit code segment: 0x") + ToString(apm->codeSegment16, 16) + '\n');
-                LogString(String("\t32 bit data segment: 0x") + ToString(apm->dataSegment, 16) + '\n');
-                LogString(String("\tFlags: 0x") + ToString(apm->flags, 16) + '\n');
-                LogString(String("\t32 bit code segment length: 0x") + ToString(apm->codeSegmentLength, 16) + '\n');
-                LogString(String("\t16 bit code segment length: 0x") + ToString(apm->codeSegment16Length, 16) + '\n');
-                LogString(String("\t32 bit data segment length: 0x") + ToString(apm->dataSegmentLength, 16) + '\n');
-                LogString("}\n");
+                LogString(((const Multiboot2TagAPM*)tag)->ToString());
                 break;
             }
             case Multiboot2Tag::Type::Module: {
@@ -176,12 +121,12 @@ RSDP* InitMultiboot2(Multiboot2Info* info) {
                 LogString(String("\tInterface length: ") + ToString(vbe->interfaceLength) + '\n');
                 LogString(String("\tSignature: ") + signature + '\n');
                 LogString(String("\tVersion: 0x") + ToString(vbe->info.version, 16) + '\n');
-                LogString(String("\tOEM: 0x") + ToString(vbe->info.oem, 16) + '\n');
+                LogString(String("\tOEM segment: 0x") + ToString(vbe->info.oemSegment, 16) + '\n');
+                LogString(String("\tOEM offset: 0x") + ToString(vbe->info.oemOffset, 16) + '\n');
                 LogString(String("\tCapabilities: 0x") + ToString(vbe->info.capabilities, 16) + '\n');
                 LogString(String("\tVideo mode segment: 0x") + ToString(vbe->info.videoModeSegment, 16) + '\n');
                 LogString(String("\tVideo mode offset: 0x") + ToString(vbe->info.videoModeOffset, 16) + '\n');
                 LogString(String("\tMemory: ") + ToString(vbe->info.memory * 64) + "KB\n");
-                LogString(String("\tAttributes: 0x") + ToString(vbe->modeInfo.attributes, 16) + '\n');
                 LogString(String("\tWindow A: 0x") + ToString(vbe->modeInfo.windowA, 16) + '\n');
                 LogString(String("\tWindow B: 0x") + ToString(vbe->modeInfo.windowB, 16) + '\n');
                 LogString(String("\tGranularity: 0x") + ToString(vbe->modeInfo.granularity, 16) + '\n');

@@ -1,12 +1,9 @@
 #include "VFS.hpp"
 #include "../../String.hpp"
 
-VFS::VFS(void) : entries(0), files(0) {}
-size_t VFS::GetFileSystems(void) const {
-    return entries.GetSize();
-}
+VFS::VFS(void) : entries(Array<VFSEntry>()), files(Array<VFSFile>()) {}
 bool VFS::AddFileSystem(const VFSEntry& entry) {
-    return entries.Add(entry);
+    return entry.fs && entries.Add(entry);
 }
 size_t VFS::OpenInternal(const String& path, const OpenMode& mode) {
     size_t off = 0;
@@ -58,9 +55,7 @@ Array<FileInfo> VFS::ReadDirectory(const String& path) {
             if (!ret.Add(FileInfo(FileInfo::Type::Directory, entry.name))) return Array<FileInfo>();
         return ret;
     }
-    off++;
-    String fsPath = off == path.GetSize() + 1 ? "" : SubString(path, off, path.GetSize() - off);
     for (size_t i = 0; i < entries.GetSize(); i++)
-        if (entries.At(i).name == fs) return entries.At(i).fs->ReadDirectory(fsPath);
+        if (entries.At(i).name == fs) return entries.At(i).fs->ReadDirectory(++off == path.GetSize() + 1 ? "" : SubString(path, off, path.GetSize() - off));
     return Array<FileInfo>();
 }

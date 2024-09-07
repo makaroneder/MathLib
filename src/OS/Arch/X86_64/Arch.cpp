@@ -9,9 +9,11 @@
 #include "MSR.hpp"
 #include "PIT.hpp"
 #include "E9.hpp"
+#include "IO.hpp"
 #include <Logger.hpp>
 #include <String.hpp>
 
+RangeMemoryManager rangeMemoryManager;
 uint8_t fxsaveRegion[512] __attribute__((aligned(16)));
 bool InitArch(uintptr_t signature, void* info) {
     if (E9::IsPresent()) logger = new E9();
@@ -28,18 +30,30 @@ bool InitArch(uintptr_t signature, void* info) {
     if (d & (1 << (uint8_t)CPUIDBits::D1FXSR)) {
         asm volatile("fxsave %0" :: "m"(fxsaveRegion));
         if (d & (1 << (uint8_t)CPUIDBits::D1FPU)) {
-            SetControlRegister(0, GetControlRegister(0) & ~((1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched)));
+            const Expected<uintptr_t> tmp = GetControlRegister(0);
+            if (!tmp.HasValue()) return false;
+            SetControlRegister(0, tmp.Get() & ~((1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched)));
             asm volatile("fninit");
         }
-        else SetControlRegister(0, GetControlRegister(0) | (1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched));
+        else {
+            const Expected<uintptr_t> tmp = GetControlRegister(0);
+            if (!tmp.HasValue()) return false;
+            SetControlRegister(0, tmp.Get() | (1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched));
+        }
         if (d & (1 << (uint8_t)CPUIDBits::D1SSE)) {
-            SetControlRegister(0, (GetControlRegister(0) & ~(1 << (uint8_t)ControlRegister0::Emulation)) | (1 << (uint8_t)ControlRegister0::MonitorCoProcessor));
-            SetControlRegister(4, GetControlRegister(4) | (1 << (uint8_t)ControlRegister4::FXSaveOSSupport) | (1 << (uint8_t)ControlRegister4::UnmaskedSIMDFloatExceptionsOSSupport));
+            Expected<uintptr_t> tmp = GetControlRegister(0);
+            if (!tmp.HasValue()) return false;
+            SetControlRegister(0, (tmp.Get() & ~(1 << (uint8_t)ControlRegister0::Emulation)) | (1 << (uint8_t)ControlRegister0::MonitorCoProcessor));
+            tmp = GetControlRegister(4);
+            if (!tmp.HasValue()) return false;
+            SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::FXSaveOSSupport) | (1 << (uint8_t)ControlRegister4::UnmaskedSIMDFloatExceptionsOSSupport));
             sseEnabled = true;
         }
     }
     if (c & (1 << (uint8_t)CPUIDBits::C1XSave)) {
-        SetControlRegister(4, GetControlRegister(4) | (1 << (uint8_t)ControlRegister4::XSaveEnable));
+        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        if (!tmp.HasValue()) return false;
+        SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::XSaveEnable));
         if (sseEnabled && c & (1 << (uint8_t)CPUIDBits::C1AVX)) asm volatile (
             "xor %%rcx, %%rcx\n"
             "xgetbv\n"
@@ -48,17 +62,27 @@ bool InitArch(uintptr_t signature, void* info) {
         );
     }
     CPUID(0x7, nullptr, &b, &c, &d);
-    if (b & 1 << (uint8_t)CPUIDBits::B7SMEP) SetControlRegister(4, GetControlRegister(4) | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable);
-    if (b & 1 << (uint8_t)CPUIDBits::B7SMAP) SetControlRegister(4, GetControlRegister(4) | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable);
+    if (b & 1 << (uint8_t)CPUIDBits::B7SMEP) {
+        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        if (!tmp.HasValue()) return false;
+        SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable);
+    }
+    if (b & 1 << (uint8_t)CPUIDBits::B7SMAP) {
+        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        if (!tmp.HasValue()) return false;
+        SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable);
+    }
     if (!InitInterrupts(0x20, 0x08)) return false;
     mainTimer = new PIT();
     if (!mainTimer) return false;
     RSDP* rsdp = nullptr;
-    if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info);
-    else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info);
+    if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info, rangeMemoryManager);
+    else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info, rangeMemoryManager);
     else LogString(String("Unknown bootloader signature: 0x") + ToString(signature, 16) + '\n');
+    if (rangeMemoryManager.GetSize()) memoryManager = &rangeMemoryManager;
+    // TODO: Create new paging structure
     if (!rsdp) rsdp = FindRSDP();
-    if (!InitACPI(rsdp, true) || !mainTimer) return false;
+    if (!InitACPI(rsdp, true)) return false;
     const CMOSFloppyData floppyData = cmos->GetFloppyData();
     LogString(String("CMOS master floppy data: 0x") + ToString(floppyData.master, 16) + '\n');
     LogString(String("CMOS slave floppy data: 0x") + ToString(floppyData.slave, 16) + '\n');
@@ -83,6 +107,18 @@ bool InitArch(uintptr_t signature, void* info) {
     }
     #endif
     return true;
+}
+[[noreturn]] void ShutdownArch(void) {
+    // TODO: Perform APCI shutdown
+    // Bochs shutdown
+    WritePort<uint16_t>(0xb004, 0x2000);
+    // QEMU shutdown
+    WritePort<uint16_t>(0x0604, 0x2000);
+    // VirtualBox shutdown
+    WritePort<uint16_t>(0x4004, 0x3400);
+    // Cloud Hypervisor shutdown
+    WritePort<uint16_t>(0x0600, 0x0034);
+    Panic("It's now safe to turn off your computer");
 }
 [[noreturn]] void ArchPanic(void) {
     if (cmos) cmos->SetNMI(false);

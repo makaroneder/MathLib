@@ -20,23 +20,23 @@ int main(int argc, char** argv) {
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
-        EquationSolverState state = EquationSolverState();
-        Node* optimizedRoot = Optimize(root, state);
+        Optimizer optimizer = Optimizer();
+        Node* optimizedRoot = optimizer.Optimize(root);
         delete root;
         #ifdef Debug
         std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
         #endif
         delete optimizedRoot;
-        state.runtime = true;
-        FunctionNode main = state.GetFunction("Main");
+        optimizer.runtime = true;
+        FunctionNode main = optimizer.GetFunction("Main");
         Array<Node*> args = Array<Node*>(argc - 1);
         for (int i = 1; i < argc; i++) args.At(i - 1) = new Node(Node::Type::String, argv[i]);
-        state.variables.Add(Variable(main.arguments[0].name, main.arguments[0].dataType, ToString(argc - 1), true));
-        state.variables.Add(Variable(main.arguments[1].name, main.arguments[1].dataType, ArrayToComma(args), true));
-        Node* tmp = Optimize(main.body, state);
+        optimizer.variables.Add(Variable(main.arguments[0].name, main.arguments[0].dataType, ToString(argc - 1), true));
+        optimizer.variables.Add(Variable(main.arguments[1].name, main.arguments[1].dataType, ArrayToComma(args), true));
+        Node* tmp = optimizer.Optimize(main.body);
         std::cout << "Return value: " << *tmp << std::endl;
         delete tmp;
-        state.Destroy();
+        optimizer.Destroy();
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

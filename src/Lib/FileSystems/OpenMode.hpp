@@ -5,6 +5,7 @@
 enum class OpenMode {
     Read,
     Write,
+    ReadWrite,
 };
 
 #endif

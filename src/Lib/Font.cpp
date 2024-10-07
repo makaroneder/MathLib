@@ -9,6 +9,6 @@ size_t PSF1::GetWidth(void) const {
 size_t PSF1::GetHeight(void) const {
     return charSize;
 }
-const uint8_t* PSF1::GetGlyph(const char& chr) const {
+const uint8_t* PSF1::GetGlyph(char chr) const {
     return &buffer[chr * charSize];
 }

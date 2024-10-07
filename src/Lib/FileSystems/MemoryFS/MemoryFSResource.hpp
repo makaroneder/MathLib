@@ -1,5 +1,5 @@
-#ifndef MemoryFSResource_H
-#define MemoryFSResource_H
+#ifndef FileSystems_MemoryFS_Resource_H
+#define FileSystems_MemoryFS_Resource_H
 #include <Typedefs.hpp>
 
 struct MemoryFSResource {

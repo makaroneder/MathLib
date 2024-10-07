@@ -34,7 +34,7 @@ struct X86 : Emulator {
         if (ret.HasValue()) state.sp.value += sizeof(T);
         return ret;
     }
-    Register* GetRegister(const uint8_t& code);
+    Register* GetRegister(uint8_t code);
 };
 
 #endif

@@ -20,10 +20,10 @@ size_t AHCIPort::GetSize(void) const {
 size_t AHCIPort::GetSectorSize(void) const {
     return bytesPerSector;
 }
-bool AHCIPort::ReadSectors(const size_t& sector, void* buff, const size_t& count) {
+bool AHCIPort::ReadSectors(size_t sector, void* buff, size_t count) {
     return port->AccessPort(sector, count, buff, false);
 }
-bool AHCIPort::WriteSectors(const size_t& sector, const void* buff, const size_t& count) {
+bool AHCIPort::WriteSectors(size_t sector, const void* buff, size_t count) {
     return port->AccessPort(sector, count, (void*)buff, true);
 }
 bool InitAHCI(PCIHeader* header) {

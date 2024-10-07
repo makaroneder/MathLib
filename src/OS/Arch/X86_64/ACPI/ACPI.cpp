@@ -1,6 +1,8 @@
 #include "SCI.hpp"
 #include "ACPI.hpp"
 #include "MADT.hpp"
+#include "HPET.hpp"
+#include "WAET.hpp"
 #include "../RTC.hpp"
 #include "LocalAPIC.hpp"
 #include "../PCI/PCI.hpp"
@@ -11,9 +13,15 @@
 #include <stddef.h>
 
 SCI sci;
+bool InitRTC(bool nmi, CMOS::Register centuryRegister) {
+    RTC* rtc = new RTC(nmi, centuryRegister);
+    if (!rtc) return false;
+    cmos = rtc;
+    dateKeeper = rtc;
+    return true;
+}
 bool NoFADTInit(bool nmi) {
-    cmos = new RTC(nmi);
-    if (!cmos) return false;
+    if (!InitRTC(nmi, (CMOS::Register)0)) return false;
     InitPS2();
     return true;
 }
@@ -56,15 +64,21 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
         const ACPITable* table = (const ACPITable*)(rsdp->revision == 2 ? *(uint64_t*)offset : (uintptr_t)*(uint32_t*)offset);
         if (!table->IsValid()) continue;
         char signature[5];
-        for (size_t i = 0; i < 4; i++) signature[i] = table->signature[i];
+        for (size_t i = 0; i < SizeOfArray(table->signature); i++) signature[i] = table->signature[i];
         signature[4] = '\0';
+        char oemID[7];
+        for (size_t i = 0; i < SizeOfArray(table->oemID); i++) oemID[i] = table->oemID[i];
+        oemID[6] = '\0';
+        char oemTableID[9];
+        for (size_t i = 0; i < SizeOfArray(table->oemTableID); i++) oemTableID[i] = table->oemTableID[i];
+        oemTableID[8] = '\0';
         LogString(String("ACPI table ") + ToString(i) + ": {\n");
         LogString(String("\tSignature: ") + signature + '\n');
         LogString(String("\tLength: 0x") + ToString(table->length, 16) + '\n');
         LogString(String("\tRevision: 0x") + ToString(table->revision, 16) + '\n');
         LogString(String("\tChecksum: 0x") + ToString(table->checksum, 16) + '\n');
-        LogString(String("\tOEM ID: ") + table->oemID + '\n');
-        LogString(String("\tOEM table ID: ") + table->oemTableID + '\n');
+        LogString(String("\tOEM ID: ") + oemID + '\n');
+        LogString(String("\tOEM table ID: ") + oemTableID + '\n');
         LogString(String("\tOEM revision: 0x") + ToString(table->oemRevision, 16) + '\n');
         LogString(String("\tCreator ID: 0x") + ToString(table->creatorID, 16) + '\n');
         LogString(String("\tCreator revision: 0x") + ToString(table->creatorRevision, 16) + '\n');
@@ -76,7 +90,7 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
             LogString(String("\tSMI command port: 0x") + ToString(fadt->smiCommandPort, 16) + '\n');
             LogString(String("\tACPI enable: 0x") + ToString(fadt->acpiEnable, 16) + '\n');
             LogString(String("\tACPI disable: 0x") + ToString(fadt->acpiDisable, 16) + '\n');
-            LogString(String("\tRTC century register: 0x") + ToString(fadt->rtcCenturyRegister, 16) + '\n');
+            LogString(String("\tRTC century register: 0x") + ToString((uint8_t)fadt->rtcCenturyRegister, 16) + '\n');
             LogString(String("\tACPI boot architecture flags: 0x") + ToString(fadt->bootArchitectureFlags, 16) + '\n');
             if (fadt->revision >= 0x02) {
                 const FADT2* fadt2 = (const FADT2*)fadt;
@@ -93,9 +107,28 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
             mcfg = (const MCFG*)table;
             LogString(String("\tReserved: 0x") + ToString(mcfg->reserved, 16) + '\n');
         }
+        else if (String(signature) == String(HPET::expectedSignature)) {
+            const HPET* hpet = (const HPET*)table;
+            LogString(String("\tHardware revision: 0x") + ToString(hpet->hardwareRevision, 16) + '\n');
+            LogString(String("\tComparator count: 0x") + ToString(hpet->comparatorCount, 16) + '\n');
+            LogString(String("\tComparator size: 0x") + ToString(hpet->counterSize, 16) + '\n');
+            LogString(String("\tReserved: 0x") + ToString(hpet->reserved, 16) + '\n');
+            LogString(String("\tLegacy IRQ replacement: ") + BoolToString(hpet->legacyIRQReplacement) + '\n');
+            LogString(String("\tPCI vendor: 0x") + ToString(hpet->pciVendor, 16) + '\n');
+            LogString(String("\tNumber: 0x") + ToString(hpet->number, 16) + '\n');
+            LogString(String("\tMinimum tick: 0x") + ToString(hpet->minimumTick, 16) + '\n');
+            LogString(String("\tPage protection: 0x") + ToString(hpet->pageProtection, 16) + '\n');
+        }
+        else if (String(signature) == String(WAET::expectedSignature)) {
+            const WAET* waet = (const WAET*)table;
+            LogString(String("\tEnhanced RTC: ") + BoolToString(waet->enhancedRTC) + '\n');
+            LogString(String("\tEnhanced ACPI PM timer: ") + BoolToString(waet->enhancedACPIPMTimer) + '\n');
+            LogString(String("\tReserved: 0x") + ToString(waet->reserved, 16) + '\n');
+        }
         LogString("}\n");
     }
     if (madt) {
+        if (!madt->dual8259) return false;
         LocalAPIC* lapic = (LocalAPIC*)(uintptr_t)madt->localAPIC;
         for (const MADTEntry* entry = (MADTEntry*)((uintptr_t)madt + sizeof(MADT)); (uintptr_t)entry < (uintptr_t)madt + madt->length; entry = (MADTEntry*)((uintptr_t)entry + entry->length)) {
             switch (entry->type) {
@@ -168,11 +201,13 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
     }
     if (mcfg && !InitPCI(mcfg)) return false;
     if (fadt) {
-        if (madt && !madt->dual8259) return false;
         sci = SCI(fadt);
         if (fadt->bootArchitectureFlags & (1 << 1) || !fadt->bootArchitectureFlags) InitPS2();
-        cmos = fadt->bootArchitectureFlags & (1 << 5) ? new CMOS(nmi) : new RTC(nmi);
-        if (!cmos) return false;
+        if (fadt->bootArchitectureFlags & (1 << 5)) {
+            cmos = new CMOS(nmi);
+            if (!cmos) return false;
+        }
+        else if (!InitRTC(nmi, fadt->rtcCenturyRegister)) return false;
     }
     else if (!NoFADTInit(nmi)) return false;
     // TODO: Parse AML

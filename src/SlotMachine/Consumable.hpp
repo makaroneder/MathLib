@@ -11,7 +11,7 @@ struct Consumable : WavefrontObject<num_t> {
     ssize_t value;
     ssize_t cost;
 
-    Consumable(FileSystem& fileSystem, const String& path, const Type& t, const ssize_t& val, const ssize_t& cost_);
+    Consumable(FileSystem& fileSystem, const String& path, Type type, ssize_t value, ssize_t cost);
 };
 
 #endif

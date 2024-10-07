@@ -1,5 +1,6 @@
 #ifndef FADT_H
 #define FADT_H
+#include "../CMOS.hpp"
 #include "ACPITable.hpp"
 #include "GenericAddressStructure.hpp"
 
@@ -50,7 +51,7 @@ struct FADT : ACPITable {
     uint8_t dutyWidth;
     uint8_t dayAlarm;
     uint8_t monthAlarm;
-    uint8_t rtcCenturyRegister;
+    CMOS::Register rtcCenturyRegister;
     uint16_t bootArchitectureFlags;
 } __attribute__((packed));
 struct FADT2 : FADT {

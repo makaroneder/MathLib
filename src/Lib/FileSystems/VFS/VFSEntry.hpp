@@ -1,5 +1,5 @@
-#ifndef VFSEntry_H
-#define VFSEntry_H
+#ifndef FileSystems_VFS_Entry_H
+#define FileSystems_VFS_Entry_H
 #include "../FileSystem.hpp"
 
 struct VFSEntry {

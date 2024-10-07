@@ -1,14 +1,14 @@
-#ifndef ISO9660File_H
-#define ISO9660File_H
-#include "DirectoryEntry.hpp"
+#ifndef FileSystems_ISO9660_File_H
+#define FileSystems_ISO9660_File_H
+#include "ISO9660DirectoryEntry.hpp"
 #include "../OpenMode.hpp"
 
 struct ISO9660File {
-    DirectoryEntry entry;
+    ISO9660DirectoryEntry entry;
     OpenMode mode;
     bool free;
 
-    ISO9660File(DirectoryEntry entry = DirectoryEntry(), OpenMode mode = OpenMode::Read);
+    ISO9660File(ISO9660DirectoryEntry entry = ISO9660DirectoryEntry(), OpenMode mode = OpenMode::Read);
 };
 
 #endif

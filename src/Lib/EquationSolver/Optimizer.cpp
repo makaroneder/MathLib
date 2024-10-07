@@ -1,4 +1,4 @@
-#include "../Factorial.hpp"
+#include "../Math/Factorial.hpp"
 #include "Optimizer.hpp"
 #include "../Host.hpp"
 

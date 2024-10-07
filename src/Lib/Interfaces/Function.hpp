@@ -1,5 +1,5 @@
-#ifndef Function_H
-#define Function_H
+#ifndef Interfaces_Function_H
+#define Interfaces_Function_H
 #include "Allocatable.hpp"
 
 template <typename Ret, typename... Args>

@@ -1,5 +1,5 @@
-#ifndef FunctionNode_H
-#define FunctionNode_H
+#ifndef EquationSolver_FunctionNode_H
+#define EquationSolver_FunctionNode_H
 #include "Variable.hpp"
 
 /// @brief Function

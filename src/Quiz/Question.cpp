@@ -1,6 +1,7 @@
 #include "Question.hpp"
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Optimizer.hpp>
+#include <Host.hpp>
 
 Question::Question(const String& eq) : equation(eq), solution(MakeNaN()) {
     Node* root = Tokenize(equation);

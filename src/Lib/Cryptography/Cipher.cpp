@@ -9,7 +9,7 @@ Cipher::Cipher(void) {
     }
 }
 Cipher::Cipher(const String& letters, const String& upperLetters, const String& digits) : letters(letters), upperLetters(upperLetters), digits(digits) {}
-uint8_t Cipher::GetIndex(const char& chr) const {
+uint8_t Cipher::GetIndex(char chr) const {
     if (IsDigit(chr)) {
         for (uint8_t i = 0; i < digits.GetSize(); i++)
             if (chr == digits.At(i)) return i;
@@ -29,7 +29,7 @@ uint8_t Cipher::GetIndex(const char& chr) const {
     }
     else return UINT8_MAX;
 }
-String Cipher::GetString(const String& str, const String& key, const bool& encrypt) const {
+String Cipher::GetString(const String& str, const String& key, bool encrypt) const {
     Array<uint8_t> tmp = Array<uint8_t>(str.GetSize());
     for (size_t i = 0; i < tmp.GetSize(); i++) tmp.At(i) = GetIndex(str.At(i));
     tmp = encrypt ? Encrypt(tmp, key) : Decrypt(tmp, key);

@@ -1,5 +1,5 @@
-#ifndef Tokenizer_H
-#define Tokenizer_H
+#ifndef EquationSolver_Tokenizer_H
+#define EquationSolver_Tokenizer_H
 #include "Node.hpp"
 
 /// @brief Skips whitespace characters

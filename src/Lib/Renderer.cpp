@@ -1,6 +1,6 @@
 #include "Renderer.hpp"
 
-Renderer::Renderer(const size_t& w, const size_t& h) : Image(w, h), position(CreateVector<num_t>(0, 0, 0)), pointMultiplier(100), image(nullptr) {}
+Renderer::Renderer(size_t width, size_t height) : SaveableImage(width, height), position(CreateVector<num_t>(0, 0, 0)), pointMultiplier(100), image(nullptr) {}
 Renderer::~Renderer(void) {
     if (image) delete image;
 }
@@ -9,7 +9,7 @@ Event Renderer::WaitForEvent(void) {
     while (ret.type == Event::Type::None) ret = GetEvent();
     return ret;
 }
-void Renderer::DrawAxis(const uint32_t& axisColor, const uint32_t& cellColor) {
+void Renderer::DrawAxis(uint32_t axisColor, uint32_t cellColor) {
     const num_t cellSize = 1;
     const Matrix<num_t> start = GetStart<num_t>();
     const Matrix<num_t> end = GetEnd<num_t>();

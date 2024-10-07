@@ -3,8 +3,8 @@
 #include "Typedefs.hpp"
 
 struct CRC32 {
-    CRC32(const uint32_t& magic);
-    void Fill(const uint32_t& magic);
+    CRC32(uint32_t magic);
+    void Fill(uint32_t magic);
     uint32_t Calculate(const Array<uint8_t>& data) const;
 
     private:

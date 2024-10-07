@@ -22,17 +22,7 @@ bool Write8042(uint16_t value) {
     return true;
 }
 Expected<uint8_t> Read8042(uint8_t cmd) {
-    if (!Write8042(cmd)) return Expected<uint8_t>();
-    return Expected<uint8_t>(ReadPort<uint8_t>(0x60));
-}
-bool SendPS2Data(uint8_t value, bool second) {
-    if (!Await8042(true)) return false;
-    if (second) {
-        WritePort<uint8_t>(0x64, 0xd4);
-        if (!Await8042(true)) return false;
-    }
-    WritePort<uint8_t>(0x60, value);
-    return true;
+    return Write8042(cmd) ? Expected<uint8_t>(ReadPort<uint8_t>(0x60)) : Expected<uint8_t>();
 }
 String PS2PortToString(bool second) {
     return String(second ? "second" : "first") + " PS2 port";

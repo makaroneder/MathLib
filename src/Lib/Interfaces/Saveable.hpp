@@ -1,5 +1,5 @@
-#ifndef Saveable_H
-#define Saveable_H
+#ifndef Interfaces_Saveable_H
+#define Interfaces_Saveable_H
 #include "ByteDevice.hpp"
 #include "../FileSystems/FileSystem.hpp"
 

@@ -1,4 +1,5 @@
 #include "Variable.hpp"
+#include "../Math/Constants.hpp"
 
 Variable::Variable(void) {}
 Variable::Variable(const String& name, const String& dataType, Node* value, bool constant) : name(name), dataType(dataType), value(value), constant(constant) {}

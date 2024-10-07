@@ -7,9 +7,9 @@
 struct SDL2Renderer : Renderer {
     /// @brief Creates a new renderer
     /// @param title Title of the window
-    /// @param w Width of the window
-    /// @param h Height of the window
-    SDL2Renderer(const String& title, const size_t& w, const size_t& h);
+    /// @param width Width of the window
+    /// @param height Height of the window
+    SDL2Renderer(const String& title, size_t width, size_t height);
     /// @brief Destroys the renderer
     virtual ~SDL2Renderer(void) override;
     /// @brief Copies pixels from memory to screen

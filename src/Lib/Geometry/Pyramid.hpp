@@ -1,7 +1,7 @@
 #ifndef Geometry_Pyramid_H
 #define Geometry_Pyramid_H
 #include "LineShape.hpp"
-#include "../Quaternion.hpp"
+#include "../Math/Quaternion.hpp"
 
 template <typename T>
 struct Pyramid : LineShape<T> {

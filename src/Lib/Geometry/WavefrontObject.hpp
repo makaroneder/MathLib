@@ -1,7 +1,7 @@
 #ifndef Geometry_WavefrontObject_H
 #define Geometry_WavefrontObject_H
 #include "LineShape.hpp"
-#include "../Quaternion.hpp"
+#include "../Math/Quaternion.hpp"
 #include "../FileSystems/File.hpp"
 #include "../EquationSolver/Tokenizer.hpp"
 

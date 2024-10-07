@@ -1,11 +1,11 @@
-#ifndef Collection_H
-#define Collection_H
+#ifndef Interfaces_Collection_H
+#define Interfaces_Collection_H
 #include "../Iterator.hpp"
 
 template <typename T>
 struct Collection : Iteratable<T> {
-    virtual T At(const size_t& index) const = 0;
-    virtual T& At(const size_t& index) = 0;
+    virtual T At(size_t index) const = 0;
+    virtual T& At(size_t index) = 0;
     virtual bool Add(const T& val) = 0;
     virtual size_t GetSize(void) const = 0;
     virtual const T* GetValue(void) const = 0;
@@ -24,10 +24,10 @@ struct Collection : Iteratable<T> {
     virtual Iterator<T> end(void) override {
         return Iterator<T>((T*)GetValue() + GetSize());
     }
-    T operator[](const size_t& index) const {
+    T operator[](size_t index) const {
         return At(index);
     }
-    T& operator[](const size_t& index) {
+    T& operator[](size_t index) {
         return At(index);
     }
     Collection<T>& operator+=(const T& val) {

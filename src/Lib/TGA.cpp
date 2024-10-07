@@ -5,7 +5,7 @@
 #include "TGAExtensionArea.hpp"
 
 const String identifier = "MathLib";
-TGA::TGA(const size_t& w, const size_t& h) : Image(w, h) {}
+TGA::TGA(size_t width, size_t height) : SaveableImage(width, height) {}
 bool TGA::Save(Writeable& file) const {
     TGAHeader header = {};
     header.idLength = identifier.GetSize();
@@ -14,8 +14,8 @@ bool TGA::Save(Writeable& file) const {
     header.height = header.yOrigin = GetHeight();
     header.pixelDepth = 32;
     header.imageDescriptor = 1 << 5;
-    file.Write<TGAHeader>(header);
-    for (const char& chr : identifier) file.Write<char>(chr);
+    if (!file.Write<TGAHeader>(header)) return false;
+    if (!file.Puts(identifier)) return false;
     for (size_t y = 0; y < header.height; y++) {
         for (size_t x = 0; x < header.width; x++) {
             const Color pixel = pixels.At(x, y);
@@ -39,12 +39,12 @@ bool TGA::Save(Writeable& file) const {
     }
     for (size_t i = 0; i < 6; i++) extension.timestamp[i] = 0;
     for (size_t i = 0; i < 3; i++) extension.jobTime[i] = 0;
-    file.Write<TGAExtensionArea>(extension);
+    if (!file.Write<TGAExtensionArea>(extension)) return false;
     TGAFooter footer = {};
     footer.extensionOffset = sizeof(TGAHeader) + header.width * header.height * sizeof(uint32_t);
     footer.developerOffset = 0;
     for (size_t i = 0; footer.expectedSignature[i]; i++) footer.signature[i] = footer.expectedSignature[i];
-    file.Write<TGAFooter>(footer);
+    if (!file.Write<TGAFooter>(footer)) return false;
     return true;
 }
 bool TGA::Load(Readable& file) {
@@ -52,12 +52,10 @@ bool TGA::Load(Readable& file) {
     if (!file.Read<TGAHeader>(header)) return false;
     if (header.imageType != 2) return false;
     if (header.pixelDepth != 32) return false;
-    if (header.imageDescriptor != 1 << 5) return false;
-
     bool createdByMathLib = false;
     if (header.idLength) {
         char id[header.idLength];
-        file.ReadBuffer(id, header.idLength);
+        if (!file.ReadBuffer(id, header.idLength)) return false;
         if (String(id) == identifier) createdByMathLib = true;
     }
     pixels = Matrix<uint32_t>(header.width, header.height);
@@ -79,7 +77,6 @@ bool TGA::Load(Readable& file) {
         if (String(extension.authorName) != identifier) return false;
         if (String(extension.softwareId) != identifier) return false;
         if (String(extension.jobName) != identifier) return false;
-
         TGAFooter footer;
         if (!file.Read<TGAFooter>(footer)) return false;
         if (String(footer.signature) != String(footer.expectedSignature)) return false;

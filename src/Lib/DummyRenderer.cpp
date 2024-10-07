@@ -1,6 +1,6 @@
 #include "DummyRenderer.hpp"
 
-DummyRenderer::DummyRenderer(const size_t& w, const size_t& h) : Renderer(w, h) { }
+DummyRenderer::DummyRenderer(size_t width, size_t height) : Renderer(width, height) { }
 bool DummyRenderer::Update(void) {
     return true;
 }

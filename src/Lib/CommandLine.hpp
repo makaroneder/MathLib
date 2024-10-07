@@ -9,7 +9,7 @@ struct CommandLineEntry {
     CommandLineEntry(const String& name = "", const String& value = "");
 };
 struct CommandLine {
-    CommandLine(const size_t& argc, const char** argv);
+    CommandLine(size_t argc, const char** argv);
     Expected<String> GetEntry(const String& name) const;
 
     private:

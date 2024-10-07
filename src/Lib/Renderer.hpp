@@ -4,18 +4,19 @@
 #include "Image.hpp"
 #include "Event.hpp"
 #include "Color.hpp"
+#include "String.hpp"
 #include "Threads.hpp"
-#include "Quaternion.hpp"
-#include "ComplexPosition.hpp"
+#include "Math/Quaternion.hpp"
 #include "Geometry/LineShape.hpp"
 #include "Interfaces/Saveable.hpp"
 #include "Interfaces/Function.hpp"
+#include "Math/ComplexPosition.hpp"
 
-struct Renderer : Image {
+struct Renderer : SaveableImage {
     /// @brief Creates a new renderer
-    /// @param w Width of the window
-    /// @param h Height of the window
-    Renderer(const size_t& w, const size_t& h);
+    /// @param width Width of the window
+    /// @param height Height of the window
+    Renderer(size_t width, size_t height);
     virtual ~Renderer(void) override;
     /// @brief Updates renderer
     /// @return Status
@@ -31,7 +32,7 @@ struct Renderer : Image {
     /// @param pixel Pixel to render
     /// @param color Color of the pixel
     template <typename T>
-    void SetPixel(const Matrix<T>& pixel, const uint32_t& color) {
+    void SetPixel(const Matrix<T>& pixel, uint32_t color) {
         SetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier, color);
     }
     /// @brief Returns pixel
@@ -40,7 +41,7 @@ struct Renderer : Image {
     /// @return Color of the pixel
     template <typename T>
     uint32_t GetPixel(const Matrix<T>& pixel) {
-        uint32_t* color = GetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+        const uint32_t* color = GetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
         return color ? *color : 0;
     }
     /// @brief Copies pixels from renderer to this renderer
@@ -49,14 +50,14 @@ struct Renderer : Image {
     /// @param rotation Vector containing axis to rotate around
     /// @return Status
     template <typename T>
-    bool DrawImage(const Renderer& renderer, const Matrix<T>& rotation) {
+    bool DrawImage(Renderer& renderer, const Matrix<T>& rotation) {
         if (pointMultiplier != renderer.pointMultiplier) return false;
         const T w = renderer.GetWidth() / (pointMultiplier * 2);
         const T h = renderer.GetHeight() / (pointMultiplier * 2);
         for (T y = -h; y <= h; y += 1 / pointMultiplier) {
             for (T x = -w; x <= w; x += 1 / pointMultiplier) {
-                const Matrix<T> pos = CreateVector<T>(x, y, 0);
-                SetPixel<T>(RotateVector<T>(pos + renderer.position, renderer.position, rotation), renderer.GetPixel<T>(pos));
+                const Matrix<T> pos = CreateVector<T>(x, y, 0) + renderer.position;
+                SetPixel<T>(RotateVector<T>(pos, renderer.position, rotation), renderer.GetPixel<T>(pos));
             }
         }
         return true;
@@ -66,7 +67,7 @@ struct Renderer : Image {
     /// @param line Line to draw
     /// @param color Color of the line
     template <typename T>
-    void DrawLine(const Line<T>& line, const uint32_t& color) {
+    void DrawLine(const Line<T>& line, uint32_t color) {
         Matrix<ssize_t> startVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.start - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
         Matrix<ssize_t> endVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.end - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
         bool steep = false;
@@ -103,24 +104,24 @@ struct Renderer : Image {
     /// @param rotation Vector containing axis to rotate around
     /// @param color Color of the shape
     template <typename T>
-    void DrawShape(const LineShape<T>& shape, const Matrix<T>& rotation, const uint32_t& color) {
+    void DrawShape(const LineShape<T>& shape, const Matrix<T>& rotation, uint32_t color) {
         const Array<Line<T>> lines = shape.ToLines(rotation);
         for (size_t i = 0; i < lines.GetSize(); i++) DrawLine<T>(Line<T>(lines.At(i).start, lines.At(i).end), color);
     }
-    /// @brief Renders string
+    /// @brief Renders 2D circle
     /// @tparam T Type of number
-    /// @param str String to render
-    /// @param font Font to renderer string with
-    /// @param pos Position of the string
-    /// @param rotation Vector containing axis to rotate around
-    /// @param scale Scale of the string
-    /// @param color Color to render string with
-    /// @return Status
+    /// @param position Position of the circle
+    /// @param radius Radius of the circle
+    /// @param color Color of the circle
     template <typename T>
-    bool Puts(const String& str, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, const uint32_t& color) {
-        Array<String> strs = Array<String>(1);
-        strs.At(0) = str;
-        return Puts<T>(strs, font, pos, rotation, scale, color);
+    void DrawCircle2D(const Matrix<T>& position, const T& radius, uint32_t color) {
+        const T div = 1 / pointMultiplier;
+        for (T y = -radius; y <= radius; y += div) {
+            for (T x = -radius; x <= radius; x += div) {
+                const Matrix<T> offset = CreateVector<T>(x, y, 0);
+                if (FloatsEqual<T>(offset.GetLengthSquared(), Pow(radius, 2), div)) SetPixel<T>(position + offset, color);
+            }
+        }
     }
     /// @brief Renders strings
     /// @tparam T Type of number
@@ -132,8 +133,9 @@ struct Renderer : Image {
     /// @param color Color to render strings with
     /// @return Status
     template <typename T>
-    bool Puts(const Array<String>& strs, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, const uint32_t& color) {
+    bool Puts(const String& str, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, uint32_t color) {
         if (!font || !font->IsValid()) return false;
+        const Array<String> strs = Split(str, "\n", false);
         const T w = font->GetWidth() / 2;
         const T h = font->GetHeight() / 2;
         const size_t sx = GetX(scale);
@@ -179,7 +181,7 @@ struct Renderer : Image {
     /// @brief Draw x and y axis
     /// @param axisColor Color of the axis
     /// @param cellColor Color of the cells
-    void DrawAxis(const uint32_t& axisColor, const uint32_t& cellColor);
+    void DrawAxis(uint32_t axisColor, uint32_t cellColor);
     /// @brief Draws complex function based on its values
     /// @tparam T Type of number
     /// @param values Values generated by function
@@ -192,7 +194,7 @@ struct Renderer : Image {
     /// @param values Values generated by function
     /// @param color Color of function
     template <typename T>
-    void DrawFunction(const Array<Line<T>>& values, const uint32_t& color) {
+    void DrawFunction(const Array<Line<T>>& values, uint32_t color) {
         for (size_t i = 0; i < values.GetSize(); i++) {
             #ifdef FillGapsInFunctions
             if (!IsNaN(GetX(values.At(i).start))) DrawLine<T>(Line<T>(values.At(i).start, values.At(i).end), color);
@@ -228,7 +230,7 @@ struct Renderer : Image {
     /// @param outAxis Axis we are using for output values
     /// @return Result of function
     template <typename T>
-    Array<Line<T>> GenerateMultiFunction(const Function<Array<T>, T>& f, const VectorAxis& inAxis = VectorAxis::X, const VectorAxis& outAxis = VectorAxis::Y) {
+    Array<Line<T>> GenerateMultiFunction(const Function<Array<T>, T>& f, VectorAxis inAxis = VectorAxis::X, VectorAxis outAxis = VectorAxis::Y) {
         Array<Matrix<T>> prev;
         Array<Line<T>> ret;
         const T start = GetVectorAxis(GetStart<T>(), inAxis) + (T)GetX(position);
@@ -255,17 +257,20 @@ struct Renderer : Image {
     }
     template <typename T>
     Matrix<T> IndexToPosition(const Matrix<T>& index) const {
-        return CreateVector<T>((GetX(index) - pixels.GetWidth() / 2) / pointMultiplier, (pixels.GetHeight() / 2 - GetY(index)) / pointMultiplier, 0);
+        return CreateVector<T>((GetX(index) - GetWidth() / 2) / pointMultiplier, (GetHeight() / 2 - GetY(index)) / pointMultiplier, 0);
+    }
+    template <typename T>
+    Matrix<T> PositionToIndex(const Matrix<T>& pos) const {
+        return PositionToIndexInternal(pos * pointMultiplier);
     }
     template <typename T, typename... Args>
     bool SetImage(Args... args) {
-        T* tmp = new T(GetWidth(), GetHeight(), args...);
+        T* tmp = new T(0, 0, args...);
         if (!tmp) return false;
         if (image) delete image;
         image = tmp;
         return true;
     }
-
     /// @brief Saves data as image
     /// @param file File to save data into
     /// @return Status
@@ -282,23 +287,27 @@ struct Renderer : Image {
 
     private:
     /// @brief Image for saving and loading
-    Image* image;
+    SaveableImage* image;
 
+    template <typename T>
+    Matrix<T> PositionToIndexInternal(const Matrix<T>& pos) const {
+        return CreateVector<T>(GetWidth() / 2 + GetX(pos), GetHeight() / 2 - GetY(pos), 0);
+    }
     /// @brief Returns pixel from index
     /// @tparam T Type of number
     /// @param pos Index of pixel
     /// @return Pixel
     template <typename T>
     uint32_t* GetPixelInternal(const Matrix<T>& pos) {
-        const Matrix<T> tmp = CreateVector<T>(pixels.GetWidth() / 2 + GetX(pos), pixels.GetHeight() / 2 - GetY(pos), 0);
-        return (IsBetween(GetX(tmp), 0, (ssize_t)pixels.GetWidth() - 1) && IsBetween(GetY(tmp), 0, (ssize_t)pixels.GetHeight() - 1)) ? &pixels.At(GetX(tmp), GetY(tmp)) : nullptr;
+        const Matrix<T> tmp = PositionToIndexInternal<T>(pos);
+        return (IsBetween(GetX(tmp), 0, (ssize_t)GetWidth() - 1) && IsBetween(GetY(tmp), 0, (ssize_t)GetHeight() - 1)) ? &At(GetX(tmp), GetY(tmp)) : nullptr;
     }
     /// @brief Sets pixel from index
     /// @tparam T Type of number
     /// @param pos Index of pixel
     /// @param color Value to set
     template <typename T>
-    void SetPixelInternal(const Matrix<T>& pos, const uint32_t& color) {
+    void SetPixelInternal(const Matrix<T>& pos, uint32_t color) {
         uint32_t* pixel = GetPixelInternal<T>(pos);
         if (pixel) *pixel = BlendColor(*pixel, color);
     }

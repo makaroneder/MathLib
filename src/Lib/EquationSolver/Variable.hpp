@@ -1,6 +1,5 @@
-#ifndef Variable_H
-#define Variable_H
-#include "../Constants.hpp"
+#ifndef EquationSolver_Variable_H
+#define EquationSolver_Variable_H
 #include "Node.hpp"
 
 /// @brief Contains the name, value and type of the variable

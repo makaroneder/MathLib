@@ -3,7 +3,7 @@
 #include <Host.hpp>
 #include <Logger.hpp>
 #include <String.hpp>
-#include <Trigonometry.hpp>
+#include <Math/Trigonometry.hpp>
 
 num_t RealNaturalLog(num_t x) {
     if (x <= 0) return MakeNaN();
@@ -27,12 +27,41 @@ num_t RealSqrt(num_t x) {
     if (x < 0) return MakeNaN();
     if (!x) return 0;
     num_t guess = x;
-    num_t prev_guess;
+    num_t prev;
     do {
-        prev_guess = guess;
+        prev = guess;
         guess = (guess + x / guess) / 2;
-    } while (Abs(guess - prev_guess) > eps);
+    } while (Abs(guess - prev) > eps);
     return guess;
+}
+num_t RealInversedTan(num_t x) {
+    if (Abs(x) > 1) {
+        if (x > 0) return pi / 2 - RealInversedTan(1 / x);
+        else return -pi / 2 - RealInversedTan(1 / x);
+    }
+    else {
+        num_t result = 0;
+        num_t term = x;
+        const num_t tmp = x * x;
+        size_t n = 1;
+        while (Abs(term) > eps) {
+            result += term;
+            term *= -tmp * (2 * n - 1) / (2 * n + 1);
+            n++;
+        }
+        return result;
+    }
+}
+complex_t ComplexExp(complex_t x) {
+    complex_t term = complex_t(1, 0);
+    complex_t sum = term;
+    size_t n = 1;
+    while (Abs(term) > eps) {
+        term *= complex_t(0, x.GetImaginary()) / n;
+        sum += term;
+        n++;
+    }
+    return sum * Exp(x.GetReal());
 }
 [[noreturn]] void Panic(const char* str) {
     if (LogString(str)) LogChar('\n');
@@ -97,13 +126,13 @@ num_t RandomFloat(void) {
     return (num_t)((rand / (UINT16_MAX + 1)) % ((UINT16_MAX + 1) / 2)) / ((UINT16_MAX + 1) / 2);
 }
 num_t Abs(complex_t x) {
-    return Sqrt(Pow(x.GetReal(), 2) + Pow(x.GetImaginary(), 2));
+    return RealSqrt(x.GetReal() * x.GetReal() + x.GetImaginary() * x.GetImaginary());
 }
 complex_t Pow(complex_t x, complex_t y) {
-    return Exp(y * NaturalLog(x));
+    return ComplexExp(y * NaturalLog(x));
 }
 complex_t NaturalLog(complex_t x) {
-    return complex_t(RealNaturalLog(RealSqrt(x.GetReal() * x.GetReal() + x.GetImaginary() * x.GetImaginary())), x.GetArgument());
+    return complex_t(RealNaturalLog(Abs(x)), x.GetArgument());
 }
 bool IsNaN(num_t x) {
     return x != x;
@@ -122,38 +151,36 @@ num_t Exp(num_t x) {
     }
     return sum;
 }
-
-
-// TODO:
-bool panicOnHost = false;
-
 num_t Round(num_t x) {
-    if (panicOnHost) Panic(__func__);
-    // TODO: almost not used in library
-    (void)x;
-    return 0;
+    const ssize_t ix = x;
+    x -= ix;
+    if (Abs(x) >= 0.5) return ix + Sign<num_t>(x);
+    else return ix;
 }
 num_t Floor(num_t x) {
     const ssize_t ix = x;
-    return x == ix ? ix : (ix - 1);
+    return x < 0 ? (ix - 1) : ix;
 }
 complex_t Sin(complex_t x) {
-    if (panicOnHost) Panic(__func__);
-    // TODO: important
-    (void)x;
-    return complex_t();
+    complex_t term = x;
+    complex_t sum = term;
+    const complex_t tmp = x * x;
+    size_t n = 1;
+    while (Abs(term) > eps) {
+        term *= -tmp / ((2 * n) * (2 * n + 1));
+        sum += term;
+        n++;
+    }
+    return sum;
 }
 complex_t InversedSin(complex_t x) {
-    if (panicOnHost) Panic(__func__);
-    // TODO: important
-    (void)x;
-    return complex_t();
+    return complex_t(0, 1) * NaturalLog(Sqrt(-x * x + 1) - x * complex_t(0, 1));
 }
 num_t InversedTan2(num_t y, num_t x) {
-    if (x > 0) return InversedTan(y / x);
+    if (x > 0) return RealInversedTan(y / x);
     else if (x < 0) {
-        if (y >= 0) return InversedTan(y / x) + pi;
-        else return InversedTan(y / x) - pi;
+        if (y >= 0) return RealInversedTan(y / x) + pi;
+        else return RealInversedTan(y / x) - pi;
     }
     else if (y > 0) return pi / 2;
     else if (y < 0) return -pi / 2;

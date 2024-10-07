@@ -5,7 +5,7 @@ VFS::VFS(void) : entries(Array<VFSEntry>()), files(Array<VFSFile>()) {}
 bool VFS::AddFileSystem(const VFSEntry& entry) {
     return entry.fs && entries.Add(entry);
 }
-size_t VFS::OpenInternal(const String& path, const OpenMode& mode) {
+size_t VFS::OpenInternal(const String& path, OpenMode mode) {
     size_t off = 0;
     if (path.At(0) == '/') off++;
     String fs;
@@ -26,21 +26,21 @@ size_t VFS::OpenInternal(const String& path, const OpenMode& mode) {
     }
     return files.Add(ret) ? files.GetSize() - 1 : SIZE_MAX;
 }
-bool VFS::Close(const size_t& file) {
+bool VFS::Close(size_t file) {
     if (files.GetSize() <= file || entries.GetSize() <= files.At(file).fs) return false;
     if (!entries.At(files.At(file).fs).fs->Close(files.At(file).index)) return false;
     files.At(file).free = true;
     return true;
 }
-size_t VFS::Read(const size_t& file, void* buffer, const size_t& size, const size_t& position) {
+size_t VFS::Read(size_t file, void* buffer, size_t size, size_t position) {
     if (files.GetSize() <= file || entries.GetSize() <= files.At(file).fs) return 0;
     return entries.At(files.At(file).fs).fs->Read(files.At(file).index, buffer, size, position);
 }
-size_t VFS::Write(const size_t& file, const void* buffer, const size_t& size, const size_t& position) {
+size_t VFS::Write(size_t file, const void* buffer, size_t size, size_t position) {
     if (files.GetSize() <= file || entries.GetSize() <= files.At(file).fs) return 0;
     return entries.At(files.At(file).fs).fs->Write(files.At(file).index, buffer, size, position);
 }
-size_t VFS::GetSize(const size_t& file) {
+size_t VFS::GetSize(size_t file) {
     if (files.GetSize() <= file || entries.GetSize() <= files.At(file).fs) return 0;
     return entries.At(files.At(file).fs).fs->GetSize(files.At(file).index);
 }

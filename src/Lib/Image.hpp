@@ -1,12 +1,12 @@
 #ifndef Image_H
 #define Image_H
-#include "Matrix.hpp"
+#include "Math/Matrix.hpp"
 
-struct Image : Saveable {
+struct Image : Allocatable {
     /// @brief Creates a new image
-    /// @param w Width of the image
-    /// @param h Height of the image
-    Image(const size_t& w, const size_t& h);
+    /// @param width Width of the image
+    /// @param height Height of the image
+    Image(size_t width, size_t height);
     /// @brief Returns width of the image
     /// @return Width of the image
     size_t GetWidth(void) const;
@@ -15,10 +15,27 @@ struct Image : Saveable {
     size_t GetHeight(void) const;
     /// @brief Fills image
     /// @param color Color to fill the image with
-    inline void Fill(const uint32_t& color);
+    inline void Fill(uint32_t color);
+    /// @brief Returns data at specified position
+    /// @param x X position
+    /// @param y Y position
+    /// @return Data at specified position
+    inline uint32_t& At(size_t x, size_t y);
+    /// @brief Returns data at specified position
+    /// @param x X position
+    /// @param y Y position
+    /// @return Data at specified position
+    inline uint32_t At(size_t x, size_t y) const;
+    Image Resize(size_t xMultiplier, size_t yMultiplier) const;
 
     /// @brief Pixels
     Matrix<uint32_t> pixels;
+};
+struct SaveableImage : Image, Saveable {
+    /// @brief Creates a new image
+    /// @param width Width of the image
+    /// @param height Height of the image
+    SaveableImage(size_t width, size_t height);
 };
 
 #endif

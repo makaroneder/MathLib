@@ -1,5 +1,5 @@
-#ifndef Preprocesor_H
-#define Preprocesor_H
+#ifndef EquationSolver_Preprocesor_H
+#define EquationSolver_Preprocesor_H
 #include "../FileSystems/FileSystem.hpp"
 
 /// @brief Reads file from given path

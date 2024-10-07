@@ -1,5 +1,5 @@
-#ifndef Optimizer_H
-#define Optimizer_H
+#ifndef EquationSolver_Optimizer_H
+#define EquationSolver_Optimizer_H
 #include "BuiltinFunction.hpp"
 #include "FunctionNode.hpp"
 

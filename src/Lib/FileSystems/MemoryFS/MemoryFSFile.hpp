@@ -1,5 +1,5 @@
-#ifndef MemoryFSFile_H
-#define MemoryFSFile_H
+#ifndef FileSystems_MemoryFS_File_H
+#define FileSystems_MemoryFS_File_H
 #include <stddef.h>
 #include <stdint.h>
 
@@ -8,7 +8,7 @@ struct MemoryFSFile {
     bool write;
     bool free;
 
-    MemoryFSFile(const size_t& resource = SIZE_MAX, const bool& write = false);
+    MemoryFSFile(size_t resource = SIZE_MAX, bool write = false);
 };
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef MathFSBootSector_H
-#define MathFSBootSector_H
+#ifndef FileSystems_MathFS_BootSector_H
+#define FileSystems_MathFS_BootSector_H
 #include <stdint.h>
 
 struct MathFSBootSector {

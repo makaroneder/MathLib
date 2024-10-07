@@ -1,6 +1,6 @@
 #include "File.hpp"
 
-File FileSystem::Open(const String& path, const OpenMode& mode) {
+File FileSystem::Open(const String& path, OpenMode mode) {
     return File(*this, OpenInternal(path, mode));
 }
 String FileSystem::ListFiles(const String& path_, const String& padding) {

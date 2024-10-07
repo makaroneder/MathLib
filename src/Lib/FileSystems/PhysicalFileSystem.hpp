@@ -1,5 +1,5 @@
-#ifndef PhysicalFileSystem_H
-#define PhysicalFileSystem_H
+#ifndef FileSystems_PhysicalFileSystem_H
+#define FileSystems_PhysicalFileSystem_H
 #include "FileSystem.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 

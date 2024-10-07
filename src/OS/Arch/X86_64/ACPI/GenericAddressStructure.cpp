@@ -1,7 +1,7 @@
 #include "GenericAddressStructure.hpp"
 #include "../IO.hpp"
 
-Expected<uint64_t> GenericAddressStructure::Read(const AccessSize& legacySize) const {
+Expected<uint64_t> GenericAddressStructure::Read(AccessSize legacySize) const {
     const AccessSize size = accessSize == AccessSize::Undefined ? legacySize : accessSize;
     switch (addressSpace) {
         case AddressSpace::SystemMemory: switch (size) {
@@ -20,7 +20,7 @@ Expected<uint64_t> GenericAddressStructure::Read(const AccessSize& legacySize) c
         default: return Expected<uint64_t>();
     }
 }
-bool GenericAddressStructure::Write(uint64_t value, const AccessSize& legacySize) {
+bool GenericAddressStructure::Write(uint64_t value, AccessSize legacySize) {
     const AccessSize size = accessSize == AccessSize::Undefined ? legacySize : accessSize;
     switch (addressSpace) {
         case AddressSpace::SystemMemory: switch (size) {

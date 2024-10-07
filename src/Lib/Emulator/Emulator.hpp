@@ -1,5 +1,5 @@
-#ifndef Emulator_Emulator_H
-#define Emulator_Emulator_H
+#ifndef Emulator_H
+#define Emulator_H
 #include "../Interfaces/Printable.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 
@@ -14,13 +14,13 @@ struct Emulator : ByteDevice, Printable {
     /// @param size Size of the buffer
     /// @param position Position to read from
     /// @return Size of bytes read
-    virtual size_t ReadPositionedSizedBuffer(void* buffer, const size_t& size, const size_t& position) override;
+    virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;
     /// @brief Writes data to the buffer
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @param position Position to write to
     /// @return Size of written bytes
-    virtual size_t WritePositionedSizedBuffer(const void* buffer, const size_t& size, const size_t& position) override;
+    virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
 
     protected:
     Array<uint8_t> memory;

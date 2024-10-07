@@ -1,9 +1,7 @@
 #include "Event.hpp"
 
-Event::Event(const Type& t) : type(t) {}
-Event::Event(const char& chr, const bool& pressed) : Event(pressed ? Type::KeyPressed : Type::KeyReleased) {
-    key = chr;
-}
+Event::Event(Type type) : type(type) {}
+Event::Event(char key, bool pressed) : type(pressed ? Type::KeyPressed : Type::KeyReleased), key(key) {}
 String Event::KeyToString(void) const {
     if (key == '\n') return "\\n";
     else return key;

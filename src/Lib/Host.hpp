@@ -1,6 +1,6 @@
 #ifndef Host_H
 #define Host_H
-#include "Complex.hpp"
+#include "Math/Complex.hpp"
 
 #ifndef Freestanding
 #include <ostream>
@@ -35,7 +35,7 @@ bool IsDigit(char chr);
 /// @brief Checks if character is white space
 /// @param chr Character to check
 /// @return Is character white space
-bool IsWhiteSpace(const char& chr);
+bool IsWhiteSpace(char chr);
 bool IsHexDigit(char chr);
 bool IsAlphaDigit(char chr);
 size_t BitwiseAnd(size_t x, size_t y);

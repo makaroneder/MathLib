@@ -49,7 +49,7 @@ bool ContainsVariable(const Node* node, const String& name) {
     if (node->right) return ContainsVariable(node->right, name);
     return false;
 }
-Node::Node(const Type& t, const String& val, Node* l, Node* r) : type(t), value(val), left(l), right(r) {}
+Node::Node(Type type, const String& value, Node* left, Node* right) : type(type), value(value), left(left), right(right) {}
 Node::~Node(void) {
     if (left != nullptr) delete left;
     if (right != nullptr) delete right;

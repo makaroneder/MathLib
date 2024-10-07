@@ -5,9 +5,9 @@
 /// @brief Renderer implementation using dummy functions
 struct DummyRenderer : Renderer {
     /// @brief Creates a new renderer
-    /// @param w Width of the window
-    /// @param h Height of the window
-    DummyRenderer(const size_t& w, const size_t& h);
+    /// @param width Width of the window
+    /// @param height Height of the window
+    DummyRenderer(size_t width, size_t height);
     /// @brief Does nothing
     /// @return Status
     virtual bool Update(void) override;

@@ -33,6 +33,9 @@ Array<String> Split(String str, String delim, bool preserveDelim) {
     ret.Add(str);
     return ret;
 }
+String BoolToString(bool x) {
+    return x ? "true" : "false";
+}
 String ToString(size_t x, size_t base, size_t size) {
     if (!x) return "0";
     String buff;

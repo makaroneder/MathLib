@@ -1,5 +1,5 @@
-#ifndef Writeable_H
-#define Writeable_H
+#ifndef Interfaces_Writeable_H
+#define Interfaces_Writeable_H
 #include "../Expected.hpp"
 
 struct Writeable : Allocatable {
@@ -7,12 +7,12 @@ struct Writeable : Allocatable {
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @return Size of written bytes
-    virtual size_t WriteSizedBuffer(const void* buffer, const size_t& size) = 0;
+    virtual size_t WriteSizedBuffer(const void* buffer, size_t size) = 0;
     /// @brief Writes data to the buffer
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @return Status
-    bool WriteBuffer(const void* buffer, const size_t& size);
+    bool WriteBuffer(const void* buffer, size_t size);
     /// @brief Writes text
     /// @param str Text to write
     /// @return Status

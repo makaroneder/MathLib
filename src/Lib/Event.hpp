@@ -15,12 +15,12 @@ struct Event : Printable {
     char key;
 
     /// @brief Creates a new event
-    /// @param t Type of event
-    Event(const Type& t = Type::None);
+    /// @param type Type of event
+    Event(Type type = Type::None);
     /// @brief Creates a new event
-    /// @param chr Key pressed or released
+    /// @param key Key pressed or released
     /// @param pressed Key status
-    Event(const char& chr, const bool& pressed);
+    Event(char key, bool pressed);
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation

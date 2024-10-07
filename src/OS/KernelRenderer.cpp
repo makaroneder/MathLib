@@ -1,8 +1,8 @@
 #include "KernelRenderer.hpp"
 
 KernelRenderer* renderer = nullptr;
-KernelRenderer::KernelRenderer(const size_t& width, const size_t& height) : KernelRenderer(width, height, nullptr, Color(0)) {}
-KernelRenderer::KernelRenderer(const size_t& width, const size_t& height, uint32_t* framebuffer, const Color& fieldPosition) : Renderer(width, height), events(Array<Event>()), framebuffer(framebuffer), fieldPosition(fieldPosition) {}
+KernelRenderer::KernelRenderer(size_t width, size_t height) : KernelRenderer(width, height, nullptr, Color(0)) {}
+KernelRenderer::KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const Color& fieldPosition) : Renderer(width, height), events(Array<Event>()), framebuffer(framebuffer), fieldPosition(fieldPosition) {}
 bool KernelRenderer::Update(void) {
     if (framebuffer) {
         const size_t width = GetWidth();

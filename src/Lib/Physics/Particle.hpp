@@ -1,11 +1,11 @@
-#ifndef Particle_H
+#ifndef Physics_Particle_H
 #define Particle_H
 #include "../Geometry/LineShape.hpp"
 #include "SIUnits.hpp"
 
 template <typename T>
 struct Particle : LineShape<T> {
-    Particle(const Matrix<T>& position = CreateVector<T>(0, 0, 0), const bool& fixed = false) : LineShape<T>(position), acceleration(CreateVector<T>(0, 0, 0)), prevPosition(position), fixed(fixed) {}
+    Particle(const Matrix<T>& position = CreateVector<T>(0, 0, 0), bool fixed = false) : LineShape<T>(position), prevPosition(position), acceleration(CreateVector<T>(0, 0, 0)), fixed(fixed) {}
     constexpr Matrix<T> GetPreviousPosition(void) const {
         return prevPosition;
     }
@@ -32,10 +32,10 @@ struct Particle : LineShape<T> {
         const Particle<T>& other = (const Particle<T>&)other_;
         return this->position == other.position;
     }
+    Matrix<T> prevPosition;
 
     private:
     Matrix<T> acceleration;
-    Matrix<T> prevPosition;
     bool fixed;
 };
 

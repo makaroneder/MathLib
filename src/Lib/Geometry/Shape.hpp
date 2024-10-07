@@ -1,6 +1,6 @@
 #ifndef Geometry_Shape_H
 #define Geometry_Shape_H
-#include "../Matrix.hpp"
+#include "../Math/Matrix.hpp"
 
 template <typename T>
 struct Shape : Allocatable {

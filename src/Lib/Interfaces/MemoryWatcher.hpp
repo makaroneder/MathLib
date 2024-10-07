@@ -1,5 +1,5 @@
-#ifndef MemoryWatcher_H
-#define MemoryWatcher_H
+#ifndef Interfaces_MemoryWatcher_H
+#define Interfaces_MemoryWatcher_H
 #include <stddef.h>
 
 struct MemoryWatcher {

@@ -1,5 +1,5 @@
-#ifndef MBRHeader_H
-#define MBRHeader_H
+#ifndef MBR_Header_H
+#define MBR_Header_H
 #include "MBRPartitionEntry.hpp"
 
 /// @brief MBR boot sector

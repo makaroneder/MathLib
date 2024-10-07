@@ -1,11 +1,10 @@
 #ifndef Rope_H
 #define Rope_H
 #include <Physics/Particle.hpp>
-#include <Quaternion.hpp>
+#include <Math/Quaternion.hpp>
 
 template <typename T>
 struct Rope : LineShape<T> {
-    static constexpr size_t jakobsenIterations = 50;
     Rope(const Matrix<T>& gravity, const Array<Matrix<T>>& segments) : LineShape<T>(CreateVector<T>(0, 0, 0)), gravity(gravity), particles(Array<Particle<T>>(segments.GetSize())), lengths(Array<T>(segments.GetSize() - 1)) {
         particles.At(0) = Particle<T>(segments.At(0), true);
         for (size_t i = 1; i < particles.GetSize(); i++) {
@@ -18,19 +17,17 @@ struct Rope : LineShape<T> {
             particle.Accelerate(gravity);
             particle.Update(dt);
         }
-        for (size_t iteration = 0; iteration < jakobsenIterations; iteration++) {
-            for (size_t i = 1; i < particles.GetSize(); i++) {
-                Particle<T>& p1 = particles.At(i - 1);
-                Particle<T>& p2 = particles.At(i);
-                const Matrix<T> d1 = p2.position - p1.position;
-                const T d2 = d1.GetLength();
-                const Matrix<T> tmp = d1 * (d2 - lengths.At(i - 1)) / (d2 * 2);
-                if (p1.IsFixed() && !p2.IsFixed()) p2.position -= tmp * 2;
-                else if (!p1.IsFixed() && p2.IsFixed()) p1.position += tmp * 2;
-                else {
-                    p1.position += tmp;
-                    p2.position -= tmp;
-                }
+        for (size_t i = 1; i < particles.GetSize(); i++) {
+            Particle<T>& p1 = particles.At(i - 1);
+            Particle<T>& p2 = particles.At(i);
+            const Matrix<T> d1 = p2.prevPosition - p1.prevPosition;
+            const T d2 = d1.GetLength();
+            const Matrix<T> tmp = d1 * (d2 - lengths.At(i - 1)) / (d2 * 2);
+            if (p1.IsFixed() && !p2.IsFixed()) p2.position -= tmp * 2;
+            else if (!p1.IsFixed() && p2.IsFixed()) p1.position += tmp * 2;
+            else {
+                p1.position += tmp;
+                p2.position -= tmp;
             }
         }
     }

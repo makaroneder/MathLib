@@ -21,7 +21,7 @@ struct MusicNote : Allocatable {
     } type;
     Second<T> duration;
 
-    MusicNote(const Type& t, const Second<T>& dur) : type(t), duration(dur) {}
+    MusicNote(Type type, const Second<T>& duration) : type(type), duration(duration) {}
     Hertz<T> GetFrequency(void) const {
         return type == Type::None ? Hertz<T>(0) : Hertz<T>(440) * Pow(2, ((ssize_t)type - 49) / 12);
     }

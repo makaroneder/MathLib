@@ -1,11 +1,10 @@
 #include "Time.hpp"
 #include "Disks.hpp"
 #include "Arch/Arch.hpp"
+#include "DateKeeper.hpp"
 #include "KernelRenderer.hpp"
 #include <MathLib.hpp>
 
-// TODO:
-extern bool panicOnHost;
 bool constructorsCalled = false;
 [[gnu::constructor]] void TestConstructors(void) {
     constructorsCalled = true;
@@ -33,10 +32,6 @@ extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
     LogString(String("Boot time: ") + Second<num_t>(GetTime()).ToString() + '\n');
     mainTimer->Sleep(eps);
     renderer->Fill(UINT32_MAX);
-    #if 0
-    panicOnHost = true;
-    renderer->Puts<num_t>("Hello, world!", &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, 0, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff);
-    #endif
     if (!renderer->Update()) Panic("Failed to update renderer");
     String command = "";
     LogString("> ");
@@ -53,11 +48,16 @@ extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
                     }
                     else if (args.At(0) == "ls") LogString(vfs.ListFiles(args.GetSize() > 1 ? args.At(1) : ""));
                     else if (args.At(0) == "read") LogString(args.GetSize() < 2 ? "Usage: read <path>\n" : vfs.Open(args.At(1), OpenMode::Read).ReadUntil('\0') + '\n');
+                    else if (args.At(0) == "date") LogString(dateKeeper->GetDate().ToString() + '\n');
                     else if (args.At(0) == "exit") ShutdownArch();
                     else LogString(String("Unknown command: '") + args.At(0) + "'\n");
                 }
                 command = "";
                 LogString("> ");
+            }
+            else if (event.key == '\b') {
+                command = SubString(command, 0, command.GetSize() - 1);
+                LogString(String("\n> ") + command);
             }
             else command += event.key;
         }

@@ -73,7 +73,7 @@ uint8_t GetIRQBase(void) {
     return pic.GetBase();
 }
 void SetInterrupts(bool value) {
-    Flags flags = GetFlags();
+    X86Flags flags = GetFlags();
     if (value) {
         if (!--interruptDisabledCount) flags.interruptEnable = true;
     }

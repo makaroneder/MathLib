@@ -28,7 +28,7 @@ struct PSF1 {
     /// @brief Returns glyph
     /// @param chr Character to return glyph of
     /// @return Glyph
-    const uint8_t* GetGlyph(const char& chr) const;
+    const uint8_t* GetGlyph(char chr) const;
 } __attribute__((packed));
 
 /// @brief src/Lib/zap-light16.psf

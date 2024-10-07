@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "Rope.hpp"
 #include <MathLib.hpp>
 #include <SDL2.cpp>
@@ -21,15 +22,18 @@ int main(int, char**) {
         for (num_t i = 0; i <= 5; i += 0.1) points.Add(CreateVector<num_t>(i, 3, 0));
         Rope<num_t> rope = Rope<num_t>(CreateVector<num_t>(0, -9.81, 0), points);
         Second<num_t> prevTime = Second<num_t>(GetTime());
+        bool pause = false;
         while (true) {
             const Second<num_t> currTime = Second<num_t>(GetTime());
             const Second<num_t> dt = currTime - prevTime;
             prevTime = currTime;
-            rope.Update(dt);
+            if (!pause) rope.Update(dt);
             renderer.Fill(0);
             renderer.DrawShape<num_t>(rope, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
             if (!renderer.Update()) Panic("Failed to update UI");
-            if (renderer.GetEvent().type == Event::Type::Quit) break;
+            const Event event = renderer.GetEvent();
+            if (event.type == Event::Type::Quit) break;
+            else if (event.type == Event::Type::KeyPressed && event.key == ' ') pause = !pause;
         }
         return EXIT_SUCCESS;
     }

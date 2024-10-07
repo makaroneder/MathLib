@@ -15,7 +15,7 @@ struct CharBuffer : Buffer<char> {
         for (size_t i = 0; i < size; i++) buffer[i] = str[i];
         buffer[size] = '\0';
     }
-    CharBuffer(const char& chr) : CharBuffer((CharBuffer() + chr).GetValue()) {}
+    CharBuffer(const char& chr) : CharBuffer(&chr, 1) {}
     CharBuffer& operator+=(const CharBuffer& other) {
         char* ptr = new char[size + other.size + 1];
         if (!ptr) return *this;
@@ -30,7 +30,7 @@ struct CharBuffer : Buffer<char> {
     CharBuffer& operator+=(const char* other) {
         return *this += CharBuffer(other);
     }
-    CharBuffer& operator+=(const char& chr) {
+    CharBuffer& operator+=(char chr) {
         char* ptr = new char[size + 2];
         if (!ptr) return *this;
         for (size_t i = 0; i < size; i++) ptr[i] = At(i);
@@ -50,7 +50,7 @@ struct CharBuffer : Buffer<char> {
         tmp += other;
         return tmp;
     }
-    CharBuffer operator+(const char& chr) const {
+    CharBuffer operator+(char chr) const {
         CharBuffer tmp = *this;
         tmp += chr;
         return tmp;

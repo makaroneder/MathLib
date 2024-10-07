@@ -11,7 +11,7 @@ struct E9 : Writeable {
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @return Size of written bytes
-    virtual size_t WriteSizedBuffer(const void* buffer, const size_t& size) override;
+    virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
 };
 
 #endif

@@ -1,10 +1,10 @@
-#ifndef X86State_H
-#define X86State_H
+#ifndef Emulator_X86_State_H
+#define Emulator_X86_State_H
 #include "../Register.hpp"
-#include "Flags.hpp"
+#include "X86Flags.hpp"
 
 struct X86State : Printable {
-    Flags flags;
+    X86Flags flags;
     Register ip;
     Register cs;
     Register ds;
@@ -29,7 +29,7 @@ struct X86State : Printable {
     Register r14;
     Register r15;
 
-    X86State(Flags flags, Register ip);
+    X86State(X86Flags flags, Register ip);
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation

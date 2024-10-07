@@ -1,5 +1,5 @@
-#ifndef FileInfo_H
-#define FileInfo_H
+#ifndef FileSystems_FileInfo_H
+#define FileSystems_FileInfo_H
 #include "../Interfaces/Printable.hpp"
 
 struct FileInfo : Printable {
@@ -15,7 +15,7 @@ struct FileInfo : Printable {
     };
     String path;
 
-    FileInfo(const Type& type = Type::Unknown, const String& path = "");
+    FileInfo(Type type = Type::Unknown, const String& path = "");
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation

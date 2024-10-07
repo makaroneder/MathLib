@@ -19,13 +19,13 @@ struct AHCIPort : SectorByteDevice {
     /// @param buff Buffer to read data into
     /// @param count Number of sectors to read
     /// @return Status
-    virtual bool ReadSectors(const size_t& sector, void* buff, const size_t& count) override;
+    virtual bool ReadSectors(size_t sector, void* buff, size_t count) override;
     /// @brief Writes sectors
     /// @param sector First sector to write
     /// @param buff Buffer to write data to
     /// @param count Number of sectors to write
     /// @return Status
-    virtual bool WriteSectors(const size_t& sector, const void* buff, const size_t& count) override;
+    virtual bool WriteSectors(size_t sector, const void* buff, size_t count) override;
 
     private:
     HBAPort* port;

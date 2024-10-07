@@ -1,12 +1,12 @@
 #include "SDL2.hpp"
 
-SDL2Renderer::SDL2Renderer(const String& title, const size_t& w, const size_t& h) : Renderer(w, h) {
+SDL2Renderer::SDL2Renderer(const String& title, size_t width, size_t height) : Renderer(width, height) {
     if (SDL_Init(SDL_INIT_VIDEO)) Panic(SDL_GetError());
-    window = SDL_CreateWindow(title.GetValue(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_SHOWN);
+    window = SDL_CreateWindow(title.GetValue(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
     if (!window) Panic(SDL_GetError());
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) Panic(SDL_GetError());
-    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, w, h);
+    texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (!texture) Panic(SDL_GetError());
 }
 SDL2Renderer::~SDL2Renderer(void) {

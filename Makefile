@@ -53,6 +53,7 @@ CRYPTMSG ?= $(SRCDIR)/TestPrograms/Cryptography/CaesarCipher.txt
 MLITERS ?= 20000
 SERVERPORT ?= 8080
 INTERPRETERPROGRAM ?= $(SRCDIR)/TestPrograms/Interpreter/Main.txt
+CHEMPROGRAM ?= $(SRCDIR)/TestPrograms/Chemistry/All.txt
 DISKSIZE ?= 4480
 DISKOUTPUT ?= $(BUILDDIR)/Disk.img
 DISKTYPE ?= MBR
@@ -60,7 +61,7 @@ DISKARGS = -diskSize $(DISKSIZE) -diskType $(DISKTYPE) -output $(DISKOUTPUT)
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
-OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 2048 -cdrom $(BUILDDIR)/OS.img
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img
 
 include $(BUILDDIR)/Targets.mk
 

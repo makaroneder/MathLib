@@ -1,5 +1,5 @@
-#ifndef Printable_H
-#define Printable_H
+#ifndef Interfaces_Printable_H
+#define Interfaces_Printable_H
 #include "../Typedefs.hpp"
 #include "Allocatable.hpp"
 

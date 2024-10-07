@@ -1,5 +1,5 @@
 #include "Host.hpp"
-#include "Trigonometry.hpp"
+#include "Math/Trigonometry.hpp"
 
 #define ComplexToReal(x)                                                \
     const complex_t complex = x;                                        \
@@ -24,7 +24,7 @@ bool IsAlpha(char chr) {
 bool IsDigit(char chr) {
     return chr >= '0' && chr <= '9';
 }
-bool IsWhiteSpace(const char& chr) {
+bool IsWhiteSpace(char chr) {
     return chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r';
 }
 bool IsHexDigit(char chr) {

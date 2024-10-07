@@ -1,5 +1,5 @@
-#ifndef Readable_H
-#define Readable_H
+#ifndef Interfaces_Readable_H
+#define Interfaces_Readable_H
 #include "../Expected.hpp"
 
 struct Readable : Allocatable {
@@ -7,19 +7,19 @@ struct Readable : Allocatable {
     /// @param buffer Buffer to read data from
     /// @param size Size of the buffer
     /// @return Size of bytes read
-    virtual size_t ReadSizedBuffer(void* buffer, const size_t& size) = 0;
+    virtual size_t ReadSizedBuffer(void* buffer, size_t size) = 0;
     /// @brief Reads data to the buffer
     /// @param buffer Buffer to read data into
     /// @param size Size of the buffer
     /// @return Status
-    bool ReadBuffer(void* buffer, const size_t& size);
+    bool ReadBuffer(void* buffer, size_t size);
     /// @brief Reads one character
     /// @return Character
     Expected<char> Getc(void);
     /// @brief Reads until certain character is found
     /// @param end Last character to read
     /// @return Read text
-    String ReadUntil(const char& end);
+    String ReadUntil(char end);
     /// @brief Reads one T value
     /// @tparam T Type of value
     /// @param value Value to read

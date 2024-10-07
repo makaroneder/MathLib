@@ -1,5 +1,5 @@
-#ifndef MBRPartitionEntry_H
-#define MBRPartitionEntry_H
+#ifndef MBR_PartitionEntry_H
+#define MBR_PartitionEntry_H
 #include "MBRPartitionEntryCHS.hpp"
 #include "../Interval.hpp"
 
@@ -226,7 +226,7 @@ struct MBRPartitionEntry {
     uint32_t sectorCount;
 
     MBRPartitionEntry(void);
-    MBRPartitionEntry(const Interval<uint32_t>& lba, const ID& id, const Type& type = Type::Normal, const uint8_t& heads = 16, const uint8_t& sectors = 63);
+    MBRPartitionEntry(const Interval<uint32_t>& lba, ID id, Type type = Type::Normal, uint8_t heads = 16, uint8_t sectors = 63);
     bool IsValid(void) const;
     Interval<uint32_t> GetInterval(void) const;
 } __attribute__((packed));

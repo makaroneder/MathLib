@@ -1,5 +1,5 @@
 #include "X86.hpp"
-#include "ModRM.hpp"
+#include "X86ModRM.hpp"
 
 // TODO: xlatb daa das cmps scas test xchg div idiv imul lds lea les loop loope loopne loopnz
 // TODO: loopz mul neg not rcl rcr rol ror sal sar rep repe repne repnz repz in out int into
@@ -8,7 +8,7 @@
 case op: {                                                                          \
     const Expected<uint8_t> tmp = Fetch<uint8_t>();                                 \
     if (!tmp.HasValue()) return false;                                              \
-    const ModRM modrm = tmp.Get();                                                  \
+    const X86ModRM modrm = tmp.Get();                                               \
     uint64_t result;                                                                \
     uint64_t a;                                                                     \
     uint64_t b;                                                                     \
@@ -49,7 +49,7 @@ void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
     state.flags.parity = !(parity & 1);
     state.flags.auxiliaryCarry = (a ^ b ^ val) & 1 << 4;
 }
-Register* X86::GetRegister(const uint8_t& code) {
+Register* X86::GetRegister(uint8_t code) {
     switch (code) {
         case 0: return &state.a;
         case 1: return &state.c;
@@ -338,7 +338,7 @@ bool X86::Step(void) {
         case 0x39: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
-            const ModRM modrm = tmp.Get();
+            const X86ModRM modrm = tmp.Get();
             uint64_t a;
             uint64_t b;
             switch (modrm.mode) {
@@ -397,7 +397,7 @@ bool X86::Step(void) {
         case 0xd3: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
-            const ModRM modrm = tmp.Get();
+            const X86ModRM modrm = tmp.Get();
             if (modrm.src != 0b101) return false;
             uint64_t a;
             uint8_t b = state.c.Get8(false);

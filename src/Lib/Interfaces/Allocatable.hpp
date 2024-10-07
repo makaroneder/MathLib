@@ -1,5 +1,5 @@
-#ifndef Allocatable_H
-#define Allocatable_H
+#ifndef Interfaces_Allocatable_H
+#define Interfaces_Allocatable_H
 #include "MemoryWatcher.hpp"
 
 struct Allocatable {

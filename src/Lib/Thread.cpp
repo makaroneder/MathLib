@@ -4,7 +4,7 @@ void Thread::RunAndJoin(const Function<void, Interval<ssize_t>>& function, const
     Run(function, interval);
     Join();
 }
-Array<Interval<ssize_t>> SplitJob(const Interval<ssize_t>& interval, const size_t& threads) {
+Array<Interval<ssize_t>> SplitJob(const Interval<ssize_t>& interval, size_t threads) {
     Array<Interval<ssize_t>> ret = Array<Interval<ssize_t>>(threads);
     const num_t step = interval.GetSize() / threads;
     for (size_t i = 0; i < threads; i++) {

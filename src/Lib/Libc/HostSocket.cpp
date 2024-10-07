@@ -13,11 +13,11 @@ HostSocket::HostSocket(int handle_) {
 HostSocket::~HostSocket(void) {
     if (close(handle)) Panic("Failed to close socket");
 }
-size_t HostSocket::ReadSizedBuffer(void* buffer, const size_t& size) {
+size_t HostSocket::ReadSizedBuffer(void* buffer, size_t size) {
     const ssize_t tmp = recv(handle, buffer, size, 0);
     return tmp < 0 ? 0 : tmp;
 }
-size_t HostSocket::WriteSizedBuffer(const void* buffer, const size_t& size) {
+size_t HostSocket::WriteSizedBuffer(const void* buffer, size_t size) {
     const ssize_t tmp = send(handle, buffer, size, 0);
     return tmp < 0 ? 0 : tmp;
 }

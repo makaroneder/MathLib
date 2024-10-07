@@ -2,11 +2,11 @@
 #define TGA_H
 #include "Image.hpp"
 
-struct TGA : Image {
+struct TGA : SaveableImage {
     /// @brief Creates a new TGA image
-    /// @param w Width of the window
-    /// @param h Height of the window
-    TGA(const size_t& w, const size_t& h);
+    /// @param width Width of the window
+    /// @param height Height of the window
+    TGA(size_t width, size_t height);
     /// @brief Saves data as TGA image
     /// @param file File to save data into
     /// @return Status

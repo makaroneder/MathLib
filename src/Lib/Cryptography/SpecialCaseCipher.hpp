@@ -1,5 +1,5 @@
-#ifndef SpecialCaseCipher_H
-#define SpecialCaseCipher_H
+#ifndef Cryptography_SpecialCaseCipher_H
+#define Cryptography_SpecialCaseCipher_H
 #include "Cipher.hpp"
 #include "../Expected.hpp"
 

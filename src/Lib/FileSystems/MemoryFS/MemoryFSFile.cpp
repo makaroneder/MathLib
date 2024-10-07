@@ -1,3 +1,3 @@
 #include "MemoryFSFile.hpp"
 
-MemoryFSFile::MemoryFSFile(const size_t& resource, const bool& write) : resource(resource), write(write), free(false) {}
+MemoryFSFile::MemoryFSFile(size_t resource, bool write) : resource(resource), write(write), free(false) {}

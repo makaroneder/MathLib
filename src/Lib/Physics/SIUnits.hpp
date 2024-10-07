@@ -1,7 +1,7 @@
 #ifndef Physics_SIUnits_H
 #define Physics_SIUnits_H
-#include "../MathObject.hpp"
-#include "../Constants.hpp"
+#include "../Math/MathObject.hpp"
+#include "../Math/Constants.hpp"
 
 template <typename T>
 struct Unit : Printable {

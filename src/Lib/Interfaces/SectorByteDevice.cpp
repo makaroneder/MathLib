@@ -1,6 +1,6 @@
 #include "SectorByteDevice.hpp"
 
-size_t SectorByteDevice::ReadPositionedSizedBuffer(void* buffer, const size_t& size, const size_t& position) {
+size_t SectorByteDevice::ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) {
     const size_t sectorSize = GetSectorSize();
     const size_t start = position % sectorSize;
     const size_t count = size / sectorSize + (size % sectorSize != 0) + (start != 0);
@@ -10,7 +10,7 @@ size_t SectorByteDevice::ReadPositionedSizedBuffer(void* buffer, const size_t& s
     for (size_t i = 0; i < size; i++) buff8[i] = tmp[i + start];
     return size;
 }
-size_t SectorByteDevice::WritePositionedSizedBuffer(const void* buffer, const size_t& size, const size_t& position) {
+size_t SectorByteDevice::WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) {
     const size_t sectorSize = GetSectorSize();
     const size_t start = position % sectorSize;
     const size_t count = size / sectorSize + (size % sectorSize != 0) + (start != 0);

@@ -1,8 +1,7 @@
 #ifndef Color_H
 #define Color_H
-#include "Constants.hpp"
+#include "Math/Constants.hpp"
 #include "Interval.hpp"
-#include "Vector.hpp"
 #include <stdint.h>
 
 /// @brief Union for converting 32 bit color to RGBA
@@ -23,13 +22,13 @@ union Color {
 
     /// @brief Creates a new color union from a 32 bit color
     /// @param h 32 bit color
-    Color(const uint32_t& h = 0);
+    Color(uint32_t h = 0);
     /// @brief Creates a new color union from a RGBA color
     /// @param r Red channel
     /// @param g Green channel
     /// @param b Blue channel
     /// @param a Alpha channel
-    Color(const uint8_t& r, const uint8_t& g, const uint8_t& b, const uint8_t& a);
+    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 };
 /// @brief R(t) = [255 * sin^2(t), 255 * sin^2(t + 0.66 * pi), 255 * sin^2(t + 1.32 * pi), 255]
 /// @tparam T Type of number
@@ -39,15 +38,10 @@ template <typename T>
 uint32_t GetRainbow(const T& t) {
     return Color(UINT8_MAX * Pow(Sin(t), 2), UINT8_MAX * Pow(Sin(t + 0.66 * pi), 2), UINT8_MAX * Pow(Sin(t + 1.32 * pi), 2), UINT8_MAX).hex;
 }
-template <typename T>
-uint32_t VectorToColor(const Matrix<T>& vector) {
-    const Interval<T> intensity = Interval<T>(0, 0.999);
-    return Color(intensity.Clamp(LinearToGamma<T>(GetX(vector))) * 256, intensity.Clamp(LinearToGamma<T>(GetY(vector))) * 256, intensity.Clamp(LinearToGamma<T>(GetZ(vector))) * 256, UINT8_MAX).hex;
-}
 /// @brief B(a, b) = [a_0 * (255 - b_3) + b_0 * b_3) / 255, a_1 * (255 - b_3) + b_1 * b_3) / 255, a_2 * (255 - b_3) + b_2 * b_3) / 255, 255]
 /// @param c1 Previus color
 /// @param c2 New color
 /// @return Blended colors
-uint32_t BlendColor(const uint32_t& c1, const uint32_t& c2);
+uint32_t BlendColor(uint32_t c1, uint32_t c2);
 
 #endif

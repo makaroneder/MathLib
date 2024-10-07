@@ -2,7 +2,7 @@
 #include "String.hpp"
 
 CommandLineEntry::CommandLineEntry(const String& name, const String& value) : name(name), value(value) {}
-CommandLine::CommandLine(const size_t& argc, const char** argv) {
+CommandLine::CommandLine(size_t argc, const char** argv) {
     String prevName = "";
     for (size_t i = 1; i < argc; i++) {
         const String arg = argv[i];

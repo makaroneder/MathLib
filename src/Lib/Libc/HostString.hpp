@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef HostString_H
-#define HostString_H
+#ifndef Libc_HostString_H
+#define Libc_HostString_H
 #include "../Interfaces/Collection.hpp"
 #include <string>
 
@@ -9,11 +9,11 @@ struct HostString : Collection<char> {
     HostString(const char* str) : string(str) {}
     HostString(const char* str, size_t size) : string(str, size) {}
     HostString(const std::string& str) : string(str) {}
-    HostString(const char& chr) : HostString((HostString() + chr).GetValue()) {}
-    virtual char At(const size_t& index) const override {
+    HostString(char chr) : HostString((HostString() + chr).GetValue()) {}
+    virtual char At(size_t index) const override {
         return string.at(index);
     }
-    virtual char& At(const size_t& index) override {
+    virtual char& At(size_t index) override {
         return string.at(index);
     }
     virtual bool Add(const char& val) override {

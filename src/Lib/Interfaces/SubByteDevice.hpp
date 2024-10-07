@@ -1,5 +1,5 @@
-#ifndef SubByteDevice_H
-#define SubByteDevice_H
+#ifndef Interfaces_SubByteDevice_H
+#define Interfaces_SubByteDevice_H
 #include "ByteDevice.hpp"
 #include "../Interval.hpp"
 
@@ -13,13 +13,13 @@ struct SubByteDevice : ByteDevice {
     /// @param size Size of the buffer
     /// @param position Position to read from
     /// @return Size of bytes read
-    virtual size_t ReadPositionedSizedBuffer(void* buffer, const size_t& size, const size_t& position) override;
+    virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;
     /// @brief Writes data to the buffer
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @param position Position to write to
     /// @return Size of written bytes
-    virtual size_t WritePositionedSizedBuffer(const void* buffer, const size_t& size, const size_t& position) override;
+    virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
 
     private:
     ByteDevice& base;

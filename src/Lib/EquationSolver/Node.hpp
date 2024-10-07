@@ -1,6 +1,6 @@
-#ifndef Node_H
-#define Node_H
-#include "../Complex.hpp"
+#ifndef EquationSolver_Node_H
+#define EquationSolver_Node_H
+#include "../Math/Complex.hpp"
 
 /// @brief Contains mathematical operations, constants, functions and variables
 struct Node : Printable {
@@ -27,11 +27,11 @@ struct Node : Printable {
     Node* right;
 
     /// @brief Creates a new node
-    /// @param t Node type
-    /// @param val Value
-    /// @param l Left child
-    /// @param r Right child
-    Node(const Type& t, const String& val, Node* l = nullptr, Node* r = nullptr);
+    /// @param type Node type
+    /// @param value Value
+    /// @param left Left child
+    /// @param right Right child
+    Node(Type type, const String& value, Node* left = nullptr, Node* right = nullptr);
     /// @brief Destroys current node and it's children
     virtual ~Node(void) override;
     /// @brief Creates a new node with the same values as the current node

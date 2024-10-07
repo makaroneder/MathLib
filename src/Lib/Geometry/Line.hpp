@@ -1,6 +1,6 @@
-#ifndef Line_H
-#define Line_H
-#include "../Vector.hpp"
+#ifndef Geometry_Line_H
+#define Geometry_Line_H
+#include "../Math/Vector.hpp"
 
 /// @brief Line
 /// @tparam T Type of number

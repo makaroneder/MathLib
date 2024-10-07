@@ -6,8 +6,8 @@
 template <typename T>
 struct Buffer : Collection<T> {
     Buffer(void) : buffer(nullptr), size(0) {}
-    Buffer(const size_t& size_) : buffer(size_ ? new T[size_] : nullptr), size(size_) {}
-    Buffer(const T* arr, const size_t& size) : Buffer(size) {
+    Buffer(size_t size) : buffer(size ? new T[size] : nullptr), size(size) {}
+    Buffer(const T* arr, size_t size) : Buffer(size) {
         for (size_t i = 0; i < size; i++) At(i) = arr[i];
     }
     Buffer(const Buffer<T>& other) : Buffer(other.size) {
@@ -19,12 +19,12 @@ struct Buffer : Collection<T> {
     virtual ~Buffer(void) override {
         delete [] buffer;
     }
-    virtual T At(const size_t& index) const override {
+    virtual T At(size_t index) const override {
         if (index >= size) Panic("Index out of bounds");
         if (!buffer) Panic("Buffer allocation failed");
         return buffer[index];
     }
-    virtual T& At(const size_t& index) override {
+    virtual T& At(size_t index) override {
         if (index >= size) Panic("Index out of bounds");
         if (!buffer) Panic("Buffer allocation failed");
         return buffer[index];

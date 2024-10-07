@@ -1,7 +1,7 @@
 #include "P6.hpp"
 #include "Color.hpp"
 
-P6::P6(const size_t& w, const size_t& h) : Image(w, h) {}
+P6::P6(size_t width, size_t height) : SaveableImage(width, height) {}
 bool P6::Save(Writeable& file) const {
     if (!file.Puts("P6\n") || !file.Puts(ToString(pixels.GetWidth())) || !file.Puts(" ") || !file.Puts(ToString(pixels.GetHeight())) || !file.Puts(" 255\n")) return false;
     for (size_t y = 0; y < pixels.GetHeight(); y++) {

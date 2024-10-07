@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef HostCollection_H
-#define HostCollection_H
+#ifndef Libc_HostCollection_H
+#define Libc_HostCollection_H
 #include "../Interfaces/Collection.hpp"
 #include <vector>
 
@@ -8,15 +8,15 @@ template <typename T>
 struct HostCollection : Collection<T> {
     HostCollection(void) {}
     HostCollection(const std::vector<T>& arr) : buffer(arr) {}
-    HostCollection(const size_t& size_) : buffer(std::vector<T>(size_)) {}
-    HostCollection(const T* arr, const size_t& size) {
+    HostCollection(size_t size) : buffer(std::vector<T>(size)) {}
+    HostCollection(const T* arr, size_t size) {
         buffer.reserve(size);
         for (size_t i = 0; i < size; i++) buffer.push_back(arr[i]);
     }
-    virtual T At(const size_t& index) const override {
+    virtual T At(size_t index) const override {
         return buffer.at(index);
     }
-    virtual T& At(const size_t& index) override {
+    virtual T& At(size_t index) override {
         return buffer.at(index);
     }
     virtual bool Add(const T& val) override {

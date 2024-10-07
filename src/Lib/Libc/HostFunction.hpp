@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef HostFunction_H
-#define HostFunction_H
+#ifndef Libc_HostFunction_H
+#define Libc_HostFunction_H
 #include "../Interfaces/Function.hpp"
 #include <functional>
 

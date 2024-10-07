@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include <MathLib.hpp>
 #include <Libc/HostFunction.hpp>
 #include <SDL2.cpp>

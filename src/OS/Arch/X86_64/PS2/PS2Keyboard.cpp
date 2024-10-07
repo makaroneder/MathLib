@@ -12,7 +12,6 @@ PS2Keyboard::~PS2Keyboard(void) {
     RegisterInterruptDevice(GetIRQBase() + 1, nullptr);
 }
 void PS2Keyboard::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
-    // TODO: Register backspace
     // TODO: Correctly convert keys with capslock
     uint8_t code = Read().Get("Failed to read keyboard scancode");
     bool pressed = true;
@@ -21,8 +20,7 @@ void PS2Keyboard::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
         code -= 0x80;
     }
     char key = '\0';
-    if (code == (uint8_t)SpecialCodes::Enter) key = '\n';
-    else if (code == (uint8_t)SpecialCodes::LeftShift) leftShift = pressed;
+    if (code == (uint8_t)SpecialCodes::LeftShift) leftShift = pressed;
     else if (code == (uint8_t)SpecialCodes::RightShift) rightShift = pressed;
     else if (code == (uint8_t)SpecialCodes::Capslock && pressed) capslock = !capslock;
     else if (code < SizeOfArray(scanCodeSet1)) key = scanCodeSet1[code];

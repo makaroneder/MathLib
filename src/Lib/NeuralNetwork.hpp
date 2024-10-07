@@ -1,8 +1,8 @@
 #ifndef NeuralNetwork_H
 #define NeuralNetwork_H
-#include "Matrix.hpp"
-#include "Sigmoid.hpp"
-#include "Trigonometry.hpp"
+#include "Math/Matrix.hpp"
+#include "Math/Sigmoid.hpp"
+#include "Math/Trigonometry.hpp"
 
 /// @brief Neural network
 /// @tparam T Type of number

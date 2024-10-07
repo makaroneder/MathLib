@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "Symbol.hpp"
 #include "Consumable.hpp"
 #include <MathLib.hpp>
@@ -58,7 +59,7 @@ int main(int, char**) {
                 if (!renderer.Puts<num_t>(ToString(SizeOfArray(consumables) - i) + ")", &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(-3.5, y, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
                 renderer.DrawShape<num_t>(tmp, CreateVector<num_t>(0, 0, 0), 0xff0000ff);
             }
-            if (!renderer.Puts<num_t>(std::vector<String> { String("Score: ") + ToString(score), String("Bet: ") + ToString(bet), }, &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, -0.6, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
+            if (!renderer.Puts<num_t>(String("Score: ") + ToString(score) + "\nBet: " + ToString(bet), &_binary_src_Lib_zap_light16_psf_start, CreateVector<num_t>(0, -0.6, 0), CreateVector<num_t>(0, 0, 0), CreateVector<size_t>(1, 1, 1), 0xff0000ff)) Panic("Failed to print text");
             for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
                 Symbol tmp = symbols[symbolIndexes.At(i)];
                 tmp.position = CreateVector<num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);

@@ -1,5 +1,5 @@
-#ifndef VFSFile_H
-#define VFSFile_H
+#ifndef FileSystems_VFS_File_H
+#define FileSystems_VFS_File_H
 #include <stddef.h>
 #include <stdint.h>
 

@@ -11,8 +11,8 @@ struct Cipher : Allocatable {
     String DecryptString(const String& str, const String& key) const;
 
     private:
-    String GetString(const String& str, const String& key, const bool& encrypt) const;
-    uint8_t GetIndex(const char& chr) const;
+    String GetString(const String& str, const String& key, bool encrypt) const;
+    uint8_t GetIndex(char chr) const;
 
     String letters;
     String upperLetters;

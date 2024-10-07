@@ -10,7 +10,7 @@ bool HasMSR(void) {
     if (d & (1 << (uint8_t)CPUIDBits::D1MSR)) hasMSR = true;
     return hasMSR;
 }
-Expected<uint64_t> GetMSR(const uint32_t& msr) {
+Expected<uint64_t> GetMSR(uint32_t msr) {
     if (!HasMSR()) return Expected<uint64_t>();
     uint32_t low = 0;
     uint32_t high = 0;
@@ -20,7 +20,7 @@ Expected<uint64_t> GetMSR(const uint32_t& msr) {
     tmp.Set32(high, true);
     return Expected<uint64_t>(tmp.value);
 }
-bool SetMSR(const uint32_t& msr, const uint64_t& value) {
+bool SetMSR(uint32_t msr, uint64_t value) {
     if (!HasMSR()) return false;
     const Register tmp = Register(value);
     asm volatile("wrmsr" : : "a"(tmp.Get32(false)), "d"(tmp.Get32(true)), "c"(msr));

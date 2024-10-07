@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
         #endif
         if (argc < 2) Panic(String("Usage: ") + argv[0] + " <output file>");
         HostFileSystem fs;
-        Music<num_t> music = Music<num_t>(44100, 32767, std::vector<MusicNote<num_t>> {
+        const Music<num_t> music = Music<num_t>(44100, 32767, std::vector<MusicNote<num_t>> {
             MusicNote<num_t>(MusicNote<num_t>::Type::E3, 0.4), MusicNote<num_t>(MusicNote<num_t>::Type::None, 0.5),
             MusicNote<num_t>(MusicNote<num_t>::Type::D2, 0.4), MusicNote<num_t>(MusicNote<num_t>::Type::None, 0.5),
             MusicNote<num_t>(MusicNote<num_t>::Type::C1, 0.4), MusicNote<num_t>(MusicNote<num_t>::Type::None, 0.5),

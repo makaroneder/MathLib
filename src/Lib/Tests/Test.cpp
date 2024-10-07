@@ -1,7 +1,7 @@
 #include "Test.hpp"
-#include "../Matrix.hpp"
-#include "../Sigmoid.hpp"
-#include "../Factorial.hpp"
+#include "../Math/Matrix.hpp"
+#include "../Math/Sigmoid.hpp"
+#include "../Math/Factorial.hpp"
 #include "../Physics/SIUnits.hpp"
 
 bool Test::ReportRecord(const Record& record) {

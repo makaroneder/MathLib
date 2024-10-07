@@ -1,8 +1,6 @@
-#ifndef BuiltinFunction_H
-#define BuiltinFunction_H
+#ifndef EquationSolver_BuiltinFunction_H
+#define EquationSolver_BuiltinFunction_H
 #include "Node.hpp"
-#include "../Sigmoid.hpp"
-#include "../Trigonometry.hpp"
 #include "../FunctionPointer.hpp"
 
 using BuiltinFunctionPointer = FunctionPointer<Node*, const Array<const Node*>&>;

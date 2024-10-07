@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #define FillGapsInFunctions
 #include <MathLib.hpp>
 #include <Libc/HostFunction.hpp>

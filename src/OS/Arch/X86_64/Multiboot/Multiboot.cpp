@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Multiboot.hpp"
 #include <String.hpp>
 #include <Host.hpp>
@@ -25,3 +26,5 @@ String MultibootFramebuffer::ToString(const String& padding) const {
     ret += padding + "\tType: " + (type < Type::TypeCount ? typeStr[(uint8_t)type] : String("Unknown(0x") + ::ToString((uint8_t)type, 16) + ')') + '\n';
     return ret + padding + "}\n";
 }
+
+#endif

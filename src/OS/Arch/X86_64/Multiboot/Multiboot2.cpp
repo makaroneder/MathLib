@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "Multiboot2.hpp"
 #include <Logger.hpp>
@@ -168,3 +169,5 @@ RSDP* InitMultiboot2(Multiboot2Info* info, RangeMemoryManager& rangeMemoryManage
     }
     return rsdp;
 }
+
+#endif

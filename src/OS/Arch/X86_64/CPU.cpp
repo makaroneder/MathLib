@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "CPU.hpp"
 
 uintptr_t GetFlags(void) {
@@ -14,3 +15,5 @@ void SetFlags(uintptr_t flags) {
         "popfq" :: "r"(flags) : "cc"
     );
 }
+
+#endif

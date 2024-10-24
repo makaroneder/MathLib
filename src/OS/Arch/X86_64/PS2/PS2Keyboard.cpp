@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "PS2Keyboard.hpp"
 
@@ -27,3 +28,5 @@ void PS2Keyboard::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     if (key && (leftShift || rightShift || capslock)) key = ToUpper(key);
     if (key && renderer && !renderer->AddEvent(Event(key, pressed))) Panic("Failed to add keyboard event");
 }
+
+#endif

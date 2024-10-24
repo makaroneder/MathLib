@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Registers.hpp"
 #include <String.hpp>
 
@@ -27,3 +28,5 @@ X86State Registers::ToX86State(void) const {
     ret.r15 = r15;
     return ret;
 }
+
+#endif

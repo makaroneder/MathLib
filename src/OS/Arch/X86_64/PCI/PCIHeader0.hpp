@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PCIHeader0_H
 #define PCIHeader0_H
 #include "PCIHeader.hpp"
@@ -16,4 +17,5 @@ struct PCIHeader0 : PCIHeader {
     uint8_t maxLatency;
 } __attribute__((packed));
 
+#endif
 #endif

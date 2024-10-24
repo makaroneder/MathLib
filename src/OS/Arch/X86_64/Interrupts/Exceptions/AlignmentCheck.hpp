@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef AlignmentCheck_H
 #define AlignmentCheck_H
 #include "Exception.hpp"
@@ -8,4 +9,5 @@ struct AlignmentCheck : Exception {
     virtual String GetPanicMessage(uintptr_t error) const override;
 };
 
+#endif
 #endif

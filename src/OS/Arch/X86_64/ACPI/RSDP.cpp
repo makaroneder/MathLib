@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "RSDP.hpp"
 #include <stddef.h>
 
@@ -21,3 +22,5 @@ RSDP* FindRSDP(void) {
         if (rsdp->IsValid()) return rsdp;
     return nullptr;
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "GeneralProtectionFault.hpp"
 #include <String.hpp>
 
@@ -5,3 +6,5 @@ GeneralProtectionFault::GeneralProtectionFault(void) : Exception(Type::GeneralPr
 String GeneralProtectionFault::GetPanicMessage(uintptr_t error) const {
     return String("General protection fault detected\nSegment selector: 0x") + ToString(error, 16) + '\n';
 }
+
+#endif

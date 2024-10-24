@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "SCI.hpp"
 #include "ACPI.hpp"
 #include "MADT.hpp"
@@ -216,3 +217,5 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
     // TODO: Init local APIC
     return true;
 }
+
+#endif

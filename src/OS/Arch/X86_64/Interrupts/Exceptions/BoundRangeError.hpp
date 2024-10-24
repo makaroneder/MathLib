@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef BoundRangeError_H
 #define BoundRangeError_H
 #include "Exception.hpp"
@@ -7,4 +8,5 @@ struct BoundRangeError : Exception {
     virtual String GetPanicMessage(uintptr_t error) const override;
 };
 
+#endif
 #endif

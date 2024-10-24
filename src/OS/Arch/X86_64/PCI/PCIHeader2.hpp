@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PCIHeader2_H
 #define PCIHeader2_H
 #include "PCIHeader.hpp"
@@ -27,4 +28,5 @@ struct PCIHeader2 : PCIHeader {
     uint32_t legacyPCCard;
 } __attribute__((packed));
 
+#endif
 #endif

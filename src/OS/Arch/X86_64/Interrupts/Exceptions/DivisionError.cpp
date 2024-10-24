@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "DivisionError.hpp"
 
 DivisionError::DivisionError(void) : Exception(Type::DivisionError) {}
@@ -15,3 +16,5 @@ void DivisionError::Trigger(Registers regs) {
         "r8", "r9", "r10"
     );
 }
+
+#endif

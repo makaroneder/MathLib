@@ -27,25 +27,30 @@ HEADERS = $(shell find $(SRCDIR) -type f -name "*.hpp")
 HEADERS += $(shell find $(SRCDIR)/Platform -type f -name "*.cpp")
 HEADERS += $(SRCDIR)/Lib/MathLib.hpp
 
+BUILDSYSDEPS = $(shell find $(SRCDIR)/BuildSystem -type f -name "*.cpp")
 SRCXX = $(shell find $(SRCDIR)/Lib -type f -name "*.cpp")
 SRCPSF = $(shell find $(SRCDIR)/Lib -type f -name "*.psf")
-OBJS = $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Objects/Lib/%.o, $(SRCPSF))
+OBJS = $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Lib/%.o, $(SRCPSF))
 
 $(BUILDDIR)/libExtras.a: $(OBJS)
 	@mkdir -p $(@D)
 	@$(AR) $(ARFLAGS) $@ $^
 	@echo "==> Created: $@"
-$(BUILDDIR)/Objects/%.o: $(SRCDIR)/%.psf Makefile $(BUILDDIR)/Targets.mk
+$(BUILDDIR)/Lib/%.o: $(SRCDIR)/Lib/%.psf Makefile
 	@mkdir -p $(@D)
 	@$(OBJCPY) $(OBJCPYFLAGS) $< $@
-	@echo "==> Created: $@"
-$(BUILDDIR)/Targets.mk: $(SCRIPTSDIR)/Config.py Targets.txt
-	@mkdir -p $(@D)
-	@$(PYTHON) $^ $@
 	@echo "==> Created: $@"
 $(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX)
 	@mkdir -p $(@D)
 	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
+	@echo "==> Created: $@"
+$(BUILDDIR)/TmpBuild.out: $(SRCDIR)/BuildSystem/Main.cpp $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libExtras.a
+	@mkdir -p $(@D)
+	@$(CXX) $(CXXFLAGS) -DIncludeSources $< -o $@ -L $(BUILDDIR) -l Extras
+	@echo "==> Created: $@"
+$(BUILDDIR)/Build.mk: $(BUILDDIR)/TmpBuild.out Build.txt
+	@mkdir -p $(@D)
+	@./$^ $@
 	@echo "==> Created: $@"
 
 MATHPROGRAMS ?= $(shell find $(SRCDIR)/TestPrograms/Math -type f -name "*.txt")
@@ -58,12 +63,15 @@ DISKSIZE ?= 4480
 DISKOUTPUT ?= $(BUILDDIR)/Disk.img
 DISKTYPE ?= MBR
 DISKARGS = -diskSize $(DISKSIZE) -diskType $(DISKTYPE) -output $(DISKOUTPUT)
+CARBONS ?= 6
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
+OSLINKER = $(SRCDIR)/OS/Linker.ld
+OSLDFLAGS = $(OSCXXFLAGS) -T $(OSLINKER) -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map
 OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img
 
-include $(BUILDDIR)/Targets.mk
+include $(BUILDDIR)/Build.mk
 
 clean:
 	@mkdir -p $(BUILDDIR)

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "HBAPort.hpp"
 #include "FISRegH2D.hpp"
 #include "HBACommandTable.hpp"
@@ -159,3 +160,5 @@ uint8_t HBAPort::FindCommandSlot(void) const {
         if (!(slots >> i & 1)) return i;
     return 32;
 }
+
+#endif

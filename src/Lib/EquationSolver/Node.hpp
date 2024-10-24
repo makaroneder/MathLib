@@ -37,6 +37,7 @@ struct Node : Printable {
     /// @brief Creates a new node with the same values as the current node
     /// @return New node
     Node* Recreate(void) const;
+    Array<const Node*> ToArray(void) const;
     /// @brief Converts node to number array
     /// @return Number array
     Array<complex_t> ToNumber(void) const;

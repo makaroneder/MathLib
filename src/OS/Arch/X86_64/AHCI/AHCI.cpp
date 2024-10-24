@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "AHCI.hpp"
 #include "HBAMemory.hpp"
 #include "../../../Disks.hpp"
@@ -59,3 +60,5 @@ bool InitAHCI(PCIHeader* header) {
     }
     return true;
 }
+
+#endif

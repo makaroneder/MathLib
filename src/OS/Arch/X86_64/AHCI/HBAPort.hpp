@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef HBAPort_H
 #define HBAPort_H
 #include <stdint.h>
@@ -117,4 +118,5 @@ struct HBAPort {
     uint64_t vendor[2];
 };
 
+#endif
 #endif

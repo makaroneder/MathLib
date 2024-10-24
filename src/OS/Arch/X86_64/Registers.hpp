@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Registers_H
 #define Registers_H
 #include <Emulator/X86/X86State.hpp>
@@ -33,4 +34,5 @@ struct Registers {
     X86State ToX86State(void) const;
 } __attribute__((packed));
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PCIHeader_H
 #define PCIHeader_H
 #include <stdint.h>
@@ -23,4 +24,5 @@ struct PCIHeader {
     bool IsValid(void) const;
 } __attribute__((packed));
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef RTC_H
 #define RTC_H
 #include "CMOS.hpp"
@@ -22,4 +23,5 @@ struct RTC : CMOS, Timer, DateKeeper, InterruptDevice {
     bool SetRate(uint8_t rate);
 };
 
+#endif
 #endif

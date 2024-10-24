@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef VBE_H
 #define VBE_H
 #include <stdint.h>
@@ -54,4 +55,5 @@ struct VBEModeInfo {
     uint16_t reserved4[103];
 } __attribute__((packed));
 
+#endif
 #endif

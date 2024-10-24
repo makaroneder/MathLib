@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "GDTEntry.hpp"
 
 void GDTEntry::SetBase(uint32_t base) {
@@ -12,3 +13,5 @@ bool GDTEntry::SetLimit(uint32_t limit) {
     limit2 = limit >> 16;
     return true;
 }
+
+#endif

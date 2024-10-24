@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef CMOS_H
 #define CMOS_H
 #include <stdint.h>
@@ -39,4 +40,5 @@ struct CMOS {
 };
 extern CMOS* cmos;
 
+#endif
 #endif

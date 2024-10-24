@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PCI.hpp"
 #include "PCIHeader.hpp"
 #include "../USB/UHCI.hpp"
@@ -850,3 +851,5 @@ bool InitPCI(const MCFG* mcfg) {
     }
     return true;
 }
+
+#endif

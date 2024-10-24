@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Interrupts_H
 #define Interrupts_H
 #include "../Registers.hpp"
@@ -10,4 +11,5 @@ void SetInterrupts(bool value);
 void RegisterInterruptDevice(uintptr_t interrupt, InterruptDevice* device);
 bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment);
 
+#endif
 #endif

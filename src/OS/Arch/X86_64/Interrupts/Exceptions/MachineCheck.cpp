@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "MachineCheck.hpp"
 #include "../../ControlRegisters.hpp"
 
@@ -10,3 +11,5 @@ bool MachineCheck::Enable(void) {
 String MachineCheck::GetPanicMessage(uintptr_t) const {
     return "CPU internal error detected\n";
 }
+
+#endif

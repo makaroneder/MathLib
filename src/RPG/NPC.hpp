@@ -14,6 +14,9 @@ struct NPC : Entity<T> {
         dialog = tmp.Get();
         return true;
     }
+    size_t GetDialogIndex(void) const {
+        return dialog;
+    }
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status

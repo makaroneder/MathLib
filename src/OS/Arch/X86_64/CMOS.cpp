@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Interrupts/Interrupts.hpp"
 #include "CMOS.hpp"
 #include "IO.hpp"
@@ -27,3 +28,5 @@ void CMOS::SetNMI(bool nmi_) {
     nmi = nmi_;
     Read((Register)ReadPort<uint8_t>(0x70));
 }
+
+#endif

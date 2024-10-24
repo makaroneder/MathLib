@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef HBAMemory_H
 #define HBAMemory_H
 #include "HBAPort.hpp"
@@ -19,4 +20,5 @@ struct HBAMemory {
     HBAPort ports[1];
 };
 
+#endif
 #endif

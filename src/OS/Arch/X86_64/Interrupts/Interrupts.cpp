@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Exceptions/HypervisorInjectionException.hpp"
 #include "Exceptions/ControlProtectionException.hpp"
 #include "Exceptions/CoprocessorSegmentOverrun.hpp"
@@ -98,3 +99,5 @@ bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment) {
     initialized = true;
     return true;
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "MSR.hpp"
 #include "CPUID.hpp"
 #include <Emulator/Register.hpp>
@@ -26,3 +27,5 @@ bool SetMSR(uint32_t msr, uint64_t value) {
     asm volatile("wrmsr" : : "a"(tmp.Get32(false)), "d"(tmp.Get32(true)), "c"(msr));
     return true;
 }
+
+#endif

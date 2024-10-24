@@ -94,10 +94,12 @@ Node* Optimizer::OptimizeInternal(const Node* node) {
         const complex_t index = r->ToNumber().At(0).GetReal() - 1;
         if (index.GetImaginary() != 0) return new Node(Node::Type::Index, "", l, r);
         if (l->type == Node::Type::Array) {
-            const complex_t tmp = l->ToNumber().At(index.GetReal());
+            Node* tmp = l->ToArray().At(index.GetReal())->Recreate();
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, tmp.ToString());
+            Node* ret = OptimizeInternal(tmp);
+            delete tmp;
+            return ret;
         }
         else if (l->type == Node::Type::String) {
             const char tmp = l->value.At(index.GetReal());
@@ -306,11 +308,16 @@ Node* Optimizer::OptimizeInternal(const Node* node) {
         Node* l = OptimizeInternal(node->left);
         Node* r = OptimizeInternal(node->right);
         if (l->type == Node::Type::Constant && r->type == Node::Type::Constant) {
-            const complex_t lv = l->ToNumber().At(0);
-            const complex_t rv = r->ToNumber().At(0);
+            const String ret = (l->ToNumber().At(0) + r->ToNumber().At(0)).ToString();
             delete l;
             delete r;
-            return new Node(Node::Type::Constant, (lv + rv).ToString());
+            return new Node(Node::Type::Constant, ret);
+        }
+        else if (l->type == Node::Type::String && r->type == Node::Type::String) {
+            const String ret = l->value + r->value;
+            delete l;
+            delete r;
+            return new Node(Node::Type::String, ret);
         }
         else if (l->type == Node::Type::Constant && l->value == "0") {
             Node* ret = r->Recreate();

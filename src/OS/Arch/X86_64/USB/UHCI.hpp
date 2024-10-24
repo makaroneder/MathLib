@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef UHCI_H
 #define UHCI_H
 #include "../PCI/PCIHeader.hpp"
@@ -48,4 +49,5 @@ struct UHCI {
     uint32_t base;
 };
 
+#endif
 #endif

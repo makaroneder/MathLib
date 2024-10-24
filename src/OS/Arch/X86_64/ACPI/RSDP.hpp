@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef RSDP_H
 #define RSDP_H
 #include <stdint.h>
@@ -22,4 +23,5 @@ struct RSDP2 : RSDP {
 } __attribute__((packed));
 RSDP* FindRSDP(void);
 
+#endif
 #endif

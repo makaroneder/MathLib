@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef ControlRegisters_H
 #define ControlRegisters_H
 #include <Expected.hpp>
@@ -42,4 +43,5 @@ enum class ControlRegister4 : uint8_t {
 Expected<uintptr_t> GetControlRegister(uint8_t num);
 bool SetControlRegister(uint8_t num, uintptr_t value);
 
+#endif
 #endif

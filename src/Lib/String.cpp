@@ -6,9 +6,9 @@ String Erase(String str, size_t pos, size_t len) {
     for (size_t i = pos + len; i < str.GetSize(); i++) ret += str.At(i);
     return ret;
 }
-size_t Find(String str, String delim) {
+size_t Find(String str, String delim, size_t start) {
     if (str.GetSize() < delim.GetSize()) return SIZE_MAX;
-    for (size_t i = 0; i < str.GetSize() - delim.GetSize(); i++) {
+    for (size_t i = start; i < str.GetSize() - delim.GetSize(); i++) {
         bool found = true;
         for (size_t j = 0; j < delim.GetSize() && found; j++)
             if (str.At(i + j) != delim.At(j)) found = false;

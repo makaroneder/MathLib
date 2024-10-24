@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PIT.hpp"
 #include "IO.hpp"
 
@@ -35,3 +36,5 @@ bool PIT::SetReloadValue(size_t value) {
 void PIT::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     time += 1 / GetFrequency();
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PS2.hpp"
 #include "../IO.hpp"
 #include "PS2Mouse.hpp"
@@ -111,3 +112,5 @@ void InitPS2(void) {
         }
     }
 }
+
+#endif

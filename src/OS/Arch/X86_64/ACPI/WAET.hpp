@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef WAET_H
 #define WAET_H
 #include "ACPITable.hpp"
@@ -9,4 +10,5 @@ struct WAET : ACPITable {
     uint32_t reserved : 30;
 } __attribute__((packed));
 
+#endif
 #endif

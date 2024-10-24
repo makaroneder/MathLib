@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PS2Mouse_H
 #define PS2Mouse_H
 #include "PS2Device.hpp"
@@ -40,4 +41,5 @@ struct PS2Mouse : PS2Device, InterruptDevice {
     uint8_t packets[4];
 };
 
+#endif
 #endif

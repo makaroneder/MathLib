@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef LocalAPIC_H
 #define LocalAPIC_H
 #include <stdint.h>
@@ -55,4 +56,5 @@ struct LocalAPIC {
     LocalAPICRegister reserved5;
 } __attribute__((packed));
 
+#endif
 #endif

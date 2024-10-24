@@ -1,0 +1,39 @@
+MakeObjects(dir : String, ext : String, cmd : String, sources : String) : String = DeclareTarget("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext + " $(HEADERS)", cmd, false) + CreateObjects("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext, sources)
+LDTarget(out : String, objs : String, libs : String, ld : String, ldFlags : String, deps : String) : String = DeclareTarget("$(BUILDDIR)/" + out, objs + deps + " $(BUILDDIR)/libExtras.a", ld + " " + ldFlags + " " + objs + " -o $@ " + libs + " -L $(BUILDDIR) -l Extras", false)
+DefaultRunTargets(name : String, app : String, args : String) : Void = DeclareTarget("run" + name, app, "./$< " + args, true) + DeclareTarget("debug" + name, app, "$(VALGRIND) $(VALGRINDFLAGS) ./$< " + args, true)
+DefaultTarget(out : String, dir : String, libs : String, run : String, args : String) : Void = {
+    LDTarget(out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs, "$(CXX)", "$(CXXFLAGS)", ""),
+    DefaultRunTargets(run, "$(BUILDDIR)/" + out, args)
+}
+DefaultTarget("Build.out", "BuildSystem", "", "Build", "Build.txt $(BUILDDIR)/Build.mk")
+DefaultTarget("MathGraph.out", "Graph", "-l SDL2", "Graph", "$(MATHPROGRAMS)")
+DefaultTarget("Quiz.out", "Quiz", "", "Quiz", "$(MATHPROGRAMS)")
+DefaultTarget("Simulation.out", "Simulation", "-l SDL2", "Sim", "")
+DefaultTarget("Chemistry.out", "Chemistry", "", "Chem", "$(CHEMPROGRAM)")
+DefaultTarget("MachineLearning.out", "MachineLearning", "", "ML", "$(BUILDDIR)/ML.bin $(MLITERS)")
+DefaultTarget("3D.out", "3D", "-l SDL2", "3D", "")
+DefaultTarget("Cryptography.out", "Cryptography", "", "Crypt", "$(CRYPTMSG)")
+DefaultTarget("ComplexAnimation.out", "ComplexAnimation", "-l SDL2", "Anim", "$(SRCDIR)/TestPrograms/Math/Trigonometry/Sine.txt $(BUILDDIR) $(BUILDDIR)/Sine.mp4")
+DefaultTarget("SlotMachine.out", "SlotMachine", "-l SDL2", "Slot", "")
+DefaultTarget("Emulator.out", "Emulator", "", "Emu", "$(BUILDDIR)/Program.bin")
+DefaultTarget("Music.out", "Music", "", "Music", "$(BUILDDIR)/Music.wav")
+DefaultTarget("Server.out", "Server", "", "Server", "$(SERVERPORT)")
+DefaultTarget("Interpreter.out", "Interpreter", "", "Interpreter", "$(INTERPRETERPROGRAM)")
+DefaultTarget("DiskGenerator.out", "DiskGenerator", "", "DiskGen", "$(DISKARGS)")
+DefaultTarget("RPG.out", "RPG", "-l SDL2", "RPG", "")
+DefaultTarget("Tetris.out", "Tetris", "-l SDL2", "Tetris", "")
+DefaultTarget("IsomerGenerator.out", "IsomerGenerator", "", "IsomerGen", "$(CARBONS)")
+DefaultTarget("Tests.out", "Tests", "", "Test", "")
+DeclareTarget("$(BUILDDIR)/Program.bin", "$(SRCDIR)/TestPrograms/Emulator/Program.asm", "$(AS) -f bin $< -o $@", false)
+DeclareTarget("$(BUILDDIR)/OS.img", "$(BUILDDIR)/Kernel.elf $(OSROOT)/*", "cp $< $(OSROOT)/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT) && rm $(OSROOT)/boot/Kernel.elf", false)
+DeclareTarget("$(BUILDDIR)/OS.gdb", "Scripts/MakeGDB.sh", "bash $< $@ $(BUILDDIR)/Kernel.elf Main '$(OSQEMUCMD)'", false)
+
+MakeObjects("OS", "s", "$(AS) $(ASFLAGS) $< -o $@", "$(BUILDDIR)/OS/crti.s $(BUILDDIR)/OS/crtn.s")
+kernelObjs : String =
+    "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o)" +
+    MakeObjects("OS", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS", ".cpp")) +
+    MakeObjects("OS", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS", ".asm")) +
+    "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "
+LDTarget("Kernel.elf", kernelObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS)", "$(OSLINKER)")
+DeclareTarget("runOS", "$(BUILDDIR)/OS.img", "$(OSQEMUCMD) -debugcon stdio", true)
+DeclareTarget("debugOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/OS.gdb", "gdb -x $(BUILDDIR)/OS.gdb", true)

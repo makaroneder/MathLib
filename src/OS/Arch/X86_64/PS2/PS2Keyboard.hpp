@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PS2Keyboard_H
 #define PS2Keyboard_H
 #include "PS2Device.hpp"
@@ -37,4 +38,5 @@ struct PS2Keyboard : PS2Device, InterruptDevice {
     };
 };
 
+#endif
 #endif

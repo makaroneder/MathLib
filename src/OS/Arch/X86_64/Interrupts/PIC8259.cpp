@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PIC8259.hpp"
 #include "../IO.hpp"
 #include <Host.hpp>
@@ -38,3 +39,5 @@ bool PIC8259::SetMask(uint16_t mask) {
     WritePort<uint8_t>((uint16_t)Ports::SlaveData, mask >> 8);
     return true;
 }
+
+#endif

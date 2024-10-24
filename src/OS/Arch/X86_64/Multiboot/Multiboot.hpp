@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Multiboot_H
 #define Multiboot_H
 #include <Typedefs.hpp>
@@ -58,4 +59,5 @@ static constexpr const char* multibootMemoryMapEntryTypeStr[] = {
     "Bad RAM",
 };
 
+#endif
 #endif

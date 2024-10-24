@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PS2Device_H
 #define PS2Device_H
 #include <Expected.hpp>
@@ -17,4 +18,5 @@ struct PS2Device {
     bool second;
 };
 
+#endif
 #endif

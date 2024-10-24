@@ -1,4 +1,5 @@
 #ifndef Freestanding
+#if __has_include("unistd.h") && __has_include("netdb.h")
 #include "HostSocket.hpp"
 #include "../Host.hpp"
 #include <unistd.h>
@@ -38,4 +39,5 @@ int HostSocket::GetHandle(void) const {
     return handle;
 }
 
+#endif
 #endif

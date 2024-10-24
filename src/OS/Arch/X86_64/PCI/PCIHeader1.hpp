@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PCIHeader1_H
 #define PCIHeader1_H
 #include "PCIHeader.hpp"
@@ -27,4 +28,5 @@ struct PCIHeader1 : PCIHeader {
     uint16_t bridgeControl;
 } __attribute__((packed));
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef E9_H
 #define E9_H
 #include <Interfaces/Writeable.hpp>
@@ -14,4 +15,5 @@ struct E9 : Writeable {
     virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
 };
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Cascade_H
 #define Cascade_H
 #include "Interrupts.hpp"
@@ -8,4 +9,5 @@ struct Cascade : InterruptDevice {
     virtual void OnInterrupt(uintptr_t, Registers*, uintptr_t) override;
 };
 
+#endif
 #endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PIC_H
 #define PIC_H
 #include <Interfaces/Allocatable.hpp>
@@ -17,4 +18,5 @@ struct PIC : Allocatable {
     uint16_t mask;
 };
 
+#endif
 #endif

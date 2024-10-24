@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef MSR_H
 #define MSR_H
 #include <Expected.hpp>
@@ -16,4 +17,5 @@ bool HasMSR(void);
 Expected<uint64_t> GetMSR(uint32_t msr);
 bool SetMSR(uint32_t msr, uint64_t value);
 
+#endif
 #endif

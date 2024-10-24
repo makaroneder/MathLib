@@ -111,6 +111,9 @@ Array<complex_t> Node::ToNumber(void) const {
     }
     else return Array<complex_t>();
 }
+Array<const Node*> Node::ToArray(void) const {
+    return type == Type::Array ? CommaToArray(left) : Array<const Node*>();
+}
 String Node::ToString(const String& padding) const {
     switch (type) {
         case Type::Function: {

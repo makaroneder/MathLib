@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "RTC.hpp"
 
 RTC::RTC(bool nmi_, Register centuryRegister) : CMOS(false), centuryRegister(centuryRegister) {
@@ -80,3 +81,5 @@ void RTC::SetDate(const Date& date) {
     (void)date;
     // TODO:
 }
+
+#endif

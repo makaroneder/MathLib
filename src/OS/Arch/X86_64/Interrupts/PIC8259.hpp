@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PIC8259_H
 #define PIC8259_H
 #include "PIC.hpp"
@@ -41,4 +42,5 @@ struct PIC8259 : PIC {
     uint8_t base;
 };
 
+#endif
 #endif

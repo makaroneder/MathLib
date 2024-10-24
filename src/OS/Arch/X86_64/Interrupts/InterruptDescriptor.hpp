@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef InterruptDescriptor_H
 #define InterruptDescriptor_H
 #include <stdint.h>
@@ -18,4 +19,5 @@ struct InterruptDescriptor {
     InterruptDescriptor(uintptr_t offset = 0, uint16_t codeSegment = 0, uint8_t attributes = 0);
 } __attribute__((packed));
 
+#endif
 #endif

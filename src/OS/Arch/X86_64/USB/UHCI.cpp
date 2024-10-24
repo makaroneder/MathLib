@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "UHCI.hpp"
 #include "../PCI/PCIHeader0.hpp"
 #include <Host.hpp>
@@ -15,3 +16,5 @@ UHCI::UHCI(PCIHeader* header) {
     }
     // TODO:
 }
+
+#endif

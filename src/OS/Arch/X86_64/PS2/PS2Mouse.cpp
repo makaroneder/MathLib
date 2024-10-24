@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PS2Mouse.hpp"
 #include <Logger.hpp>
 
@@ -58,3 +59,5 @@ bool PS2Mouse::SetSampleRate(uint8_t sampleRate) {
     tmp = SendCommand(sampleRate);
     return tmp.HasValue() && tmp.Get() == (uint8_t)Response::Acknowledge;
 }
+
+#endif

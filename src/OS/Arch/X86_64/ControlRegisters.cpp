@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "ControlRegisters.hpp"
 
 Expected<uintptr_t> GetControlRegister(uint8_t num) {
@@ -53,3 +54,5 @@ bool SetControlRegister(uint8_t num, uintptr_t value) {
     }
     return true;
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef TSSEntry_H
 #define TSSEntry_H
 #include "GDTEntry.hpp"
@@ -9,4 +10,5 @@ struct TSSEntry : GDTEntry {
     void SetBase(uint64_t base);
 } __attribute__((packed));
 
+#endif
 #endif

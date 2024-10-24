@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "AlignmentCheck.hpp"
 #include "../../ControlRegisters.hpp"
 #include "../../CPU.hpp"
@@ -16,3 +17,5 @@ bool AlignmentCheck::Enable(void) {
 String AlignmentCheck::GetPanicMessage(uintptr_t) const {
     return "Unaligned memory data reference detected\n";
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef ACPITable_H
 #define ACPITable_H
 #include <stdint.h>
@@ -16,4 +17,5 @@ struct ACPITable {
     bool IsValid(void) const;
 } __attribute__((packed));
 
+#endif
 #endif

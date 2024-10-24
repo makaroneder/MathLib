@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef GenericAddressStructure_H
 #define GenericAddressStructure_H
 #include <Expected.hpp>
@@ -34,4 +35,5 @@ struct GenericAddressStructure {
     uint64_t address;
 } __attribute__((packed));
 
+#endif
 #endif

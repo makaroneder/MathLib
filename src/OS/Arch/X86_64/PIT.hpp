@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef PIT_H
 #define PIT_H
 #include "../../Time.hpp"
@@ -43,4 +44,5 @@ struct PIT : Timer, InterruptDevice {
     bool SetReloadValue(size_t value);
 };
 
+#endif
 #endif

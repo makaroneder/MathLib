@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Multiboot1Info_H
 #define Multiboot1Info_H
 #include "Multiboot.hpp"
@@ -81,4 +82,5 @@ struct Multiboot1Module {
     uint32_t reserved;
 };
 
+#endif
 #endif

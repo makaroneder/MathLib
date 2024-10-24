@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef InterruptDescriptorTableRegister_H
 #define InterruptDescriptorTableRegister_H
 #include "InterruptDescriptorTable.hpp"
@@ -9,4 +10,5 @@ struct InterruptDescriptorTableRegister {
     InterruptDescriptorTableRegister(InterruptDescriptorTable* base);
 } __attribute__((packed));
 
+#endif
 #endif

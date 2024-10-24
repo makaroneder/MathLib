@@ -6,8 +6,8 @@
 struct Emulator : ByteDevice, Printable {
     Emulator(const Array<uint8_t>& mem);
     virtual bool Run(void) = 0;
-    /// @brief Returns size
-    /// @return Size
+    /// @brief Returns memory size
+    /// @return Memory size
     virtual size_t GetSize(void) const override;
     /// @brief Reads data from the buffer
     /// @param buffer Buffer to read data from

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef FISRegH2D_H
 #define FISRegH2D_H
 #include <stdint.h>
@@ -27,4 +28,5 @@ struct FISRegH2D {
     uint32_t reserved2;
 };
 
+#endif
 #endif

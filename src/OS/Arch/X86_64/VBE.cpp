@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "VBE.hpp"
 #include <Typedefs.hpp>
 
@@ -6,3 +7,5 @@ bool VBEInfo::IsValid(void) const {
         if (signature[i] != expectedSignature[i]) return false;
     return true;
 }
+
+#endif

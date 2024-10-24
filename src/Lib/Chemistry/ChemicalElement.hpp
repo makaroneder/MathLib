@@ -18,9 +18,10 @@ struct ChemicalElement : Printable {
     bool metal;
 };
 
-#define CreateChemicalElement(name, symbol, metal)                  \
+#define CreateChemicalElement(name, symbolStr, metal)               \
 struct name : ChemicalElement {                                     \
-    name(size_t count) : ChemicalElement(#symbol, count, metal) {}  \
+    static constexpr const char* symbol = #symbolStr;               \
+    name(size_t count) : ChemicalElement(symbol, count, metal) {}   \
 }
 
 CreateChemicalElement(Hydrogen, H, false);

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Exception.hpp"
 #include "../../Stack.hpp"
 #include <Host.hpp>
@@ -11,3 +12,5 @@ Exception::~Exception(void) {
 void Exception::OnInterrupt(uintptr_t, Registers* regs, uintptr_t error) {
     Panic(GetPanicMessage(error) + "State: " + regs->ToX86State().ToString() + "\nStack trace: " + StackFrameToString((StackFrame*)regs->bp));
 }
+
+#endif

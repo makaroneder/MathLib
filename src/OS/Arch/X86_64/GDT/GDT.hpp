@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef GDT_H
 #define GDT_H
 #include "TSSEntry.hpp"
@@ -8,4 +9,5 @@ struct GDT {
     GDTEntry data;
 } __attribute__((packed));
 
+#endif
 #endif

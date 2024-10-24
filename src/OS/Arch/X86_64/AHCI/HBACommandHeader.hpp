@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef HBACommandHeader_H
 #define HBACommandHeader_H
 #include <stdint.h>
@@ -19,4 +20,5 @@ struct HBACommandHeader {
     uint64_t reserved2[2];
 };
 
+#endif
 #endif

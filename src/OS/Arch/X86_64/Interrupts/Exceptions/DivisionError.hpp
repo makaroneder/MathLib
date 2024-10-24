@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef DivisionError_H
 #define DivisionError_H
 #include "Exception.hpp"
@@ -10,4 +11,5 @@ struct DivisionError : Exception {
     virtual String GetPanicMessage(uintptr_t error) const override;
 };
 
+#endif
 #endif

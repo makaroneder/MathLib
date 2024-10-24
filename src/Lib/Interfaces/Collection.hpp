@@ -24,11 +24,25 @@ struct Collection : Iteratable<T> {
     virtual Iterator<T> end(void) override {
         return Iterator<T>((T*)GetValue() + GetSize());
     }
+    bool Contains(const T& value) const {
+        for (size_t i = 0; i < GetSize(); i++)
+            if (At(i) == value) return true;
+        return false;
+    }
     T operator[](size_t index) const {
         return At(index);
     }
     T& operator[](size_t index) {
         return At(index);
+    }
+    bool operator==(const Collection<T>& other) const {
+        if (GetSize() != other.GetSize()) return false;
+        for (size_t i = 0; i < GetSize(); i++)
+            if (At(i) != other.At(i)) return false;
+        return true;
+    }
+    bool operator!=(const Collection<T>& other) const {
+        return !(*this == other);
     }
     Collection<T>& operator+=(const T& val) {
         Add(val);

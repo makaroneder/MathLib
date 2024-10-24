@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "SCI.hpp"
 #include "../IO.hpp"
 #include <Logger.hpp>
@@ -28,3 +29,5 @@ void SCI::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     LogString("SCI\n");
     // TODO:
 }
+
+#endif

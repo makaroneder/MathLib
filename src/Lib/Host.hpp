@@ -72,11 +72,4 @@ num_t InversedSin(num_t x);
 complex_t InversedSin(complex_t x);
 num_t InversedTan2(num_t y, num_t x);
 
-template <typename T>
-constexpr void Swap(T& a, T& b) {
-    const T tmp = a;
-    a = b;
-    b = tmp;
-}
-
 #endif

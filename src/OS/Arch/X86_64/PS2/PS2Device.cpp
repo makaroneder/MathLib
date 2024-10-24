@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "PS2Device.hpp"
 #include "../IO.hpp"
 #include "PS2.hpp"
@@ -35,3 +36,5 @@ Expected<uint16_t> PS2Device::GetID(void) {
     if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) return Expected<uint16_t>();
     else return Expected<uint16_t>(type);
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Stack_H
 #define Stack_H
 #include <Typedefs.hpp>
@@ -8,4 +9,5 @@ struct StackFrame {
 } __attribute__((packed));
 String StackFrameToString(const StackFrame* frame);
 
+#endif
 #endif

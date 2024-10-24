@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "Multiboot1.hpp"
 #include <Logger.hpp>
@@ -75,3 +76,5 @@ void InitMultiboot1(Multiboot1Info* info, RangeMemoryManager& rangeMemoryManager
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "GenericAddressStructure.hpp"
 #include "../IO.hpp"
 
@@ -60,3 +61,5 @@ bool GenericAddressStructure::Write(uint64_t value, AccessSize legacySize) {
         default: return false;
     }
 }
+
+#endif

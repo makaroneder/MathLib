@@ -76,5 +76,34 @@ T BitReverse(const T& x, const uint8_t& bits = sizeof(T) * 8) {
         ret |= !!(x & 1 << i) << (bits - i - 1);
     return ret;
 }
+/// @brief Swaps 2 values
+/// @tparam T Type of value
+/// @param a First value to swap
+/// @param b Second value to swap
+template <typename T>
+void Swap(T& a, T& b) {
+    const T tmp = a;
+    a = b;
+    b = tmp;
+}
+/// @brief Sorts specified array
+/// @tparam T Type of data in array
+/// @param array Array to be sorted
+/// @return Sorted array
+template <typename T>
+Array<T> BubbleSort(const Array<T>& array) {
+    Array<T> ret = array;
+    while (true) {
+        bool any = false;
+        for (size_t i = 0; i < ret.GetSize() - 1; i++) {
+            if (ret.At(i) < ret.At(i + 1)) {
+                Swap<T>(ret.At(i), ret.At(i + 1));
+                any = true;
+            }
+        }
+        if (!any) break;
+    }
+    return ret;
+}
 
 #endif

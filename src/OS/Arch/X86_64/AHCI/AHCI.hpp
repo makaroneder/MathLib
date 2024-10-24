@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef AHCI_H
 #define AHCI_H
 #include "HBAPort.hpp"
@@ -35,4 +36,5 @@ struct AHCIPort : SectorByteDevice {
 };
 bool InitAHCI(PCIHeader* header);
 
+#endif
 #endif

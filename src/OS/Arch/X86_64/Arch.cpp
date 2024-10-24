@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Interrupts/Exceptions/DivisionError.hpp"
 #include "Multiboot/Multiboot1.hpp"
 #include "Multiboot/Multiboot2.hpp"
@@ -125,3 +126,5 @@ bool InitArch(uintptr_t signature, void* info) {
     SetInterrupts(false);
     while (true) asm volatile("hlt");
 }
+
+#endif

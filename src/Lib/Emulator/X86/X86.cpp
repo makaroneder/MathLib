@@ -1,9 +1,6 @@
 #include "X86.hpp"
 #include "X86ModRM.hpp"
 
-// TODO: xlatb daa das cmps scas test xchg div idiv imul lds lea les loop loope loopne loopnz
-// TODO: loopz mul neg not rcl rcr rol ror sal sar rep repe repne repnz repz in out int into
-
 #define MathOperation(op, operation, cf, of, arg)                                   \
 case op: {                                                                          \
     const Expected<uint8_t> tmp = Fetch<uint8_t>();                                 \
@@ -50,15 +47,15 @@ void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
     state.flags.auxiliaryCarry = (a ^ b ^ val) & 1 << 4;
 }
 Register* X86::GetRegister(uint8_t code) {
-    switch (code) {
-        case 0: return &state.a;
-        case 1: return &state.c;
-        case 2: return &state.d;
-        case 3: return &state.b;
-        case 4: return &state.sp;
-        case 5: return &state.bp;
-        case 6: return &state.si;
-        case 7: return &state.di;
+    switch ((X86RegisterCode)code) {
+        case X86RegisterCode::A: return &state.a;
+        case X86RegisterCode::C: return &state.c;
+        case X86RegisterCode::D: return &state.d;
+        case X86RegisterCode::B: return &state.b;
+        case X86RegisterCode::SP: return &state.sp;
+        case X86RegisterCode::BP: return &state.bp;
+        case X86RegisterCode::SI: return &state.si;
+        case X86RegisterCode::DI: return &state.di;
         default: return nullptr;
     }
 }
@@ -76,38 +73,31 @@ uint64_t X86::ToLinear(uint64_t segment, uint64_t offset) {
 bool X86::Step(void) {
     const Expected<uint8_t> opcode = Fetch<uint8_t>();
     if (!opcode.HasValue()) return false;
-    switch (opcode.Get()) {
-        // nop
-        case 0x90: return true;
-        // hlt
-        case 0xf4: {
+    switch ((X86Opcode)opcode.Get()) {
+        case X86Opcode::Nop: return true;
+        case X86Opcode::Hlt: {
             state.ip.value--;
             return true;
         }
-        // sahf
-        case 0x9e: {
+        case X86Opcode::Sahf: {
             Register tmp = state.flags.value;
             tmp.Set8(state.a.Get8(true), false);
             state.flags.value = tmp.value;
             return true;
         }
-        // lahf
-        case 0x9f: {
+        case X86Opcode::Lahf: {
             state.a.Set8(state.flags.value, true);
             return true;
         }
-        // cbw
-        case 0x98: {
+        case X86Opcode::Cbw: {
             state.a.Set8(state.a.Get8(false) & 1 << 7 ? UINT8_MAX : 0, true);
             return true;
         }
-        // cwd
-        case 0x99: {
+        case X86Opcode::Cwd: {
             state.d.Set16(state.a.Get16(false) & 1 << 15 ? UINT16_MAX : 0, true);
             return true;
         }
-        // mov8
-        case 0xb0 ... 0xb7: {
+        case X86Opcode::Mov8Start ... X86Opcode::Mov8End: {
             uint8_t tmp = opcode.Get() - 0xb0;
             bool upper = false;
             if (tmp > 3) {
@@ -120,8 +110,7 @@ bool X86::Step(void) {
             reg->Set8(val.Get(), upper);
             return true;
         }
-        // mov16
-        case 0xb8 ... 0xbf: {
+        case X86Opcode::Mov16Start ... X86Opcode::Mov16End: {
             Register* reg = GetRegister(opcode.Get() - 0xb8);
             if (!reg) return false;
             const Expected<uint16_t> val = Fetch<uint16_t>();
@@ -129,8 +118,7 @@ bool X86::Step(void) {
             reg->Set16(val.Get(), false);
             return true;
         }
-        // inc
-        case 0x40 ... 0x47: {
+        case X86Opcode::Inc16Start ... X86Opcode::Inc16End: {
             Register* reg = GetRegister(opcode.Get() - 0x40);
             if (!reg) return false;
             reg->value++;
@@ -138,8 +126,7 @@ bool X86::Step(void) {
             if (!reg->value) state.flags.overflow = true;
             return true;
         }
-        // dec
-        case 0x48 ... 0x4f: {
+        case X86Opcode::Dec16Start ... X86Opcode::Dec16End: {
             Register* reg = GetRegister(opcode.Get() - 0x48);
             if (!reg) return false;
             reg->value--;
@@ -147,13 +134,11 @@ bool X86::Step(void) {
             if (reg->value == UINT64_MAX) state.flags.overflow = true;
             return true;
         }
-        // push16
-        case 0x50 ... 0x57: {
+        case X86Opcode::Push16Start ... X86Opcode::Push16End: {
             Register* reg = GetRegister(opcode.Get() - 0x50);
             return reg && Push<uint16_t>(reg->Get16(false));
         }
-        // pop16
-        case 0x58 ... 0x5f: {
+        case X86Opcode::Pop16Start ... X86Opcode::Pop16End: {
             Register* reg = GetRegister(opcode.Get() - 0x58);
             if (!reg) return false;
             const Expected<uint16_t> tmp = Pop<uint16_t>();
@@ -161,8 +146,7 @@ bool X86::Step(void) {
             reg->Set16(tmp.Get(), false);
             return true;
         }
-        // pusha16
-        case 0x60: {
+        case X86Opcode::Pusha16: {
             const Register tmp = state.sp;
             return (
                 Push<uint16_t>(state.a.Get16(false)) &&
@@ -175,8 +159,7 @@ bool X86::Step(void) {
                 Push<uint16_t>(state.di.Get16(false))
             );
         }
-        // popa16
-        case 0x61: {
+        case X86Opcode::Popa16: {
             Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             state.di.Set16(tmp.Get(), false);
@@ -201,10 +184,8 @@ bool X86::Step(void) {
             state.a.Set16(tmp.Get(), false);
             return true;
         }
-        // pushf16
-        case 0x9c: return Push<uint16_t>(Register(state.flags.value).Get16(false));
-        // popf16
-        case 0x9d: {
+        case X86Opcode::Pushf16: return Push<uint16_t>(Register(state.flags.value).Get16(false));
+        case X86Opcode::Popf16: {
             const Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             Register reg = state.flags.value;
@@ -212,23 +193,20 @@ bool X86::Step(void) {
             state.flags.value = reg.value;
             return true;
         }
-        // call16
-        case 0xe8: {
+        case X86Opcode::Call16: {
             const Expected<uint16_t> val = Fetch<uint16_t>();
             if (!val.HasValue() || !Push<uint16_t>(state.ip.Get16(false))) return false;
             state.ip.Set16(state.ip.Get16(false) + val.Get(), false);
             return true;
         }
         // TODO: Immediate ret16, iret16
-        // ret16
-        case 0xc3: {
+        case X86Opcode::Ret16: {
             Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             state.ip.Set16(tmp.Get(), false);
             return true;
         }
-        // immediate retf16
-        case 0xca: {
+        case X86Opcode::ImmediateRetf16: {
             Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             state.ip.Set16(tmp.Get(), false);
@@ -240,8 +218,7 @@ bool X86::Step(void) {
             state.sp.Set16(state.sp.Get16(false) + tmp.Get(), false);
             return true;
         }
-        // retf16
-        case 0xcb: {
+        case X86Opcode::Retf16: {
             Expected<uint16_t> tmp = Pop<uint16_t>();
             if (!tmp.HasValue()) return false;
             state.ip.Set16(tmp.Get(), false);
@@ -250,8 +227,7 @@ bool X86::Step(void) {
             state.cs.Set16(tmp.Get(), false);
             return true;
         }
-        // iret16
-        case 0xcf: {
+        case X86Opcode::IRet16: {
             uint16_t tmp[3];
             for (uint8_t i = 0; i < SizeOfArray(tmp); i++) {
                 const Expected<uint16_t> t = Pop<uint16_t>();
@@ -265,54 +241,32 @@ bool X86::Step(void) {
             state.flags.value = reg.value;
             return true;
         }
-        // jo8
-        JumpIf(0x70, state.flags.overflow, 8)
-        // jno8
-        JumpIf(0x71, !state.flags.overflow, 8)
-        // jc8 / jb8 / jnae8
-        JumpIf(0x72, state.flags.carry, 8)
-        // jnc8 / jnb8 / jae8
-        JumpIf(0x73, !state.flags.carry, 8)
-        // jz8 / je8
-        JumpIf(0x74, state.flags.zero, 8)
-        // jnz8 / jne8
-        JumpIf(0x75, !state.flags.zero, 8)
-        // jbe8 / jna8
-        JumpIf(0x76, state.flags.carry || state.flags.zero, 8)
-        // ja8 / jnbe8
-        JumpIf(0x77, state.flags.carry && state.flags.zero, 8)
-        // js8
-        JumpIf(0x78, state.flags.sign, 8)
-        // jns8
-        JumpIf(0x79, !state.flags.sign, 8)
-        // jp8 / jpe8
-        JumpIf(0x7a, state.flags.parity, 8)
-        // jnp8 / jpo8
-        JumpIf(0x7b, !state.flags.parity, 8)
-        // jl8 / jnge8
-        JumpIf(0x7c, state.flags.sign != state.flags.overflow, 8)
-        // jge8 / jnl8
-        JumpIf(0x7d, state.flags.sign == state.flags.overflow, 8)
-        // jle8 / jng8
-        JumpIf(0x7e, state.flags.sign != state.flags.overflow || state.flags.zero, 8)
-        // jg8 / jnle8
-        JumpIf(0x7f, !state.flags.zero && state.flags.sign == state.flags.overflow, 8)
-        // jcxz8
-        JumpIf(0xe3, !state.c.Get16(false), 8)
-        // jmp16
-        JumpIf(0xe9, true, 16)
-        // jmp8
-        JumpIf(0xeb, true, 8)
-
-        // stos8
-        case 0xaa: {
+        JumpIf(X86Opcode::Jo8, state.flags.overflow, 8)
+        JumpIf(X86Opcode::Jno8, !state.flags.overflow, 8)
+        JumpIf(X86Opcode::Jc8, state.flags.carry, 8)
+        JumpIf(X86Opcode::Jnc8, !state.flags.carry, 8)
+        JumpIf(X86Opcode::Jz8, state.flags.zero, 8)
+        JumpIf(X86Opcode::Jnz8, !state.flags.zero, 8)
+        JumpIf(X86Opcode::Jbe8, state.flags.carry || state.flags.zero, 8)
+        JumpIf(X86Opcode::Ja8, state.flags.carry && state.flags.zero, 8)
+        JumpIf(X86Opcode::Js8, state.flags.sign, 8)
+        JumpIf(X86Opcode::Jns8, !state.flags.sign, 8)
+        JumpIf(X86Opcode::Jp8, state.flags.parity, 8)
+        JumpIf(X86Opcode::Jnp8, !state.flags.parity, 8)
+        JumpIf(X86Opcode::Jl8, state.flags.sign != state.flags.overflow, 8)
+        JumpIf(X86Opcode::Jge8, state.flags.sign == state.flags.overflow, 8)
+        JumpIf(X86Opcode::Jle8, state.flags.sign != state.flags.overflow || state.flags.zero, 8)
+        JumpIf(X86Opcode::Jg8, !state.flags.zero && state.flags.sign == state.flags.overflow, 8)
+        JumpIf(X86Opcode::Jcxz8, !state.c.Get16(false), 8)
+        JumpIf(X86Opcode::Jmp16, true, 16)
+        JumpIf(X86Opcode::Jmp8, true, 8)
+        case X86Opcode::Stos8: {
             if (!WritePositioned<uint8_t>(state.a.Get8(false), ToLinear(state.es.value, state.di.value))) return false;
             if (state.flags.direction) state.di.value--;
             else state.di.value++;
             return true;
         }
-        // lods8
-        case 0xac: {
+        case X86Opcode::Lods8: {
             const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(ToLinear(state.ds.value, state.si.value));
             if (!tmp.HasValue()) return false;
             state.a.Set8(tmp.Get(), false);
@@ -320,8 +274,7 @@ bool X86::Step(void) {
             else state.si.value++;
             return true;
         }
-        // movs8
-        case 0xa4: {
+        case X86Opcode::Movs8: {
             const Expected<uint8_t> tmp = ReadPositioned<uint8_t>(ToLinear(state.ds.value, state.si.value));
             if (!tmp.HasValue() || !WritePositioned<uint8_t>(tmp.Get(), ToLinear(state.es.value, state.di.value))) return false;
             if (state.flags.direction) {
@@ -334,8 +287,7 @@ bool X86::Step(void) {
             }
             return true;
         }
-        // cmp16
-        case 0x39: {
+        case X86Opcode::Cmp16: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
             const X86ModRM modrm = tmp.Get();
@@ -358,43 +310,35 @@ bool X86::Step(void) {
             state.flags.overflow = (a ^ b) & (a ^ (a - b)) & 0x8000;
             return true;
         }
-        // cmc
-        case 0xf5: {
+        case X86Opcode::Cmc: {
             state.flags.carry = !state.flags.carry;
             return true;
         }
-        // clc
-        case 0xf8: {
+        case X86Opcode::Clc: {
             state.flags.carry = false;
             return true;
         }
-        // stc
-        case 0xf9: {
+        case X86Opcode::Stc: {
             state.flags.carry = true;
             return true;
         }
-        // cli
-        case 0xfa: {
+        case X86Opcode::Cli: {
             state.flags.interruptEnable = false;
             return true;
         }
-        // sti
-        case 0xfb: {
+        case X86Opcode::Sti: {
             state.flags.interruptEnable = true;
             return true;
         }
-        // cld
-        case 0xfc: {
+        case X86Opcode::Cld: {
             state.flags.direction = false;
             return true;
         }
-        // std
-        case 0xfd: {
+        case X86Opcode::Std: {
             state.flags.direction = true;
             return true;
         }
-        // shr16 / shl16
-        case 0xd3: {
+        case X86Opcode::Shr16: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
             const X86ModRM modrm = tmp.Get();
@@ -422,44 +366,34 @@ bool X86::Step(void) {
             if (b == 1) state.flags.overflow = ((result >> 15) & 0x1) ^ ((result >> 14) & 0x1);
             return true;
         }
-        // or16
-        MathOperation(0x09, |, false, false, 0)
-        // and16
-        MathOperation(0x21, &, false, false, 0)
-        // xor16
-        MathOperation(0x31, ^, false, false, 0)
-        // add16
-        MathOperation(0x01, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, 0)
-        // adc16
-        MathOperation(0x11, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, state.flags.carry)
-        // sub16
-        MathOperation(0x29, -, a < b, (a ^ b) & (a ^ result) & 0x8000, 0)
-        // sbb16
-        MathOperation(0x19, -, a < b, (a ^ b) & (a ^ result) & 0x8000, state.flags.carry)
-        // aaa
-        case 0x37: {
-            if ((state.a.Get8(false) & 0b1111) > 9 || state.flags.auxiliaryCarry) {
+        MathOperation(X86Opcode::Or16, |, false, false, 0)
+        MathOperation(X86Opcode::And16, &, false, false, 0)
+        MathOperation(X86Opcode::Xor16, ^, false, false, 0)
+        MathOperation(X86Opcode::Add16, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, 0)
+        MathOperation(X86Opcode::Adc16, +, result > UINT16_MAX, (a ^ result) & (b ^ result) & 0x8000, state.flags.carry)
+        MathOperation(X86Opcode::Sub16, -, a < b, (a ^ b) & (a ^ result) & 0x8000, 0)
+        MathOperation(X86Opcode::Sbb16, -, a < b, (a ^ b) & (a ^ result) & 0x8000, state.flags.carry)
+        case X86Opcode::Aaa: {
+            if (state.a.Get4(false) > 9 || state.flags.auxiliaryCarry) {
                 state.a.Set8(state.a.Get8(false) + 6, false);
                 state.a.Set8(state.a.Get8(true) + 1, true);
                 state.flags.auxiliaryCarry = state.flags.carry = true;
             }
             else state.flags.auxiliaryCarry = state.flags.carry = false;
-            state.a.Set8(state.a.Get8(false) & ~0b11110000, false);
+            state.a.Clear4(true);
             return true;
         }
-        // aas
-        case 0x3f: {
-            if ((state.a.Get8(false) & 0b1111) > 9 || state.flags.auxiliaryCarry) {
+        case X86Opcode::Aas: {
+            if (state.a.Get4(false) > 9 || state.flags.auxiliaryCarry) {
                 state.a.Set8(state.a.Get8(false) - 6, false);
                 state.a.Set8(state.a.Get8(true) - 1, true);
                 state.flags.auxiliaryCarry = state.flags.carry = true;
             }
             else state.flags.auxiliaryCarry = state.flags.carry = false;
-            state.a.Set8(state.a.Get8(false) & ~0b11110000, false);
+            state.a.Clear4(true);
             return true;
         }
-        // aam
-        case 0xd4: {
+        case X86Opcode::Aam: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
             // TODO: Set Z, S and P
@@ -467,8 +401,7 @@ bool X86::Step(void) {
             state.a.Set8(state.a.Get8(false) % tmp.Get(), false);
             return true;
         }
-        // aad
-        case 0xd5: {
+        case X86Opcode::Aad: {
             const Expected<uint8_t> tmp = Fetch<uint8_t>();
             if (!tmp.HasValue()) return false;
             // TODO: Set Z, S and P
@@ -476,16 +409,39 @@ bool X86::Step(void) {
             state.a.Set8(0, true);
             return true;
         }
-        // extended
-        case 0x0f: {
-            // jc16
-            JumpIf(0x82, state.flags.carry, 16)
-            // jnc16
-            JumpIf(0x83, !state.flags.carry, 16)
-            // jz16 / je16
-            JumpIf(0x84, state.flags.zero, 16)
-            // jnz16 / jne16
-            JumpIf(0x85, !state.flags.zero, 16)
+        case X86Opcode::Daa: {
+            // TODO: Set Z, S, O, P
+            if (state.a.Get4(false) > 9 || state.flags.auxiliaryCarry) {
+                state.a.Set8(state.a.Get8(false) + 6, false);
+                state.flags.auxiliaryCarry = true;
+            }
+            if (state.a.Get8(false) > 0x9f || state.flags.carry) {
+                state.a.Set8(state.a.Get8(false) + 0x60, false);
+                state.flags.carry = true;
+            }
+            return true;
+        }
+        case X86Opcode::Das: {
+            // TODO: Set Z, S, O, P
+            if (state.a.Get4(false) > 9 || state.flags.auxiliaryCarry) {
+                state.a.Set8(state.a.Get8(false) - 6, false);
+                state.flags.auxiliaryCarry = true;
+            }
+            if (state.a.Get8(false) > 0x9f || state.flags.carry) {
+                state.a.Set8(state.a.Get8(false) - 0x60, false);
+                state.flags.carry = true;
+            }
+            return true;
+        }
+        case X86Opcode::Xlat8: {
+            state.a.Set8(ToLinear(state.ds.value, state.b.value + state.a.Get8(false)), false);
+            return true;
+        }
+        case X86Opcode::Extended: {
+            JumpIf(X86Opcode::ExtendedJc16, state.flags.carry, 16)
+            JumpIf(X86Opcode::ExtendedJnc16, !state.flags.carry, 16)
+            JumpIf(X86Opcode::ExtendedJz16, state.flags.zero, 16)
+            JumpIf(X86Opcode::ExtendedJnz16, !state.flags.zero, 16)
         }
         default: return false;
     }

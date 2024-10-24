@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef FADT_H
 #define FADT_H
 #include "../CMOS.hpp"
@@ -72,4 +73,5 @@ struct FADT2 : FADT {
     GenericAddressStructure gpe1Block2;
 } __attribute__((packed));
 
+#endif
 #endif

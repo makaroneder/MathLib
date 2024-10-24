@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef MCFG_H
 #define MCFG_H
 #include "ACPITable.hpp"
@@ -15,4 +16,5 @@ struct MCFG : ACPITable {
     MCFGEntry entries[];
 } __attribute__((packed));
 
+#endif
 #endif

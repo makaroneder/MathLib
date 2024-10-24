@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "E9.hpp"
 #include "IO.hpp"
 
@@ -9,3 +10,5 @@ size_t E9::WriteSizedBuffer(const void* buffer, size_t size) {
     for (size_t i = 0; i < size; i++) WritePort<uint8_t>(0xe9, buff8[i]);
     return size;
 }
+
+#endif

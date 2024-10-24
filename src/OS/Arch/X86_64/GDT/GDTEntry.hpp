@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef GDTEntry_H
 #define GDTEntry_H
 #include <stdint.h>
@@ -23,4 +24,5 @@ struct GDTEntry {
     bool SetLimit(uint32_t limit);
 } __attribute__((packed));
 
+#endif
 #endif

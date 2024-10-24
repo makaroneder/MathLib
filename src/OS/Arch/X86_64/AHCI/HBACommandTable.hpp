@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef HBACommandTable_H
 #define HBACommandTable_H
 #include <stdint.h>
@@ -17,4 +18,5 @@ struct HBACommandTable {
     HBAPRDTEntry entry[];
 };
 
+#endif
 #endif

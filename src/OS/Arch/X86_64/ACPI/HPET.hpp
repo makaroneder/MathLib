@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef HPET_H
 #define HPET_H
 #include "ACPITable.hpp"
@@ -17,4 +18,5 @@ struct HPET : ACPITable {
     uint8_t pageProtection;
 } __attribute__((packed));
 
+#endif
 #endif

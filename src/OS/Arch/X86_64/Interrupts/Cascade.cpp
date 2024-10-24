@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "Cascade.hpp"
 #include <Host.hpp>
 
@@ -10,3 +11,5 @@ Cascade::~Cascade(void) {
 void Cascade::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     Panic("Cascade interrupt raised");
 }
+
+#endif

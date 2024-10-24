@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "IO.hpp"
 
 template<> void WritePort(uint16_t port, uint8_t value) {
@@ -27,3 +28,5 @@ template<> uint32_t ReadPort(uint16_t port) {
 void IOWait(void) {
     WritePort<uint8_t>(0x80, 0);
 }
+
+#endif

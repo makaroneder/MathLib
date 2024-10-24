@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef MADT_H
 #define MADT_H
 #include "ACPITable.hpp"
@@ -64,4 +65,5 @@ struct MADTProcessorLocalX2APIC : MADTEntry {
     uint32_t acpiID;
 } __attribute__((packed));
 
+#endif
 #endif

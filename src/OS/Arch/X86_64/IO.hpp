@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef IO_H
 #define IO_H
 #include <stdint.h>
@@ -8,4 +9,5 @@ template <typename T>
 T ReadPort(uint16_t port);
 void IOWait(void);
 
+#endif
 #endif

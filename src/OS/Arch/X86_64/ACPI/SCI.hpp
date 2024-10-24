@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef SCI_H
 #define SCI_H
 #include "FADT.hpp"
@@ -14,4 +15,5 @@ struct SCI : InterruptDevice {
     FADT* fadt;
 };
 
+#endif
 #endif

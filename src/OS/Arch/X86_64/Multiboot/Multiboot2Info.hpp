@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #ifndef Multiboot2Info_H
 #define Multiboot2Info_H
 #include "Multiboot.hpp"
@@ -152,4 +153,5 @@ struct Multiboot2TagLoadBaseAddr : Multiboot2Tag {
     uint32_t address;
 };
 
+#endif
 #endif

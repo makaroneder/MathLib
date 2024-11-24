@@ -8,27 +8,20 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        #ifdef Debug
-        const Test test = TestSelf();
-        const size_t tests = test.GetRecordCount();
-        const size_t passed = test.GetPassed();
-        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
-        if (passed != tests) Panic("Some tests failed");
-        #endif
-        if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input files>");
-        HostFileSystem fs;
+        if (argc < 2) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <input files>");
+        MathLib::HostFileSystem fs;
         const size_t retryCount = 3;
-        num_t solved = 0;
+        MathLib::num_t solved = 0;
         bool running = true;
         for (int i = 1; i < argc && running; i++) {
-            const Question question = Question(Preproces(fs, argv[i]));
+            const Question question = Question(MathLib::Preproces(fs, argv[i]));
             std::cout << question.equation;
             for (size_t j = 0; j < retryCount && running; j++) {
                 std::cout << "> ";
                 std::string tmp;
                 std::cin >> tmp;
                 if (tmp == "exit") running = false;
-                else if (FloatsEqual<num_t>(StringToNumber(tmp), question.solution, 0.01)) {
+                else if (MathLib::FloatsEqual<MathLib::num_t>(MathLib::StringToNumber(tmp), question.solution, 0.01)) {
                     solved++;
                     break;
                 }

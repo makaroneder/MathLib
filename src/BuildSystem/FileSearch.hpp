@@ -3,10 +3,10 @@
 #include <Typedefs.hpp>
 
 struct FileSearch {
-    String directory;
-    String extension;
+    MathLib::String directory;
+    MathLib::String extension;
 
-    FileSearch(const String& directory, const String& extension);
+    FileSearch(const MathLib::String& directory, const MathLib::String& extension);
 };
 
 #endif

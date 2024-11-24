@@ -3,8 +3,10 @@
 #include "CaesarCipher.hpp"
 #include "SpecialCaseCipher.hpp"
 
-struct ROT13 : SpecialCaseCipher<CaesarCipher> {
-    virtual Expected<String> GetKey(const String& baseKey) const override;
-};
+namespace MathLib {
+    struct ROT13 : SpecialCaseCipher<CaesarCipher> {
+        virtual Expected<String> GetKey(const String& baseKey) const override;
+    };
+}
 
 #endif

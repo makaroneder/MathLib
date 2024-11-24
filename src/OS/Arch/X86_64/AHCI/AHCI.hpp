@@ -5,7 +5,7 @@
 #include "../PCI/PCIHeader.hpp"
 #include <Interfaces/SectorByteDevice.hpp>
 
-struct AHCIPort : SectorByteDevice {
+struct AHCIPort : MathLib::SectorByteDevice {
     AHCIPort(void);
     AHCIPort(HBAPort* port);
     virtual ~AHCIPort(void) override;

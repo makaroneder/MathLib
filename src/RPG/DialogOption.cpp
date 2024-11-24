@@ -1,4 +1,4 @@
 #include "DialogOption.hpp"
 
-DialogOption::DialogOption(const String& text, size_t nextDialog) : requiredStatistic(Statistic::Inteligence), requiredStatisticValue(0), text(text), alternativeText(String()), nextDialog(nextDialog), alternativeNextDialog(0) {}
-DialogOption::DialogOption(Statistic requiredStatistic, size_t requiredStatisticValue, const String& text, const String& alternativeText, size_t nextDialog, size_t alternativeNextDialog) : requiredStatistic(requiredStatistic), requiredStatisticValue(requiredStatisticValue), text(text), alternativeText(alternativeText), nextDialog(nextDialog), alternativeNextDialog(alternativeNextDialog) {}
+DialogOption::DialogOption(const MathLib::String& text, size_t nextDialog) : requiredStatistic(Statistic::Inteligence), requiredStatisticValue(0), text(text), alternativeText(MathLib::String()), nextDialog(nextDialog), alternativeNextDialog(0) {}
+DialogOption::DialogOption(Statistic requiredStatistic, size_t requiredStatisticValue, const MathLib::String& text, const MathLib::String& alternativeText, size_t nextDialog, size_t alternativeNextDialog) : requiredStatistic(requiredStatistic), requiredStatisticValue(requiredStatisticValue), text(text), alternativeText(alternativeText), nextDialog(nextDialog), alternativeNextDialog(alternativeNextDialog) {}

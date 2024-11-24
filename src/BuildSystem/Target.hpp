@@ -2,17 +2,17 @@
 #define Target_H
 #include <Interfaces/Printable.hpp>
 
-struct Target : Printable {
-    String name;
-    String deps;
-    String command;
+struct Target : MathLib::Printable {
+    MathLib::String name;
+    MathLib::String deps;
+    MathLib::String command;
     bool phony;
 
-    Target(const String& name, const String& deps, const String& command, bool phony);
+    Target(const MathLib::String& name, const MathLib::String& deps, const MathLib::String& command, bool phony);
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 };
 
 

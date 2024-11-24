@@ -2,17 +2,17 @@
 #include <String.hpp>
 #include <Host.hpp>
 
-HTTPResponse::HTTPResponse(String str) {
+HTTPResponse::HTTPResponse(MathLib::String str) {
     if (!str.IsEmpty()) {
-        Array<String> lines = Split(str, "\r\n", true);
-        Array<String> statusLine = Split(lines.At(0), " ", true);
-        version = SubString(statusLine.At(0), 0, statusLine.At(0).GetSize() - 1);
-        status = SubString(statusLine.At(1), 0, statusLine.At(1).GetSize() - 1);
-        description = SubString(statusLine.At(2), 0, statusLine.At(2).GetSize() - 1);
+        MathLib::Array<MathLib::String> lines = MathLib::Split(str, "\r\n", true);
+        MathLib::Array<MathLib::String> statusLine = MathLib::Split(lines.At(0), " ", true);
+        version = MathLib::SubString(statusLine.At(0), 0, statusLine.At(0).GetSize() - 1);
+        status = MathLib::SubString(statusLine.At(1), 0, statusLine.At(1).GetSize() - 1);
+        description = MathLib::SubString(statusLine.At(2), 0, statusLine.At(2).GetSize() - 1);
         const size_t size = lines.GetSize();
         size_t bodyIndex = size;
         for (size_t i = 1; i < size; i++) {
-            String line = SubString(lines.At(i), 0, lines.At(i).GetSize() - 1);
+            MathLib::String line = MathLib::SubString(lines.At(i), 0, lines.At(i).GetSize() - 1);
             if (line == "\r") {
                 for (const HTTPHeader& header : headers) {
                     if (header.name == "Content-Length") {
@@ -22,35 +22,35 @@ HTTPResponse::HTTPResponse(String str) {
                 }
                 break;
             }
-            Array<String> tmp = Split(line, ":", true);
+            MathLib::Array<MathLib::String> tmp = MathLib::Split(line, ":", true);
             size_t off = 0;
             while (tmp.At(1).At(off) == ' ') off++;
-            headers.Add(HTTPHeader(SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)));
+            headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)));
         }
         for (size_t i = bodyIndex; i < size; i++) body += lines.At(i) + "\n";
     }
 }
-HTTPResponse HTTPResponse::FromStatus(HTTPStatus status, String desc) {
+HTTPResponse HTTPResponse::FromStatus(HTTPStatus status, MathLib::String desc) {
     HTTPResponse ret = HTTPResponse();
     ret.version = "HTTP/1.1";
     ret.status = httpStatusStr[(size_t)status];
     ret.description = desc;
     return ret;
 }
-HTTPResponse HTTPResponse::FromHTML(String str) {
+HTTPResponse HTTPResponse::FromHTML(MathLib::String str) {
     HTTPResponse ret = FromStatus(HTTPStatus::Success, "OK");
     ret.headers.Add(HTTPHeader("Content-Type", "text/html; charset=utf-8"));
-    ret.headers.Add(HTTPHeader("Content-Length", ::ToString(str.GetSize())));
+    ret.headers.Add(HTTPHeader("Content-Length", MathLib::ToString(str.GetSize())));
     ret.body = str;
     return ret;
 }
-String HTTPResponse::Raw(void) const {
-    String ret = version + " " + status + " " + description + "\r\n";
+MathLib::String HTTPResponse::Raw(void) const {
+    MathLib::String ret = version + " " + status + " " + description + "\r\n";
     for (const HTTPHeader& header : headers) ret += header.name + ": " + header.value + "\r\n";
     return ret + "\r\n" + body;
 }
-String HTTPResponse::ToString(const String& padding) const {
-    String ret = padding + "Status line:\n";
+MathLib::String HTTPResponse::ToString(const MathLib::String& padding) const {
+    MathLib::String ret = padding + "Status line:\n";
     ret += padding + "\tHTTP version: " + version + '\n';
     ret += padding + "\tStatus: " + status + '\n';
     ret += padding + "\tDescription: " + description + '\n';

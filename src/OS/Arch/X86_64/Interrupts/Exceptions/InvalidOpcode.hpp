@@ -5,7 +5,7 @@
 
 struct InvalidOpcode : Exception {
     InvalidOpcode(void);
-    virtual String GetPanicMessage(uintptr_t error) const override;
+    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

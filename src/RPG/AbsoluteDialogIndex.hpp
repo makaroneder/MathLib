@@ -3,21 +3,21 @@
 #include <Interfaces/Saveable.hpp>
 #include <Interfaces/Printable.hpp>
 
-struct AbsoluteDialogIndex : Saveable, Printable {
+struct AbsoluteDialogIndex : MathLib::Saveable, MathLib::Printable {
     AbsoluteDialogIndex(void);
     AbsoluteDialogIndex(size_t npc, size_t dialog);
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(Writeable& file) const override;
+    virtual bool Save(MathLib::Writeable& file) const override;
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(Readable& file) override;
+    virtual bool Load(MathLib::Readable& file) override;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
     bool operator==(const AbsoluteDialogIndex& other) const;
 
     private:

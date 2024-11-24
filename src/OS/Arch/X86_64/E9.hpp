@@ -4,7 +4,7 @@
 #include <Interfaces/Writeable.hpp>
 
 /// @brief E9 logger
-struct E9 : Writeable {
+struct E9 : MathLib::Writeable {
     /// @brief Checks if E9 logger is present
     /// @return Presence of E9 logger
     static bool IsPresent(void);

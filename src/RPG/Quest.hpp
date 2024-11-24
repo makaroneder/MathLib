@@ -2,8 +2,8 @@
 #define Quest_H
 #include "QuestStep.hpp"
 
-struct Quest : Printable {
-    Quest(const String& name, const String& description, const Array<QuestStep>& steps);
+struct Quest : MathLib::Printable {
+    Quest(const MathLib::String& name, const MathLib::String& description, const MathLib::Array<QuestStep>& steps);
     bool IsHidden(void) const;
     template <typename T>
     bool Check(const Player<T>& player) {
@@ -14,12 +14,12 @@ struct Quest : Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 
     private:
-    String name;
-    String description;
-    Array<QuestStep> steps;
+    MathLib::String name;
+    MathLib::String description;
+    MathLib::Array<QuestStep> steps;
     size_t step;
 };
 

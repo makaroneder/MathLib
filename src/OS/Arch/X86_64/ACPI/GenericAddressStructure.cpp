@@ -2,23 +2,23 @@
 #include "GenericAddressStructure.hpp"
 #include "../IO.hpp"
 
-Expected<uint64_t> GenericAddressStructure::Read(AccessSize legacySize) const {
+MathLib::Expected<uint64_t> GenericAddressStructure::Read(AccessSize legacySize) const {
     const AccessSize size = accessSize == AccessSize::Undefined ? legacySize : accessSize;
     switch (addressSpace) {
         case AddressSpace::SystemMemory: switch (size) {
-            case AccessSize::U8Access: return Expected<uint64_t>(*(uint8_t*)address);
-            case AccessSize::U16Access: return Expected<uint64_t>(*(uint16_t*)address);
-            case AccessSize::U32Access: return Expected<uint64_t>(*(uint32_t*)address);
-            case AccessSize::U64Access: return Expected<uint64_t>(*(uint64_t*)address);
-            default: return Expected<uint64_t>();
+            case AccessSize::U8Access: return MathLib::Expected<uint64_t>(*(uint8_t*)address);
+            case AccessSize::U16Access: return MathLib::Expected<uint64_t>(*(uint16_t*)address);
+            case AccessSize::U32Access: return MathLib::Expected<uint64_t>(*(uint32_t*)address);
+            case AccessSize::U64Access: return MathLib::Expected<uint64_t>(*(uint64_t*)address);
+            default: return MathLib::Expected<uint64_t>();
         }
         case AddressSpace::SystemIO: switch (size) {
-            case AccessSize::U8Access: return Expected<uint64_t>(ReadPort<uint8_t>(address));
-            case AccessSize::U16Access: return Expected<uint64_t>(ReadPort<uint16_t>(address));
-            case AccessSize::U32Access: return Expected<uint64_t>(ReadPort<uint32_t>(address));
-            default: return Expected<uint64_t>();
+            case AccessSize::U8Access: return MathLib::Expected<uint64_t>(ReadPort<uint8_t>(address));
+            case AccessSize::U16Access: return MathLib::Expected<uint64_t>(ReadPort<uint16_t>(address));
+            case AccessSize::U32Access: return MathLib::Expected<uint64_t>(ReadPort<uint32_t>(address));
+            default: return MathLib::Expected<uint64_t>();
         }
-        default: return Expected<uint64_t>();
+        default: return MathLib::Expected<uint64_t>();
     }
 }
 bool GenericAddressStructure::Write(uint64_t value, AccessSize legacySize) {

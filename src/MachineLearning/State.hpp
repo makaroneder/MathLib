@@ -5,15 +5,15 @@
 /// @brief Contains every information needed by neural network
 /// @tparam T Type of number
 template <typename T>
-struct NeuralNetworkState : Saveable {
+struct NeuralNetworkState : MathLib::Saveable {
     /// @brief Rate by which the neural network is learning
     T rate;
     /// @brief Input data for learning
-    Matrix<T> trainingDataInput;
+    MathLib::Matrix<T> trainingDataInput;
     /// @brief Output data for learning
-    Matrix<T> trainingDataOutput;
+    MathLib::Matrix<T> trainingDataOutput;
     /// @brief Neural network
-    NeuralNetwork<T> neuralNetwork;
+    MathLib::NeuralNetwork<T> neuralNetwork;
 
     /// @brief Creates empty state
     constexpr NeuralNetworkState(void) {}
@@ -22,26 +22,26 @@ struct NeuralNetworkState : Saveable {
     /// @param in Input data for learning
     /// @param out Output data for learning
     /// @param nn Neural network
-    constexpr NeuralNetworkState(const T& r, const Matrix<T>& in, const Matrix<T>& out, const NeuralNetwork<T>& nn) : rate(r), trainingDataInput(in), trainingDataOutput(out), neuralNetwork(nn) {}
+    constexpr NeuralNetworkState(const T& r, const MathLib::Matrix<T>& in, const MathLib::Matrix<T>& out, const MathLib::NeuralNetwork<T>& nn) : rate(r), trainingDataInput(in), trainingDataOutput(out), neuralNetwork(nn) {}
     constexpr bool Forward(void) {
         return neuralNetwork.Forward();
     }
     constexpr T Cost(void) {
         return neuralNetwork.Cost(trainingDataInput, trainingDataOutput);
     }
-    constexpr NeuralNetwork<T> FiniteDiff(const T& eps_ = eps) {
+    constexpr MathLib::NeuralNetwork<T> FiniteDiff(const T& eps_ = MathLib::eps) {
         return neuralNetwork.FiniteDiff(trainingDataInput, trainingDataOutput, eps_);
     }
-    constexpr Expected<NeuralNetwork<T>> Backprop(void) {
+    constexpr MathLib::Expected<MathLib::NeuralNetwork<T>> Backprop(void) {
         return neuralNetwork.Backprop(trainingDataInput, trainingDataOutput);
     }
-    constexpr void Learn(const NeuralNetwork<T>& diff) {
+    constexpr void Learn(const MathLib::NeuralNetwork<T>& diff) {
         neuralNetwork.Learn(diff, rate);
     }
-    virtual bool Save(Writeable& file) const override {
+    virtual bool Save(MathLib::Writeable& file) const override {
         return file.Write<T>(rate) && trainingDataInput.Save(file) && trainingDataOutput.Save(file) && neuralNetwork.Save(file);
     }
-    virtual bool Load(Readable& file) override {
+    virtual bool Load(MathLib::Readable& file) override {
         return file.Read<T>(rate) && trainingDataInput.Load(file) && trainingDataOutput.Load(file) && neuralNetwork.Load(file);
     }
 };

@@ -31,7 +31,7 @@ struct Registers {
     uintptr_t ksp;
     uintptr_t kss;
 
-    X86State ToX86State(void) const;
+    MathLib::X86State ToX86State(void) const;
 } __attribute__((packed));
 
 #endif

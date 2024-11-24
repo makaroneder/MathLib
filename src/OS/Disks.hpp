@@ -2,6 +2,6 @@
 #define Disks_H
 #include <Interfaces/ByteDevice.hpp>
 
-extern Array<ByteDevice*> disks;
+extern MathLib::Array<MathLib::ByteDevice*> disks;
 
 #endif

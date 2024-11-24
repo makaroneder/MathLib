@@ -2,11 +2,11 @@
 #define Symbol_H
 #include <Geometry/WavefrontObject.hpp>
 
-struct Symbol : WavefrontObject<num_t> {
-    String name;
-    Array<size_t> multiplier;
+struct Symbol : MathLib::WavefrontObject<MathLib::num_t> {
+    MathLib::String name;
+    MathLib::Array<size_t> multiplier;
 
-    Symbol(FileSystem& fileSystem, const String& path, const String& name, const Array<size_t>& multiplier);
+    Symbol(MathLib::FileSystem& fileSystem, const MathLib::String& path, const MathLib::String& name, const MathLib::Array<size_t>& multiplier);
     bool operator==(const Symbol& other) const;
 };
 

@@ -10,6 +10,6 @@ bool Date::operator==(const Date& other) const {
 bool Date::operator!=(const Date& other) const {
     return !(*this == other);
 }
-String Date::ToString(const String& padding) const {
-    return padding + ::ToString(hour, 10, 2) + ':' + ::ToString(minute, 10, 2) + ':' + ::ToString(second, 10, 2) + ' ' + ::ToString(day, 10, 2) + '.' + ::ToString(month, 10, 2) + '.' + ::ToString(year, 10);
+MathLib::String Date::ToString(const MathLib::String& padding) const {
+    return padding + MathLib::ToString(hour, 10, 2) + ':' + MathLib::ToString(minute, 10, 2) + ':' + MathLib::ToString(second, 10, 2) + ' ' + MathLib::ToString(day, 10, 2) + '.' + MathLib::ToString(month, 10, 2) + '.' + MathLib::ToString(year, 10);
 }

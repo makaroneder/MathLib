@@ -9,10 +9,10 @@ struct PS2Device {
         Resend = 0xfe,
     };
     PS2Device(bool second);
-    Expected<uint8_t> Read(void) const;
+    MathLib::Expected<uint8_t> Read(void) const;
     bool Write(uint8_t value);
-    Expected<uint8_t> SendCommand(uint8_t command);
-    Expected<uint16_t> GetID(void);
+    MathLib::Expected<uint8_t> SendCommand(uint8_t command);
+    MathLib::Expected<uint16_t> GetID(void);
 
     private:
     bool second;

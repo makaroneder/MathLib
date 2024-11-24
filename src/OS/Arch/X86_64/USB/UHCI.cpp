@@ -4,7 +4,7 @@
 #include <Host.hpp>
 
 UHCI::UHCI(PCIHeader* header) {
-    if (header->type) Panic("Invalid header type");
+    if (header->type) MathLib::Panic("Invalid header type");
     base = ((UHCIConfigurationSpace*)(uintptr_t)((PCIHeader0*)header)->bar[4])->ioBase;
     for (uint8_t i = 0; i <= 2; i += 2) {
         UHCIStatusRegister port = Read<uint16_t>(0x10 + i);

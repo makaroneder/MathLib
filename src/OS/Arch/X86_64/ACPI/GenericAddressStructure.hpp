@@ -25,7 +25,7 @@ struct GenericAddressStructure {
         U32Access,
         U64Access,
     };
-    Expected<uint64_t> Read(AccessSize legacySize = AccessSize::Undefined) const;
+    MathLib::Expected<uint64_t> Read(AccessSize legacySize = AccessSize::Undefined) const;
     bool Write(uint64_t value, AccessSize legacySize = AccessSize::Undefined);
 
     AddressSpace addressSpace;

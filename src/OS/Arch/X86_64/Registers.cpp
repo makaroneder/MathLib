@@ -2,8 +2,8 @@
 #include "Registers.hpp"
 #include <String.hpp>
 
-X86State Registers::ToX86State(void) const {
-    X86State ret = X86State(flags, ip);
+MathLib::X86State Registers::ToX86State(void) const {
+    MathLib::X86State ret = MathLib::X86State(flags, ip);
     ret.cs = cs;
     ret.ds = ds;
     ret.es = es;

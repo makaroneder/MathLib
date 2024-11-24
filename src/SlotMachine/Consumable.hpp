@@ -2,7 +2,7 @@
 #define Consumable_H
 #include <Geometry/WavefrontObject.hpp>
 
-struct Consumable : WavefrontObject<num_t> {
+struct Consumable : MathLib::WavefrontObject<MathLib::num_t> {
     enum class Type {
         RewardMultiplier,
         BetIncreaser,
@@ -11,7 +11,7 @@ struct Consumable : WavefrontObject<num_t> {
     ssize_t value;
     ssize_t cost;
 
-    Consumable(FileSystem& fileSystem, const String& path, Type type, ssize_t value, ssize_t cost);
+    Consumable(MathLib::FileSystem& fileSystem, const MathLib::String& path, Type type, ssize_t value, ssize_t cost);
 };
 
 #endif

@@ -1,21 +1,21 @@
 #ifdef __x86_64__
+#include "../../../KernelRenderer.hpp"
 #include "PS2Mouse.hpp"
-#include <Logger.hpp>
 
-PS2Mouse::PS2Mouse(bool second) : PS2Device(second), packet(0) {
+PS2Mouse::PS2Mouse(bool second) : PS2Device(second), position(MathLib::CreateVector<size_t>(0, 0, 0)), packet(0) {
     for (uint8_t i = 0; i < SizeOfArray(packets); i++) packets[i] = 0;
-    if (!SetSampleRate(200) || !SetSampleRate(100) || !SetSampleRate(80)) Panic("Failed to check for Z axis mouse extension");
-    Expected<uint16_t> id = GetID();
-    if (!id.HasValue()) Panic("Failed to check for Z axis mouse extension");
+    if (!SetSampleRate(200) || !SetSampleRate(100) || !SetSampleRate(80)) MathLib::Panic("Failed to check for Z axis mouse extension");
+    MathLib::Expected<uint16_t> id = GetID();
+    if (!id.HasValue()) MathLib::Panic("Failed to check for Z axis mouse extension");
     if (id.Get() == 3) {
         type = Type::ZAxis;
-        if (!SetSampleRate(200) || !SetSampleRate(200) || !SetSampleRate(80)) Panic("Failed to check for 5 buttons mouse extension");
+        if (!SetSampleRate(200) || !SetSampleRate(200) || !SetSampleRate(80)) MathLib::Panic("Failed to check for 5 buttons mouse extension");
         id = GetID();
-        if (!id.HasValue()) Panic("Failed to check for 5 buttons mouse extension");
+        if (!id.HasValue()) MathLib::Panic("Failed to check for 5 buttons mouse extension");
         if (id.Get() == 4) type = Type::MoreButtons;
     }
     else type = Type::Normal;
-    if (!SetSampleRate(200)) Panic("Failed to set mouse sample rate");
+    if (!SetSampleRate(200)) MathLib::Panic("Failed to set mouse sample rate");
     RegisterInterruptDevice(GetIRQBase() + 12, this);
 }
 PS2Mouse::~PS2Mouse(void) {
@@ -26,27 +26,20 @@ void PS2Mouse::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     packets[packet++] = tmp;
     packet = packet % (type == Type::Normal ? 3 : 4);
     if (!packet) {
-        // TODO: Use data instead of logging it
         const PS2MousePacket1 packet1 = *(const PS2MousePacket1*)&packets[0];
-        if (!packet1.alwaysOne) Panic("Invalid main packet");
-        LogString("Mouse packets:\n");
-        LogString(String("\tLeft button: ") + (packet1.leftButton ? "pressed" : "released") + '\n');
-        LogString(String("\tRight button: ") + (packet1.rightButton ? "pressed" : "released") + '\n');
-        LogString(String("\tMiddle button: ") + (packet1.middleButton ? "pressed" : "released") + '\n');
-        LogString(String("\tX sign bit: ") + (packet1.xSign + '0') + '\n');
-        LogString(String("\tY sign bit: ") + (packet1.ySign + '0') + '\n');
-        LogString(String("\tX overflow bit: ") + (packet1.xOverflow + '0') + '\n');
-        LogString(String("\tY overflow bit: ") + (packet1.yOverflow + '0') + '\n');
-        LogString(String("\tX: ") + ToString(packets[1]) + '\n');
-        LogString(String("\tY: ") + ToString(packets[2]) + '\n');
-        if (type == Type::ZAxis) LogString(String("\tZ: ") + ToString(packets[3]) + '\n');
+        if (!packet1.alwaysOne) MathLib::Panic("Invalid main packet");
+        position += MathLib::CreateVector<size_t>(packet1.xSign ? -packets[1] : packets[1], packet1.ySign ? -packets[2] : packets[2], 0);
+        if (type == Type::ZAxis) GetZ(position) += (int8_t)packets[3];
         else if (type == Type::MoreButtons) {
             const PS2Mouse5ButtonsPacket packet4 = *(const PS2Mouse5ButtonsPacket*)&packets[3];
-            if (packet4.alwaysZero) Panic("Invalid 5 buttons packet");
-            LogString(String("\tZ: ") + ToString(packet4.z) + '\n');
-            LogString(String("\t4 button: ") + (packet4.button4 ? "pressed" : "released") + '\n');
-            LogString(String("\t5 button: ") + (packet4.button5 ? "pressed" : "released") + '\n');
+            if (packet4.alwaysZero) MathLib::Panic("Invalid 5 buttons packet");
+            GetZ(position) += (int8_t)packet4.z;
+            if (packet4.button4) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button4, true));
+            if (packet4.button5) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button5, true));
         }
+        if (packet1.leftButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Left, true));
+        if (packet1.middleButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Middle, true));
+        if (packet1.rightButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Right, true));
     }
 }
 bool PS2Mouse::SetSampleRate(uint8_t sampleRate) {
@@ -54,7 +47,7 @@ bool PS2Mouse::SetSampleRate(uint8_t sampleRate) {
     for (size_t i = 0; i < SizeOfArray(validSampleRates) && !valid; i++)
         if (sampleRate == validSampleRates[i]) valid = true;
     if (!valid) return false;
-    Expected<uint8_t> tmp = SendCommand(0xf3);
+    MathLib::Expected<uint8_t> tmp = SendCommand(0xf3);
     if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) return false;
     tmp = SendCommand(sampleRate);
     return tmp.HasValue() && tmp.Get() == (uint8_t)Response::Acknowledge;

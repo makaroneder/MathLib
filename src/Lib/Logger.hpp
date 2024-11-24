@@ -2,9 +2,11 @@
 #define Logger_H
 #include "Interfaces/Writeable.hpp"
 
-#define LogString(str) (logger && logger->Puts(str))
-#define LogChar(chr) (logger && logger->Write<char>(chr))
+#define LogString(str) (MathLib::logger && MathLib::logger->Puts(str))
+#define LogChar(chr) (MathLib::logger && MathLib::logger->Write<char>(chr))
 
-extern Writeable* logger;
+namespace MathLib {
+    extern Writeable* logger;
+}
 
 #endif

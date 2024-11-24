@@ -4,7 +4,7 @@
 #include <Interfaces/Allocatable.hpp>
 #include <stdint.h>
 
-struct PIC : Allocatable {
+struct PIC : MathLib::Allocatable {
     PIC(void);
     virtual uint8_t GetBase(void) const = 0;
     virtual bool SendEndOfInterrupt(uint8_t irq) = 0;

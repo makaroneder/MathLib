@@ -7,11 +7,11 @@
 /// @return Status
 int main(int, char**) {
     try {
-        const Test test = TestSelf();
+        const MathLib::Test test = MathLib::TestSelf();
         const size_t tests = test.GetRecordCount();
         const size_t passed = test.GetPassed();
         std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
-        if (passed != tests) Panic("Some tests failed");
+        if (passed != tests) MathLib::Panic("Some tests failed");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

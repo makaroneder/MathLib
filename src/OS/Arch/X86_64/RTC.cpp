@@ -26,14 +26,14 @@ bool RTC::SetRate(uint8_t rate) {
     SetInterrupts(true);
     return true;
 }
-void RTC::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
-    time += 1 / GetFrequency();
+void RTC::OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) {
     Read(Register::StatusRegisterC);
+    InterruptTimer::OnInterrupt(interrupt, regs, error);
 }
-num_t RTC::GetFrequency(void) const {
+MathLib::num_t RTC::GetFrequency(void) const {
     return 32768 >> (GetRate() - 1);
 }
-bool RTC::SetFrequency(num_t frequency) {
+bool RTC::SetFrequency(MathLib::num_t frequency) {
     // TODO:
     (void)frequency;
     return false;

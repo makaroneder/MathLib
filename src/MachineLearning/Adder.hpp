@@ -10,7 +10,7 @@ NeuralNetworkState<T> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
     const size_t rows = Pow(n, 2);
-    NeuralNetworkState<T> state = NeuralNetworkState<T>(1, Matrix<T>(bits * 2, rows), Matrix<T>(bits, rows), NeuralNetwork<T>(NeuralNetwork<T>::ActivationFunction::Sigmoid, std::vector<size_t> { bits * 2, bits * 4, bits, }));
+    NeuralNetworkState<T> state = NeuralNetworkState<T>(1, MathLib::Matrix<T>(bits * 2, rows), MathLib::Matrix<T>(bits, rows), MathLib::NeuralNetwork<T>(MathLib::NeuralNetwork<T>::ActivationFunction::Sigmoid, std::vector<size_t> { bits * 2, bits * 4, bits, }));
     for (size_t i = 0; i < rows; i++) {
         const size_t x = i / n;
         const size_t y = i % n;
@@ -24,10 +24,10 @@ NeuralNetworkState<T> GetDefaultState(void) {
     return state;
 }
 template <typename T>
-String StateToString(NeuralNetworkState<T>& state) {
+MathLib::String StateToString(NeuralNetworkState<T>& state) {
     const size_t bits = state.trainingDataInput.GetWidth() / 2;
     const size_t n = 1 << bits;
-    String ret;
+    MathLib::String ret;
     for (size_t y = 0; y < n; y++) {
         for (size_t x = 0; x < n; x++) {
             for (size_t i = 0; i < bits; i++) {
@@ -37,7 +37,7 @@ String StateToString(NeuralNetworkState<T>& state) {
             state.Forward();
             size_t z = 0;
             for (size_t i = 0; i < state.trainingDataOutput.GetWidth(); i++) z |= (state.neuralNetwork.GetOutput().At(i, 0) > 0.5) << i;
-            ret += String("[") + ToString(y) + ", " + ToString(x) + "] => " + ToString(z) + '\n';
+            ret += MathLib::String("[") + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(z) + '\n';
         }
     }
     return ret;

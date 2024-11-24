@@ -8,9 +8,9 @@
 
 AHCIPort::AHCIPort(void) : port(nullptr), buffer(nullptr) {}
 AHCIPort::AHCIPort(HBAPort* port) : port(port), buffer(new uint8_t[1024 + 256 * 33 + 1023]) {
-    if (!buffer) Panic("Failed to allocate AHCI buffer");
+    if (!buffer) MathLib::Panic("Failed to allocate AHCI buffer");
     port->Configure(buffer + (uintptr_t)buffer % 1024);
-    if (!port->GetSize(sectors, bytesPerSector)) Panic("Failed to get size of AHCI");
+    if (!port->GetSize(sectors, bytesPerSector)) MathLib::Panic("Failed to get size of AHCI");
 }
 AHCIPort::~AHCIPort(void) {
     if (buffer) delete [] buffer;
@@ -33,7 +33,7 @@ bool InitAHCI(PCIHeader* header) {
     for (uint8_t i = 0; i < 32; i++) {
         if (abar->ports[i].IsValid()) {
             const HBAPort::Type tmp = abar->ports[i].GetType();
-            String type;
+            MathLib::String type;
             switch (tmp) {
                 case HBAPort::Type::ATAPI: {
                     type = "ATAPI";
@@ -51,9 +51,9 @@ bool InitAHCI(PCIHeader* header) {
                     type = "PM";
                     break;
                 }
-                default: type = String("Unknown (0x") + ToString((uint32_t)tmp, 16) + ')';
+                default: type = MathLib::String("Unknown (0x") + MathLib::ToString((uint32_t)tmp, 16) + ')';
             }
-            LogString(String("Found ") + type + " on AHCI port " + ToString(i) + '\n');
+            LogString(MathLib::String("Found ") + type + " on AHCI port " + MathLib::ToString(i) + '\n');
             AHCIPort* port = new AHCIPort(&abar->ports[i]);
             if (!port || !disks.Add(port)) return false;
         }

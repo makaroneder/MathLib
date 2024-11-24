@@ -14,14 +14,14 @@
 /// @param lastState Last state of the program
 /// @return Status
 template <typename T>
-bool HandleEvents(Renderer& renderer, const Function<bool>& func, size_t& state, const size_t& lastState) {
+bool HandleEvents(MathLib::Renderer& renderer, const MathLib::Function<bool>& func, size_t& state, const size_t& lastState) {
     bool running = true;
     const T speed = 1;
     if (!func()) return false;
     while (running) {
-        const Event event = renderer.GetEvent();
-        if (event.type == Event::Type::Quit) running = false;
-        else if (event.type == Event::Type::KeyPressed) {
+        const MathLib::Event event = renderer.GetEvent();
+        if (event.type == MathLib::Event::Type::Quit) running = false;
+        else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
             bool update = true;
             switch (event.key) {
                 case 'w': {
@@ -70,24 +70,17 @@ bool HandleEvents(Renderer& renderer, const Function<bool>& func, size_t& state,
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        #ifdef Debug
-        const Test test = TestSelf();
-        const size_t tests = test.GetRecordCount();
-        const size_t passed = test.GetPassed();
-        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
-        if (passed != tests) Panic("Some tests failed");
-        #endif
-        if (argc < 2) Panic(String("Usage: ") + argv[0] + " <input file>");
-        HostFileSystem fs;
-        SDL2Renderer renderer = SDL2Renderer("Math graph", 800, 800);
-        Array<Optimizer> states;
+        if (argc < 2) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <input file>");
+        MathLib::HostFileSystem fs;
+        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Math graph", 800, 800);
+        MathLib::Array<MathLib::Optimizer> states;
         for (int i = 1; i < argc; i++) {
-            Node* root = Tokenize(Preproces(fs, argv[i]));
+            MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[i]));
             #ifdef Debug
             std::cout << "Generated nodes:\n" << *root << std::endl;
             #endif
-            Optimizer optimizer = Optimizer();
-            Node* optimizedRoot = optimizer.Optimize(root);
+            MathLib::Optimizer optimizer = MathLib::Optimizer();
+            MathLib::Node* optimizedRoot = optimizer.Optimize(root);
             delete root;
             #ifdef Debug
             std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
@@ -97,42 +90,42 @@ int main(int argc, char** argv) {
             states.Add(optimizer);
         }
         size_t state = 0;
-        const HostFunction<Array<num_t>, num_t> func = HostFunction<Array<num_t>, num_t>(nullptr, [&states, &state](const void*, num_t x) -> Array<num_t> {
-            const FunctionNode funcNode = states.At(state).GetFunction("f");
-            Optimizer tmp = states.At(state);
-            Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, ToString(x), true);
+        const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>(nullptr, [&states, &state](const void*, MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
+            MathLib::Optimizer tmp = states.At(state);
+            MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
             tmp.variables.Add(var);
-            Node* n = tmp.Optimize(funcNode.body);
+            MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
-            const Array<complex_t> complexRet = n->ToNumber();
+            const MathLib::Array<MathLib::complex_t> complexRet = n->ToNumber();
             delete n;
-            Array<num_t> ret = Array<num_t>(complexRet.GetSize());
-            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = !complexRet.At(i).GetImaginary() ? complexRet.At(i).GetReal() : MakeNaN();
+            MathLib::Array<MathLib::num_t> ret = MathLib::Array<MathLib::num_t>(complexRet.GetSize());
+            for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).ToReal();
             return ret;
         });
-        const HostFunction<complex_t, complex_t> complexFunc = HostFunction<complex_t, complex_t>(nullptr, [&states, &state](const void*, complex_t z) -> complex_t {
-            const FunctionNode funcNode = states.At(state).GetFunction("f");
-            Optimizer tmp = states.At(state);
-            Variable var = Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
+        const MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> complexFunc = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [&states, &state](const void*, MathLib::complex_t z) -> MathLib::complex_t {
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
+            MathLib::Optimizer tmp = states.At(state);
+            MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
             tmp.variables.Add(var);
-            Node* n = tmp.Optimize(funcNode.body);
+            MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
-            const complex_t ret = n->ToNumber().At(0);
+            const MathLib::complex_t ret = n->ToNumber().At(0);
             delete n;
             return ret;
         });
-        if (!HandleEvents<num_t>(renderer, HostFunction<bool>(nullptr, [&renderer, func, complexFunc, &states, &state](const void*) -> bool {
+        if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>(nullptr, [&renderer, func, complexFunc, &states, &state](const void*) -> bool {
             renderer.Fill(0);
             renderer.DrawAxis(0xffffffff, 0x808080ff);
-            const FunctionNode funcNode = states.At(state).GetFunction("f");
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             if (funcNode.dataType == "C")
-                renderer.DrawComplexFunction<num_t>(renderer.GenerateComplexFunction<num_t>(complexFunc));
+                renderer.DrawComplexFunction<MathLib::num_t>(renderer.GenerateComplexFunction<MathLib::num_t>(complexFunc));
             else if (funcNode.dataType == "R")
-                renderer.DrawFunction<num_t>(renderer.GenerateMultiFunction<num_t>(func), 0xff0000ff);
+                renderer.DrawFunction<MathLib::num_t>(renderer.GenerateMultiFunction<MathLib::num_t>(func), 0xff0000ff);
             else return false;
             return renderer.Update();
-        }), state, states.GetSize())) Panic("Failed to render function");
-        for (Optimizer& optimizer : states) optimizer.Destroy();
+        }), state, states.GetSize())) MathLib::Panic("Failed to render function");
+        for (MathLib::Optimizer& optimizer : states) optimizer.Destroy();
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

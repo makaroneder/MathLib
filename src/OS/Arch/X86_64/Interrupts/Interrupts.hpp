@@ -3,7 +3,7 @@
 #define Interrupts_H
 #include "../Registers.hpp"
 
-struct InterruptDevice : Allocatable {
+struct InterruptDevice : MathLib::Allocatable {
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) = 0;
 };
 uint8_t GetIRQBase(void);

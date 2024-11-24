@@ -35,16 +35,16 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
     for (size_t i = 0; i < 6; i++) oemID[i] = rsdp->oemID[i];
     oemID[6] = '\0';
     LogString("RSDP: {\n");
-    LogString(String("\tSignature: ") + signature + '\n');
-    LogString(String("\tChecksum: 0x") + ToString(rsdp->checksum, 16) + '\n');
-    LogString(String("\tOEM ID: ") + oemID + '\n');
-    LogString(String("\tRevision: 0x") + ToString(rsdp->revision, 16) + '\n');
-    LogString(String("\tRSDT address: 0x") + ToString(rsdp->rsdt, 16) + '\n');
+    LogString(MathLib::String("\tSignature: ") + signature + '\n');
+    LogString(MathLib::String("\tChecksum: 0x") + MathLib::ToString(rsdp->checksum, 16) + '\n');
+    LogString(MathLib::String("\tOEM ID: ") + oemID + '\n');
+    LogString(MathLib::String("\tRevision: 0x") + MathLib::ToString(rsdp->revision, 16) + '\n');
+    LogString(MathLib::String("\tRSDT address: 0x") + MathLib::ToString(rsdp->rsdt, 16) + '\n');
     if (rsdp->revision == 2) {
         const RSDP2* rsdp2 = (const RSDP2*)rsdp;
-        LogString(String("\tLength: 0x") + ToString(rsdp2->length, 16) + '\n');
-        LogString(String("\tXSDT address: 0x") + ToString(rsdp2->xsdt, 16) + '\n');
-        LogString(String("\tExtended checksum: 0x") + ToString(rsdp2->extendedChecksum, 16) + '\n');
+        LogString(MathLib::String("\tLength: 0x") + MathLib::ToString(rsdp2->length, 16) + '\n');
+        LogString(MathLib::String("\tXSDT address: 0x") + MathLib::ToString(rsdp2->xsdt, 16) + '\n');
+        LogString(MathLib::String("\tExtended checksum: 0x") + MathLib::ToString(rsdp2->extendedChecksum, 16) + '\n');
     }
     LogString("}\n");
     ACPITable* rsdt = (ACPITable*)(uintptr_t)rsdp->rsdt;
@@ -73,58 +73,58 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
         char oemTableID[9];
         for (size_t i = 0; i < SizeOfArray(table->oemTableID); i++) oemTableID[i] = table->oemTableID[i];
         oemTableID[8] = '\0';
-        LogString(String("ACPI table ") + ToString(i) + ": {\n");
-        LogString(String("\tSignature: ") + signature + '\n');
-        LogString(String("\tLength: 0x") + ToString(table->length, 16) + '\n');
-        LogString(String("\tRevision: 0x") + ToString(table->revision, 16) + '\n');
-        LogString(String("\tChecksum: 0x") + ToString(table->checksum, 16) + '\n');
-        LogString(String("\tOEM ID: ") + oemID + '\n');
-        LogString(String("\tOEM table ID: ") + oemTableID + '\n');
-        LogString(String("\tOEM revision: 0x") + ToString(table->oemRevision, 16) + '\n');
-        LogString(String("\tCreator ID: 0x") + ToString(table->creatorID, 16) + '\n');
-        LogString(String("\tCreator revision: 0x") + ToString(table->creatorRevision, 16) + '\n');
-        if (String(signature) == String(FADT::expectedSignature)) {
+        LogString(MathLib::String("ACPI table ") + MathLib::ToString(i) + ": {\n");
+        LogString(MathLib::String("\tSignature: ") + signature + '\n');
+        LogString(MathLib::String("\tLength: 0x") + MathLib::ToString(table->length, 16) + '\n');
+        LogString(MathLib::String("\tRevision: 0x") + MathLib::ToString(table->revision, 16) + '\n');
+        LogString(MathLib::String("\tChecksum: 0x") + MathLib::ToString(table->checksum, 16) + '\n');
+        LogString(MathLib::String("\tOEM ID: ") + oemID + '\n');
+        LogString(MathLib::String("\tOEM table ID: ") + oemTableID + '\n');
+        LogString(MathLib::String("\tOEM revision: 0x") + MathLib::ToString(table->oemRevision, 16) + '\n');
+        LogString(MathLib::String("\tCreator ID: 0x") + MathLib::ToString(table->creatorID, 16) + '\n');
+        LogString(MathLib::String("\tCreator revision: 0x") + MathLib::ToString(table->creatorRevision, 16) + '\n');
+        if (MathLib::String(signature) == MathLib::String(FADT::expectedSignature)) {
             fadt = (FADT*)table;
-            LogString(String("\tFACS: 0x") + ToString(fadt->facs, 16) + '\n');
-            LogString(String("\tDSDT: 0x") + ToString(fadt->dsdt, 16) + '\n');
-            LogString(String("\tSCI interrupt: 0x") + ToString(fadt->sciInterrupt, 16) + '\n');
-            LogString(String("\tSMI command port: 0x") + ToString(fadt->smiCommandPort, 16) + '\n');
-            LogString(String("\tACPI enable: 0x") + ToString(fadt->acpiEnable, 16) + '\n');
-            LogString(String("\tACPI disable: 0x") + ToString(fadt->acpiDisable, 16) + '\n');
-            LogString(String("\tRTC century register: 0x") + ToString((uint8_t)fadt->rtcCenturyRegister, 16) + '\n');
-            LogString(String("\tACPI boot architecture flags: 0x") + ToString(fadt->bootArchitectureFlags, 16) + '\n');
+            LogString(MathLib::String("\tFACS: 0x") + MathLib::ToString(fadt->facs, 16) + '\n');
+            LogString(MathLib::String("\tDSDT: 0x") + MathLib::ToString(fadt->dsdt, 16) + '\n');
+            LogString(MathLib::String("\tSCI interrupt: 0x") + MathLib::ToString(fadt->sciInterrupt, 16) + '\n');
+            LogString(MathLib::String("\tSMI command port: 0x") + MathLib::ToString(fadt->smiCommandPort, 16) + '\n');
+            LogString(MathLib::String("\tACPI enable: 0x") + MathLib::ToString(fadt->acpiEnable, 16) + '\n');
+            LogString(MathLib::String("\tACPI disable: 0x") + MathLib::ToString(fadt->acpiDisable, 16) + '\n');
+            LogString(MathLib::String("\tRTC century register: 0x") + MathLib::ToString((uint8_t)fadt->rtcCenturyRegister, 16) + '\n');
+            LogString(MathLib::String("\tACPI boot architecture flags: 0x") + MathLib::ToString(fadt->bootArchitectureFlags, 16) + '\n');
             if (fadt->revision >= 0x02) {
                 const FADT2* fadt2 = (const FADT2*)fadt;
-                LogString(String("\tACPI 2.0 flags: 0x") + ToString(fadt2->flags, 16) + '\n');
-                LogString(String("\tACPI 2.0 FACS: 0x") + ToString(fadt2->facs2, 16) + '\n');
-                LogString(String("\tACPI 2.0 DSDT: 0x") + ToString(fadt2->dsdt2, 16) + '\n');
+                LogString(MathLib::String("\tACPI 2.0 flags: 0x") + MathLib::ToString(fadt2->flags, 16) + '\n');
+                LogString(MathLib::String("\tACPI 2.0 FACS: 0x") + MathLib::ToString(fadt2->facs2, 16) + '\n');
+                LogString(MathLib::String("\tACPI 2.0 DSDT: 0x") + MathLib::ToString(fadt2->dsdt2, 16) + '\n');
             }
         }
-        else if (String(signature) == String(MADT::expectedSignature)) {
+        else if (MathLib::String(signature) == MathLib::String(MADT::expectedSignature)) {
             madt = (const MADT*)table;
-            LogString(String("\tLocal APIC address: 0x") + ToString(madt->localAPIC, 16) + '\n');
+            LogString(MathLib::String("\tLocal APIC address: 0x") + MathLib::ToString(madt->localAPIC, 16) + '\n');
         }
-        else if (String(signature) == String(MCFG::expectedSignature)) {
+        else if (MathLib::String(signature) == MathLib::String(MCFG::expectedSignature)) {
             mcfg = (const MCFG*)table;
-            LogString(String("\tReserved: 0x") + ToString(mcfg->reserved, 16) + '\n');
+            LogString(MathLib::String("\tReserved: 0x") + MathLib::ToString(mcfg->reserved, 16) + '\n');
         }
-        else if (String(signature) == String(HPET::expectedSignature)) {
+        else if (MathLib::String(signature) == MathLib::String(HPET::expectedSignature)) {
             const HPET* hpet = (const HPET*)table;
-            LogString(String("\tHardware revision: 0x") + ToString(hpet->hardwareRevision, 16) + '\n');
-            LogString(String("\tComparator count: 0x") + ToString(hpet->comparatorCount, 16) + '\n');
-            LogString(String("\tComparator size: 0x") + ToString(hpet->counterSize, 16) + '\n');
-            LogString(String("\tReserved: 0x") + ToString(hpet->reserved, 16) + '\n');
-            LogString(String("\tLegacy IRQ replacement: ") + BoolToString(hpet->legacyIRQReplacement) + '\n');
-            LogString(String("\tPCI vendor: 0x") + ToString(hpet->pciVendor, 16) + '\n');
-            LogString(String("\tNumber: 0x") + ToString(hpet->number, 16) + '\n');
-            LogString(String("\tMinimum tick: 0x") + ToString(hpet->minimumTick, 16) + '\n');
-            LogString(String("\tPage protection: 0x") + ToString(hpet->pageProtection, 16) + '\n');
+            LogString(MathLib::String("\tHardware revision: 0x") + MathLib::ToString(hpet->hardwareRevision, 16) + '\n');
+            LogString(MathLib::String("\tComparator count: 0x") + MathLib::ToString(hpet->comparatorCount, 16) + '\n');
+            LogString(MathLib::String("\tComparator size: 0x") + MathLib::ToString(hpet->counterSize, 16) + '\n');
+            LogString(MathLib::String("\tReserved: 0x") + MathLib::ToString(hpet->reserved, 16) + '\n');
+            LogString(MathLib::String("\tLegacy IRQ replacement: ") + MathLib::BoolToString(hpet->legacyIRQReplacement) + '\n');
+            LogString(MathLib::String("\tPCI vendor: 0x") + MathLib::ToString(hpet->pciVendor, 16) + '\n');
+            LogString(MathLib::String("\tNumber: 0x") + MathLib::ToString(hpet->number, 16) + '\n');
+            LogString(MathLib::String("\tMinimum tick: 0x") + MathLib::ToString(hpet->minimumTick, 16) + '\n');
+            LogString(MathLib::String("\tPage protection: 0x") + MathLib::ToString(hpet->pageProtection, 16) + '\n');
         }
-        else if (String(signature) == String(WAET::expectedSignature)) {
+        else if (MathLib::String(signature) == MathLib::String(WAET::expectedSignature)) {
             const WAET* waet = (const WAET*)table;
-            LogString(String("\tEnhanced RTC: ") + BoolToString(waet->enhancedRTC) + '\n');
-            LogString(String("\tEnhanced ACPI PM timer: ") + BoolToString(waet->enhancedACPIPMTimer) + '\n');
-            LogString(String("\tReserved: 0x") + ToString(waet->reserved, 16) + '\n');
+            LogString(MathLib::String("\tEnhanced RTC: ") + MathLib::BoolToString(waet->enhancedRTC) + '\n');
+            LogString(MathLib::String("\tEnhanced ACPI PM timer: ") + MathLib::BoolToString(waet->enhancedACPIPMTimer) + '\n');
+            LogString(MathLib::String("\tReserved: 0x") + MathLib::ToString(waet->reserved, 16) + '\n');
         }
         LogString("}\n");
     }
@@ -136,65 +136,65 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
                 case MADTEntry::Type::ProcessorLocalAPIC: {
                     const MADTProcessorLocalAPIC* lapic = (const MADTProcessorLocalAPIC*)entry;
                     LogString("MADT processor local APIC: {\n");
-                    LogString(String("\tACPI processor ID: 0x") + ToString(lapic->acpiProcessorID, 16) + '\n');
-                    LogString(String("\tAPIC ID: 0x") + ToString(lapic->apicID, 16) + '\n');
-                    LogString(String("\tFlags: 0x") + ToString(lapic->flags, 16) + '\n');
+                    LogString(MathLib::String("\tACPI processor ID: 0x") + MathLib::ToString(lapic->acpiProcessorID, 16) + '\n');
+                    LogString(MathLib::String("\tAPIC ID: 0x") + MathLib::ToString(lapic->apicID, 16) + '\n');
+                    LogString(MathLib::String("\tFlags: 0x") + MathLib::ToString(lapic->flags, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 case MADTEntry::Type::IOAPIC: {
                     const MADTIOAPIC* ioapic = (const MADTIOAPIC*)entry;
                     LogString("MADT IO APIC: {\n");
-                    LogString(String("\tIO APIC ID: 0x") + ToString(ioapic->ioAPICID, 16) + '\n');
-                    LogString(String("\tIO APIC address: 0x") + ToString(ioapic->ioAPIC, 16) + '\n');
-                    LogString(String("\tGlobal system interrupt address: 0x") + ToString(ioapic->gsiBase, 16) + '\n');
+                    LogString(MathLib::String("\tIO APIC ID: 0x") + MathLib::ToString(ioapic->ioAPICID, 16) + '\n');
+                    LogString(MathLib::String("\tIO APIC address: 0x") + MathLib::ToString(ioapic->ioAPIC, 16) + '\n');
+                    LogString(MathLib::String("\tGlobal system interrupt address: 0x") + MathLib::ToString(ioapic->gsiBase, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 case MADTEntry::Type::IOAPICInterruptSourceOverride: {
                     const MADTIOAPICInterruptSourceOverride* ioapicISO = (const MADTIOAPICInterruptSourceOverride*)entry;
                     LogString("MADT IO APIC interrupt source override: {\n");
-                    LogString(String("\tBus source: 0x") + ToString(ioapicISO->busSource, 16) + '\n');
-                    LogString(String("\tIRQ source: 0x") + ToString(ioapicISO->irqSource, 16) + '\n');
-                    LogString(String("\tGlobal system interrupt: 0x") + ToString(ioapicISO->gsi, 16) + '\n');
-                    LogString(String("\tFlags: 0x") + ToString(ioapicISO->flags, 16) + '\n');
+                    LogString(MathLib::String("\tBus source: 0x") + MathLib::ToString(ioapicISO->busSource, 16) + '\n');
+                    LogString(MathLib::String("\tIRQ source: 0x") + MathLib::ToString(ioapicISO->irqSource, 16) + '\n');
+                    LogString(MathLib::String("\tGlobal system interrupt: 0x") + MathLib::ToString(ioapicISO->gsi, 16) + '\n');
+                    LogString(MathLib::String("\tFlags: 0x") + MathLib::ToString(ioapicISO->flags, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 case MADTEntry::Type::IOAPICNonMaskableInterruptSource: {
                     const MADTIOAPICNonMaskableInterruptSource* ioapicNMISource = (const MADTIOAPICNonMaskableInterruptSource*)entry;
                     LogString("MADT IO APIC non maskable interrupt source: {\n");
-                    LogString(String("\tNon maskable interrupt source: 0x") + ToString(ioapicNMISource->nmiSource, 16) + '\n');
-                    LogString(String("\tFlags: 0x") + ToString(ioapicNMISource->flags, 16) + '\n');
-                    LogString(String("\tGlobal system interrupt: 0x") + ToString(ioapicNMISource->gsi, 16) + '\n');
+                    LogString(MathLib::String("\tNon maskable interrupt source: 0x") + MathLib::ToString(ioapicNMISource->nmiSource, 16) + '\n');
+                    LogString(MathLib::String("\tFlags: 0x") + MathLib::ToString(ioapicNMISource->flags, 16) + '\n');
+                    LogString(MathLib::String("\tGlobal system interrupt: 0x") + MathLib::ToString(ioapicNMISource->gsi, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 case MADTEntry::Type::LocalAPICNonMaskableInterrupts: {
                     const MADTLocalAPICNonMaskableInterrupts* lapicNMI = (const MADTLocalAPICNonMaskableInterrupts*)entry;
                     LogString("MADT local APIC non maskable interrupts: {\n");
-                    LogString(String("\tACPI processor ID: ") + (lapicNMI->acpiProcessorID == UINT8_MAX ? "all" : String("0x") + ToString(lapicNMI->acpiProcessorID, 16)) + '\n');
-                    LogString(String("\tFlags: 0x") + ToString(lapicNMI->flags, 16) + '\n');
-                    LogString(String("\tLINT: 0x") + ToString(lapicNMI->lint, 16) + '\n');
+                    LogString(MathLib::String("\tACPI processor ID: ") + (lapicNMI->acpiProcessorID == UINT8_MAX ? "all" : MathLib::String("0x") + MathLib::ToString(lapicNMI->acpiProcessorID, 16)) + '\n');
+                    LogString(MathLib::String("\tFlags: 0x") + MathLib::ToString(lapicNMI->flags, 16) + '\n');
+                    LogString(MathLib::String("\tLINT: 0x") + MathLib::ToString(lapicNMI->lint, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 case MADTEntry::Type::LocalAPICAddressOverride: {
                     lapic = (LocalAPIC*)((const MADTLocalAPICAddressOverride*)entry)->address;
-                    LogString(String("MADT local APIC address override: 0x") + ToString((uintptr_t)lapic, 16) + '\n');
+                    LogString(MathLib::String("MADT local APIC address override: 0x") + MathLib::ToString((uintptr_t)lapic, 16) + '\n');
                     break;
                 }
                 case MADTEntry::Type::ProcessorLocalX2APIC: {
                     const MADTProcessorLocalX2APIC* localX2APIC = (const MADTProcessorLocalX2APIC*)entry;
                     LogString("MADT processor local X2 APIC: {\n");
-                    LogString(String("\tLocal X2 APIC ID: 0x") + ToString(localX2APIC->localX2APICID, 16) + '\n');
-                    LogString(String("\tFlags: 0x") + ToString(localX2APIC->flags, 16) + '\n');
-                    LogString(String("\tACPI ID: 0x") + ToString(localX2APIC->acpiID, 16) + '\n');
+                    LogString(MathLib::String("\tLocal X2 APIC ID: 0x") + MathLib::ToString(localX2APIC->localX2APICID, 16) + '\n');
+                    LogString(MathLib::String("\tFlags: 0x") + MathLib::ToString(localX2APIC->flags, 16) + '\n');
+                    LogString(MathLib::String("\tACPI ID: 0x") + MathLib::ToString(localX2APIC->acpiID, 16) + '\n');
                     LogString("}\n");
                     break;
                 }
                 default: {
-                    LogString(String("Unknown MADT entry type: ") + ToString((uint8_t)entry->type) + '\n');
+                    LogString(MathLib::String("Unknown MADT entry type: ") + MathLib::ToString((uint8_t)entry->type) + '\n');
                     break;
                 }
             }

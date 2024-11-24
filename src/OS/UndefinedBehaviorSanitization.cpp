@@ -30,11 +30,11 @@ struct TypeMismatchInfo : SourceLocation {
     Type type;
 };
 
-String SourceLocationToString(SourceLocation* location) {
-    return String(location->file) + " " + ToString(location->line) + ":" + ToString(location->column);
+MathLib::String SourceLocationToString(SourceLocation* location) {
+    return MathLib::String(location->file) + " " + MathLib::ToString(location->line) + ":" + MathLib::ToString(location->column);
 }
 extern "C" void __ubsan_handle_type_mismatch(TypeMismatchInfo<uintptr_t>* info, uintptr_t ptr) {
-    String tmp;
+    MathLib::String tmp;
     if (!ptr) tmp = "Null pointer access";
     else if (info->alignment && !(ptr & (info->alignment - 1))) tmp = "Unaligned memory access";
     else {
@@ -77,20 +77,20 @@ extern "C" void __ubsan_handle_type_mismatch(TypeMismatchInfo<uintptr_t>* info, 
                 break;
             }
         }
-        tmp += String(" 0x") + ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
+        tmp += MathLib::String(" 0x") + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
     }
-    Panic(String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
+    MathLib::Panic(MathLib::String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
 }
 extern "C" void __ubsan_handle_out_of_bounds(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_pointer_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_type_mismatch_v1(TypeMismatchInfo<uint8_t>* info, uintptr_t ptr) {
-    String tmp;
+    MathLib::String tmp;
     if (!ptr) tmp = "Null pointer access";
     else if (info->alignment && !(ptr & (1 << info->alignment))) tmp = "Unaligned memory access";
     else {
@@ -133,39 +133,39 @@ extern "C" void __ubsan_handle_type_mismatch_v1(TypeMismatchInfo<uint8_t>* info,
                 break;
             }
         }
-        tmp += String(" 0x") + ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
+        tmp += MathLib::String(" 0x") + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
     }
-    Panic(String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
+    MathLib::Panic(MathLib::String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
 }
 extern "C" void __ubsan_handle_sub_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_add_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_mul_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_divrem_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_load_invalid_value(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_shift_out_of_bounds(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_vla_bound_not_positive(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }
 extern "C" void __ubsan_handle_negate_overflow(SourceLocation* info) {
     // TODO:
-    Panic(String(__func__) + " " + SourceLocationToString(info));
+    MathLib::Panic(MathLib::String(__func__) + " " + SourceLocationToString(info));
 }

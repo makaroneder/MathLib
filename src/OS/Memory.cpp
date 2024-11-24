@@ -41,8 +41,8 @@ void* Alloc(size_t size) {
 }
 void Dealloc(void* ptr) {
     AllocationHeader* header = (AllocationHeader*)((uintptr_t)ptr - sizeof(AllocationHeader));
-    if (!header->IsValid()) Panic("Allocation header is not valid");
-    if (header->free) Panic("Double deallocation detected");
+    if (!header->IsValid()) MathLib::Panic("Allocation header is not valid");
+    if (header->free) MathLib::Panic("Double deallocation detected");
     header->free = true;
 }
 void* operator new(size_t size) {

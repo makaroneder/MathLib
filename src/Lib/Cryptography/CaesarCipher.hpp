@@ -3,8 +3,10 @@
 #include "AffineCipher.hpp"
 #include "SpecialCaseCipher.hpp"
 
-struct CaesarCipher : SpecialCaseCipher<AffineCipher> {
-    virtual Expected<String> GetKey(const String& baseKey) const override;
-};
+namespace MathLib {
+    struct CaesarCipher : SpecialCaseCipher<AffineCipher> {
+        virtual Expected<String> GetKey(const String& baseKey) const override;
+    };
+}
 
 #endif

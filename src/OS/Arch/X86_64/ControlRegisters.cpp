@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #include "ControlRegisters.hpp"
 
-Expected<uintptr_t> GetControlRegister(uint8_t num) {
+MathLib::Expected<uintptr_t> GetControlRegister(uint8_t num) {
     uintptr_t val = 0;
     switch (num) {
         case 0: {
@@ -24,9 +24,9 @@ Expected<uintptr_t> GetControlRegister(uint8_t num) {
             asm volatile("mov %%cr8, %0" : "=r" (val));
             break;
         }
-        default: return Expected<uintptr_t>();
+        default: return MathLib::Expected<uintptr_t>();
     }
-    return Expected<uintptr_t>(val);
+    return MathLib::Expected<uintptr_t>(val);
 }
 bool SetControlRegister(uint8_t num, uintptr_t value) {
     switch (num) {

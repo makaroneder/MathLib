@@ -2,16 +2,15 @@
 #ifndef RTC_H
 #define RTC_H
 #include "CMOS.hpp"
-#include "../../Time.hpp"
+#include "InterruptTimer.hpp"
 #include "../../DateKeeper.hpp"
-#include "Interrupts/Interrupts.hpp"
 
-struct RTC : CMOS, Timer, DateKeeper, InterruptDevice {
+struct RTC : CMOS, DateKeeper, InterruptTimer {
     RTC(bool nmi_, Register centuryRegister = (Register)0);
     virtual ~RTC(void) override;
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;
-    virtual num_t GetFrequency(void) const override;
-    virtual bool SetFrequency(num_t frequency) override;
+    virtual MathLib::num_t GetFrequency(void) const override;
+    virtual bool SetFrequency(MathLib::num_t frequency) override;
     virtual Date GetDate(void) const override;
     virtual void SetDate(const Date& date) override;
 

@@ -1,3 +1,3 @@
 #include "Disks.hpp"
 
-Array<ByteDevice*> disks = Array<ByteDevice*>();
+MathLib::Array<MathLib::ByteDevice*> disks = MathLib::Array<MathLib::ByteDevice*>();

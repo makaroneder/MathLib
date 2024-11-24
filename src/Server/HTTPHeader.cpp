@@ -1,9 +1,9 @@
 #include "HTTPHeader.hpp"
 
-HTTPHeader::HTTPHeader(String n, String val) {
+HTTPHeader::HTTPHeader(MathLib::String n, MathLib::String val) {
     name = n;
     value = val;
 }
-String HTTPHeader::ToString(const String& padding) const {
+MathLib::String HTTPHeader::ToString(const MathLib::String& padding) const {
     return padding + name + ": " + value;
 }

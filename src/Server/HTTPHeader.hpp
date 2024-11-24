@@ -2,15 +2,15 @@
 #define HTTPHeader_H
 #include <Interfaces/Printable.hpp>
 
-struct HTTPHeader : Printable {
-    String name;
-    String value;
+struct HTTPHeader : MathLib::Printable {
+    MathLib::String name;
+    MathLib::String value;
 
-    HTTPHeader(String n = "", String val = "");
+    HTTPHeader(MathLib::String n = "", MathLib::String val = "");
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 };
 
 #endif

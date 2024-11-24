@@ -1,6 +1,6 @@
 #include <Host.hpp>
 
-struct AtExitFunction : Allocatable {
+struct AtExitFunction : MathLib::Allocatable {
     using Function = void (*)(void*);
     Function function;
     void* arg;
@@ -33,8 +33,8 @@ extern "C" void __cxa_finalize(void* function) {
 }
 uintptr_t __stack_chk_guard = 0x2137699642012345;
 extern "C" [[noreturn]] void __stack_chk_fail(void) {
-	Panic("Stack smashing detected");
+	MathLib::Panic("Stack smashing detected");
 }
 extern "C" void __cxa_pure_virtual(void) {
-    Panic("Pure virtual function called");
+    MathLib::Panic("Pure virtual function called");
 }

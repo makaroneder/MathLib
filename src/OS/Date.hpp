@@ -2,7 +2,7 @@
 #define Date_H
 #include <Interfaces/Printable.hpp>
 
-struct Date : Printable {
+struct Date : MathLib::Printable {
     static constexpr size_t currentYear = 2024;
     static constexpr uint8_t monthDays[] = {
         31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
@@ -20,7 +20,7 @@ struct Date : Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 };
 
 #endif

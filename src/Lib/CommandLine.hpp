@@ -2,18 +2,20 @@
 #define CommandLine_H
 #include "Expected.hpp"
 
-struct CommandLineEntry {
-    String name;
-    String value;
+namespace MathLib {
+    struct CommandLineEntry {
+        String name;
+        String value;
 
-    CommandLineEntry(const String& name = "", const String& value = "");
-};
-struct CommandLine {
-    CommandLine(size_t argc, const char** argv);
-    Expected<String> GetEntry(const String& name) const;
+        CommandLineEntry(const String& name = "", const String& value = "");
+    };
+    struct CommandLine {
+        CommandLine(size_t argc, const char** argv);
+        Expected<String> GetEntry(const String& name) const;
 
-    private:
-    Array<CommandLineEntry> entries;
-};
+        private:
+        Array<CommandLineEntry> entries;
+    };
+}
 
 #endif

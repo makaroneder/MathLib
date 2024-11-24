@@ -9,7 +9,7 @@ Cascade::~Cascade(void) {
     RegisterInterruptDevice(GetIRQBase() + 2, nullptr);
 }
 void Cascade::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
-    Panic("Cascade interrupt raised");
+    MathLib::Panic("Cascade interrupt raised");
 }
 
 #endif

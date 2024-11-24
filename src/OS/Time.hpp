@@ -2,15 +2,15 @@
 #define Time_H
 #include <Typedefs.hpp>
 
-struct Timer : Allocatable {
+struct Timer : MathLib::Allocatable {
     Timer(void);
-    num_t GetTime(void) const;
-    void Sleep(num_t duration);
-    virtual num_t GetFrequency(void) const = 0;
-    virtual bool SetFrequency(num_t frequency) = 0;
+    MathLib::num_t GetTime(void) const;
+    void Sleep(MathLib::num_t duration);
+    virtual MathLib::num_t GetFrequency(void) const = 0;
+    virtual bool SetFrequency(MathLib::num_t frequency) = 0;
 
     protected:
-    num_t time;
+    MathLib::num_t time;
 };
 extern Timer* mainTimer;
 

@@ -3,27 +3,29 @@
 #include "../Interfaces/Printable.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 
-struct Emulator : ByteDevice, Printable {
-    Emulator(const Array<uint8_t>& mem);
-    virtual bool Run(void) = 0;
-    /// @brief Returns memory size
-    /// @return Memory size
-    virtual size_t GetSize(void) const override;
-    /// @brief Reads data from the buffer
-    /// @param buffer Buffer to read data from
-    /// @param size Size of the buffer
-    /// @param position Position to read from
-    /// @return Size of bytes read
-    virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;
-    /// @brief Writes data to the buffer
-    /// @param buffer Buffer to write data to
-    /// @param size Size of the buffer
-    /// @param position Position to write to
-    /// @return Size of written bytes
-    virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
+namespace MathLib {
+    struct Emulator : ByteDevice, Printable {
+        Emulator(const Array<uint8_t>& memory);
+        virtual bool Run(void) = 0;
+        /// @brief Returns memory size
+        /// @return Memory size
+        virtual size_t GetSize(void) const override;
+        /// @brief Reads data from the buffer
+        /// @param buffer Buffer to read data from
+        /// @param size Size of the buffer
+        /// @param position Position to read from
+        /// @return Size of bytes read
+        virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;
+        /// @brief Writes data to the buffer
+        /// @param buffer Buffer to write data to
+        /// @param size Size of the buffer
+        /// @param position Position to write to
+        /// @return Size of written bytes
+        virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
 
-    protected:
-    Array<uint8_t> memory;
-};
+        protected:
+        Array<uint8_t> memory;
+    };
+}
 
 #endif

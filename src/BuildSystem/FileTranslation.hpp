@@ -3,11 +3,11 @@
 #include <Typedefs.hpp>
 
 struct FileTranslation {
-    String inputFormat;
-    String outputFormat;
-    String sources;
+    MathLib::String inputFormat;
+    MathLib::String outputFormat;
+    MathLib::String sources;
 
-    FileTranslation(const String& inputFormat, const String& outputFormat, const String& sources);
+    FileTranslation(const MathLib::String& inputFormat, const MathLib::String& outputFormat, const MathLib::String& sources);
 };
 
 

@@ -3,12 +3,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct MemoryFSFile {
-    size_t resource;
-    bool write;
-    bool free;
+namespace MathLib {
+    struct MemoryFSFile {
+        size_t resource;
+        bool write;
+        bool free;
 
-    MemoryFSFile(size_t resource = SIZE_MAX, bool write = false);
-};
+        MemoryFSFile(size_t resource = SIZE_MAX, bool write = false);
+    };
+}
 
 #endif

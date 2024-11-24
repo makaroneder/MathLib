@@ -5,7 +5,7 @@
 
 struct DebugException : Exception {
     DebugException(void);
-    virtual String GetPanicMessage(uintptr_t error) const override;
+    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

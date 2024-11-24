@@ -3,10 +3,10 @@
 #include "PS2Keyboard.hpp"
 
 PS2Keyboard::PS2Keyboard(bool second) : PS2Device(second), leftShift(false), rightShift(false), capslock(false) {
-    Expected<uint8_t> tmp = SendCommand(0xf0);
-    if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) Panic("Failed to set scan code set");
+    MathLib::Expected<uint8_t> tmp = SendCommand(0xf0);
+    if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) MathLib::Panic("Failed to set scan code set");
     tmp = SendCommand(0b01);
-    if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) Panic("Failed to set scan code set");
+    if (!tmp.HasValue() || tmp.Get() != (uint8_t)Response::Acknowledge) MathLib::Panic("Failed to set scan code set");
     RegisterInterruptDevice(GetIRQBase() + 1, this);
 }
 PS2Keyboard::~PS2Keyboard(void) {
@@ -25,8 +25,8 @@ void PS2Keyboard::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
     else if (code == (uint8_t)SpecialCodes::RightShift) rightShift = pressed;
     else if (code == (uint8_t)SpecialCodes::Capslock && pressed) capslock = !capslock;
     else if (code < SizeOfArray(scanCodeSet1)) key = scanCodeSet1[code];
-    if (key && (leftShift || rightShift || capslock)) key = ToUpper(key);
-    if (key && renderer && !renderer->AddEvent(Event(key, pressed))) Panic("Failed to add keyboard event");
+    if (key && (leftShift || rightShift || capslock)) key = MathLib::ToUpper(key);
+    if (key && renderer && !renderer->AddEvent(MathLib::Event(key, pressed))) MathLib::Panic("Failed to add keyboard event");
 }
 
 #endif

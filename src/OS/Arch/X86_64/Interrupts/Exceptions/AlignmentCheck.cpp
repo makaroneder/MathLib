@@ -6,15 +6,15 @@
 
 AlignmentCheck::AlignmentCheck(void) : Exception(Type::AlignmentCheck) {}
 bool AlignmentCheck::Enable(void) {
-    const Expected<uintptr_t> tmp = GetControlRegister(0);
+    const MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
     if (!tmp.HasValue()) return false;
     if (!SetControlRegister(0, tmp.Get() | 1 << (uint8_t)ControlRegister0::AlignmentMask)) return false;
-    X86Flags flags = GetFlags();
+    MathLib::X86Flags flags = GetFlags();
     flags.alignmentCheck = true;
     SetFlags(flags.value);
     return true;
 }
-String AlignmentCheck::GetPanicMessage(uintptr_t) const {
+MathLib::String AlignmentCheck::GetPanicMessage(uintptr_t) const {
     return "Unaligned memory data reference detected\n";
 }
 

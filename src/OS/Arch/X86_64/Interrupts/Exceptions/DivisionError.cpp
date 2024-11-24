@@ -2,7 +2,7 @@
 #include "DivisionError.hpp"
 
 DivisionError::DivisionError(void) : Exception(Type::DivisionError) {}
-String DivisionError::GetPanicMessage(uintptr_t) const {
+MathLib::String DivisionError::GetPanicMessage(uintptr_t) const {
     return "Division error detected\n";
 }
 void DivisionError::Trigger(Registers regs) {

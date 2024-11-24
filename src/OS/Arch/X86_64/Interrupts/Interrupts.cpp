@@ -74,7 +74,7 @@ uint8_t GetIRQBase(void) {
     return pic.GetBase();
 }
 void SetInterrupts(bool value) {
-    X86Flags flags = GetFlags();
+    MathLib::X86Flags flags = GetFlags();
     if (value) {
         if (!--interruptDisabledCount) flags.interruptEnable = true;
     }
@@ -86,7 +86,7 @@ void RegisterInterruptDevice(uintptr_t interrupt, InterruptDevice* device) {
     interrupt -= pic.GetBase();
     if (interrupt <= 15) {
         pic.SetIRQMask(interrupt, !device);
-        if (initialized && !pic.UpdateMask()) Panic("Failed to update PIC interrupt mask");
+        if (initialized && !pic.UpdateMask()) MathLib::Panic("Failed to update PIC interrupt mask");
     }
 }
 bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment) {

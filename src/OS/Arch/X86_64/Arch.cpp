@@ -4,6 +4,7 @@
 #include "Multiboot/Multiboot2.hpp"
 #include "ControlRegisters.hpp"
 #include "ACPI/ACPI.hpp"
+#include "Scheduler.hpp"
 #include "../Arch.hpp"
 #include "CPUID.hpp"
 #include "CMOS.hpp"
@@ -17,10 +18,10 @@
 RangeMemoryManager rangeMemoryManager;
 uint8_t fxsaveRegion[512] __attribute__((aligned(16)));
 bool InitArch(uintptr_t signature, void* info) {
-    if (E9::IsPresent()) logger = new E9();
+    if (E9::IsPresent()) MathLib::logger = new E9();
     LogString("Logger initialized\n");
     if (HasMSR()) {
-        const Expected<uint64_t> tmp = GetMSR(0xc0000080);
+        const MathLib::Expected<uint64_t> tmp = GetMSR(0xc0000080);
         if (!tmp.HasValue() || !SetMSR(0xc0000080, tmp.Get() | 1 << (uint8_t)EFER::NoExecuteEnable)) return false;
     }
     uintptr_t c;
@@ -31,18 +32,18 @@ bool InitArch(uintptr_t signature, void* info) {
     if (d & (1 << (uint8_t)CPUIDBits::D1FXSR)) {
         asm volatile("fxsave %0" :: "m"(fxsaveRegion));
         if (d & (1 << (uint8_t)CPUIDBits::D1FPU)) {
-            const Expected<uintptr_t> tmp = GetControlRegister(0);
+            const MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
             if (!tmp.HasValue()) return false;
             SetControlRegister(0, tmp.Get() & ~((1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched)));
             asm volatile("fninit");
         }
         else {
-            const Expected<uintptr_t> tmp = GetControlRegister(0);
+            const MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
             if (!tmp.HasValue()) return false;
             SetControlRegister(0, tmp.Get() | (1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched));
         }
         if (d & (1 << (uint8_t)CPUIDBits::D1SSE)) {
-            Expected<uintptr_t> tmp = GetControlRegister(0);
+            MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
             if (!tmp.HasValue()) return false;
             SetControlRegister(0, (tmp.Get() & ~(1 << (uint8_t)ControlRegister0::Emulation)) | (1 << (uint8_t)ControlRegister0::MonitorCoProcessor));
             tmp = GetControlRegister(4);
@@ -52,7 +53,7 @@ bool InitArch(uintptr_t signature, void* info) {
         }
     }
     if (c & (1 << (uint8_t)CPUIDBits::C1XSave)) {
-        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
         if (!tmp.HasValue()) return false;
         SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::XSaveEnable));
         if (sseEnabled && c & (1 << (uint8_t)CPUIDBits::C1AVX)) asm volatile (
@@ -64,29 +65,31 @@ bool InitArch(uintptr_t signature, void* info) {
     }
     CPUID(0x7, nullptr, &b, &c, &d);
     if (b & 1 << (uint8_t)CPUIDBits::B7SMEP) {
-        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
         if (!tmp.HasValue()) return false;
         SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable);
     }
     if (b & 1 << (uint8_t)CPUIDBits::B7SMAP) {
-        const Expected<uintptr_t> tmp = GetControlRegister(4);
+        const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
         if (!tmp.HasValue()) return false;
         SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable);
     }
     if (!InitInterrupts(0x20, 0x08)) return false;
-    mainTimer = new PIT();
-    if (!mainTimer) return false;
+    PIT* pit = new PIT();
+    if (!pit) return false;
+    pit->SetFunction(MathLib::FunctionPointer<void, Registers*>(nullptr, &Schedule));
+    mainTimer = pit;
     RSDP* rsdp = nullptr;
     if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info, rangeMemoryManager);
     else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info, rangeMemoryManager);
-    else LogString(String("Unknown bootloader signature: 0x") + ToString(signature, 16) + '\n');
+    else LogString(MathLib::String("Unknown bootloader signature: 0x") + MathLib::ToString(signature, 16) + '\n');
     if (rangeMemoryManager.GetSize()) memoryManager = &rangeMemoryManager;
     // TODO: Create new paging structure
     if (!rsdp) rsdp = FindRSDP();
     if (!InitACPI(rsdp, true)) return false;
     const CMOSFloppyData floppyData = cmos->GetFloppyData();
-    LogString(String("CMOS master floppy data: 0x") + ToString(floppyData.master, 16) + '\n');
-    LogString(String("CMOS slave floppy data: 0x") + ToString(floppyData.slave, 16) + '\n');
+    LogString(MathLib::String("CMOS master floppy data: 0x") + MathLib::ToString(floppyData.master, 16) + '\n');
+    LogString(MathLib::String("CMOS slave floppy data: 0x") + MathLib::ToString(floppyData.slave, 16) + '\n');
     #ifdef TriggerDivisionError
     {
         Registers regs;
@@ -119,7 +122,7 @@ bool InitArch(uintptr_t signature, void* info) {
     WritePort<uint16_t>(0x4004, 0x3400);
     // Cloud Hypervisor shutdown
     WritePort<uint16_t>(0x0600, 0x0034);
-    Panic("It's now safe to turn off your computer");
+    MathLib::Panic("It's now safe to turn off your computer");
 }
 [[noreturn]] void ArchPanic(void) {
     if (cmos) cmos->SetNMI(false);

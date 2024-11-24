@@ -12,10 +12,10 @@ PIT::PIT(void) {
 PIT::~PIT(void) {
     RegisterInterruptDevice(GetIRQBase(), nullptr);
 }
-num_t PIT::GetFrequency(void) const {
+MathLib::num_t PIT::GetFrequency(void) const {
     return baseFrequency / GetReloadValue();
 }
-bool PIT::SetFrequency(num_t frequency) {
+bool PIT::SetFrequency(MathLib::num_t frequency) {
     return SetReloadValue(baseFrequency / frequency);
 }
 size_t PIT::GetReloadValue(void) const {
@@ -32,9 +32,6 @@ bool PIT::SetReloadValue(size_t value) {
 	WritePort<uint8_t>((uint16_t)Ports::Channel0, value >> 8);
     SetInterrupts(true);
     return true;
-}
-void PIT::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
-    time += 1 / GetFrequency();
 }
 
 #endif

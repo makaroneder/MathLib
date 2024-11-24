@@ -2,11 +2,13 @@
 #define FileSystems_VFS_Entry_H
 #include "../FileSystem.hpp"
 
-struct VFSEntry {
-    FileSystem* fs;
-    String name;
+namespace MathLib {
+    struct VFSEntry {
+        FileSystem* fs;
+        String name;
 
-    VFSEntry(FileSystem* fs = nullptr, String name = "");
-};
+        VFSEntry(FileSystem* fs = nullptr, String name = "");
+    };
+}
 
 #endif

@@ -14,7 +14,7 @@ enum class EFER : uint8_t {
     TranslationCacheExtension,
 };
 bool HasMSR(void);
-Expected<uint64_t> GetMSR(uint32_t msr);
+MathLib::Expected<uint64_t> GetMSR(uint32_t msr);
 bool SetMSR(uint32_t msr, uint64_t value);
 
 #endif

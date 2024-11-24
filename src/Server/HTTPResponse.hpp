@@ -34,21 +34,21 @@ static constexpr const char* httpStatusStr[] = {
     "505", "506", "507", "508",
     "510", "511",
 };
-struct HTTPResponse : Printable {
-    HTTPResponse(String str = "");
-    static HTTPResponse FromStatus(HTTPStatus status, String desc);
-    static HTTPResponse FromHTML(String str);
-    String Raw(void) const;
+struct HTTPResponse : MathLib::Printable {
+    HTTPResponse(MathLib::String str = "");
+    static HTTPResponse FromStatus(HTTPStatus status, MathLib::String desc);
+    static HTTPResponse FromHTML(MathLib::String str);
+    MathLib::String Raw(void) const;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 
-    String version;
-    String status;
-    String description;
-    Array<HTTPHeader> headers;
-    String body;
+    MathLib::String version;
+    MathLib::String status;
+    MathLib::String description;
+    MathLib::Array<HTTPHeader> headers;
+    MathLib::String body;
 };
 
 #endif

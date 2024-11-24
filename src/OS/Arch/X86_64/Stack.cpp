@@ -2,9 +2,9 @@
 #include "Stack.hpp"
 #include <String.hpp>
 
-String StackFrameToString(const StackFrame* frame) {
-    String ret = "{\n";
-    for (; frame; frame = frame->bp) ret += String("\t0x") + ::ToString(frame->ip, 16) + '\n';
+MathLib::String StackFrameToString(const StackFrame* frame) {
+    MathLib::String ret = "{\n";
+    for (; frame; frame = frame->bp) ret += MathLib::String("\t0x") + MathLib::ToString(frame->ip, 16) + '\n';
     return ret + '}';
 }
 

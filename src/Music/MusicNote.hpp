@@ -3,7 +3,7 @@
 #include <Physics/SIUnits.hpp>
 
 template <typename T>
-struct MusicNote : Allocatable {
+struct MusicNote : MathLib::Allocatable {
     enum class Type : size_t {
         None = 0,
         C1 = 4,
@@ -19,11 +19,11 @@ struct MusicNote : Allocatable {
         B4 = 51,
         C5 = 52,
     } type;
-    Second<T> duration;
+    MathLib::Second<T> duration;
 
-    MusicNote(Type type, const Second<T>& duration) : type(type), duration(duration) {}
-    Hertz<T> GetFrequency(void) const {
-        return type == Type::None ? Hertz<T>(0) : Hertz<T>(440) * Pow(2, ((ssize_t)type - 49) / 12);
+    MusicNote(Type type, const MathLib::Second<T>& duration) : type(type), duration(duration) {}
+    MathLib::Hertz<T> GetFrequency(void) const {
+        return type == Type::None ? MathLib::Hertz<T>(0) : MathLib::Hertz<T>(440) * MathLib::Pow(2, ((ssize_t)type - 49) / 12);
     }
 };
 

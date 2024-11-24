@@ -3,7 +3,7 @@
 #include <Renderer.hpp>
 
 /// @brief Renderer implementation
-struct KernelRenderer : Renderer {
+struct KernelRenderer : MathLib::Renderer {
     /// @brief Creates a new renderer
     /// @param width Width of the renderer
     /// @param height Height of the renderer
@@ -13,19 +13,19 @@ struct KernelRenderer : Renderer {
     /// @param height Height of the renderer
     /// @param framebuffer Framebuffer
     /// @param fieldPosition Bit offset of each RGB field
-    KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const Color& fieldPosition);
+    KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const MathLib::Color& fieldPosition);
     /// @brief Updates renderer
     /// @return Status
     virtual bool Update(void) override;
     /// @brief Return current event
     /// @return Event
-    virtual Event GetEvent(void) override;
-    bool AddEvent(const Event& event);
+    virtual MathLib::Event GetEvent(void) override;
+    bool AddEvent(const MathLib::Event& event);
 
     private:
-    Array<Event> events;
+    MathLib::Array<MathLib::Event> events;
     uint32_t* framebuffer;
-    Color fieldPosition;
+    MathLib::Color fieldPosition;
 };
 extern KernelRenderer* renderer;
 

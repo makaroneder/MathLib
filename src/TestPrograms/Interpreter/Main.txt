@@ -1,3 +1,4 @@
 Main(argc : USize, argv : Strings) : Bool = [!
-    return(0)
+    Print("Hello World!" + newLine),
+    return(true),
 ]

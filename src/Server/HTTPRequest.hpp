@@ -2,19 +2,19 @@
 #define HTTPRequest_H
 #include "HTTPHeader.hpp"
 
-struct HTTPRequest : Printable {
-    HTTPRequest(String str = "");
-    String Raw(void) const;
+struct HTTPRequest : MathLib::Printable {
+    HTTPRequest(MathLib::String str = "");
+    MathLib::String Raw(void) const;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual String ToString(const String& padding = "") const override;
+    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 
-    String method;
-    String target;
-    String version;
-    Array<HTTPHeader> headers;
-    String body;
+    MathLib::String method;
+    MathLib::String target;
+    MathLib::String version;
+    MathLib::Array<HTTPHeader> headers;
+    MathLib::String body;
 };
 
 #endif

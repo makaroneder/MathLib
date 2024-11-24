@@ -1,7 +1,9 @@
 #include "MemoryWatcher.hpp"
 
-MemoryWatcher* memoryWatcher = nullptr;
-MemoryWatcher::MemoryWatcher(void) {
-    memoryWatcher = this;
+namespace MathLib {
+    MemoryWatcher* memoryWatcher = nullptr;
+    MemoryWatcher::MemoryWatcher(void) {
+        memoryWatcher = this;
+    }
+    MemoryWatcher::~MemoryWatcher(void) {}
 }
-MemoryWatcher::~MemoryWatcher(void) {}

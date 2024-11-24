@@ -40,7 +40,7 @@ enum class ControlRegister4 : uint8_t {
     EnableControlFlowEnforcementTechnology,
     EnableSupervisorModePagesProtectionKeys,
 };
-Expected<uintptr_t> GetControlRegister(uint8_t num);
+MathLib::Expected<uintptr_t> GetControlRegister(uint8_t num);
 bool SetControlRegister(uint8_t num, uintptr_t value);
 
 #endif

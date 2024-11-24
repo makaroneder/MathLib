@@ -1,10 +1,9 @@
 #ifdef __x86_64__
 #ifndef PIT_H
 #define PIT_H
-#include "../../Time.hpp"
-#include "Interrupts/Interrupts.hpp"
+#include "InterruptTimer.hpp"
 
-struct PIT : Timer, InterruptDevice {
+struct PIT : InterruptTimer {
     enum class Ports : uint16_t {
         Channel0 = 0x40,
         Channel1,
@@ -35,9 +34,8 @@ struct PIT : Timer, InterruptDevice {
 
     PIT(void);
     virtual ~PIT(void) override;
-    virtual void OnInterrupt(uintptr_t, Registers*, uintptr_t) override;
-    virtual num_t GetFrequency(void) const override;
-    virtual bool SetFrequency(num_t frequency) override;
+    virtual MathLib::num_t GetFrequency(void) const override;
+    virtual bool SetFrequency(MathLib::num_t frequency) override;
 
     private:
     size_t GetReloadValue(void) const;

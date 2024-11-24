@@ -3,6 +3,7 @@
 #define PS2Mouse_H
 #include "PS2Device.hpp"
 #include "../Interrupts/Interrupts.hpp"
+#include <Math/Matrix.hpp>
 
 struct PS2MousePacket1 {
     bool leftButton : 1;
@@ -37,6 +38,7 @@ struct PS2Mouse : PS2Device, InterruptDevice {
 
     private:
     Type type;
+    MathLib::Matrix<size_t> position;
     uint8_t packet;
     uint8_t packets[4];
 };

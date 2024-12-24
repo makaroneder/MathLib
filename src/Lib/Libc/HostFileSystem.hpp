@@ -1,7 +1,7 @@
 #ifndef Freestanding
-#ifndef Libc_HostFileSystem_H
-#define Libc_HostFileSystem_H
-#include "../FileSystems/FileSystem.hpp"
+#ifndef MathLib_Libc_HostFileSystem_H
+#define MathLib_Libc_HostFileSystem_H
+#include "../FileSystem/FileSystem.hpp"
 
 namespace MathLib {
     /// @brief File system implementation using libc file system

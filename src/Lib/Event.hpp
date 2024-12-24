@@ -1,5 +1,5 @@
-#ifndef Event_H
-#define Event_H
+#ifndef MathLib_Event_H
+#define MathLib_Event_H
 #include "Math/Matrix.hpp"
 
 namespace MathLib {
@@ -13,7 +13,8 @@ namespace MathLib {
             MousePressed,
         } type;
         enum class MouseButton {
-            Left = 1,
+            None = 0,
+            Left,
             Middle,
             Right,
             Button4,
@@ -35,9 +36,13 @@ namespace MathLib {
         /// @param pressed Key status
         Event(char key, bool pressed);
         /// @brief Creates a new event
-        /// @param key Key pressed or released
-        /// @param pressed Key status
+        /// @param position Mouse position
+        /// @param button Mouse button pressed or released
+        /// @param pressed Mouse button status
         Event(const Matrix<size_t>& position, MouseButton button, bool pressed);
+        /// @brief Creates a new event
+        /// @param position Mouse position
+        Event(const Matrix<size_t>& position);
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation

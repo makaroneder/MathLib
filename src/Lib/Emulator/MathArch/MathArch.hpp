@@ -1,5 +1,5 @@
-#ifndef Emulator_MathArch_H
-#define Emulator_MathArch_H
+#ifndef MathLib_Emulator_MathArch_H
+#define MathLib_Emulator_MathArch_H
 #include "MathArchOpcode.hpp"
 #include "../Emulator.hpp"
 #include "../Register.hpp"
@@ -19,20 +19,23 @@ namespace MathLib {
         bool Step(void);
         template <typename T>
         Expected<T> Fetch(void) {
+            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(pc.value);
             if (ret.HasValue()) pc.value += sizeof(T);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         template <typename T>
         bool Push(T value) {
+            StartBenchmark
             sp.value -= sizeof(T);
-            return WritePositioned<T>(value, sp.value);
+            ReturnFromBenchmark(WritePositioned<T>(value, sp.value))
         }
         template <typename T>
         Expected<T> Pop(void) {
+            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(sp.value);
             if (ret.HasValue()) sp.value += sizeof(T);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
 
         Register pc;

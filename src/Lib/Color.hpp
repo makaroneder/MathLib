@@ -1,8 +1,7 @@
-#ifndef Color_H
-#define Color_H
+#ifndef MathLib_Color_H
+#define MathLib_Color_H
 #include "Math/Constants.hpp"
 #include "Interval.hpp"
-#include <stdint.h>
 
 namespace MathLib {
     /// @brief Union for converting 32 bit color to RGBA
@@ -37,7 +36,8 @@ namespace MathLib {
     /// @return Rainbow color
     template <typename T>
     uint32_t GetRainbow(const T& t) {
-        return Color(UINT8_MAX * Pow(Sin(t), 2), UINT8_MAX * Pow(Sin(t + 0.66 * pi), 2), UINT8_MAX * Pow(Sin(t + 1.32 * pi), 2), UINT8_MAX).hex;
+        StartBenchmark
+        ReturnFromBenchmark(Color(UINT8_MAX * Pow(Sin(t), 2), UINT8_MAX * Pow(Sin(t + 0.66 * pi), 2), UINT8_MAX * Pow(Sin(t + 1.32 * pi), 2), UINT8_MAX).hex);
     }
     /// @brief B(a, b) = [a_0 * (255 - b_3) + b_0 * b_3) / 255, a_1 * (255 - b_3) + b_1 * b_3) / 255, a_2 * (255 - b_3) + b_2 * b_3) / 255, 255]
     /// @param c1 Previus color

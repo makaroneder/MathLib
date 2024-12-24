@@ -1,5 +1,5 @@
-#ifndef Cryptography_Cipher_H
-#define Cryptography_Cipher_H
+#ifndef MathLib_Cryptography_Cipher_H
+#define MathLib_Cryptography_Cipher_H
 #include "../Interval.hpp"
 
 namespace MathLib {

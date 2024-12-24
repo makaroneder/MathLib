@@ -1,5 +1,5 @@
-#ifndef CommandLine_H
-#define CommandLine_H
+#ifndef MathLib_CommandLine_H
+#define MathLib_CommandLine_H
 #include "Expected.hpp"
 
 namespace MathLib {

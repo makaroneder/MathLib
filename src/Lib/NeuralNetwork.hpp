@@ -1,5 +1,5 @@
-#ifndef NeuralNetwork_H
-#define NeuralNetwork_H
+#ifndef MathLib_NeuralNetwork_H
+#define MathLib_NeuralNetwork_H
 #include "Math/Matrix.hpp"
 #include "Math/Sigmoid.hpp"
 #include "Math/Trigonometry.hpp"
@@ -17,10 +17,13 @@ namespace MathLib {
             LeakyReLU,
         } activation;
         /// @brief Creates empty neural network
-        NeuralNetwork<T>(void) : activation(ActivationFunction::None) {}
+        NeuralNetwork<T>(void) : activation(ActivationFunction::None) {
+            EmptyBenchmark
+        }
         /// @brief Creates a new neural network
         /// @param arch Architecture of the neural network
         NeuralNetwork<T>(ActivationFunction activation, const Array<size_t>& arch) : activation(activation) {
+            StartBenchmark
             const size_t c = arch.GetSize();
             if (!c) Panic("Invalid architecture size");
             count = c - 1;
@@ -30,85 +33,97 @@ namespace MathLib {
                 if (!bs.Add(Matrix<T>(arch.At(i), 1))) Panic("Failed to allocate bias");
                 if (!as.Add(Matrix<T>(arch.At(i), 1))) Panic("Failed to allocate neuron");
             }
+            EndBenchmark
         }
         /// @brief Returns count of weights, biases and count of neurons - 1
         /// @return Count of weights, biases and count of neurons - 1
-        constexpr size_t GetCount(void) const {
-            return count;
+        size_t GetCount(void) const {
+            StartBenchmark
+            ReturnFromBenchmark(count);
         }
         /// @brief Returns input neuron
         /// @return Input neuron
-        constexpr Matrix<T>& GetInput(void) {
-            return as.At(0);
+        Matrix<T>& GetInput(void) {
+            StartBenchmark
+            ReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns input neuron
         /// @return Input neuron
-        constexpr Matrix<T> GetInput(void) const {
-            return as.At(0);
+        Matrix<T> GetInput(void) const {
+            StartBenchmark
+            ReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
-        constexpr Matrix<T>& GetOutput(void) {
-            return as.At(count);
+        Matrix<T>& GetOutput(void) {
+            StartBenchmark
+            ReturnFromBenchmark(as.At(count));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
-        constexpr Matrix<T> GetOutput(void) const {
-            return as.At(count);
+        Matrix<T> GetOutput(void) const {
+            StartBenchmark
+            ReturnFromBenchmark(as.At(count));
         }
         /// @brief Fills weights, biases and neurons
         /// @param x Value to fill with
-        constexpr void Fill(const T& x) {
-            GetOutput().Fill(x);
+        void Fill(const T& x) {
+            StartBenchmark
             for (size_t i = 0; i < count; i++) {
                 ws.At(i).Fill(x);
                 bs.At(i).Fill(x);
                 as.At(i).Fill(x);
             }
+            GetOutput().Fill(x);
+            EndBenchmark
         }
         /// @brief Randomizes weights and biases
         /// @param min Minimal value
         /// @param max Maximal value
         void Random(const T& min, const T& max) {
+            StartBenchmark
             for (size_t i = 0; i < count; i++) {
                 ws.At(i).Random(min, max);
                 bs.At(i).Random(min, max);
             }
+            EndBenchmark
         }
         /// @brief Applies weights and biases to neurons
         /// @return Status 
-        constexpr bool Forward(void) {
+        bool Forward(void) {
+            StartBenchmark
             for (size_t i = 0; i < count; i++) {
                 const Expected<Matrix<T>> tmp = as.At(i) * ws.At(i);
-                if (!tmp.HasValue()) return false;
+                if (!tmp.HasValue()) ReturnFromBenchmark(false);
                 as.At(i + 1) = tmp.Get() + bs.At(i);
                 for (size_t y = 0; y < as.At(i + 1).GetHeight(); y++)
                     for (size_t x = 0; x < as.At(i + 1).GetWidth(); x++)
                         as.At(i + 1).At(x, y) = Activation(as.At(i + 1).At(x, y));
             }
-            return true;
+            ReturnFromBenchmark(true);
         }
         /// @brief Calculates average error
         /// @param input Input data
         /// @param output Output data
         /// @return Average error
-        constexpr T Cost(const Matrix<T>& input, const Matrix<T>& output) {
-            if (input.GetHeight() != output.GetHeight()) return MakeNaN();
-            if (output.GetWidth() != GetOutput().GetWidth()) return MakeNaN();
+        T Cost(const Matrix<T>& input, const Matrix<T>& output) {
+            StartBenchmark
+            if (input.GetHeight() != output.GetHeight() || output.GetWidth() != GetOutput().GetWidth()) ReturnFromBenchmark(MakeNaN());
             T ret = 0;
             for (size_t y = 0; y < input.GetHeight(); y++) {
                 GetInput() = input.GetRow(y);
-                if (!Forward()) return MakeNaN();
+                if (!Forward()) ReturnFromBenchmark(MakeNaN());
                 for (size_t x = 0; x < output.GetWidth(); x++) ret += Pow(GetOutput().At(x, 0) - output.At(x, y), 2);
             }
-            return ret / input.GetHeight();
+            ReturnFromBenchmark(ret / input.GetHeight());
         }
         /// @brief Calculates difference between expected and actual results using finite difference algorithm
         /// @param input Input data
         /// @param output Output data
         /// @param eps_ Error tolerance
         /// @return Difference
-        constexpr NeuralNetwork<T> FiniteDiff(const Matrix<T>& input, const Matrix<T>& output, const T& eps_ = eps) {
+        NeuralNetwork<T> FiniteDiff(const Matrix<T>& input, const Matrix<T>& output, const T& eps_ = eps) {
+            StartBenchmark
             const T cost = Cost(input, output);
             NeuralNetwork<T> ret = *this;
             for (size_t i = 0; i < count; i++) {
@@ -129,20 +144,20 @@ namespace MathLib {
                     }
                 }
             }
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         /// @brief Calculates difference between expected and actual results using backpropagation algorithm
         /// @param input Input data
         /// @param output Output data
         /// @return Difference
-        constexpr Expected<NeuralNetwork<T>> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
-            if (input.GetHeight() != output.GetHeight()) return Expected<NeuralNetwork<T>>();
-            if (GetOutput().GetWidth() != output.GetWidth()) return Expected<NeuralNetwork<T>>();
+        Expected<NeuralNetwork<T>> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
+            StartBenchmark
+            if (input.GetHeight() != output.GetHeight() || GetOutput().GetWidth() != output.GetWidth()) ReturnFromBenchmark(Expected<NeuralNetwork<T>>());
             NeuralNetwork<T> ret = *this;
             ret.Fill(0);
             for (size_t i = 0; i < input.GetHeight(); i++) {
                 GetInput() = input.GetRow(i);
-                if (!Forward()) return Expected<NeuralNetwork<T>>();
+                if (!Forward()) ReturnFromBenchmark(Expected<NeuralNetwork<T>>());
                 for (size_t j = 0; j <= count; j++) ret.as.At(j).Fill(0);
                 for (size_t j = 0; j < output.GetWidth(); j++) ret.GetOutput().At(j, 0) = GetOutput().At(j, 0) - output.At(j, i);
                 for (size_t l = count; l > 0; l--) {
@@ -163,71 +178,69 @@ namespace MathLib {
                 ret.ws.At(i) /= input.GetHeight();
                 ret.bs.At(i) /= input.GetHeight();
             }
-            return Expected<NeuralNetwork<T>>(ret);
+            ReturnFromBenchmark(Expected<NeuralNetwork<T>>(ret));
         }
         /// @brief Learns
         /// @param diff Difference between expected and actual results
         /// @param rate Rate to learn in
-        constexpr void Learn(const NeuralNetwork<T>& diff, T rate) {
+        void Learn(const NeuralNetwork<T>& diff, T rate) {
+            StartBenchmark
             for (size_t i = 0; i < count; i++) {
                 ws.At(i) -= diff.ws.At(i) * rate;
                 bs.At(i) -= diff.bs.At(i) * rate;
             }
+            EndBenchmark
         }
         /// @brief Converts neural network to string
         /// @param padding String to pad with
         /// @return String representation of neural network
         virtual String ToString(const String& padding = "") const override {
+            StartBenchmark
             String ret = padding + "a[0] = " + GetInput().ToString() + '\n';
             for (size_t i = 0; i < count; i++)
                 ret += padding + "a[" + MathLib::ToString(i + 1) + "] = " + as.At(i + 1).ToString() + '\n' + padding + "b[" + MathLib::ToString(i) + "] = " + bs.At(i).ToString() + '\n' + padding + "w[" + MathLib::ToString(i) + "] = " + ws.At(i).ToString() + '\n';
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         /// @brief Saves neural network data
         /// @param file File to save neural network data into
         /// @return Status
         virtual bool Save(Writeable& file) const override {
-            if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) return false;
-            for (size_t i = 0; i < count; i++) {
-                if (!as.At(i + 1).Save(file)) return false;
-                if (!ws.At(i).Save(file)) return false;
-                if (!bs.At(i).Save(file)) return false;
-            }
-            return true;
+            StartBenchmark
+            if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) ReturnFromBenchmark(false);
+            for (size_t i = 0; i < count; i++)
+                if (!as.At(i + 1).Save(file) || !ws.At(i).Save(file) || !bs.At(i).Save(file)) ReturnFromBenchmark(false);
+            ReturnFromBenchmark(true);
         }
         /// @brief Loads neural network data
         /// @param file File to load neural network data from
         /// @return Status
         virtual bool Load(Readable& file) override {
-            if (!file.Read<ActivationFunction>(activation) || !file.Read<size_t>(count) || !as.Add(Matrix<T>()) || !GetInput().Load(file)) return false;
-            for (size_t i = 0; i < count; i++) {
-                if (!as.Add(Matrix<T>())) return false;
-                if (!ws.Add(Matrix<T>())) return false;
-                if (!bs.Add(Matrix<T>())) return false;
-                if (!as.At(i + 1).Load(file)) return false;
-                if (!ws.At(i).Load(file)) return false;
-                if (!bs.At(i).Load(file)) return false;
-            }
-            return true;
+            StartBenchmark
+            if (!file.Read<ActivationFunction>(activation) || !file.Read<size_t>(count) || !as.Add(Matrix<T>()) || !GetInput().Load(file)) ReturnFromBenchmark(false);
+            for (size_t i = 0; i < count; i++)
+                if (!as.Add(Matrix<T>()) || !ws.Add(Matrix<T>()) || !bs.Add(Matrix<T>()) || !as.At(i + 1).Load(file) || !ws.At(i).Load(file) || !bs.At(i).Load(file)) ReturnFromBenchmark(false);
+            ReturnFromBenchmark(true);
         }
 
         private:
         T Activation(const T& x) {
+            StartBenchmark
             switch (activation) {
-                case ActivationFunction::Sigmoid: return Sigmoid<T>(x);
-                case ActivationFunction::Tanh: return HyperbolicTan<T>(x);
-                case ActivationFunction::ReLU: return x > 0 ? x : x;
-                case ActivationFunction::LeakyReLU: return x > 0 ? x : x * eps;
-                default: return MakeNaN();
+                case ActivationFunction::Sigmoid: ReturnFromBenchmark(Sigmoid<T>(x));
+                case ActivationFunction::Tanh: ReturnFromBenchmark(HyperbolicTan<T>(x));
+                case ActivationFunction::ReLU: ReturnFromBenchmark(x > 0 ? x : x);
+                case ActivationFunction::LeakyReLU: ReturnFromBenchmark(x > 0 ? x : x * eps);
+                default: ReturnFromBenchmark(MakeNaN());
             }
         }
         T ActivationDerivate(T y) {
+            StartBenchmark
             switch (activation) {
-                case ActivationFunction::Sigmoid: return y * (1 - y);
-                case ActivationFunction::Tanh: return 1 - Pow(y, 2);
-                case ActivationFunction::ReLU: return y >= 0 ? 1 : 0;
-                case ActivationFunction::LeakyReLU: return y >= 0 ? 1 : eps;
-                default: return MakeNaN();
+                case ActivationFunction::Sigmoid: ReturnFromBenchmark(y * (1 - y));
+                case ActivationFunction::Tanh: ReturnFromBenchmark(1 - y * y);
+                case ActivationFunction::ReLU: ReturnFromBenchmark(y >= 0 ? 1 : 0);
+                case ActivationFunction::LeakyReLU: ReturnFromBenchmark(y >= 0 ? 1 : eps);
+                default: ReturnFromBenchmark(MakeNaN());
             }
         }
 

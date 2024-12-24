@@ -1,5 +1,5 @@
-#ifndef Chemistry_ReactionElement_H
-#define Chemistry_ReactionElement_H
+#ifndef MathLib_Chemistry_ReactionElement_H
+#define MathLib_Chemistry_ReactionElement_H
 #include "../Math/Matrix.hpp"
 
 namespace MathLib {

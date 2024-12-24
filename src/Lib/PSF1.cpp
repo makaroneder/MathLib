@@ -1,16 +1,21 @@
 #include "PSF1.hpp"
+#include "Typedefs.hpp"
 
 namespace MathLib {
     bool PSF1::IsValid(void) const {
-        return signature == expectedSignature;
+        StartBenchmark
+        ReturnFromBenchmark(signature == expectedSignature);
     }
     size_t PSF1::GetWidth(void) const {
-        return 8;
+        StartBenchmark
+        ReturnFromBenchmark(8);
     }
     size_t PSF1::GetHeight(void) const {
-        return charSize;
+        StartBenchmark
+        ReturnFromBenchmark(charSize);
     }
     const uint8_t* PSF1::GetGlyph(char chr) const {
-        return &buffer[chr * charSize];
+        StartBenchmark
+        ReturnFromBenchmark(&buffer[chr * charSize]);
     }
 }

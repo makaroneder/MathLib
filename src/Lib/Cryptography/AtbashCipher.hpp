@@ -1,5 +1,5 @@
-#ifndef Cryptography_AtbashCipher_H
-#define Cryptography_AtbashCipher_H
+#ifndef MathLib_Cryptography_AtbashCipher_H
+#define MathLib_Cryptography_AtbashCipher_H
 #include "AffineCipher.hpp"
 #include "SpecialCaseCipher.hpp"
 

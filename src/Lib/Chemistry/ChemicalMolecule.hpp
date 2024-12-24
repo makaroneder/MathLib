@@ -1,5 +1,5 @@
-#ifndef Chemistry_Molecule_H
-#define Chemistry_Molecule_H
+#ifndef MathLib_Chemistry_Molecule_H
+#define MathLib_Chemistry_Molecule_H
 #include "ChemicalElement.hpp"
 
 namespace MathLib {

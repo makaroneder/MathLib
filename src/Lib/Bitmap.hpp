@@ -1,6 +1,6 @@
-#ifndef Bitmap_H
-#define Bitmap_H
-#include <Expected.hpp>
+#ifndef MathLib_Bitmap_H
+#define MathLib_Bitmap_H
+#include "Expected.hpp"
 
 namespace MathLib {
     struct Bitmap {

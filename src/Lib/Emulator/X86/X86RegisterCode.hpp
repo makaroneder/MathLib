@@ -1,5 +1,5 @@
-#ifndef Emulator_X86_RegisterCode_H
-#define Emulator_X86_RegisterCode_H
+#ifndef MathLib_Emulator_X86_RegisterCode_H
+#define MathLib_Emulator_X86_RegisterCode_H
 #include <stdint.h>
 
 namespace MathLib {

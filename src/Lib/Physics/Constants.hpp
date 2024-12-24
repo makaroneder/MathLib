@@ -1,5 +1,5 @@
-#ifndef Physics_Constants_H
-#define Physics_Constants_H
+#ifndef MathLib_Physics_Constants_H
+#define MathLib_Physics_Constants_H
 #include "SIUnits.hpp"
 
 namespace MathLib {

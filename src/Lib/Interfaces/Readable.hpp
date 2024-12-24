@@ -1,5 +1,5 @@
-#ifndef Interfaces_Readable_H
-#define Interfaces_Readable_H
+#ifndef MathLib_Interfaces_Readable_H
+#define MathLib_Interfaces_Readable_H
 #include "../Expected.hpp"
 
 namespace MathLib {
@@ -27,15 +27,17 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         bool Read(T& value) {
-            return ReadBuffer(&value, sizeof(T));
+            StartBenchmark
+            ReturnFromBenchmark(ReadBuffer(&value, sizeof(T)));
         }
         /// @brief Reads one T value
         /// @tparam T Type of value
         /// @return Value and status
         template <typename T>
         Expected<T> Read(void) {
+            StartBenchmark
             T ret;
-            return Read<T>(ret) ? Expected<T>(ret) : Expected<T>();
+            ReturnFromBenchmark(Read<T>(ret) ? Expected<T>(ret) : Expected<T>());
         }
     };
 }

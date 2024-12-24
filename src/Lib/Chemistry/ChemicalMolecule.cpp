@@ -1,37 +1,50 @@
 #include "ChemicalMolecule.hpp"
 
 namespace MathLib {
-    ChemicalMolecule::ChemicalMolecule(void) {}
-    ChemicalMolecule::ChemicalMolecule(const Array<ChemicalElement>& elements, size_t count) : count(count), elements(elements) {}
+    ChemicalMolecule::ChemicalMolecule(void) : count(0), elements(Array<ChemicalElement>()) {
+        EmptyBenchmark
+    }
+    ChemicalMolecule::ChemicalMolecule(const Array<ChemicalElement>& elements, size_t count) : count(count), elements(elements) {
+        EmptyBenchmark
+    }
     Array<ChemicalElement> ChemicalMolecule::GetElements(void) const {
+        StartBenchmark
         Array<ChemicalElement> ret = elements;
         for (ChemicalElement& element : ret) element *= count;
-        return ret;
+        ReturnFromBenchmark(ret);
     }
     bool ChemicalMolecule::IsCompound(void) const {
-        return elements.GetSize() > 1;
+        StartBenchmark
+        ReturnFromBenchmark(elements.GetSize() > 1);
     }
     bool ChemicalMolecule::IsWater(void) const {
-        return IsCompound() && elements.At(0).GetSymbol() == "H" && elements.At(1).GetSymbol() == "O" && elements.At(0).GetCount() == 2 && elements.At(1).GetCount() == 1;
+        StartBenchmark
+        ReturnFromBenchmark(IsCompound() && elements.At(0).GetSymbol() == "H" && elements.At(1).GetSymbol() == "O" && elements.At(0).GetCount() == 2 && elements.At(1).GetCount() == 1);
     }
     bool ChemicalMolecule::IsMetal(void) const {
-        return !IsCompound() && elements.At(0).IsMetal();
+        StartBenchmark
+        ReturnFromBenchmark(!IsCompound() && elements.At(0).IsMetal());
     }
     bool ChemicalMolecule::IsNonMetal(void) const {
-        return !IsCompound() && !elements.At(0).IsMetal();
+        StartBenchmark
+        ReturnFromBenchmark(!IsCompound() && !elements.At(0).IsMetal());
     }
     bool ChemicalMolecule::IsAcid(void) const {
-        return IsCompound() && !IsWater() && elements.At(0).GetSymbol() == "H";
+        StartBenchmark
+        ReturnFromBenchmark(IsCompound() && !IsWater() && elements.At(0).GetSymbol() == "H");
     }
     bool ChemicalMolecule::IsHydroxide(void) const {
-        return IsCompound() && !IsWater() && elements.At(elements.GetSize() - 2).GetSymbol() == "O" && elements.At(elements.GetSize() - 1).GetSymbol() == "H" && elements.At(elements.GetSize() - 2).GetCount() == elements.At(elements.GetSize() - 1).GetCount();
+        StartBenchmark
+        ReturnFromBenchmark(IsCompound() && !IsWater() && elements.At(elements.GetSize() - 2).GetSymbol() == "O" && elements.At(elements.GetSize() - 1).GetSymbol() == "H" && elements.At(elements.GetSize() - 2).GetCount() == elements.At(elements.GetSize() - 1).GetCount());
     }
     bool ChemicalMolecule::IsOxide(void) const {
-        return IsCompound() && !IsWater() && elements.At(elements.GetSize() - 1).GetSymbol() == "O";
+        StartBenchmark
+        ReturnFromBenchmark(IsCompound() && !IsWater() && elements.At(elements.GetSize() - 1).GetSymbol() == "O");
     }
     String ChemicalMolecule::ToString(const String& padding) const {
+        StartBenchmark
         String str = "";
         for (const ChemicalElement& element : elements) str += element.ToString();
-        return padding + (count == 1 ? "" : MathLib::ToString(count)) + str;
+        ReturnFromBenchmark(padding + (count == 1 ? "" : MathLib::ToString(count)) + str);
     }
 }

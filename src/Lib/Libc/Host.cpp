@@ -9,81 +9,103 @@
 namespace MathLib {
     size_t threadCount = std::thread::hardware_concurrency();
     std::ostream& operator<<(std::ostream& stream, const String& string) {
-        return stream << string.GetValue();
+        StartBenchmark
+        ReturnFromBenchmark(stream << string.GetValue());
     }
     std::ostream& operator<<(std::ostream& stream, const Printable& printable) {
-        return stream << printable.ToString();
+        StartBenchmark
+        ReturnFromBenchmark(stream << printable.ToString());
     }
     [[noreturn]] void Panic(const char* str) {
         throw std::runtime_error(str);
     }
     num_t StringToNumber(String str) {
-        return std::stold(str.GetValue());
+        StartBenchmark
+        ReturnFromBenchmark(std::stold(str.GetValue()));
     }
     String ToString(num_t x) {
+        StartBenchmark
         const ssize_t ix = (ssize_t)x;
-        if ((num_t)ix == x) return std::to_string(ix);
-        else return std::to_string(x);
+        ReturnFromBenchmark((num_t)ix == x ? std::to_string(ix) : std::to_string(x));
     }
     num_t GetTime(void) {
         return (num_t)clock() / CLOCKS_PER_SEC;
     }
     size_t GetThreadCount(void) {
-        return threadCount;
+        StartBenchmark
+        ReturnFromBenchmark(threadCount);
     }
     Thread* AllocThread(void) {
-        if (!threadCount) return nullptr;
+        StartBenchmark
+        if (!threadCount) ReturnFromBenchmark(nullptr);
         threadCount--;
-        return new HostThread();
+        ReturnFromBenchmark(new HostThread());
     }
     void DeallocThread(Thread* thread) {
+        StartBenchmark
         threadCount++;
         delete thread;
+        EndBenchmark
     }
     num_t MakeNaN(void) {
-        return NAN;
+        StartBenchmark
+        ReturnFromBenchmark(NAN);
     }
     num_t MakeInf(void) {
-        return INFINITY;
+        StartBenchmark
+        ReturnFromBenchmark(INFINITY);
     }
     num_t RandomFloat(void) {
-        return (num_t)rand() / RAND_MAX;
+        StartBenchmark
+        ReturnFromBenchmark((num_t)rand() / RAND_MAX);
     }
     num_t Abs(complex_t x) {
-        return std::abs(ToStdComplex(x));
+        StartBenchmark
+        ReturnFromBenchmark(std::abs(ToStdComplex(x)));
     }
     complex_t Pow(complex_t x, complex_t y) {
-        return FromStdComplex(std::pow(ToStdComplex(x), ToStdComplex(y)));
+        StartBenchmark
+        ReturnFromBenchmark(FloatsEqual<num_t>(x.ToReal(), 0) ? complex_t(FloatsEqual<num_t>(y.ToReal(), 0), 0) : FromStdComplex(std::pow(ToStdComplex(x), ToStdComplex(y))));
     }
     num_t Cbrt(num_t x) {
-        return std::cbrt(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::cbrt(x));
     }
     complex_t NaturalLog(complex_t x) {
-        return FromStdComplex(std::log(ToStdComplex(x)));
+        StartBenchmark
+        ReturnFromBenchmark(FromStdComplex(std::log(ToStdComplex(x))));
     }
     bool IsNaN(num_t x) {
-        return std::isnan(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::isnan(x));
     }
     bool IsInf(num_t x) {
-        return std::isinf(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::isinf(x));
     }
     num_t Exp(num_t x) {
-        return std::exp(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::exp(x));
     }
     num_t Round(num_t x) {
-        return std::round(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::round(x));
     }
     num_t Floor(num_t x) {
-        return std::floor(x);
+        StartBenchmark
+        ReturnFromBenchmark(std::floor(x));
     }
     complex_t Sin(complex_t x) {
-        return FromStdComplex(std::sin(ToStdComplex(x)));
+        StartBenchmark
+        ReturnFromBenchmark(FromStdComplex(std::sin(ToStdComplex(x))));
     }
     complex_t InversedSin(complex_t x) {
-        return FromStdComplex(std::asin(ToStdComplex(x)));
+        StartBenchmark
+        ReturnFromBenchmark(FromStdComplex(std::asin(ToStdComplex(x))));
     }
     num_t InversedTan2(num_t y, num_t x) {
-        return std::atan2(y, x);
+        StartBenchmark
+        ReturnFromBenchmark(std::atan2(y, x));
     }
 }
 

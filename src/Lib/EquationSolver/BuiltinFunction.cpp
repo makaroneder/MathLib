@@ -3,16 +3,22 @@
 #include "../Math/Trigonometry.hpp"
 
 namespace MathLib {
-    BuiltinFunction::BuiltinFunction(void) {}
-    BuiltinFunction::BuiltinFunction(const String& n, const BuiltinFunctionPointer& func) : name(n), function(func) {}
-
-    #define CreateBuiltinFunction(name, func, argc, ...)                                                                \
-    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                             \
-        return args.GetSize() == argc ? new Node(Node::Type::Constant, MathLib::ToString(func(__VA_ARGS__))) : nullptr; \
+    BuiltinFunction::BuiltinFunction(void) {
+        EmptyBenchmark
     }
-    #define CreateComplexBuiltinFunction(name, func, argc, ...)                                                         \
-    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                             \
-        return args.GetSize() == argc ? new Node(Node::Type::Constant, func(__VA_ARGS__).ToString()) : nullptr;         \
+    BuiltinFunction::BuiltinFunction(const String& n, const BuiltinFunctionPointer& func) : name(n), function(func) {
+        EmptyBenchmark
+    }
+
+    #define CreateBuiltinFunction(name, func, argc, ...)                                                                                \
+    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                                             \
+        StartBenchmark                                                                                                                  \
+        ReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, MathLib::ToString(func(__VA_ARGS__))) : nullptr);   \
+    }
+    #define CreateComplexBuiltinFunction(name, func, argc, ...)                                                                 \
+    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                                     \
+        StartBenchmark                                                                                                          \
+        ReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, func(__VA_ARGS__).ToString()) : nullptr);   \
     }
     CreateBuiltinFunction(Argument, InversedTan2, 1, args[0]->ToNumber().At(0).GetImaginary(), args[0]->ToNumber().At(0).GetReal())
     CreateBuiltinFunction(Real, args[0]->ToNumber().At(0).GetReal, 1, )
@@ -83,6 +89,7 @@ namespace MathLib {
     #define CreateBuiltinFunction(name, func) BuiltinFunction(name, BuiltinFunctionPointer(nullptr, EquationSolverBuiltin##func))
 
     Array<BuiltinFunction> CreateDefaultBuiltinFunctions(void) {
+        StartBenchmark
         const BuiltinFunction defaultBuiltinFuncs[] = {
             CreateBuiltinFunction("arg", Argument),
             CreateBuiltinFunction("re", Real),
@@ -148,7 +155,7 @@ namespace MathLib {
             CreateBuiltinFunction("nor", BitwiseNor),
             CreateBuiltinFunction("xnor", BitwiseXnor),
         };
-        return Array<BuiltinFunction>(defaultBuiltinFuncs, SizeOfArray(defaultBuiltinFuncs));
+        ReturnFromBenchmark(Array<BuiltinFunction>(defaultBuiltinFuncs, SizeOfArray(defaultBuiltinFuncs)));
     }
 
     #undef CreateBuiltinFunction

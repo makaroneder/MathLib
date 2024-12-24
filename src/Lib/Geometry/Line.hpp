@@ -1,5 +1,5 @@
-#ifndef Geometry_Line_H
-#define Geometry_Line_H
+#ifndef MathLib_Geometry_Line_H
+#define MathLib_Geometry_Line_H
 #include "../Math/Vector.hpp"
 
 namespace MathLib {
@@ -15,7 +15,9 @@ namespace MathLib {
         /// @brief Creates a new line
         /// @param s Starting point of line
         /// @param e Ending point of line
-        Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
+        Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {
+            EmptyBenchmark
+        }
     };
     /// @brief Converts a line from one type to another
     /// @tparam T Old type
@@ -24,7 +26,8 @@ namespace MathLib {
     /// @return Converted line
     template <typename T, typename F>
     Line<F> ConvertLine(const Line<T>& line) {
-        return Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end));
+        StartBenchmark
+        ReturnFromBenchmark(Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end)));
     }
 }
 

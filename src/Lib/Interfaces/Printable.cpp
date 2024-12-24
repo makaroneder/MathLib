@@ -2,6 +2,7 @@
 
 namespace MathLib {
     String ToString(const Printable& printable) {
-        return printable.ToString();
+        StartBenchmark
+        ReturnFromBenchmark(printable.ToString());
     }
 }

@@ -1,5 +1,5 @@
-#ifndef Emulator_X86_State_H
-#define Emulator_X86_State_H
+#ifndef MathLib_Emulator_X86_State_H
+#define MathLib_Emulator_X86_State_H
 #include "../Register.hpp"
 #include "X86Flags.hpp"
 

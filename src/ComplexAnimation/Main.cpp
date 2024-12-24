@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         optimizer.Destroy();
         for (MathLib::num_t i = 0; i <= iter; i++) {
             renderer.Fill(0);
-            renderer.DrawAxis(0xffffffff, 0x808080ff);
+            renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
             for (size_t j = 0; j < domain.GetSize(); j++) {
                 const MathLib::complex_t dir = domain.At(j) + directions.At(j) * i;
                 renderer.SetPixel<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(dir.GetReal(), dir.GetImaginary(), 0), 0xff0000ff);

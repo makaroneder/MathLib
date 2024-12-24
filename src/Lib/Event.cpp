@@ -1,17 +1,31 @@
 #include "Event.hpp"
 
 namespace MathLib {
-    Event::Event(Type type) : type(type) {}
-    Event::Event(char key, bool pressed) : type(Type::KeyPressed), pressed(pressed), key(key) {}
-    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : type(Type::MousePressed), pressed(pressed), mousePosition(position), mouseButton(button) {}
+    Event::Event(Type type) : type(type) {
+        EmptyBenchmark
+    }
+    Event::Event(char key, bool pressed) : type(Type::KeyPressed), pressed(pressed), key(key) {
+        EmptyBenchmark
+    }
+    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : type(Type::MousePressed), pressed(pressed), mousePosition(position), mouseButton(button) {
+        EmptyBenchmark
+    }
+    Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {
+        EmptyBenchmark
+    }
     String Event::ToString(const String& padding) const {
+        StartBenchmark
         switch (type) {
-            case Event::Type::None: return padding + "None";
-            case Event::Type::Quit: return padding + "Quit";
-            case Event::Type::KeyPressed: return padding + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'';
+            case Event::Type::None: ReturnFromBenchmark(padding + "None");
+            case Event::Type::Quit: ReturnFromBenchmark(padding + "Quit");
+            case Event::Type::KeyPressed: ReturnFromBenchmark(padding + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'');
             case Event::Type::MousePressed: {
                 String ret = padding + (pressed ? "Pressed" : "Released") + ' ';
                 switch (mouseButton) {
+                    case MouseButton::None: {
+                        ret += "no";
+                        break;
+                    }
                     case MouseButton::Left: {
                         ret += "left";
                         break;
@@ -34,9 +48,9 @@ namespace MathLib {
                     }
                     default: ret += "unknown";
                 }
-                return ret + " button at " + mousePosition.ToString();
+                ReturnFromBenchmark(ret + " button at " + mousePosition.ToString());
             }
-            default: return padding + "Unknown";
+            default: ReturnFromBenchmark(padding + "Unknown");
         }
     }
 }

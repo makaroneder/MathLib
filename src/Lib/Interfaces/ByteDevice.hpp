@@ -1,5 +1,5 @@
-#ifndef Interfaces_ByteDevice_H
-#define Interfaces_ByteDevice_H
+#ifndef MathLib_Interfaces_ByteDevice_H
+#define MathLib_Interfaces_ByteDevice_H
 #include "../SeekMode.hpp"
 #include "Readable.hpp"
 #include "Writeable.hpp"
@@ -60,7 +60,8 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         bool ReadPositioned(T& value, size_t position) {
-            return ReadPositionedBuffer(&value, sizeof(T), position);
+            StartBenchmark
+            ReturnFromBenchmark(ReadPositionedBuffer(&value, sizeof(T), position));
         }
         /// @brief Writes one T value
         /// @tparam T Type of value
@@ -69,7 +70,8 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         bool WritePositioned(const T& value, size_t position) {
-            return WritePositionedBuffer(&value, sizeof(T), position);
+            StartBenchmark
+            ReturnFromBenchmark(WritePositionedBuffer(&value, sizeof(T), position));
         }
         /// @brief Reads one T value
         /// @tparam T Type of value
@@ -77,8 +79,9 @@ namespace MathLib {
         /// @return Value and status
         template <typename T>
         Expected<T> ReadPositioned(size_t position) {
+            StartBenchmark
             T ret;
-            return ReadPositioned<T>(ret, position) ? Expected<T>(ret) : Expected<T>();
+            ReturnFromBenchmark(ReadPositioned<T>(ret, position) ? Expected<T>(ret) : Expected<T>());
         }
 
         private:

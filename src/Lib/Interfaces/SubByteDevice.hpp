@@ -1,5 +1,5 @@
-#ifndef Interfaces_SubByteDevice_H
-#define Interfaces_SubByteDevice_H
+#ifndef MathLib_Interfaces_SubByteDevice_H
+#define MathLib_Interfaces_SubByteDevice_H
 #include "ByteDevice.hpp"
 #include "../Interval.hpp"
 

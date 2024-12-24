@@ -1,5 +1,5 @@
-#ifndef Chemistry_Element_H
-#define Chemistry_Element_H
+#ifndef MathLib_Chemistry_Element_H
+#define MathLib_Chemistry_Element_H
 #include "../Host.hpp"
 
 namespace MathLib {
@@ -21,7 +21,9 @@ namespace MathLib {
     #define CreateChemicalElement(name, symbolStr, metal)               \
     struct name : ChemicalElement {                                     \
         static constexpr const char* symbol = #symbolStr;               \
-        name(size_t count) : ChemicalElement(symbol, count, metal) {}   \
+        name(size_t count) : ChemicalElement(symbol, count, metal) {    \
+            EmptyBenchmark                                              \
+        }                                                               \
     }
     CreateChemicalElement(Hydrogen, H, false);
     CreateChemicalElement(Helium, He, false);

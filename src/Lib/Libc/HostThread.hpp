@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef Libc_HostThread_H
-#define Libc_HostThread_H
+#ifndef MathLib_Libc_HostThread_H
+#define MathLib_Libc_HostThread_H
 #include "../Thread.hpp"
 #include <thread>
 

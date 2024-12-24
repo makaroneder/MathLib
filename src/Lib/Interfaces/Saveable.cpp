@@ -1,13 +1,15 @@
 #include "Saveable.hpp"
-#include "FileSystems/File.hpp"
+#include "FileSystem/File.hpp"
 
 namespace MathLib {
     bool Saveable::SaveFromPath(FileSystem& fileSystem, const String& path) const {
+        StartBenchmark
         File file = fileSystem.Open(path, OpenMode::Write);
-        return Save(file);
+        ReturnFromBenchmark(Save(file));
     }
     bool Saveable::LoadFromPath(FileSystem& fileSystem, const String& path) {
+        StartBenchmark
         File file = fileSystem.Open(path, OpenMode::Read);
-        return Load(file);
+        ReturnFromBenchmark(Load(file));
     }
 }

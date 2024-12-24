@@ -10,6 +10,7 @@
 
 namespace MathLib {
     size_t HostFileSystem::OpenInternal(const String& path, OpenMode mode) {
+        StartBenchmark
         const char* modeStr = "";
         switch (mode) {
             case OpenMode::Read: {
@@ -24,57 +25,63 @@ namespace MathLib {
                 modeStr = "rb+";
                 break;
             }
-            default: return SIZE_MAX;
+            default: ReturnFromBenchmark(SIZE_MAX);
         }
         FILE* file = fopen(path.GetValue(), modeStr);
-        if (!file) return SIZE_MAX;
+        if (!file) ReturnFromBenchmark(SIZE_MAX);
         for (size_t i = 0; i < files.GetSize(); i++) {
             if (!files[i]) {
                 files[i] = file;
-                return i;
+                ReturnFromBenchmark(i);
             }
         }
-        return files.Add(file) ? files.GetSize() - 1 : SIZE_MAX;
+        ReturnFromBenchmark(files.Add(file) ? files.GetSize() - 1 : SIZE_MAX);
     }
     bool HostFileSystem::Close(size_t file) {
+        StartBenchmark
         FILE* raw = GetFile(file);
-        if (!raw || fflush(raw) || fclose(raw)) return false;
+        if (!raw || fflush(raw) || fclose(raw)) ReturnFromBenchmark(false);
         files[file] = nullptr;
-        return true;
+        ReturnFromBenchmark(true);
     }
     size_t HostFileSystem::Read(size_t file, void* buffer, size_t size, size_t position) {
+        StartBenchmark
         FILE* raw = GetFile(file);
-        if (!raw || fseek(raw, position, SEEK_SET)) return 0;
-        return fread(buffer, sizeof(uint8_t), size, raw);
+        if (!raw || fseek(raw, position, SEEK_SET)) ReturnFromBenchmark(0);
+        ReturnFromBenchmark(fread(buffer, sizeof(uint8_t), size, raw));
     }
     size_t HostFileSystem::Write(size_t file, const void* buffer, size_t size, size_t position) {
+        StartBenchmark
         FILE* raw = GetFile(file);
-        if (!raw || fseek(raw, position, SEEK_SET)) return 0;
-        return fwrite(buffer, sizeof(uint8_t), size, raw);
+        if (!raw || fseek(raw, position, SEEK_SET)) ReturnFromBenchmark(0);
+        ReturnFromBenchmark(fwrite(buffer, sizeof(uint8_t), size, raw));
     }
     size_t HostFileSystem::GetSize(size_t file) {
+        StartBenchmark
         FILE* raw = GetFile(file);
-        if (!raw) return false;
+        if (!raw) ReturnFromBenchmark(0);
         const size_t pos = ftell(raw);
-        if (fseek(raw, 0, SEEK_END)) return 0;
+        if (fseek(raw, 0, SEEK_END)) ReturnFromBenchmark(0);
         const size_t ret = ftell(raw);
-        if (fseek(raw, pos, SEEK_SET)) return 0;
-        return ret;
+        if (fseek(raw, pos, SEEK_SET)) ReturnFromBenchmark(0);
+        ReturnFromBenchmark(ret);
     }
     Array<FileInfo> HostFileSystem::ReadDirectory(const String& path_) {
+        StartBenchmark
         const String path = String(fs::current_path().c_str()) + '/' + path_;
-        if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) return Array<FileInfo>();
+        if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) ReturnFromBenchmark(Array<FileInfo>());
         Array<FileInfo> ret;
         for (const fs::directory_entry& entry : fs::directory_iterator(path.GetValue())) {
             FileInfo::Type type = FileInfo::Type::Unknown;
             if (fs::is_directory(entry.status())) type = FileInfo::Type::Directory;
             else if (fs::is_regular_file(entry.status())) type = FileInfo::Type::File;
-            if (!ret.Add(FileInfo(type, entry.path().filename().string()))) return Array<FileInfo>();
+            if (!ret.Add(FileInfo(type, entry.path().filename().string()))) ReturnFromBenchmark(Array<FileInfo>());
         }
-        return ret;
+        ReturnFromBenchmark(ret);
     }
     FILE* HostFileSystem::GetFile(size_t file) {
-        return file < files.GetSize() ? files[file] : nullptr;
+        StartBenchmark
+        ReturnFromBenchmark(file < files.GetSize() ? files[file] : nullptr);
     }
 }
 

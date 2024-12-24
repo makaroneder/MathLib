@@ -3,6 +3,7 @@
 
 namespace MathLib {
     void MemoryCopy(const void* src, void* dst, size_t size) {
+        StartBenchmark
         #ifdef __x86_64__
         asm volatile("rep movsb" : "+D"(dst), "+S"(src), "+c"(size) :: "memory", "cc");
         #else
@@ -10,5 +11,6 @@ namespace MathLib {
         uint8_t* dst8 = (uint8_t*)dst;
         for (size_t i = 0; i < size; i++) dst8[i] = src8[i];
         #endif
+        EndBenchmark
     }
 }

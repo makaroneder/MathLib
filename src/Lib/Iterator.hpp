@@ -1,6 +1,6 @@
-#ifndef Iterator_H
-#define Iterator_H
-#include "Interfaces/Allocatable.hpp"
+#ifndef MathLib_Iterator_H
+#define MathLib_Iterator_H
+#include "Allocator/Allocatable.hpp"
 
 namespace MathLib {
     template <typename T>

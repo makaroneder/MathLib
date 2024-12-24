@@ -8,10 +8,8 @@
 int main(int, char**) {
     try {
         const MathLib::Test test = MathLib::TestSelf();
-        const size_t tests = test.GetRecordCount();
-        const size_t passed = test.GetPassed();
-        std::cout << test << passed << "/" << tests << " tests passed" << std::endl;
-        if (passed != tests) MathLib::Panic("Some tests failed");
+        std::cout << test << std::endl;
+        if (!test.Passed()) MathLib::Panic("Some tests failed");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

@@ -1,5 +1,5 @@
-#ifndef CharBuffer_H
-#define CharBuffer_H
+#ifndef MathLib_CharBuffer_H
+#define MathLib_CharBuffer_H
 #include "Buffer.hpp"
 #include "Memory.hpp"
 

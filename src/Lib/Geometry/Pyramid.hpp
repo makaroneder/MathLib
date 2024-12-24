@@ -1,5 +1,5 @@
-#ifndef Geometry_Pyramid_H
-#define Geometry_Pyramid_H
+#ifndef MathLib_Geometry_Pyramid_H
+#define MathLib_Geometry_Pyramid_H
 #include "LineShape.hpp"
 #include "../Math/Quaternion.hpp"
 
@@ -8,12 +8,16 @@ namespace MathLib {
     struct Pyramid : LineShape<T> {
         Matrix<T> sizes;
 
-        Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {}
+        Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {
+            EmptyBenchmark
+        }
         virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
-            return false;
+            StartBenchmark
+            ReturnFromBenchmark(false);
         }
         virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
+            StartBenchmark
             const T sizeX = GetX(sizes) / 2;
             const T sizeY = GetY(sizes) / 2;
             const T sizeZ = GetZ(sizes) / 2;
@@ -31,7 +35,7 @@ namespace MathLib {
             ret.At(5) = Line<T>(p2, p5);
             ret.At(6) = Line<T>(p3, p5);
             ret.At(7) = Line<T>(p4, p5);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
     };
 }

@@ -1,5 +1,4 @@
-fa : R = 1
-fb : R = 1
-fc : R = 1
-f(x : R) : R = fa * x^2 + fb * x + fc
+w(x : R) : R = x^3 + x^2 + x + 1
+q(x : R) : R = x^3 + x^2 + x + 1
+f(x : R) : R = w(x) + q(x)
 a : R = f(1)

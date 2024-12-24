@@ -1,5 +1,5 @@
-#ifndef Buffer_H
-#define Buffer_H
+#ifndef MathLib_Buffer_H
+#define MathLib_Buffer_H
 #include "Interfaces/Collection.hpp"
 
 namespace MathLib {

@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef Libc_HostCollection_H
-#define Libc_HostCollection_H
+#ifndef MathLib_Libc_HostCollection_H
+#define MathLib_Libc_HostCollection_H
 #include "../Interfaces/Collection.hpp"
 #include <vector>
 

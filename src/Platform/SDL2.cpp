@@ -11,9 +11,9 @@ namespace MathLib {
         if (!texture) Panic(SDL_GetError());
     }
     SDL2Renderer::~SDL2Renderer(void) {
+        SDL_DestroyTexture(texture);
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
-        SDL_DestroyTexture(texture);
         SDL_Quit();
     }
     bool SDL2Renderer::Update(void) {
@@ -32,6 +32,7 @@ namespace MathLib {
                 case SDL_KEYUP: return Event(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP: return Event(CreateVector<size_t>(event.button.x, event.button.y, 0), (Event::MouseButton)event.button.button, event.type == SDL_MOUSEBUTTONDOWN);
+                case SDL_MOUSEMOTION: return Event(CreateVector<size_t>(event.motion.x, event.motion.y, 0));
             }
         }
         return Event();

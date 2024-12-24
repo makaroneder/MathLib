@@ -1,5 +1,5 @@
-#ifndef Cryptography_AffineCipher_H
-#define Cryptography_AffineCipher_H
+#ifndef MathLib_Cryptography_AffineCipher_H
+#define MathLib_Cryptography_AffineCipher_H
 #include "Cipher.hpp"
 
 namespace MathLib {

@@ -1,27 +1,34 @@
-#ifndef Interval_H
-#define Interval_H
+#ifndef MathLib_Interval_H
+#define MathLib_Interval_H
 #include "Typedefs.hpp"
 
 namespace MathLib {
     template <typename T>
     struct Interval : Allocatable {
-        Interval(const T& min_ = 0, const T& max_ = 0) : min(min_), max(max_) {}
+        Interval(const T& min_ = 0, const T& max_ = 0) : min(min_), max(max_) {
+            EmptyBenchmark
+        }
         T GetMin(void) const {
-            return min;
+            StartBenchmark
+            ReturnFromBenchmark(min);
         }
         T GetMax(void) const {
-            return max;
+            StartBenchmark
+            ReturnFromBenchmark(max);
         }
         T GetSize(void) const {
-            return max - min;
+            StartBenchmark
+            ReturnFromBenchmark(max - min);
         }
         bool Contains(const T& x) const {
-            return IsBetween(x, min, max);
+            StartBenchmark
+            ReturnFromBenchmark(IsBetween(x, min, max));
         }
         T Clamp(const T& x) const {
-            if (x < min) return min;
-            else if (x > max) return max;
-            else return x;
+            StartBenchmark
+            if (x < min) ReturnFromBenchmark(min)
+            else if (x > max) ReturnFromBenchmark(max)
+            else ReturnFromBenchmark(x)
         }
 
         private:

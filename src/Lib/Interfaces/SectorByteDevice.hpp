@@ -1,5 +1,5 @@
-#ifndef Interfaces_SectorByteDevice_H
-#define Interfaces_SectorByteDevice_H
+#ifndef MathLib_Interfaces_SectorByteDevice_H
+#define MathLib_Interfaces_SectorByteDevice_H
 #include "ByteDevice.hpp"
 
 namespace MathLib {

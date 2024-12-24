@@ -1,5 +1,5 @@
-#ifndef X86Opcode_H
-#define X86Opcode_H
+#ifndef MathLib_Emulator_X86_Opcode_H
+#define MathLib_Emulator_X86_Opcode_H
 #include <stdint.h>
 
 // TODO: test (rcl rcr rol ror sal sar) in out esc

@@ -1,8 +1,8 @@
-#ifndef Geometry_WavefrontObject_H
-#define Geometry_WavefrontObject_H
+#ifndef MathLib_Geometry_WavefrontObject_H
+#define MathLib_Geometry_WavefrontObject_H
 #include "LineShape.hpp"
 #include "../Math/Quaternion.hpp"
-#include "../FileSystems/File.hpp"
+#include "../FileSystem/File.hpp"
 #include "../EquationSolver/Tokenizer.hpp"
 
 namespace MathLib {
@@ -13,6 +13,7 @@ namespace MathLib {
         Array<size_t> lines;
 
         WavefrontObject(const Matrix<T>& pos, FileSystem& fileSystem, const String& path) : LineShape<T>(pos) {
+            StartBenchmark
             File file = fileSystem.Open(path, OpenMode::Read);
             const size_t size = file.GetSize();
             while (file.Tell() < size) {
@@ -61,12 +62,15 @@ namespace MathLib {
                     }
                 }
             }
+            EndBenchmark
         }
         virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
-            return false;
+            StartBenchmark
+            ReturnFromBenchmark(false);
         }
         virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
+            StartBenchmark
             Array<Line<T>> ret;
             for (const Array<size_t>& face : faces) {
                 Array<Matrix<T>> verts = Array<Matrix<T>>(face.GetSize());
@@ -79,7 +83,7 @@ namespace MathLib {
                 for (size_t j = 0; j < 2; j++) tmp[j] = RotateVector<T>(verticies.At(lines.At(i + j)) + this->position, this->position, rotation);
                 ret.Add(Line<T>(tmp[0], tmp[1]));
             }
-            return ret;
+            ReturnFromBenchmark(ret);
         }
     };
 }

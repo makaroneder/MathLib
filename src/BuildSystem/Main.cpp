@@ -21,7 +21,7 @@ MathLib::Node* DeclareTarget(const void*, const MathLib::Array<const MathLib::No
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
     if (args.At(3)->type != MathLib::Node::Type::Constant) return nullptr;
     const Target target = Target(args.At(0)->value, args.At(1)->value, args.At(2)->value, args.At(3)->ToNumber().At(0).GetReal());
-    if (!target.phony && Find(target.name, "%") == SIZE_MAX) nonPhonyTargets += target.name + ' ';
+    if (!target.phony && !target.name.Contains('%')) nonPhonyTargets += target.name + ' ';
     return targets.Add(target) ? new MathLib::Node(MathLib::Node::Type::String, "") : nullptr;
 }
 MathLib::Node* CreateObjects(const void*, const MathLib::Array<const MathLib::Node*>& args) {

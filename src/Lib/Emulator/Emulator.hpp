@@ -1,5 +1,5 @@
-#ifndef Emulator_H
-#define Emulator_H
+#ifndef MathLib_Emulator_H
+#define MathLib_Emulator_H
 #include "../Interfaces/Printable.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 

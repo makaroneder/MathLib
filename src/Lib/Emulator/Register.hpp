@@ -1,5 +1,5 @@
-#ifndef Emulator_Register_H
-#define Emulator_Register_H
+#ifndef MathLib_Emulator_Register_H
+#define MathLib_Emulator_Register_H
 #include "../Interfaces/Printable.hpp"
 
 namespace MathLib {

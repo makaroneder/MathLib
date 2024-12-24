@@ -1,5 +1,5 @@
-#ifndef Cryptography_ROT13_H
-#define Cryptography_ROT13_H
+#ifndef MathLib_Cryptography_ROT13_H
+#define MathLib_Cryptography_ROT13_H
 #include "CaesarCipher.hpp"
 #include "SpecialCaseCipher.hpp"
 

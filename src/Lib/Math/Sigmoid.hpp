@@ -1,5 +1,5 @@
-#ifndef Math_Sigmoid_H
-#define Math_Sigmoid_H
+#ifndef MathLib_Math_Sigmoid_H
+#define MathLib_Math_Sigmoid_H
 #include "../Host.hpp"
 
 namespace MathLib {
@@ -9,8 +9,9 @@ namespace MathLib {
     /// @return Return value
     template <typename T>
     constexpr T Sigmoid(const T& x) {
+        StartBenchmark
         const T one = 1;
-        return one / (Exp(-x) + one);
+        ReturnFromBenchmark(one / (Exp(-x) + one));
     }
 }
 

@@ -1,13 +1,12 @@
-#ifndef GUID_H
-#define GUID_H
+#ifndef MathLib_GUID_H
+#define MathLib_GUID_H
 #include "Interfaces/Printable.hpp"
-#include <stdint.h>
 
 namespace MathLib {
     struct RawGUID {
         uint32_t data1;
         uint16_t data2[3];
-        uint64_t data3 : 6 * 8;
+        uint64_t data3 : 48;
     } __attribute__((packed));
     struct GUID : RawGUID, Printable {
         GUID(RawGUID guid = RawGUID());

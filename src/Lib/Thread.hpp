@@ -1,5 +1,5 @@
-#ifndef Thread_H
-#define Thread_H
+#ifndef MathLib_Thread_H
+#define MathLib_Thread_H
 #include "Interfaces/Function.hpp"
 #include "Interval.hpp"
 

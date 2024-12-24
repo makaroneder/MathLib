@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #ifndef PIC_H
 #define PIC_H
-#include <Interfaces/Allocatable.hpp>
+#include <Allocator/Allocatable.hpp>
 #include <stdint.h>
 
 struct PIC : MathLib::Allocatable {

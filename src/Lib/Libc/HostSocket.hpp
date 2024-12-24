@@ -1,6 +1,6 @@
 #ifndef Freestanding
-#ifndef Libc_HostSocket_H
-#define Libc_HostSocket_H
+#ifndef MathLib_Libc_HostSocket_H
+#define MathLib_Libc_HostSocket_H
 #include "../Interfaces/Socket.hpp"
 
 namespace MathLib {

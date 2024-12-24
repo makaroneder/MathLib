@@ -1,5 +1,5 @@
-#ifndef Libs_Memory_H
-#define Libs_Memory_H
+#ifndef MathLib_Memory_H
+#define MathLib_Memory_H
 #include <stddef.h>
 
 namespace MathLib {

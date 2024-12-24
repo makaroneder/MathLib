@@ -1,5 +1,5 @@
-#ifndef Interfaces_Socket_H
-#define Interfaces_Socket_H
+#ifndef MathLib_Interfaces_Socket_H
+#define MathLib_Interfaces_Socket_H
 #include "Readable.hpp"
 #include "Writeable.hpp"
 

@@ -1,7 +1,7 @@
 MakeObjects(dir : String, ext : String, cmd : String, sources : String) : String = DeclareTarget("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext + " $(HEADERS)", cmd, false) + CreateObjects("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext, sources)
 LDTarget(out : String, objs : String, libs : String, ld : String, ldFlags : String, deps : String) : String = DeclareTarget("$(BUILDDIR)/" + out, objs + deps + " $(BUILDDIR)/libExtras.a", ld + " " + ldFlags + " " + objs + " -o $@ " + libs + " -L $(BUILDDIR) -l Extras", false)
 DefaultRunTargets(name : String, app : String, args : String) : Void = DeclareTarget("run" + name, app, "./$< " + args, true) + DeclareTarget("debug" + name, app, "$(VALGRIND) $(VALGRINDFLAGS) ./$< " + args, true)
-DefaultTarget(out : String, dir : String, libs : String, run : String, args : String, runDeps : Stri) : Void = {
+DefaultTarget(out : String, dir : String, libs : String, run : String, args : String, runDeps : String) : Void = {
     LDTarget(out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs, "$(CXX)", "$(CXXFLAGS)", ""),
     DefaultRunTargets(run, "$(BUILDDIR)/" + out + " " + runDeps, args)
 }
@@ -14,7 +14,7 @@ DefaultTarget("ReactionBalancer.out", "ReactionBalancer", "", "Reaction", "$(CHE
 DefaultTarget("MachineLearning.out", "MachineLearning", "", "ML", "$(BUILDDIR)/ML.bin $(MLITERS)", "")
 DefaultTarget("3D.out", "3D", "-l SDL2", "3D", "", "")
 DefaultTarget("Cryptography.out", "Cryptography", "", "Crypt", "$(CRYPTMSG)", "")
-DefaultTarget("ComplexAnimation.out", "ComplexAnimation", "-l SDL2", "Anim", "$(SRCDIR)/TestPrograms/Math/Trigonometry/Sine.txt $(BUILDDIR) $(BUILDDIR)/Sine.mp4", "")
+DefaultTarget("ComplexAnimation.out", "ComplexAnimation", "-l SDL2", "Anim", "$(ANIMATIONFILE) $(BUILDDIR) $(BUILDDIR)/Animation.mp4", "")
 DefaultTarget("SlotMachine.out", "SlotMachine", "-l SDL2", "Slot", "", "")
 DefaultTarget("X86.out", "X86", "", "X86", "$(BUILDDIR)/X86.bin", "$(BUILDDIR)/X86.bin")
 DefaultTarget("Music.out", "Music", "", "Music", "$(BUILDDIR)/Music.wav", "")
@@ -27,6 +27,12 @@ DefaultTarget("IsomerGenerator.out", "IsomerGenerator", "", "IsomerGen", "$(CARB
 DefaultTarget("Gravity.out", "Gravity", "-l SDL2", "Gravity", "", "")
 DefaultTarget("MathArch.out", "MathArch", "", "MathArch", "", "")
 DefaultTarget("Circuit.out", "Circuit", "", "Circuit", "", "")
+DefaultTarget("Polynomial.out", "Polynomial", "", "Polynomial", "$(POLYNOMIAL)", "")
+DefaultTarget("Paint.out", "Paint", "-l SDL2", "Paint", "", "")
+DefaultTarget("Ray.out", "Ray", "-l SDL2", "Ray", "", "")
+DefaultTarget("ImageConverter.out", "ImageConverter", "-l SDL2", "ImgConv", "$(IMGCONVARGS)", "")
+DefaultTarget("ELFParser.out", "ELFParser", "", "ELF", "$(ELFARGS)", "")
+DefaultTarget("RootFinder.out", "RootFinder", "", "RootFinder", "", "")
 
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)
 DeclareTarget("$(BUILDDIR)/OS.img", "$(BUILDDIR)/Kernel.elf $(OSROOT)/*", "cp $< $(OSROOT)/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT) && rm $(OSROOT)/boot/Kernel.elf", false)
@@ -34,7 +40,7 @@ DeclareTarget("$(BUILDDIR)/OS.gdb", "Scripts/MakeGDB.sh", "bash $< $@ $(BUILDDIR
 
 MakeObjects("OS", "s", "$(AS) $(ASFLAGS) $< -o $@", "$(BUILDDIR)/OS/crti.s $(BUILDDIR)/OS/crtn.s")
 kernelObjs : String =
-    "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o)" +
+    "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o) " +
     MakeObjects("OS", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS", ".cpp")) +
     MakeObjects("OS", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS", ".asm")) +
     "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "

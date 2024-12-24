@@ -1,5 +1,5 @@
-#ifndef Interfaces_Collection_H
-#define Interfaces_Collection_H
+#ifndef MathLib_Interfaces_Collection_H
+#define MathLib_Interfaces_Collection_H
 #include "../Iterator.hpp"
 
 namespace MathLib {
@@ -29,6 +29,19 @@ namespace MathLib {
             for (size_t i = 0; i < GetSize(); i++)
                 if (At(i) == value) return true;
             return false;
+        }
+        bool Contains(const Collection<T>& other) const {
+            return Find(other, 0) != SIZE_MAX;
+        }
+        size_t Find(const Collection<T>& other, size_t start = 0) const {
+            if (GetSize() < other.GetSize()) return SIZE_MAX;
+            for (size_t i = start; i < GetSize() - other.GetSize(); i++) {
+                bool found = true;
+                for (size_t j = 0; j < other.GetSize() && found; j++)
+                    if (At(i + j) != other.At(j)) found = false;
+                if (found) return i;
+            }
+            return SIZE_MAX;
         }
         T operator[](size_t index) const {
             return At(index);

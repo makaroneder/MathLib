@@ -1,5 +1,5 @@
-#ifndef EquationSolver_Variable_H
-#define EquationSolver_Variable_H
+#ifndef MathLib_EquationSolver_Variable_H
+#define MathLib_EquationSolver_Variable_H
 #include "Node.hpp"
 
 namespace MathLib {

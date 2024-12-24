@@ -1,5 +1,5 @@
-#ifndef DummyRenderer_H
-#define DummyRenderer_H
+#ifndef MathLib_DummyRenderer_H
+#define MathLib_DummyRenderer_H
 #include "Renderer.hpp"
 
 namespace MathLib {

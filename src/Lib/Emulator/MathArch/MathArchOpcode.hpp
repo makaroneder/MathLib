@@ -1,5 +1,5 @@
-#ifndef Emulator_MathArch_Opcode_H
-#define Emulator_MathArch_Opcode_H
+#ifndef MathLib_Emulator_MathArch_Opcode_H
+#define MathLib_Emulator_MathArch_Opcode_H
 #include <stdint.h>
 
 namespace MathLib {

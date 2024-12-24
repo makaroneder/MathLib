@@ -1,5 +1,5 @@
-#ifndef Tests_Record_H
-#define Tests_Record_H
+#ifndef MathLib_Tests_Record_H
+#define MathLib_Tests_Record_H
 #include "../Interfaces/Printable.hpp"
 
 namespace MathLib {

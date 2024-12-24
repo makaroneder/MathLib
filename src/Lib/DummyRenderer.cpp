@@ -1,11 +1,15 @@
 #include "DummyRenderer.hpp"
 
 namespace MathLib {
-    DummyRenderer::DummyRenderer(size_t width, size_t height) : Renderer(width, height) { }
+    DummyRenderer::DummyRenderer(size_t width, size_t height) : Renderer(width, height) {
+        EmptyBenchmark
+    }
     bool DummyRenderer::Update(void) {
-        return true;
+        StartBenchmark
+        ReturnFromBenchmark(true);
     }
     Event DummyRenderer::GetEvent(void) {
-        return Event();
+        StartBenchmark
+        ReturnFromBenchmark(Event());
     }
 }

@@ -1,5 +1,5 @@
-#ifndef Chemistry_Reaction_H
-#define Chemistry_Reaction_H
+#ifndef MathLib_Chemistry_Reaction_H
+#define MathLib_Chemistry_Reaction_H
 #include "ChemicalReactionElement.hpp"
 #include "ChemicalMolecule.hpp"
 

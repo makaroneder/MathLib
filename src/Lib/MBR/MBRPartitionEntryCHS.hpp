@@ -1,5 +1,5 @@
-#ifndef MBR_PartitionEntryCHS_H
-#define MBR_PartitionEntryCHS_H
+#ifndef MathLib_MBR_PartitionEntryCHS_H
+#define MathLib_MBR_PartitionEntryCHS_H
 #include <stdint.h>
 
 namespace MathLib {

@@ -1,5 +1,5 @@
-#ifndef Math_Log_H
-#define Math_Log_H
+#ifndef MathLib_Math_Log_H
+#define MathLib_Math_Log_H
 #include "../Host.hpp"
 
 namespace MathLib {
@@ -9,8 +9,9 @@ namespace MathLib {
     /// @param x Value of the logarithm
     /// @return Logarithm of specified base and number
     template <typename T>
-    constexpr T Log(const T& b, const T& x) {
-        return NaturalLog(x) / NaturalLog(b);
+    T Log(const T& b, const T& x) {
+        StartBenchmark
+        ReturnFromBenchmark(NaturalLog(x) / NaturalLog(b));
     }
 }
 

@@ -1,5 +1,5 @@
-#ifndef Geometry_Cuboid_H
-#define Geometry_Cuboid_H
+#ifndef MathLib_Geometry_Cuboid_H
+#define MathLib_Geometry_Cuboid_H
 #include "LineShape.hpp"
 #include "../Math/Quaternion.hpp"
 
@@ -8,14 +8,18 @@ namespace MathLib {
     struct Cuboid : LineShape<T> {
         Matrix<T> sizes;
 
-        Cuboid(const Matrix<T>& pos = CreateVector<T>(0, 0, 0), const Matrix<T>& s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {}
+        Cuboid(const Matrix<T>& pos = CreateVector<T>(0, 0, 0), const Matrix<T>& s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {
+            EmptyBenchmark
+        }
         virtual bool CollidesWith(const Shape<T>& other_) const override {
+            StartBenchmark
             const Cuboid<T>& other = (const Cuboid<T>&)other_;
             for (size_t x = 0; x < this->position.GetWidth(); x++)
-                if ((this->position.At(x, 0) + sizes.At(x, 0) <= other.position.At(x, 0)) || (other.position.At(x, 0) + other.sizes.At(x, 0) <= this->position.At(x, 0))) return false;
-            return true;
+                if ((this->position.At(x, 0) + sizes.At(x, 0) <= other.position.At(x, 0)) || (other.position.At(x, 0) + other.sizes.At(x, 0) <= this->position.At(x, 0))) ReturnFromBenchmark(false);
+            ReturnFromBenchmark(true);
         }
         virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
+            StartBenchmark
             const T sizeX = GetX(sizes) / 2;
             const T sizeY = GetY(sizes) / 2;
             const T sizeZ = GetZ(sizes) / 2;
@@ -40,7 +44,7 @@ namespace MathLib {
             ret.At(9) = Line<T>(p5, p7);
             ret.At(10) = Line<T>(p6, p8);
             ret.At(11) = Line<T>(p7, p8);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
     };
 }

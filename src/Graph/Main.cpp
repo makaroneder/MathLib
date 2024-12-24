@@ -19,6 +19,7 @@ bool HandleEvents(MathLib::Renderer& renderer, const MathLib::Function<bool>& fu
     const T speed = 1;
     if (!func()) return false;
     while (running) {
+        if (!renderer.Update()) return false;
         const MathLib::Event event = renderer.GetEvent();
         if (event.type == MathLib::Event::Type::Quit) running = false;
         else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
@@ -116,14 +117,14 @@ int main(int argc, char** argv) {
         });
         if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>(nullptr, [&renderer, func, complexFunc, &states, &state](const void*) -> bool {
             renderer.Fill(0);
-            renderer.DrawAxis(0xffffffff, 0x808080ff);
+            renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             if (funcNode.dataType == "C")
                 renderer.DrawComplexFunction<MathLib::num_t>(renderer.GenerateComplexFunction<MathLib::num_t>(complexFunc));
             else if (funcNode.dataType == "R")
                 renderer.DrawFunction<MathLib::num_t>(renderer.GenerateMultiFunction<MathLib::num_t>(func), 0xff0000ff);
             else return false;
-            return renderer.Update();
+            return true;
         }), state, states.GetSize())) MathLib::Panic("Failed to render function");
         for (MathLib::Optimizer& optimizer : states) optimizer.Destroy();
         return EXIT_SUCCESS;

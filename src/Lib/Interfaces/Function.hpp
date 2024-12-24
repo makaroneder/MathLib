@@ -1,17 +1,23 @@
-#ifndef Interfaces_Function_H
-#define Interfaces_Function_H
-#include "Allocatable.hpp"
+#ifndef MathLib_Interfaces_Function_H
+#define MathLib_Interfaces_Function_H
+#include "Typedefs.hpp"
 
 namespace MathLib {
     template <typename Ret, typename... Args>
     struct Function : Allocatable {
-        Function(void) {}
-        Function(void* data) : data(data) {}
+        Function(void) {
+            EmptyBenchmark
+        }
+        Function(void* data) : data(data) {
+            EmptyBenchmark
+        }
         const void* GetData(void) const {
-            return data;
+            StartBenchmark
+            ReturnFromBenchmark(data);
         }
         Ret operator()(Args... args) const {
-            return Invoke(data, args...);
+            StartBenchmark
+            ReturnFromBenchmark(Invoke(data, args...));
         }
         virtual Ret Invoke(const void* data, Args... args) const = 0;
 

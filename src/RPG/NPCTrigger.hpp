@@ -1,6 +1,6 @@
 #ifndef NPCTrigger_H
 #define NPCTrigger_H
-#include <Interfaces/Allocatable.hpp>
+#include <Allocator/Allocatable.hpp>
 #include <stdint.h>
 
 struct NPCTrigger : MathLib::Allocatable {

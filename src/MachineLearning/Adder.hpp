@@ -9,7 +9,7 @@ template <typename T>
 NeuralNetworkState<T> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
-    const size_t rows = Pow(n, 2);
+    const size_t rows = n * n;
     NeuralNetworkState<T> state = NeuralNetworkState<T>(1, MathLib::Matrix<T>(bits * 2, rows), MathLib::Matrix<T>(bits, rows), MathLib::NeuralNetwork<T>(MathLib::NeuralNetwork<T>::ActivationFunction::Sigmoid, std::vector<size_t> { bits * 2, bits * 4, bits, }));
     for (size_t i = 0; i < rows; i++) {
         const size_t x = i / n;

@@ -1,5 +1,5 @@
-#ifndef MBR_H
-#define MBR_H
+#ifndef MathLib_MBR_H
+#define MathLib_MBR_H
 #include "MBRHeader.hpp"
 #include "../Interval.hpp"
 #include "../Interfaces/ByteDevice.hpp"

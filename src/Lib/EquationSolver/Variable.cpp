@@ -2,10 +2,17 @@
 #include "../Math/Constants.hpp"
 
 namespace MathLib {
-    Variable::Variable(void) {}
-    Variable::Variable(const String& name, const String& dataType, Node* value, bool constant) : name(name), dataType(dataType), value(value), constant(constant) {}
-    Variable::Variable(const String& name, const String& dataType, const String& value, bool constant) : name(name), dataType(dataType), value(new Node(Node::Type::Constant, value)), constant(constant) {}
+    Variable::Variable(void) {
+        EmptyBenchmark
+    }
+    Variable::Variable(const String& name, const String& dataType, Node* value, bool constant) : name(name), dataType(dataType), value(value), constant(constant) {
+        EmptyBenchmark
+    }
+    Variable::Variable(const String& name, const String& dataType, const String& value, bool constant) : name(name), dataType(dataType), value(new Node(Node::Type::Constant, value)), constant(constant) {
+        EmptyBenchmark
+    }
     Array<Variable> CreateDefaultVariables(void) {
+        StartBenchmark
         const Variable defaultVariables[] = {
             Variable("true", "Bool", "1", true),
             Variable("false", "Bool", "0", true),
@@ -93,6 +100,6 @@ namespace MathLib {
             Variable("foiasConstant", "R", ToString(foiasConstant), true),
             Variable("taniguchiConstant", "R", ToString(taniguchiConstant), true),
         };
-        return Array<Variable>(defaultVariables, SizeOfArray(defaultVariables));
+        ReturnFromBenchmark(Array<Variable>(defaultVariables, SizeOfArray(defaultVariables)));
     }
 }

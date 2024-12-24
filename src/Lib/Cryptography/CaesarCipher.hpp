@@ -1,5 +1,5 @@
-#ifndef Cryptography_CaesarCipher_H
-#define Cryptography_CaesarCipher_H
+#ifndef MathLib_Cryptography_CaesarCipher_H
+#define MathLib_Cryptography_CaesarCipher_H
 #include "AffineCipher.hpp"
 #include "SpecialCaseCipher.hpp"
 

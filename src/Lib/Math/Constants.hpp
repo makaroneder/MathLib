@@ -1,5 +1,5 @@
-#ifndef Math_Constants_H
-#define Math_Constants_H
+#ifndef MathLib_Math_Constants_H
+#define MathLib_Math_Constants_H
 #include "../Host.hpp"
 #include "Log.hpp"
 
@@ -51,11 +51,11 @@ namespace MathLib {
     static const num_t universalParabolicConstant = 2.29558714939;
     static const num_t cahenConstant = 0.64341054628833802618;
     static const num_t gelfondConstant = Exp(pi);
-    static const num_t secondFavardConstant = Pow(pi, 2) / 8;
+    static const num_t secondFavardConstant = pi * pi / 8;
     static const num_t gelfondSchneiderConstant = Pow(2, Sqrt(2));
     static const num_t sierpinskiConstant = 2.58498175957925321706;
     static const num_t landauRamanujanConstant = 0.76422365358922066299;
-    static const num_t firstNielsenRamanujanConstant = Pow(pi, 2) / 12;
+    static const num_t firstNielsenRamanujanConstant = pi * pi / 12;
     static const num_t giesekingConstant = 1.01494160640965362502;
     static const num_t bernsteinConstant = 0.28016949902386913303;
     static const num_t tribonacciConstant = 1.83928675521416113255;
@@ -67,7 +67,7 @@ namespace MathLib {
     static const num_t base10ChampernowneConstant = 0.12345678910111213141;
     static const num_t salemConstant = 1.17628081825991750654;
     static const num_t khinchinConstant = 2.68545200106530644530;
-    static const num_t levyConstant1 = Pow(pi, 2) / (12 * ln2);
+    static const num_t levyConstant1 = pi * pi / (12 * ln2);
     static const num_t levyConstant2 = Exp(levyConstant1);
     static const num_t copelandErdosConstant = 0.23571113171923293137;
     static const num_t millConstant = 1.30637788386308069046;
@@ -75,7 +75,7 @@ namespace MathLib {
     static const num_t vanDerPauwConstant = pi / ln2;
     static const num_t artinConstant = 0.37395581361920228805;
     static const num_t porterConstant = 1.46707807943397547289;
-    static const num_t lochsConstant = (6 * ln2 * NaturalLog(10)) / Pow(pi, 2);
+    static const num_t lochsConstant = (6 * ln2 * NaturalLog(10)) / (pi * pi);
     static const num_t deVicciTesseractConstant = 1.00743475688427937609;
     static const num_t liebSquareIceConstant = 8 / (3 * Sqrt(3));
     static const num_t nivenConstant = 1.70521114010536776428;

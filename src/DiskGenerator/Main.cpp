@@ -8,8 +8,8 @@ size_t ParseSize(const MathLib::String& size) {
     switch (size.At(size.GetSize() - 1)) {
         case 'B': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1));
         case 'K': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * 1024;
-        case 'M': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * MathLib::Pow(1024, 2);
-        case 'G': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * MathLib::Pow(1024, 3);
+        case 'M': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * 1024 * 1024;
+        case 'G': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * 1024 * 1024 * 1024;
         default: return MathLib::StringToNumber(size);
     }
 }

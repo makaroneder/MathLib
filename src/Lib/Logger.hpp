@@ -1,5 +1,5 @@
-#ifndef Logger_H
-#define Logger_H
+#ifndef MathLib_Logger_H
+#define MathLib_Logger_H
 #include "Interfaces/Writeable.hpp"
 
 #define LogString(str) (MathLib::logger && MathLib::logger->Puts(str))

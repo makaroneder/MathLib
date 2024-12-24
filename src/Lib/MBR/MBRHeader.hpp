@@ -1,5 +1,5 @@
-#ifndef MBR_Header_H
-#define MBR_Header_H
+#ifndef MathLib_MBR_Header_H
+#define MathLib_MBR_Header_H
 #include "MBRPartitionEntry.hpp"
 
 namespace MathLib {

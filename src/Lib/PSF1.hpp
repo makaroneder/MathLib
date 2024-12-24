@@ -1,5 +1,5 @@
-#ifndef PSF1_H
-#define PSF1_H
+#ifndef MathLib_PSF1_H
+#define MathLib_PSF1_H
 #include <stdint.h>
 #include <stddef.h>
 

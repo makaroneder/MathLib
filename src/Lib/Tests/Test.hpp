@@ -1,12 +1,11 @@
-#ifndef Test_H
-#define Test_H
+#ifndef MathLib_Test_H
+#define MathLib_Test_H
 #include "Record.hpp"
 
 namespace MathLib {
     struct Test : Printable {
         bool ReportRecord(const Record& record);
-        size_t GetRecordCount(void) const;
-        size_t GetPassed(void) const;
+        bool Passed(void) const;
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation

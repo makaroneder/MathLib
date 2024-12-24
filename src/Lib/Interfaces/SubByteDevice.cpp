@@ -1,14 +1,19 @@
 #include "SubByteDevice.hpp"
 
 namespace MathLib {
-    SubByteDevice::SubByteDevice(ByteDevice& base, const Interval<size_t>& range) : base(base), range(range) {}
+    SubByteDevice::SubByteDevice(ByteDevice& base, const Interval<size_t>& range) : base(base), range(range) {
+        EmptyBenchmark
+    }
     size_t SubByteDevice::GetSize(void) const {
-        return range.GetSize();
+        StartBenchmark
+        ReturnFromBenchmark(range.GetSize());
     }
     size_t SubByteDevice::ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) {
-        return base.ReadPositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin());
+        StartBenchmark
+        ReturnFromBenchmark(base.ReadPositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
     }
     size_t SubByteDevice::WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) {
-        return base.WritePositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin());
+        StartBenchmark
+        ReturnFromBenchmark(base.WritePositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
     }
 }

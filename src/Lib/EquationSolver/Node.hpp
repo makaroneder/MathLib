@@ -1,5 +1,5 @@
-#ifndef EquationSolver_Node_H
-#define EquationSolver_Node_H
+#ifndef MathLib_EquationSolver_Node_H
+#define MathLib_EquationSolver_Node_H
 #include "../Math/Complex.hpp"
 
 namespace MathLib {
@@ -8,7 +8,7 @@ namespace MathLib {
         /// @brief Type of the node
         enum class Type {
             None,
-            Function, Variable, Constant, Array, String,
+            Function, Variable, Constant, Array, String, Struct,
             Program,
             Comma,
             Equal, DynamicEqual,
@@ -24,6 +24,7 @@ namespace MathLib {
         } type;
         static constexpr const char* keywords[] = {
             "if", "while", "return", "integral", "summation", "product",
+            "MakeStruct", "GetField", "SetField",
         };
         /// @brief Value of the node
         String value;

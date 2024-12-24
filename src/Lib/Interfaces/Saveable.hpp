@@ -1,7 +1,7 @@
-#ifndef Interfaces_Saveable_H
-#define Interfaces_Saveable_H
+#ifndef MathLib_Interfaces_Saveable_H
+#define MathLib_Interfaces_Saveable_H
 #include "ByteDevice.hpp"
-#include "../FileSystems/FileSystem.hpp"
+#include "../FileSystem/FileSystem.hpp"
 
 namespace MathLib {
     /// @brief Interface for saveable structures

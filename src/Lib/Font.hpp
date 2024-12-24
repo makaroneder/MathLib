@@ -1,5 +1,5 @@
-#ifndef Font_H
-#define Font_H
+#ifndef MathLib_Font_H
+#define MathLib_Font_H
 #include "PSF1.hpp"
 
 /// @brief src/Lib/zap-light16.psf

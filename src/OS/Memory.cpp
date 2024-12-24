@@ -1,6 +1,9 @@
 #include "MemoryBuffer.hpp"
 #include "Memory.hpp"
 #include <Host.hpp>
+#include <Memory.hpp>
+
+// TODO: Use Allocator from MathLib
 
 MemoryBuffer<1000 * 4096> tmpMemoryManager;
 MemoryManager* memoryManager = &tmpMemoryManager;
@@ -65,30 +68,28 @@ void operator delete[](void* ptr, size_t size) {
     (void)size;
     return Dealloc(ptr);
 }
-void* memcpy(void* dst, const void* src, size_t n) {
-    uint8_t* dst8 = (uint8_t*)dst;
-    const uint8_t* src8 = (const uint8_t*)src;
-    for (size_t i = 0; i < n; i++) dst8[i] = src8[i];
+void* memcpy(void* dst, const void* src, size_t size) {
+    MathLib::MemoryCopy(src, dst, size);
     return dst;
 }
-void* memset(void *s, int c, size_t n) {
-    uint8_t* p = (uint8_t*)s;
-    for (size_t i = 0; i < n; i++) p[i] = (uint8_t)c;
-    return s;
+void* memset(void* dst, int value, size_t size) {
+    uint8_t* dst8 = (uint8_t*)dst;
+    for (size_t i = 0; i < size; i++) dst8[i] = (uint8_t)value;
+    return dst;
 }
-void* memmove(void* dst, const void* src, size_t n) {
+void* memmove(void* dst, const void* src, size_t size) {
     uint8_t* dst8 = (uint8_t*)dst;
     const uint8_t* src8 = (const uint8_t*)src;
     if (src > dst)
-        for (size_t i = 0; i < n; i++) dst8[i] = src8[i];
+        for (size_t i = 0; i < size; i++) dst8[i] = src8[i];
     else if (src < dst)
-        for (size_t i = n; i > 0; i--) dst8[i - 1] = src8[i - 1];
+        for (size_t i = size; i > 0; i--) dst8[i - 1] = src8[i - 1];
     return dst;
 }
-int memcmp(const void* s1, const void* s2, size_t n) {
-    const uint8_t* p1 = (const uint8_t*)s1;
-    const uint8_t* p2 = (const uint8_t*)s2;
-    for (size_t i = 0; i < n; i++)
-        if (p1[i] != p2[i]) return p1[i] < p2[i] ? -1 : 1;
+int memcmp(const void* a, const void* b, size_t size) {
+    const uint8_t* a8 = (const uint8_t*)a;
+    const uint8_t* b8 = (const uint8_t*)b;
+    for (size_t i = 0; i < size; i++)
+        if (a8[i] != b8[i]) return a8[i] < b8[i] ? -1 : 1;
     return 0;
 }

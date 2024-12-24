@@ -1,6 +1,6 @@
-#ifndef EquationSolver_Preprocesor_H
-#define EquationSolver_Preprocesor_H
-#include "../FileSystems/FileSystem.hpp"
+#ifndef MathLib_EquationSolver_Preprocesor_H
+#define MathLib_EquationSolver_Preprocesor_H
+#include "../FileSystem/FileSystem.hpp"
 
 namespace MathLib {
     /// @brief Reads file from given path

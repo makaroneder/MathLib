@@ -1,5 +1,5 @@
-#ifndef Emulator_X86_H
-#define Emulator_X86_H
+#ifndef MathLib_Emulator_X86_H
+#define MathLib_Emulator_X86_H
 #include "../Emulator.hpp"
 #include "X86Opcode.hpp"
 #include "X86State.hpp"
@@ -22,20 +22,23 @@ namespace MathLib {
         uint64_t ToLinear(uint64_t segment, uint64_t offset);
         template <typename T>
         Expected<T> Fetch(void) {
+            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(ToLinear(state.cs.value, state.ip.value));
             if (ret.HasValue()) state.ip.value += sizeof(T);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         template <typename T>
         bool Push(T value) {
+            StartBenchmark
             state.sp.value -= sizeof(T);
-            return WritePositioned<T>(value, ToLinear(state.ss.value, state.sp.value));
+            ReturnFromBenchmark(WritePositioned<T>(value, ToLinear(state.ss.value, state.sp.value)));
         }
         template <typename T>
         Expected<T> Pop(void) {
+            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(ToLinear(state.ss.value, state.sp.value));
             if (ret.HasValue()) state.sp.value += sizeof(T);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         Register* GetRegister(uint8_t code);
     };

@@ -1,20 +1,23 @@
 #include "MBRHeader.hpp"
-#include <stddef.h>
+#include "../Memory.hpp"
 
 namespace MathLib {
     MBRHeader::MBRHeader(void) : uniqueDiskID(0xbeefed00), attributes(Attributes::Normal), signature(expectedSignature) {
-        for (size_t i = 0; i < SizeOfArray(code); i++) code[i] = 0;
-        for (size_t i = 0; i < 4; i++) entries[i] = MBRPartitionEntry();
+        StartBenchmark
+        for (uint8_t i = 0; i < SizeOfArray(code); i++) code[i] = 0;
+        for (uint8_t i = 0; i < 4; i++) entries[i] = MBRPartitionEntry();
+        EndBenchmark
     }
     bool MBRHeader::IsValid(void) const {
+        StartBenchmark
         bool active = false;
-        for (size_t i = 0; i < 4; i++) {
-            if (!entries[i].IsValid()) return false;
+        for (uint8_t i = 0; i < 4; i++) {
+            if (!entries[i].IsValid()) ReturnFromBenchmark(false)
             else if (entries[i].type == MBRPartitionEntry::Type::Active) {
-                if (active) return false;
+                if (active) ReturnFromBenchmark(false);
                 active = true;
             }
         }
-        return (attributes == Attributes::Normal || attributes == Attributes::ReadOnly) && signature == expectedSignature;
+        ReturnFromBenchmark((attributes == Attributes::Normal || attributes == Attributes::ReadOnly) && signature == expectedSignature);
     }
 }

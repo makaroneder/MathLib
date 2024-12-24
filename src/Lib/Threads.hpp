@@ -1,5 +1,5 @@
-#ifndef Threads_H
-#define Threads_H
+#ifndef MathLib_Threads_H
+#define MathLib_Threads_H
 #include "Thread.hpp"
 #include "Host.hpp"
 

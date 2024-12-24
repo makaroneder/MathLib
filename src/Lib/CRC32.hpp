@@ -1,5 +1,5 @@
-#ifndef CRC32_H
-#define CRC32_H
+#ifndef MathLib_CRC32_H
+#define MathLib_CRC32_H
 #include "Typedefs.hpp"
 
 namespace MathLib {

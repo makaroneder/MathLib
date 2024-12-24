@@ -1,7 +1,6 @@
-#ifndef Interfaces_Printable_H
-#define Interfaces_Printable_H
+#ifndef MathLib_Interfaces_Printable_H
+#define MathLib_Interfaces_Printable_H
 #include "../Typedefs.hpp"
-#include "Allocatable.hpp"
 
 namespace MathLib {
     /// @brief Interface for printable structures

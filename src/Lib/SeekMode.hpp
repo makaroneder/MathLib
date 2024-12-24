@@ -1,5 +1,5 @@
-#ifndef SeekMode_H
-#define SeekMode_H
+#ifndef MathLib_SeekMode_H
+#define MathLib_SeekMode_H
 
 namespace MathLib {
     /// @brief Mode to use when setting position

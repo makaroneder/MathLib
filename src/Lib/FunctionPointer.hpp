@@ -1,18 +1,24 @@
-#ifndef FunctionPointer_H
-#define FunctionPointer_H
+#ifndef MathLib_FunctionPointer_H
+#define MathLib_FunctionPointer_H
 #include "Interfaces/Function.hpp"
 
 namespace MathLib {
     template <typename Ret, typename... Args>
     struct FunctionPointer : Function<Ret, Args...> {
         using RawFunction = Ret (*)(const void*, Args...);
-        FunctionPointer(void) {}
-        FunctionPointer(void* data, RawFunction function) : Function<Ret, Args...>(data), function(function) {}
+        FunctionPointer(void) {
+            EmptyBenchmark
+        }
+        FunctionPointer(void* data, RawFunction function) : Function<Ret, Args...>(data), function(function) {
+            EmptyBenchmark
+        }
         RawFunction GetFunction(void) const {
-            return function;
+            StartBenchmark
+            ReturnFromBenchmark(function);
         }
         virtual Ret Invoke(const void* data, Args... args) const override {
-            return function(data, args...);
+            StartBenchmark
+            ReturnFromBenchmark(function(data, args...));
         }
 
         private:

@@ -1,5 +1,5 @@
-#ifndef Interfaces_Writeable_H
-#define Interfaces_Writeable_H
+#ifndef MathLib_Interfaces_Writeable_H
+#define MathLib_Interfaces_Writeable_H
 #include "../Expected.hpp"
 
 namespace MathLib {
@@ -28,7 +28,8 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         bool Write(const T& value) {
-            return WriteBuffer(&value, sizeof(T));
+            StartBenchmark
+            ReturnFromBenchmark(WriteBuffer(&value, sizeof(T)));
         }
     };
 }

@@ -1,5 +1,5 @@
-#ifndef MBR_PartitionEntry_H
-#define MBR_PartitionEntry_H
+#ifndef MathLib_MBR_PartitionEntry_H
+#define MathLib_MBR_PartitionEntry_H
 #include "MBRPartitionEntryCHS.hpp"
 #include "../Interval.hpp"
 

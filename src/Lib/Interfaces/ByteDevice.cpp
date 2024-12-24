@@ -1,27 +1,34 @@
 #include "ByteDevice.hpp"
 
 namespace MathLib {
-    ByteDevice::ByteDevice(void) : position(0) {}
+    ByteDevice::ByteDevice(void) : position(0) {
+        EmptyBenchmark
+    }
     size_t ByteDevice::ReadSizedBuffer(void* buffer, size_t size) {
+        StartBenchmark
         const size_t s = ReadPositionedSizedBuffer(buffer, size, position);
         position += s;
-        return s;
+        ReturnFromBenchmark(s);
     }
     size_t ByteDevice::WriteSizedBuffer(const void* buffer, size_t size) {
+        StartBenchmark
         const size_t s = WritePositionedSizedBuffer(buffer, size, position);
         position += s;
-        return s;
+        ReturnFromBenchmark(s);
     }
     bool ByteDevice::ReadPositionedBuffer(void* buffer, size_t size, size_t position) {
-        return ReadPositionedSizedBuffer(buffer, size, position) == size;
+        StartBenchmark
+        ReturnFromBenchmark(ReadPositionedSizedBuffer(buffer, size, position) == size);
     }
     bool ByteDevice::WritePositionedBuffer(const void* buffer, size_t size, size_t position) {
-        return WritePositionedSizedBuffer(buffer, size, position) == size;
+        StartBenchmark
+        ReturnFromBenchmark(WritePositionedSizedBuffer(buffer, size, position) == size);
     }
     bool ByteDevice::Seek(ssize_t offset, SeekMode mode) {
+        StartBenchmark
         switch (mode) {
             case SeekMode::Set: {
-                if (offset < 0) return false;
+                if (offset < 0) ReturnFromBenchmark(false);
                 position = offset;
                 break;
             }
@@ -30,15 +37,16 @@ namespace MathLib {
                 break;
             }
             case SeekMode::End: {
-                if (offset < 0 || GetSize() < (size_t)offset) return false;
+                if (offset < 0 || GetSize() < (size_t)offset) ReturnFromBenchmark(false);
                 position = GetSize() - offset;
                 break;
             }
-            default: return false;
+            default: ReturnFromBenchmark(false);
         }
-        return true;
+        ReturnFromBenchmark(true);
     }
     size_t ByteDevice::Tell(void) const {
-        return position;
+        StartBenchmark
+        ReturnFromBenchmark(position);
     }
 }

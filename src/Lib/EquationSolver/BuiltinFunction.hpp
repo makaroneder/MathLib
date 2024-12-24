@@ -1,5 +1,5 @@
-#ifndef EquationSolver_BuiltinFunction_H
-#define EquationSolver_BuiltinFunction_H
+#ifndef MathLib_EquationSolver_BuiltinFunction_H
+#define MathLib_EquationSolver_BuiltinFunction_H
 #include "Node.hpp"
 #include "../FunctionPointer.hpp"
 

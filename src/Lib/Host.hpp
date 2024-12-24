@@ -1,5 +1,5 @@
-#ifndef Host_H
-#define Host_H
+#ifndef MathLib_Host_H
+#define MathLib_Host_H
 #include "Math/Complex.hpp"
 #ifndef Freestanding
 #include <ostream>

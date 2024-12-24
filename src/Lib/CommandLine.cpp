@@ -2,8 +2,11 @@
 #include "String.hpp"
 
 namespace MathLib {
-    CommandLineEntry::CommandLineEntry(const String& name, const String& value) : name(name), value(value) {}
+    CommandLineEntry::CommandLineEntry(const String& name, const String& value) : name(name), value(value) {
+        EmptyBenchmark
+    }
     CommandLine::CommandLine(size_t argc, const char** argv) {
+        StartBenchmark
         String prevName = "";
         for (size_t i = 1; i < argc; i++) {
             const String arg = argv[i];
@@ -17,10 +20,12 @@ namespace MathLib {
             }
             else Panic(String("Unknown command line entry: '") + arg + '\'');
         }
+        EndBenchmark
     }
     Expected<String> CommandLine::GetEntry(const String& name) const {
+        StartBenchmark
         for (const CommandLineEntry& entry : entries)
-            if (entry.name == name) return Expected<String>(entry.value);
-        return Expected<String>();
+            if (entry.name == name) ReturnFromBenchmark(Expected<String>(entry.value));
+        ReturnFromBenchmark(Expected<String>());
     }
 }

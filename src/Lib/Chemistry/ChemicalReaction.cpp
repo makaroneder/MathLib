@@ -1,9 +1,14 @@
 #include "ChemicalReaction.hpp"
 
 namespace MathLib {
-    ChemicalReaction::ChemicalReaction(void) {}
-    ChemicalReaction::ChemicalReaction(const Array<ChemicalMolecule>& left, const Array<ChemicalMolecule>& right) : left(left), right(right) {}
+    ChemicalReaction::ChemicalReaction(void) {
+        EmptyBenchmark
+    }
+    ChemicalReaction::ChemicalReaction(const Array<ChemicalMolecule>& left, const Array<ChemicalMolecule>& right) : left(left), right(right) {
+        EmptyBenchmark
+    }
     Expected<ChemicalReaction> ChemicalReaction::Create(const Array<ChemicalMolecule>& input) {
+        StartBenchmark
         Array<ChemicalMolecule> ret;
         if (input.GetSize() == 2) {
             Array<ChemicalElement> l0 = input.At(0).GetElements();
@@ -29,9 +34,10 @@ namespace MathLib {
                 ret.Add(ChemicalMolecule(arr, 1));
             }
         }
-        return ret.GetSize() ? Expected<ChemicalReaction>(ChemicalReaction(input, ret)) : Expected<ChemicalReaction>();
+        ReturnFromBenchmark(ret.GetSize() ? Expected<ChemicalReaction>(ChemicalReaction(input, ret)) : Expected<ChemicalReaction>());
     }
     Array<ChemicalReactionElement> ChemicalReaction::GetReactionElements(bool left_) const {
+        StartBenchmark
         Array<ChemicalReactionElement> elements;
         Array<ChemicalMolecule> molecules = left_ ? left : right;
         for (size_t i = 0; i < molecules.GetSize(); i++) {
@@ -52,9 +58,10 @@ namespace MathLib {
                 }
             }
         }
-        return elements;
+        ReturnFromBenchmark(elements);
     }
     Expected<ChemicalReaction> ChemicalReaction::Balance(void) const {
+        StartBenchmark
         const Array<ChemicalReactionElement> l = GetReactionElements(true);
         const Array<ChemicalReactionElement> r = GetReactionElements(false);
         const size_t size = left.GetSize() + right.GetSize() - 1;
@@ -86,13 +93,13 @@ namespace MathLib {
             }
         }
         Expected<Matrix<num_t>> tmp = a.GetInverse();
-        if (!tmp.HasValue()) return Expected<ChemicalReaction>();
+        if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
         tmp = tmp.Get() * b;
-        if (!tmp.HasValue()) return Expected<ChemicalReaction>();
+        if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
         const Matrix<num_t> x = tmp.Get();
         for (size_t i = 1; true; i++) {
             tmp = x * i;
-            if (!tmp.HasValue()) return Expected<ChemicalReaction>();
+            if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
             const Matrix<num_t> tmpMat = tmp.Get();
             bool ok = true;
             for (size_t y = 0; y < tmpMat.GetHeight() && ok; y++)
@@ -102,18 +109,19 @@ namespace MathLib {
                 for (size_t j = 0; j < ret.left.GetSize(); j++) ret.left.At(j).count = Round(tmpMat.At(0, j));
                 for (size_t j = 0; j < ret.right.GetSize() - 1; j++) ret.right.At(j).count = Round(tmpMat.At(0, j + ret.left.GetSize()));
                 ret.right.At(ret.right.GetSize() - 1).count = Round(i);
-                return Expected<ChemicalReaction>(ret);
+                ReturnFromBenchmark(Expected<ChemicalReaction>(ret));
             }
         }
-        return Expected<ChemicalReaction>();
+        ReturnFromBenchmark(Expected<ChemicalReaction>());
     }
     String ChemicalReaction::ToString(const String& padding) const {
+        StartBenchmark
         String ret = padding;
         for (size_t i = 0; i < left.GetSize(); i++)
             ret += left.At(i).ToString() + ((i + 1) == left.GetSize() ? "" : " + ");
         ret += " => ";
         for (size_t i = 0; i < right.GetSize(); i++)
             ret += right.At(i).ToString() + ((i + 1) == right.GetSize() ? "" : " + ");
-        return ret;
+        ReturnFromBenchmark(ret);
     }
 }

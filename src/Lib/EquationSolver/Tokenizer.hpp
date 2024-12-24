@@ -1,5 +1,5 @@
-#ifndef EquationSolver_Tokenizer_H
-#define EquationSolver_Tokenizer_H
+#ifndef MathLib_EquationSolver_Tokenizer_H
+#define MathLib_EquationSolver_Tokenizer_H
 #include "Node.hpp"
 
 namespace MathLib {

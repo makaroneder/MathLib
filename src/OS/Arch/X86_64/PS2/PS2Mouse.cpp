@@ -34,12 +34,12 @@ void PS2Mouse::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
             const PS2Mouse5ButtonsPacket packet4 = *(const PS2Mouse5ButtonsPacket*)&packets[3];
             if (packet4.alwaysZero) MathLib::Panic("Invalid 5 buttons packet");
             GetZ(position) += (int8_t)packet4.z;
-            if (packet4.button4) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button4, true));
-            if (packet4.button5) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button5, true));
+            if (packet4.button4 && !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button4, true))) MathLib::Panic("Failed to send event to renderer");
+            if (packet4.button5 && !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button5, true))) MathLib::Panic("Failed to send event to renderer");
         }
-        if (packet1.leftButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Left, true));
-        if (packet1.middleButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Middle, true));
-        if (packet1.rightButton) renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Right, true));
+        if (packet1.leftButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Left, true))) MathLib::Panic("Failed to send event to renderer");
+        if (packet1.middleButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Middle, true))) MathLib::Panic("Failed to send event to renderer");
+        if (packet1.rightButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Right, true))) MathLib::Panic("Failed to send event to renderer");
     }
 }
 bool PS2Mouse::SetSampleRate(uint8_t sampleRate) {

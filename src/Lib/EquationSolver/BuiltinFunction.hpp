@@ -21,7 +21,7 @@ namespace MathLib {
     };
     /// @brief Creates default builtin functions for equation solver
     /// @return Default builtin functions
-    Array<BuiltinFunction> CreateDefaultBuiltinFunctions(void);
+    [[nodiscard]] Array<BuiltinFunction> CreateDefaultBuiltinFunctions(void);
 }
 
 #endif

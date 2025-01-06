@@ -20,17 +20,17 @@ namespace MathLib {
         virtual ~Buffer(void) override {
             delete [] buffer;
         }
-        virtual T At(size_t index) const override {
+        [[nodiscard]] virtual T At(size_t index) const override {
             if (index >= size) Panic("Index out of bounds");
             if (!buffer) Panic("Buffer allocation failed");
             return buffer[index];
         }
-        virtual T& At(size_t index) override {
+        [[nodiscard]] virtual T& At(size_t index) override {
             if (index >= size) Panic("Index out of bounds");
             if (!buffer) Panic("Buffer allocation failed");
             return buffer[index];
         }
-        virtual bool Add(const T& val) override {
+        [[nodiscard]] virtual bool Add(const T& val) override {
             T* tmp = new T[size + 1];
             if (!tmp) return false;
             for (size_t i = 0; i < size; i++) tmp[i] = buffer[i];
@@ -39,10 +39,10 @@ namespace MathLib {
             buffer = tmp;
             return true;
         }
-        virtual size_t GetSize(void) const override {
+        [[nodiscard]] virtual size_t GetSize(void) const override {
             return size;
         }
-        virtual const T* GetValue(void) const override {
+        [[nodiscard]] virtual const T* GetValue(void) const override {
             return buffer;
         }
         Buffer<T>& operator=(const Buffer<T>& other) {

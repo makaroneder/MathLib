@@ -5,8 +5,10 @@
 namespace MathLib {
     Optimizer::Optimizer(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
         StartBenchmark
-        for (const BuiltinFunction& func : builtinFuncs) builtinFunctions.Add(func);
-        for (const Variable& var : vars) variables.Add(var);
+        for (const BuiltinFunction& func : builtinFuncs)
+            if (!builtinFunctions.Add(func)) Panic("Failed to add builtin function");
+        for (const Variable& var : vars)
+            if (!variables.Add(var)) Panic("Failed to add variable");
         EndBenchmark
     }
     Optimizer::Optimizer(Optimizer* parent) : builtinFunctions(), functions(), variables(), runtime(parent->runtime), parent(parent) {
@@ -172,15 +174,19 @@ namespace MathLib {
             Node* l = OptimizeInternal(node->left);
             Node* r = OptimizeInternal(node->right);
             if (l->type == Node::Type::Variable && (r->type == Node::Type::Constant || r->type == Node::Type::Array || r->type == Node::Type::String || r->type == Node::Type::Struct)) {
-                variables.Add(Variable(l->value, l->left->value, r->Recreate(), true));
+                if (!variables.Add(Variable(l->value, l->left->value, r->Recreate(), true))) {
+                    delete l;
+                    ReturnFromBenchmark(nullptr)
+                }
                 delete l;
                 ReturnFromBenchmark(r)
             }
             else if (l->type == Node::Type::Function && l->right != nullptr) {
                 Array<Variable> args;
                 Array<const Node*> nodeArgs = CommaToArray(l->left);
-                for (const Node*& arg : nodeArgs) args.Add(Variable(arg->value, arg->left->value, "0", true));
-                functions.Add(FunctionNode(l->value, args, r->Recreate(), l->right->value));
+                for (const Node*& arg : nodeArgs)
+                    if (!args.Add(Variable(arg->value, arg->left->value, "0", true))) ReturnFromBenchmark(nullptr);
+                if (!functions.Add(FunctionNode(l->value, args, r->Recreate(), l->right->value))) ReturnFromBenchmark(nullptr);
             }
             ReturnFromBenchmark(new Node(Node::Type::Equal, "", l, r))
         }
@@ -194,8 +200,7 @@ namespace MathLib {
                 var->value = value->Recreate();
                 ReturnFromBenchmark(value)
             }
-            variables.Add(Variable(node->left->value, node->left->left->value, value->Recreate(), false));
-            ReturnFromBenchmark(value)
+            ReturnFromBenchmark(variables.Add(Variable(node->left->value, node->left->left->value, value->Recreate(), false)) ? value : nullptr)
         }
         else if (node->type == Node::Type::Absolute) {
             Node* n = OptimizeInternal(node->left);

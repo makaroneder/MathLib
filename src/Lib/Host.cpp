@@ -2,7 +2,7 @@
 #include "Math/Trigonometry.hpp"
 
 namespace MathLib {
-    [[noreturn]] void Panic(String str) {
+    void Panic(String str) {
         StartBenchmark
         Panic(str.GetValue());
         EndBenchmark
@@ -70,14 +70,6 @@ namespace MathLib {
     num_t Abs(num_t x) {
         StartBenchmark
         ReturnFromBenchmark(x < 0 ? -x : x);
-    }
-    num_t Max(num_t x, num_t y) {
-        StartBenchmark
-        ReturnFromBenchmark((x < y) ? y : x);
-    }
-    num_t Min(num_t x, num_t y) {
-        StartBenchmark
-        ReturnFromBenchmark((x < y) ? x : y);
     }
     num_t Pow(num_t x, num_t y) {
         StartBenchmark

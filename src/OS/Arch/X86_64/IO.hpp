@@ -6,7 +6,7 @@
 template <typename T>
 void WritePort(uint16_t port, T value);
 template <typename T>
-T ReadPort(uint16_t port);
+[[nodiscard]] T ReadPort(uint16_t port);
 void IOWait(void);
 
 #endif

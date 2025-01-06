@@ -26,7 +26,7 @@ CMOSFloppyData CMOS::GetFloppyData(void) const {
 }
 void CMOS::SetNMI(bool nmi_) {
     nmi = nmi_;
-    Read((Register)ReadPort<uint8_t>(0x70));
+    (void)Read((Register)ReadPort<uint8_t>(0x70));
 }
 
 #endif

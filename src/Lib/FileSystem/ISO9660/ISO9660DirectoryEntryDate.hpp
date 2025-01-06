@@ -12,7 +12,7 @@ namespace MathLib {
         uint8_t second;
         uint8_t timeZoneOffset;
 
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

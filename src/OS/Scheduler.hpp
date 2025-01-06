@@ -4,6 +4,6 @@
 
 extern size_t currentTask;
 
-bool StartScheduler(const MathLib::FunctionPointer<void, size_t>& task);
+[[nodiscard]] bool StartScheduler(const MathLib::FunctionPointer<void, size_t>& task);
 
 #endif

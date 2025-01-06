@@ -5,7 +5,7 @@
 
 struct X87FloatException : Exception {
     X87FloatException(void);
-    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
+    [[nodiscard]] virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

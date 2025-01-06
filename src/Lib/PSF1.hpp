@@ -20,17 +20,17 @@ namespace MathLib {
 
         /// @brief Checks whether the font is valid
         /// @return Validation status
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
         /// @brief Returns width of each glyph in the font
         /// @return Width of each glyph in the font
-        size_t GetWidth(void) const;
+        [[nodiscard]] size_t GetWidth(void) const;
         /// @brief Returns height of each glyph in the font
         /// @return Height of each glyph in the font
-        size_t GetHeight(void) const;
+        [[nodiscard]] size_t GetHeight(void) const;
         /// @brief Returns glyph
         /// @param chr Character to return glyph of
         /// @return Glyph
-        const uint8_t* GetGlyph(char chr) const;
+        [[nodiscard]] const uint8_t* GetGlyph(char chr) const;
     } __attribute__((packed));
 }
 

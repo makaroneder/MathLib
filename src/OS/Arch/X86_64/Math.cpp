@@ -15,30 +15,25 @@ bool InitMath(void) {
         asm volatile("fxsave %0" :: "m"(fxsaveRegion));
         if (d & (1 << (uint8_t)CPUIDBits::D1FPU)) {
             const MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
-            if (!tmp.HasValue()) return false;
-            SetControlRegister(0, tmp.Get() & ~((1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched)));
+            if (!tmp.HasValue() || !SetControlRegister(0, tmp.Get() & ~((1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched)))) return false;
             asm volatile("fninit");
             hasFPU = true;
         }
         else {
             const MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
-            if (!tmp.HasValue()) return false;
-            SetControlRegister(0, tmp.Get() | (1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched));
+            if (!tmp.HasValue() || !SetControlRegister(0, tmp.Get() | (1 << (uint8_t)ControlRegister0::Emulation) | (1 << (uint8_t)ControlRegister0::TaskSwitched))) return false;
         }
         if (d & (1 << (uint8_t)CPUIDBits::D1SSE)) {
             MathLib::Expected<uintptr_t> tmp = GetControlRegister(0);
-            if (!tmp.HasValue()) return false;
-            SetControlRegister(0, (tmp.Get() & ~(1 << (uint8_t)ControlRegister0::Emulation)) | (1 << (uint8_t)ControlRegister0::MonitorCoProcessor));
+            if (!tmp.HasValue() || !SetControlRegister(0, (tmp.Get() & ~(1 << (uint8_t)ControlRegister0::Emulation)) | (1 << (uint8_t)ControlRegister0::MonitorCoProcessor))) return false;
             tmp = GetControlRegister(4);
-            if (!tmp.HasValue()) return false;
-            SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::FXSaveOSSupport) | (1 << (uint8_t)ControlRegister4::UnmaskedSIMDFloatExceptionsOSSupport));
+            if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::FXSaveOSSupport) | (1 << (uint8_t)ControlRegister4::UnmaskedSIMDFloatExceptionsOSSupport))) return false;
             sseEnabled = true;
         }
     }
     if (c & (1 << (uint8_t)CPUIDBits::C1XSave)) {
         const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
-        if (!tmp.HasValue()) return false;
-        SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::XSaveEnable));
+        if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | (1 << (uint8_t)ControlRegister4::XSaveEnable))) return false;
         if (sseEnabled && c & (1 << (uint8_t)CPUIDBits::C1AVX)) asm volatile (
             "xor %%rcx, %%rcx\n"
             "xgetbv\n"

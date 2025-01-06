@@ -32,7 +32,6 @@ int main(int argc, char** argv) {
             ELFProgramHeader* programHeader = (ELFProgramHeader*)buff;
             std::cout << "ELF program header " << i << ": " << programHeader->ToString() << std::endl;
         }
-        // TODO: Print other data
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

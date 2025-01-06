@@ -6,7 +6,7 @@
 #include <Logger.hpp>
 #include <String.hpp>
 
-MathLib::String PCIAddressToString(uint16_t segment, uint8_t bus, uint8_t device, uint8_t function) {
+[[nodiscard]] MathLib::String PCIAddressToString(uint16_t segment, uint8_t bus, uint8_t device, uint8_t function) {
     return MathLib::String("PCI ") + MathLib::ToString(segment) + '/' + MathLib::ToString(bus) + '/' + MathLib::ToString(device) + '/' + MathLib::ToString(function);
 }
 bool InitPCI(const MCFG* mcfg) {

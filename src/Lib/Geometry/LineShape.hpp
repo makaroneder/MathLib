@@ -9,7 +9,7 @@ namespace MathLib {
         LineShape(const Matrix<T>& pos) : Shape<T>(pos) {
             EmptyBenchmark
         }
-        virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const = 0;
+        [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const = 0;
     };
 }
 

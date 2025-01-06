@@ -1,6 +1,7 @@
 #ifndef MathLib_Color_H
 #define MathLib_Color_H
 #include "Math/Constants.hpp"
+#include "Math/Matrix.hpp"
 #include "Interval.hpp"
 
 namespace MathLib {
@@ -29,13 +30,19 @@ namespace MathLib {
         /// @param b Blue channel
         /// @param a Alpha channel
         Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+        template <typename T>
+        [[nodiscard]] static Color FromVector(const Matrix<T>& v) {
+            StartBenchmark
+            const Color ret = Color(GetX(v) * UINT8_MAX, GetY(v) * UINT8_MAX, GetZ(v) * UINT8_MAX, v.At(3, 0) * UINT8_MAX);
+            ReturnFromBenchmark(ret);
+        }
     };
     /// @brief R(t) = [255 * sin^2(t), 255 * sin^2(t + 0.66 * pi), 255 * sin^2(t + 1.32 * pi), 255]
     /// @tparam T Type of number
     /// @param t Rainbow index
     /// @return Rainbow color
     template <typename T>
-    uint32_t GetRainbow(const T& t) {
+    [[nodiscard]] uint32_t GetRainbow(const T& t) {
         StartBenchmark
         ReturnFromBenchmark(Color(UINT8_MAX * Pow(Sin(t), 2), UINT8_MAX * Pow(Sin(t + 0.66 * pi), 2), UINT8_MAX * Pow(Sin(t + 1.32 * pi), 2), UINT8_MAX).hex);
     }
@@ -43,7 +50,7 @@ namespace MathLib {
     /// @param c1 Previus color
     /// @param c2 New color
     /// @return Blended colors
-    uint32_t BlendColor(uint32_t c1, uint32_t c2);
+    [[nodiscard]] uint32_t BlendColor(uint32_t c1, uint32_t c2);
 }
 
 #endif

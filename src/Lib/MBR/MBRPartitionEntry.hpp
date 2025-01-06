@@ -228,8 +228,8 @@ namespace MathLib {
 
         MBRPartitionEntry(void);
         MBRPartitionEntry(const Interval<uint32_t>& lba, ID id, Type type = Type::Normal, uint8_t heads = 16, uint8_t sectors = 63);
-        bool IsValid(void) const;
-        Interval<uint32_t> GetInterval(void) const;
+        [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] Interval<uint32_t> GetInterval(void) const;
     } __attribute__((packed));
 }
 

@@ -13,7 +13,7 @@ namespace MathLib {
     template <typename T>
     struct Matrix : Iteratable<T>, Printable, Saveable {
         CreateOperators(Matrix<T>, T)
-        CreateExponential(Matrix<T>, width == height, Identity(width))
+        CreateExponential(Matrix<T>, IsSquare(), Identity(width))
         /// @brief Creates a new matrix
         /// @param width Width of matrix
         /// @param height Height of matrix
@@ -29,29 +29,33 @@ namespace MathLib {
         Matrix(size_t width, size_t height, const Array<T>& arr) : width(width), height(height), ptr(arr) {
             EmptyBenchmark
         }
-        static Matrix<T> Identity(size_t n) {
+        [[nodiscard]] static Matrix<T> Identity(size_t n) {
             StartBenchmark
             Matrix<T> ret = Matrix<T>(n, n);
             for (size_t i = 0; i < n; i++) ret.At(i, i) = 1;
             ReturnFromBenchmark(ret);
         }
-        size_t GetWidth(void) const {
+        [[nodiscard]] size_t GetWidth(void) const {
             StartBenchmark
             ReturnFromBenchmark(width);
         }
-        size_t GetHeight(void) const {
+        [[nodiscard]] size_t GetHeight(void) const {
             StartBenchmark
             ReturnFromBenchmark(height);
         }
-        Array<T> GetValue(void) const {
+        [[nodiscard]] Array<T> GetValue(void) const {
             StartBenchmark
             ReturnFromBenchmark(ptr);
         }
-        Matrix<T> GetRow(size_t y) const {
+        [[nodiscard]] Matrix<T> GetRow(size_t y) const {
             StartBenchmark
             Array<T> ret = Array<T>(width);
             for (size_t x = 0; x < width; x++) ret.At(x) = At(x, y);
             ReturnFromBenchmark(Matrix<T>(width, 1, ret));
+        }
+        [[nodiscard]] bool IsSquare(void) const {
+            StartBenchmark
+            ReturnFromBenchmark(width == height);
         }
         void Fill(const T& v) {
             StartBenchmark
@@ -67,7 +71,7 @@ namespace MathLib {
         /// @param x X position
         /// @param y Y position
         /// @return Data at specified position
-        T& At(size_t x, size_t y) {
+        [[nodiscard]] T& At(size_t x, size_t y) {
             StartBenchmark
             ReturnFromBenchmark(ptr.At(y * width + x));
         }
@@ -75,32 +79,32 @@ namespace MathLib {
         /// @param x X position
         /// @param y Y position
         /// @return Data at specified position
-        T At(size_t x, size_t y) const {
+        [[nodiscard]] T At(size_t x, size_t y) const {
             StartBenchmark
             ReturnFromBenchmark(ptr.At(y * width + x));
         }
         /// @brief a = (a . b) / (|a| * |b|)
         /// @param other Other matrix
         /// @return Angle between 2 matrices
-        T GetAngle(const Matrix<T>& other) const {
+        [[nodiscard]] T GetAngle(const Matrix<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(Dot(other) / (GetLength() * other.GetLength()));
         }
         /// @brief |a|^2 = a . a
         /// @return Squared length of the vector
-        T GetLengthSquared(void) const {
+        [[nodiscard]] T GetLengthSquared(void) const {
             StartBenchmark
             ReturnFromBenchmark(Dot(*this));
         }
         /// @brief |a| = sqrt(a . a)
         /// @return Length of the vector
-        T GetLength(void) const {
+        [[nodiscard]] T GetLength(void) const {
             StartBenchmark
             ReturnFromBenchmark(Sqrt(GetLengthSquared()));
         }
         /// @brief ^a = a / |a|
         /// @return Normalized matrix
-        Matrix<T> Normalize(void) const {
+        [[nodiscard]] Matrix<T> Normalize(void) const {
             StartBenchmark
             const T len = GetLength();
             ReturnFromBenchmark(FloatsEqual<T>(len, 0) ? *this : (*this / len));
@@ -108,7 +112,7 @@ namespace MathLib {
         /// @brief a . b = a_0 * b_0 + ... + a_n * b_n
         /// @param other Other matrix
         /// @return Dot product of 2 vectors
-        T Dot(const Matrix<T>& other) const {
+        [[nodiscard]] T Dot(const Matrix<T>& other) const {
             StartBenchmark
             if (other.width != width || other.height != height) ReturnFromBenchmark(MakeNaN());
             T ret = 0;
@@ -118,7 +122,7 @@ namespace MathLib {
         }
         /// @brief ln(A) = (-1)^(1 + 1) * ((A - I)^1 / 1) + ... + (-1)^(1 + ∞) * ((A - I)^∞ / ∞)
         /// @return Logarithm of matrix
-        Expected<Matrix<T>> Log(void) const {
+        [[nodiscard]] Expected<Matrix<T>> Log(void) const {
             StartBenchmark
             const Matrix<T> identity = Identity(width);
             Matrix<T> ret = Matrix<T>(width, height);
@@ -131,7 +135,7 @@ namespace MathLib {
         }
         /// @brief e^X = X^0 / 0! + ... + X^∞ / ∞!
         /// @return Exponential of matrix
-        Expected<Matrix<T>> Exponential(void) const {
+        [[nodiscard]] Expected<Matrix<T>> Exponential(void) const {
             StartBenchmark
             Matrix<T> ret = Matrix<T>(width, height);
             for (size_t k = 0; k < 100; k++) {
@@ -144,7 +148,7 @@ namespace MathLib {
         /// @brief X^n = exp(ln(X) * n)
         /// @param n Exponent
         /// @return Power of matrix
-        Expected<Matrix<T>> Pow(T n) const {
+        [[nodiscard]] Expected<Matrix<T>> Pow(T n) const {
             StartBenchmark
             if (n < 0) {
                 const Expected<Matrix<T>> tmp = GetInverse();
@@ -158,7 +162,7 @@ namespace MathLib {
         /// @brief X^n = exp(ln(X) * n)
         /// @param n Exponent matrix
         /// @return Power of matrix
-        Expected<Matrix<T>> Pow(Matrix<T> n) const {
+        [[nodiscard]] Expected<Matrix<T>> Pow(Matrix<T> n) const {
             StartBenchmark
             const Expected<Matrix<T>> tmp = Log();
             ReturnFromBenchmark(tmp.HasValue() ? (tmp.Get() * n).Exponential() : Expected<Matrix<T>>());
@@ -166,7 +170,7 @@ namespace MathLib {
         /// @brief Checks whether the matrix is multiple of another matrix
         /// @param other Another matrix
         /// @return Check status
-        bool IsMultipleOf(const Matrix<T>& other) const {
+        [[nodiscard]] bool IsMultipleOf(const Matrix<T>& other) const {
             StartBenchmark
             if (other.width != width || other.height != height) ReturnFromBenchmark(false);
             T prev = 0;
@@ -182,9 +186,9 @@ namespace MathLib {
         }
         /// @brief Returns determinant of the matrix
         /// @return Determinant of the matrix
-        T GetDeterminant(void) const {
+        [[nodiscard]] T GetDeterminant(void) const {
             StartBenchmark
-            if (width != height) ReturnFromBenchmark(MakeNaN())
+            if (!IsSquare()) ReturnFromBenchmark(MakeNaN())
             else if (!width) ReturnFromBenchmark(1)
             else if (width == 1) ReturnFromBenchmark(At(0, 0))
             else if (width == 2) ReturnFromBenchmark(At(0, 0) * At(1, 1) - At(0, 1) * At(1, 0))
@@ -204,7 +208,7 @@ namespace MathLib {
         }
         /// @brief Returns transpose of the matrix
         /// @return Transpose of the matrix
-        Matrix<T> GetTranspose(void) const {
+        [[nodiscard]] Matrix<T> GetTranspose(void) const {
             StartBenchmark
             Matrix<T> ret = Matrix<T>(height, width);
             for (size_t y = 0; y < height; y++)
@@ -213,9 +217,9 @@ namespace MathLib {
         }
         /// @brief Returns cofactor of the matrix
         /// @return Cofactor of the matrix
-        Expected<Matrix<T>> GetCofactor(void) const {
+        [[nodiscard]] Expected<Matrix<T>> GetCofactor(void) const {
             StartBenchmark
-            if (width != height) ReturnFromBenchmark(Expected<Matrix<T>>());
+            if (!IsSquare()) ReturnFromBenchmark(Expected<Matrix<T>>());
             Matrix<T> ret = Matrix<T>(width, width);
             Matrix<T> sub = Matrix<T>(width - 1, width - 1);
             for (size_t i = 0; i < width; i++) {
@@ -238,7 +242,7 @@ namespace MathLib {
         }
         /// @brief Returns inverse of the matrix
         /// @return Inverse of the matrix
-        Expected<Matrix<T>> GetInverse(void) const {
+        [[nodiscard]] Expected<Matrix<T>> GetInverse(void) const {
             StartBenchmark
             const Expected<Matrix<T>> tmp = GetCofactor();
             const T determinant = GetDeterminant();
@@ -247,7 +251,7 @@ namespace MathLib {
         /// @brief Converts matrix to string
         /// @param padding String to pad with
         /// @return String representation of matrix
-        virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
             if (height == 1) {
                 String ret = padding + "[";
@@ -267,7 +271,7 @@ namespace MathLib {
         /// @brief Multiplies 2 matrices
         /// @param other Another matrix
         /// @return Result of multiplication
-        Expected<Matrix<T>> operator*(const Matrix<T>& other) const {
+        [[nodiscard]] Expected<Matrix<T>> operator*(const Matrix<T>& other) const {
             StartBenchmark
             if (width != other.height) ReturnFromBenchmark(Expected<Matrix<T>>());
             Matrix<T> ret = Matrix<T>(other.width, height);
@@ -282,7 +286,7 @@ namespace MathLib {
         /// @brief Compares current matrix with another matrix
         /// @param other Other matrix
         /// @return Data equality
-        bool operator==(const Matrix<T>& other) const {
+        [[nodiscard]] bool operator==(const Matrix<T>& other) const {
             StartBenchmark
             bool ret = other.width == width && other.height == height;
             for (size_t y = 0; y < height && ret; y++)
@@ -292,7 +296,7 @@ namespace MathLib {
         /// @brief Saves matrix data
         /// @param file File to save matrix data into
         /// @return Status
-        virtual bool Save(Writeable& file) const override {
+        [[nodiscard]] virtual bool Save(Writeable& file) const override {
             StartBenchmark
             if (!file.Write<size_t>(width) || !file.Write<size_t>(height)) ReturnFromBenchmark(false);
             const size_t size = ptr.GetSize();
@@ -305,7 +309,7 @@ namespace MathLib {
         /// @brief Loads matrix data
         /// @param file File to load matrix data from
         /// @return Status
-        virtual bool Load(Readable& file) override {
+        [[nodiscard]] virtual bool Load(Readable& file) override {
             StartBenchmark
             if (!file.Read<size_t>(width) || !file.Read<size_t>(height)) ReturnFromBenchmark(false);
             ptr = Array<T>(width * height);
@@ -317,19 +321,19 @@ namespace MathLib {
             }
             ReturnFromBenchmark(true);
         }
-        virtual Iterator<const T> begin(void) const override {
+        [[nodiscard]] virtual Iterator<const T> begin(void) const override {
             StartBenchmark
             ReturnFromBenchmark(ptr.begin());
         }
-        virtual Iterator<const T> end(void) const override {
+        [[nodiscard]] virtual Iterator<const T> end(void) const override {
             StartBenchmark
             ReturnFromBenchmark(ptr.end());
         }
-        virtual Iterator<T> begin(void) override {
+        [[nodiscard]] virtual Iterator<T> begin(void) override {
             StartBenchmark
             ReturnFromBenchmark(ptr.begin());
         }
-        virtual Iterator<T> end(void) override {
+        [[nodiscard]] virtual Iterator<T> end(void) override {
             StartBenchmark
             ReturnFromBenchmark(ptr.end());
         }
@@ -368,13 +372,15 @@ namespace MathLib {
     /// @param matrix Matrix to convert
     /// @return Converted matrix
     template <typename T, typename F>
-    Matrix<F> ConvertMatrix(const Matrix<T>& matrix) {
+    [[nodiscard]] Matrix<F> ConvertMatrix(const Matrix<T>& matrix) {
         StartBenchmark
         Matrix<F> ret = Matrix<F>(matrix.GetWidth(), matrix.GetHeight());
         for (size_t y = 0; y < matrix.GetHeight(); y++)
             for (size_t x = 0; x < matrix.GetWidth(); x++) ret.At(x, y) = (F)matrix.At(x, y);
         ReturnFromBenchmark(ret);
     }
+    /// @brief Default type for matrices
+    using matrix_t = Matrix<num_t>;
 }
 
 #endif

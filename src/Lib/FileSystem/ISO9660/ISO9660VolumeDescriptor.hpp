@@ -16,7 +16,7 @@ namespace MathLib {
         char signature[5];
         uint8_t version;
 
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

@@ -35,7 +35,7 @@ namespace MathLib {
         uint8_t osSpecific[512];
         uint8_t reserved5[653];
 
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

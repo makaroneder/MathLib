@@ -7,10 +7,6 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-#define LoadImage(name, path_)                                  \
-    MathLib::DummyRenderer name = MathLib::DummyRenderer(0, 0); \
-    if (!name.SetImage<MathLib::TGA>() || !name.LoadFromPath(fs, path + path_)) MathLib::Panic("Failed to load image")
-
 void SetFirstVisibleQuest(size_t& quest, const MathLib::Array<Quest>& quests, bool incrementFirst) {
     bool first = true;
     while (true) {
@@ -91,9 +87,9 @@ int main(void) {
         const Ending endings[] = {
             // TODO: Ending dziadka
         };
-        const MathLib::Matrix<MathLib::num_t> start = renderer.GetStart<MathLib::num_t>();
-        const MathLib::Matrix<MathLib::num_t> end = renderer.GetEnd<MathLib::num_t>();
-        MathLib::Matrix<MathLib::num_t> move = MathLib::CreateVector<MathLib::num_t>(0, 0, 0);
+        const MathLib::matrix_t start = renderer.GetStart<MathLib::num_t>();
+        const MathLib::matrix_t end = renderer.GetEnd<MathLib::num_t>();
+        MathLib::matrix_t move = MathLib::CreateVector<MathLib::num_t>(0, 0, 0);
         MathLib::Second<MathLib::num_t> prevTime = MathLib::Second<MathLib::num_t>(MathLib::GetTime());
         size_t activeNPC = SIZE_MAX;
         size_t currentShownQuest = SIZE_MAX;
@@ -161,7 +157,7 @@ int main(void) {
                                 }
                                 default: break;
                             }
-                            player.AddHeardDialog(AbsoluteDialogIndex(activeNPC, npcs.At(activeNPC).GetDialogIndex()));
+                            if (!player.AddHeardDialog(AbsoluteDialogIndex(activeNPC, npcs.At(activeNPC).GetDialogIndex()))) MathLib::Panic("Failed to add heard dialog");
                             for (Quest& quest : quests) quest.Check(player);
                         }
                         break;
@@ -172,10 +168,10 @@ int main(void) {
                             else {
                                 if (activeNPC != SIZE_MAX) activeNPC = SIZE_MAX;
                                 else {
-                                    MathLib::Matrix<MathLib::num_t> diff = MathLib::CreateVector<MathLib::num_t>(SIZE_MAX, SIZE_MAX, 0);
+                                    MathLib::matrix_t diff = MathLib::CreateVector<MathLib::num_t>(SIZE_MAX, SIZE_MAX, 0);
                                     size_t npc = SIZE_MAX;
                                     for (size_t i = 0; i < npcs.GetSize(); i++) {
-                                        const MathLib::Matrix<MathLib::num_t> tmp = player.position - npcs.At(i).position;
+                                        const MathLib::matrix_t tmp = player.position - npcs.At(i).position;
                                         if (tmp.GetLengthSquared() < diff.GetLengthSquared()) {
                                             diff = tmp;
                                             npc = i;

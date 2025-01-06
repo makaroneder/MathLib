@@ -14,7 +14,7 @@
 /// @param lastState Last state of the program
 /// @return Status
 template <typename T>
-bool HandleEvents(MathLib::Renderer& renderer, const MathLib::Function<bool>& func, size_t& state, const size_t& lastState) {
+[[nodiscard]] bool HandleEvents(MathLib::Renderer& renderer, const MathLib::Function<bool>& func, size_t& state, const size_t& lastState) {
     bool running = true;
     const T speed = 1;
     if (!func()) return false;
@@ -88,14 +88,14 @@ int main(int argc, char** argv) {
             #endif
             delete optimizedRoot;
             optimizer.runtime = true;
-            states.Add(optimizer);
+            if (!states.Add(optimizer)) MathLib::Panic("Failed to add optimizer");
         }
         size_t state = 0;
         const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>(nullptr, [&states, &state](const void*, MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
-            tmp.variables.Add(var);
+            if (!tmp.variables.Add(var)) return MathLib::MakeNaN();
             MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const MathLib::Array<MathLib::complex_t> complexRet = n->ToNumber();
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
-            tmp.variables.Add(var);
+            if (!tmp.variables.Add(var)) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
             MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const MathLib::complex_t ret = n->ToNumber().At(0);

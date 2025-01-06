@@ -11,12 +11,12 @@ namespace MathLib {
         Expected(const T& value) : value(value), error(false) {
             EmptyBenchmark
         }
-        T Get(const String& panicStr = "Expected value doesn't exist") const {
+        [[nodiscard]] T Get(const String& panicStr = "Expected value doesn't exist") const {
             StartBenchmark
             if (error) Panic(panicStr);
             else ReturnFromBenchmark(value);
         }
-        bool HasValue(void) const {
+        [[nodiscard]] bool HasValue(void) const {
             StartBenchmark
             ReturnFromBenchmark(!error);
         }

@@ -34,12 +34,12 @@ struct PIT : InterruptTimer {
 
     PIT(void);
     virtual ~PIT(void) override;
-    virtual MathLib::num_t GetFrequency(void) const override;
-    virtual bool SetFrequency(MathLib::num_t frequency) override;
+    [[nodiscard]] virtual MathLib::num_t GetFrequency(void) const override;
+    [[nodiscard]] virtual bool SetFrequency(MathLib::num_t frequency) override;
 
     private:
-    size_t GetReloadValue(void) const;
-    bool SetReloadValue(size_t value);
+    [[nodiscard]] size_t GetReloadValue(void) const;
+    [[nodiscard]] bool SetReloadValue(size_t value);
 };
 
 #endif

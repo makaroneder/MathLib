@@ -27,7 +27,7 @@ namespace MathLib {
         MBRHeader(void);
         /// @brief Checks whether MBR boot sector is valid
         /// @return Validity of MBR boot sector
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

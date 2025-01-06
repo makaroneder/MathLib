@@ -4,6 +4,8 @@ extern end
 extern start
 extern bssStart
 
+%define TextMode 1
+
 Multiboot1Magic equ 0x1badb002
 Multiboot1AlignModules equ 0
 Multiboot1MemoryInfo equ 1
@@ -24,10 +26,10 @@ Multiboot1Header:
     .loadEndAddress: dd bssStart
     .bssEndAddress: dd end
     .entryAddress: dd Entry
-    .framebufferMode: dd 0
+    .framebufferMode: dd TextMode
     .framebufferWidth: dd 0
     .framebufferHeight: dd 0
-    .framebufferDepth: dd 32
+    .framebufferDepth: dd 32 * !TextMode
 
 align 8
 Multiboot2Header:
@@ -45,6 +47,7 @@ Multiboot2Header:
         .flagsTagFlags: dw 0
         .flagsTagSize: dd 12
         .flagsTagConsoleFlags: dd 1 << 1
+    %if !TextMode
     align 8
         .framebufferTagType: dw 5
         .framebufferTagFlags: dw 0
@@ -52,6 +55,7 @@ Multiboot2Header:
         .framebufferTagWidth: dd 0
         .framebufferTagHeight: dd 0
         .framebufferTagDepth: dd 32
+    %endif
     align 8
         .moduleAlignmentTagType: dw 6
         .moduleAlignmentTagFlags: dw 0

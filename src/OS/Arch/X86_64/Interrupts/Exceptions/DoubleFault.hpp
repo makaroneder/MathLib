@@ -5,7 +5,7 @@
 
 struct DoubleFault : Exception {
     DoubleFault(void);
-    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
+    [[nodiscard]] virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

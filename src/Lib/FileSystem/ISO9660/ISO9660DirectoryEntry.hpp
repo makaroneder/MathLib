@@ -24,8 +24,8 @@ namespace MathLib {
         uint8_t nameLength;
         char name[1];
 
-        bool IsValid(void) const;
-        String GetName(void) const;
+        [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] String GetName(void) const;
     } __attribute__((packed));
 }
 

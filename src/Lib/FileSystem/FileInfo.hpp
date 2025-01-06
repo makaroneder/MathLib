@@ -20,7 +20,7 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
     };
 }
 

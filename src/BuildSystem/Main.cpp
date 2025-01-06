@@ -15,7 +15,7 @@ MathLib::Array<FileSearch> fileSearchs;
 MathLib::Array<FileTranslation> fileTranslations;
 MathLib::String nonPhonyTargets = "";
 
-MathLib::Node* DeclareTarget(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* DeclareTarget(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     if (args.GetSize() != 4) return nullptr;
     for (size_t i = 0; i < 3; i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
@@ -24,13 +24,13 @@ MathLib::Node* DeclareTarget(const void*, const MathLib::Array<const MathLib::No
     if (!target.phony && !target.name.Contains('%')) nonPhonyTargets += target.name + ' ';
     return targets.Add(target) ? new MathLib::Node(MathLib::Node::Type::String, "") : nullptr;
 }
-MathLib::Node* CreateObjects(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* CreateObjects(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     if (args.GetSize() != 3) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
     return fileTranslations.Add(FileTranslation(args.At(0)->value, args.At(1)->value, args.At(2)->value)) ? new MathLib::Node(MathLib::Node::Type::String, MathLib::String("$(FILETRANSLATION") + MathLib::ToString(fileTranslations.GetSize()) + ") ") : nullptr;
 }
-MathLib::Node* FindFiles(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* FindFiles(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     if (args.GetSize() != 2) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
@@ -62,19 +62,19 @@ int main(int argc, char** argv) {
         optimizer.Destroy();
         MathLib::File output = fileSystem.Open(argv[2], MathLib::OpenMode::Write);
         for (size_t i = 0; i < fileSearchs.GetSize(); i++)
-            output.Puts(MathLib::String("FILESEARCH") + MathLib::ToString(i + 1) + " = $(shell find " + fileSearchs.At(i).directory + " -type f -name \"*" + fileSearchs.At(i).extension + "\")\n");
+            if (!output.Puts(MathLib::String("FILESEARCH") + MathLib::ToString(i + 1) + " = $(shell find " + fileSearchs.At(i).directory + " -type f -name \"*" + fileSearchs.At(i).extension + "\")\n")) MathLib::Panic("Failed to write output data");
         for (size_t i = 0; i < fileTranslations.GetSize(); i++)
-            output.Puts(MathLib::String("FILETRANSLATION") + MathLib::ToString(i + 1) + " = $(patsubst " + fileTranslations.At(i).outputFormat + ", " + fileTranslations.At(i).inputFormat + ", " + fileTranslations.At(i).sources + ")\n");
-        output.Puts(MathLib::String("all: ") + nonPhonyTargets + "\n.PHONY: all\n");
+            if (!output.Puts(MathLib::String("FILETRANSLATION") + MathLib::ToString(i + 1) + " = $(patsubst " + fileTranslations.At(i).outputFormat + ", " + fileTranslations.At(i).inputFormat + ", " + fileTranslations.At(i).sources + ")\n")) MathLib::Panic("Failed to write output data");
+        if (!output.Puts(MathLib::String("all: ") + nonPhonyTargets + "\n.PHONY: all\n")) MathLib::Panic("Failed to write output data");
         for (const Target& target : targets) {
             #ifdef Debug
             std::cout << target << std::endl;
             #endif
-            output.Puts(target.name + ": " + target.deps + '\n');
-            if (!target.phony) output.Puts("\t@mkdir -p $(@D)\n");
-            output.Puts(MathLib::String("\t@") + target.command + '\n');
-            if (!target.phony) output.Puts("\t@echo \"==> Created: $@\"\n");
-            else output.Puts(MathLib::String(".PHONY: ") + target.name + '\n');
+            if (!output.Puts(target.name + ": " + target.deps + '\n') || (!target.phony && !output.Puts("\t@mkdir -p $(@D)\n")) || !output.Puts(MathLib::String("\t@") + target.command + '\n')) MathLib::Panic("Failed to write output data");
+            if (!target.phony) {
+                if (!output.Puts("\t@echo \"==> Created: $@\"\n")) MathLib::Panic("Failed to write output data");
+            }
+            else if (!output.Puts(MathLib::String(".PHONY: ") + target.name + '\n')) MathLib::Panic("Failed to write output data");
         }
         return EXIT_SUCCESS;
     }

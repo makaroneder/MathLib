@@ -24,14 +24,10 @@ namespace MathLib {
     num_t StringToNumber(String str) {
         size_t i = 0;
         num_t ret = 0;
-        size_t mult = 1;
-        while (i < str.GetSize() && str.At(i) != '.') {
-            ret = ret * mult + str.At(i++) - '0';
-            mult *= 10;
-        }
+        while (i < str.GetSize() && str.At(i) != '.') ret = ret * 10 + (str.At(i++) - '0');
         if (i < str.GetSize() && str.At(i) == '.') {
             i++;
-            mult = 10;
+            size_t mult = 10;
             while (i < str.GetSize()) {
                 ret += num_t(str.At(i++) - '0') / mult;
                 mult *= 10;

@@ -1,6 +1,6 @@
 #ifndef MathLib_Image_Aseprite_String_H
 #define MathLib_Image_Aseprite_String_H
-#include "AsepriteChunkHeader.hpp"
+#include <stdint.h>
 
 namespace MathLib {
     struct AsepriteString {

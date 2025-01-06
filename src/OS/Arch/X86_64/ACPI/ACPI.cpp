@@ -14,14 +14,14 @@
 #include <stddef.h>
 
 SCI sci;
-bool InitRTC(bool nmi, CMOS::Register centuryRegister) {
+[[nodiscard]] bool InitRTC(bool nmi, CMOS::Register centuryRegister) {
     RTC* rtc = new RTC(nmi, centuryRegister);
     if (!rtc) return false;
     cmos = rtc;
     dateKeeper = rtc;
     return true;
 }
-bool NoFADTInit(bool nmi) {
+[[nodiscard]] bool NoFADTInit(bool nmi) {
     if (!InitRTC(nmi, (CMOS::Register)0)) return false;
     InitPS2();
     return true;

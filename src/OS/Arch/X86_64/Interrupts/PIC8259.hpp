@@ -31,12 +31,12 @@ struct PIC8259 : PIC {
     };
 
     PIC8259(void);
-    bool Init(uint8_t base);
-    virtual uint8_t GetBase(void) const override;
-    virtual bool SendEndOfInterrupt(uint8_t irq) override;
+    [[nodiscard]] bool Init(uint8_t base);
+    [[nodiscard]] virtual uint8_t GetBase(void) const override;
+    [[nodiscard]] virtual bool SendEndOfInterrupt(uint8_t irq) override;
 
     protected:
-    virtual bool SetMask(uint16_t mask) override;
+    [[nodiscard]] virtual bool SetMask(uint16_t mask) override;
 
     private:
     uint8_t base;

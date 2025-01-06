@@ -38,7 +38,7 @@ struct UHCI {
 
     private:
     template <typename T>
-    T Read(uint8_t offset) const {
+    [[nodiscard]] T Read(uint8_t offset) const {
         return ReadPort<T>(base + offset);
     }
     template <typename T>

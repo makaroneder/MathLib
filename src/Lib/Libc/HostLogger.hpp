@@ -11,7 +11,7 @@ namespace MathLib {
         /// @param buffer Buffer to write data to
         /// @param size Size of the buffer
         /// @return Size of written bytes
-        virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
+        [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
 
         private:
         std::ostream& stream;

@@ -5,12 +5,12 @@
 template <typename T>
 struct Sphere : MathLib::Shape<T> {
     Sphere(const MathLib::Matrix<T>& pos, const T& radius) : MathLib::Shape<T>(pos), radius(radius) {}
-    virtual bool CollidesWith(const MathLib::Shape<T>& other) const override {
+    [[nodiscard]] virtual bool CollidesWith(const MathLib::Shape<T>& other) const override {
         // TODO:
         (void)other;
         return false;
     }
-    bool HasIntersections(const MathLib::Ray<T>& ray) const {
+    [[nodiscard]] bool HasIntersections(const MathLib::Ray<T>& ray) const {
         const MathLib::Matrix<T> tmp = ray.position - this->position;
         return 4 * (MathLib::Pow(ray.GetDirection().Dot(tmp), 2) - tmp.GetLengthSquared() + radius * radius) >= 0;
     }

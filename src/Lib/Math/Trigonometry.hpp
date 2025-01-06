@@ -2,6 +2,7 @@
 #define MathLib_Math_Trigonometry_H
 #include "Constants.hpp"
 
+// TODO: Use [[nodiscard]]
 namespace MathLib {
     /// @brief cos(x) = sin(pi / 2 - x)
     /// @tparam T Type of number

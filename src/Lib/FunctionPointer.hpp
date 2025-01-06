@@ -12,11 +12,11 @@ namespace MathLib {
         FunctionPointer(void* data, RawFunction function) : Function<Ret, Args...>(data), function(function) {
             EmptyBenchmark
         }
-        RawFunction GetFunction(void) const {
+        [[nodiscard]] RawFunction GetFunction(void) const {
             StartBenchmark
             ReturnFromBenchmark(function);
         }
-        virtual Ret Invoke(const void* data, Args... args) const override {
+        [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const override {
             StartBenchmark
             ReturnFromBenchmark(function(data, args...));
         }

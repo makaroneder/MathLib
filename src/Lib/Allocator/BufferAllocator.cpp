@@ -1,5 +1,5 @@
 #include "BufferAllocator.hpp"
-#include "../Typedefs.hpp"
+#include "../Host.hpp"
 
 namespace MathLib {
     BufferAllocator::BufferAllocator(void* buffer, size_t size) : buffer(buffer), size(size), allocator(nullptr) {

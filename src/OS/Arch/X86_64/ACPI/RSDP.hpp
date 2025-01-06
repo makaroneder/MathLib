@@ -11,7 +11,7 @@ struct RSDP {
     uint8_t revision;
     uint32_t rsdt;
 
-    bool IsValid(void) const;
+    [[nodiscard]] bool IsValid(void) const;
 } __attribute__((packed));
 struct RSDP2 : RSDP {
     uint32_t length;
@@ -19,9 +19,9 @@ struct RSDP2 : RSDP {
     uint8_t extendedChecksum;
     uint8_t reserved[3];
 
-    bool IsValid(void) const;
+    [[nodiscard]] bool IsValid(void) const;
 } __attribute__((packed));
-RSDP* FindRSDP(void);
+[[nodiscard]] RSDP* FindRSDP(void);
 
 #endif
 #endif

@@ -11,7 +11,7 @@ namespace MathLib {
     };
     struct CommandLine {
         CommandLine(size_t argc, const char** argv);
-        Expected<String> GetEntry(const String& name) const;
+        [[nodiscard]] Expected<String> GetEntry(const String& name) const;
 
         private:
         Array<CommandLineEntry> entries;

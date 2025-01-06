@@ -7,7 +7,7 @@ struct Symbol : MathLib::WavefrontObject<MathLib::num_t> {
     MathLib::Array<size_t> multiplier;
 
     Symbol(MathLib::FileSystem& fileSystem, const MathLib::String& path, const MathLib::String& name, const MathLib::Array<size_t>& multiplier);
-    bool operator==(const Symbol& other) const;
+    [[nodiscard]] bool operator==(const Symbol& other) const;
 };
 
 #endif

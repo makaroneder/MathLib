@@ -7,11 +7,11 @@ namespace MathLib {
         ChemicalElement(void);
         ChemicalElement(const String& symbol, size_t count, bool metal);
         ChemicalElement(const ChemicalElement& self, size_t count);
-        String GetSymbol(void) const;
-        size_t GetCount(void) const;
-        bool IsMetal(void) const;
-        virtual String ToString(const String& padding = "") const override;
-        ChemicalElement operator*=(size_t num);
+        [[nodiscard]] String GetSymbol(void) const;
+        [[nodiscard]] size_t GetCount(void) const;
+        [[nodiscard]] bool IsMetal(void) const;
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        ChemicalElement& operator*=(size_t num);
 
         private:
         String symbol;

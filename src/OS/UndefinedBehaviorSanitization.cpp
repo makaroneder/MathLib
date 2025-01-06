@@ -30,7 +30,7 @@ struct TypeMismatchInfo : SourceLocation {
     Type type;
 };
 
-MathLib::String SourceLocationToString(SourceLocation* location) {
+[[nodiscard]] MathLib::String SourceLocationToString(SourceLocation* location) {
     return MathLib::String(location->file) + " " + MathLib::ToString(location->line) + ":" + MathLib::ToString(location->column);
 }
 extern "C" void __ubsan_handle_type_mismatch(TypeMismatchInfo<uintptr_t>* info, uintptr_t ptr) {

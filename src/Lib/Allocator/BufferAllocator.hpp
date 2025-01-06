@@ -7,9 +7,9 @@ namespace MathLib {
         BufferAllocator(void* buffer, size_t size);
         BufferAllocator(Allocator* allocator, size_t size);
         virtual ~BufferAllocator(void) override;
-        virtual size_t GetFreeMemory(void) const = 0;
-        void* GetBuffer(void) const;
-        size_t GetSize(void) const;
+        [[nodiscard]] virtual size_t GetFreeMemory(void) const = 0;
+        [[nodiscard]] void* GetBuffer(void) const;
+        [[nodiscard]] size_t GetSize(void) const;
 
         protected:
         void* buffer;

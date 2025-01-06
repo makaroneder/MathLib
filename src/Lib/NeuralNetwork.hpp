@@ -37,31 +37,31 @@ namespace MathLib {
         }
         /// @brief Returns count of weights, biases and count of neurons - 1
         /// @return Count of weights, biases and count of neurons - 1
-        size_t GetCount(void) const {
+        [[nodiscard]] size_t GetCount(void) const {
             StartBenchmark
             ReturnFromBenchmark(count);
         }
         /// @brief Returns input neuron
         /// @return Input neuron
-        Matrix<T>& GetInput(void) {
+        [[nodiscard]] Matrix<T>& GetInput(void) {
             StartBenchmark
             ReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns input neuron
         /// @return Input neuron
-        Matrix<T> GetInput(void) const {
+        [[nodiscard]] Matrix<T> GetInput(void) const {
             StartBenchmark
             ReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
-        Matrix<T>& GetOutput(void) {
+        [[nodiscard]] Matrix<T>& GetOutput(void) {
             StartBenchmark
             ReturnFromBenchmark(as.At(count));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
-        Matrix<T> GetOutput(void) const {
+        [[nodiscard]] Matrix<T> GetOutput(void) const {
             StartBenchmark
             ReturnFromBenchmark(as.At(count));
         }
@@ -90,7 +90,7 @@ namespace MathLib {
         }
         /// @brief Applies weights and biases to neurons
         /// @return Status 
-        bool Forward(void) {
+        [[nodiscard]] bool Forward(void) {
             StartBenchmark
             for (size_t i = 0; i < count; i++) {
                 const Expected<Matrix<T>> tmp = as.At(i) * ws.At(i);
@@ -106,7 +106,7 @@ namespace MathLib {
         /// @param input Input data
         /// @param output Output data
         /// @return Average error
-        T Cost(const Matrix<T>& input, const Matrix<T>& output) {
+        [[nodiscard]] T Cost(const Matrix<T>& input, const Matrix<T>& output) {
             StartBenchmark
             if (input.GetHeight() != output.GetHeight() || output.GetWidth() != GetOutput().GetWidth()) ReturnFromBenchmark(MakeNaN());
             T ret = 0;
@@ -122,7 +122,7 @@ namespace MathLib {
         /// @param output Output data
         /// @param eps_ Error tolerance
         /// @return Difference
-        NeuralNetwork<T> FiniteDiff(const Matrix<T>& input, const Matrix<T>& output, const T& eps_ = eps) {
+        [[nodiscard]] NeuralNetwork<T> FiniteDiff(const Matrix<T>& input, const Matrix<T>& output, const T& eps_ = eps) {
             StartBenchmark
             const T cost = Cost(input, output);
             NeuralNetwork<T> ret = *this;
@@ -150,7 +150,7 @@ namespace MathLib {
         /// @param input Input data
         /// @param output Output data
         /// @return Difference
-        Expected<NeuralNetwork<T>> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
+        [[nodiscard]] Expected<NeuralNetwork<T>> Backprop(const Matrix<T>& input, const Matrix<T>& output) {
             StartBenchmark
             if (input.GetHeight() != output.GetHeight() || GetOutput().GetWidth() != output.GetWidth()) ReturnFromBenchmark(Expected<NeuralNetwork<T>>());
             NeuralNetwork<T> ret = *this;
@@ -194,7 +194,7 @@ namespace MathLib {
         /// @brief Converts neural network to string
         /// @param padding String to pad with
         /// @return String representation of neural network
-        virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
             String ret = padding + "a[0] = " + GetInput().ToString() + '\n';
             for (size_t i = 0; i < count; i++)
@@ -204,7 +204,7 @@ namespace MathLib {
         /// @brief Saves neural network data
         /// @param file File to save neural network data into
         /// @return Status
-        virtual bool Save(Writeable& file) const override {
+        [[nodiscard]] virtual bool Save(Writeable& file) const override {
             StartBenchmark
             if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) ReturnFromBenchmark(false);
             for (size_t i = 0; i < count; i++)
@@ -214,7 +214,7 @@ namespace MathLib {
         /// @brief Loads neural network data
         /// @param file File to load neural network data from
         /// @return Status
-        virtual bool Load(Readable& file) override {
+        [[nodiscard]] virtual bool Load(Readable& file) override {
             StartBenchmark
             if (!file.Read<ActivationFunction>(activation) || !file.Read<size_t>(count) || !as.Add(Matrix<T>()) || !GetInput().Load(file)) ReturnFromBenchmark(false);
             for (size_t i = 0; i < count; i++)
@@ -223,7 +223,7 @@ namespace MathLib {
         }
 
         private:
-        T Activation(const T& x) {
+        [[nodiscard]] T Activation(const T& x) {
             StartBenchmark
             switch (activation) {
                 case ActivationFunction::Sigmoid: ReturnFromBenchmark(Sigmoid<T>(x));
@@ -233,7 +233,7 @@ namespace MathLib {
                 default: ReturnFromBenchmark(MakeNaN());
             }
         }
-        T ActivationDerivate(T y) {
+        [[nodiscard]] T ActivationDerivate(T y) {
             StartBenchmark
             switch (activation) {
                 case ActivationFunction::Sigmoid: ReturnFromBenchmark(y * (1 - y));

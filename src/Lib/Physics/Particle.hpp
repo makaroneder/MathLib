@@ -9,11 +9,11 @@ namespace MathLib {
         Particle(const Matrix<T>& position = CreateVector<T>(0, 0, 0), bool fixed = false) : LineShape<T>(position), prevPosition(position), acceleration(CreateVector<T>(0, 0, 0)), fixed(fixed) {
             EmptyBenchmark
         }
-        Matrix<T> GetPreviousPosition(void) const {
+        [[nodiscard]] Matrix<T> GetPreviousPosition(void) const {
             StartBenchmark
             ReturnFromBenchmark(prevPosition);
         }
-        bool IsFixed(void) const {
+        [[nodiscard]] bool IsFixed(void) const {
             StartBenchmark
             ReturnFromBenchmark(fixed);
         }
@@ -32,11 +32,11 @@ namespace MathLib {
             if (!fixed) acceleration += acc;
             EndBenchmark
         }
-        virtual Array<Line<T>> ToLines(const Matrix<T>&) const override {
+        [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>&) const override {
             StartBenchmark
             ReturnFromBenchmark(MakeArrayFromSingle<Line<T>>(Line<T>(prevPosition, this->position)));
         }
-        virtual bool CollidesWith(const Shape<T>& other) const override {
+        [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const override {
             StartBenchmark
             ReturnFromBenchmark(this->position == ((const Particle<T>&)other).position);
         }

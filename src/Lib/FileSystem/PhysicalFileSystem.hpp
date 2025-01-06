@@ -6,8 +6,8 @@
 namespace MathLib {
     struct PhysicalFileSystem : FileSystem {
         PhysicalFileSystem(ByteDevice& disk);
-        ByteDevice& GetDisk(void);
-        virtual bool Create(void) = 0;
+        [[nodiscard]] ByteDevice& GetDisk(void);
+        [[nodiscard]] virtual bool Create(void) = 0;
 
         protected:
         ByteDevice& disk;

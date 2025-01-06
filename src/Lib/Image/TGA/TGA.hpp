@@ -11,11 +11,11 @@ namespace MathLib {
         /// @brief Saves data as TGA image
         /// @param file File to save data into
         /// @return Status
-        virtual bool Save(Writeable& file) const override;
+        [[nodiscard]] virtual bool Save(Writeable& file) const override;
         /// @brief Loads data from TGA image
         /// @param file File to load data from
         /// @return Status
-        virtual bool Load(Readable& file) override;
+        [[nodiscard]] virtual bool Load(Readable& file) override;
     };
 }
 

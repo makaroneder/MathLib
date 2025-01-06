@@ -4,8 +4,8 @@
 
 namespace MathLib {
     struct Allocator : Allocatable {
-        virtual void* Alloc(size_t size) = 0;
-        virtual bool Dealloc(void* ptr) = 0;
+        [[nodiscard]] virtual void* Alloc(size_t size) = 0;
+        [[nodiscard]] virtual bool Dealloc(void* ptr) = 0;
     };
     extern Allocator* allocator;
 }

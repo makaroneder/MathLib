@@ -16,11 +16,11 @@ struct KernelRenderer : MathLib::Renderer {
     KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const MathLib::Color& fieldPosition);
     /// @brief Updates renderer
     /// @return Status
-    virtual bool Update(void) override;
+    [[nodiscard]] virtual bool Update(void) override;
     /// @brief Return current event
     /// @return Event
-    virtual MathLib::Event GetEvent(void) override;
-    bool AddEvent(const MathLib::Event& event);
+    [[nodiscard]] virtual MathLib::Event GetEvent(void) override;
+    [[nodiscard]] bool AddEvent(const MathLib::Event& event);
 
     private:
     MathLib::Array<MathLib::Event> events;

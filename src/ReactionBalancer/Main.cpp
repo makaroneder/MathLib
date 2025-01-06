@@ -1,7 +1,7 @@
 #include <MathLib.hpp>
 #include <iostream>
 
-MathLib::ChemicalMolecule ParseMolecule(const MathLib::String& str, size_t& i) {
+[[nodiscard]] MathLib::ChemicalMolecule ParseMolecule(const MathLib::String& str, size_t& i) {
     const size_t size = str.GetSize();
     MathLib::Array<MathLib::ChemicalElement> elements;
     MathLib::SkipWhiteSpace(str, i);
@@ -10,11 +10,11 @@ MathLib::ChemicalMolecule ParseMolecule(const MathLib::String& str, size_t& i) {
         while (i < size && MathLib::IsLower(str.At(i))) name += str.At(i++);
         MathLib::String count;
         while (i < size && MathLib::IsDigit(str.At(i))) count += str.At(i++);
-        elements.Add(MathLib::ChemicalElement(name, count.IsEmpty() ? 1 : MathLib::StringToNumber(count), false));
+        if (!elements.Add(MathLib::ChemicalElement(name, count.IsEmpty() ? 1 : MathLib::StringToNumber(count), false))) return MathLib::ChemicalMolecule();
     }
     return MathLib::ChemicalMolecule(elements, 1);
 }
-MathLib::Array<MathLib::ChemicalReaction> ParseReactions(const MathLib::String& str) {
+[[nodiscard]] MathLib::Array<MathLib::ChemicalReaction> ParseReactions(const MathLib::String& str) {
     MathLib::Array<MathLib::ChemicalReaction> ret;
     const MathLib::Array<MathLib::String> split = MathLib::Split(str, '\n', false);
     for (const MathLib::String& str : split) {

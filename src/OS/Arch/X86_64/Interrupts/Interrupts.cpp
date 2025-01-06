@@ -68,7 +68,7 @@ SystemCall systemCall;
 extern "C" void InterruptHandler(uintptr_t interrupt, Registers* regs, uintptr_t error) {
     if (interruptDevices[interrupt]) interruptDevices[interrupt]->OnInterrupt(interrupt, regs, error);
     interrupt -= pic.GetBase();
-    if (interrupt <= 15) pic.SendEndOfInterrupt(interrupt);
+    if (interrupt <= 15 && !pic.SendEndOfInterrupt(interrupt)) MathLib::Panic("Failed to send EOI to PIC");
 }
 uint8_t GetIRQBase(void) {
     return pic.GetBase();

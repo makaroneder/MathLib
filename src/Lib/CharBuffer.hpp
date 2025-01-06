@@ -47,34 +47,34 @@ namespace MathLib {
             buffer = ptr;
             return *this;
         }
-        CharBuffer operator+(const CharBuffer& other) const {
+        [[nodiscard]] CharBuffer operator+(const CharBuffer& other) const {
             CharBuffer tmp = *this;
             tmp += other;
             return tmp;
         }
-        CharBuffer operator+(const char* other) const {
+        [[nodiscard]] CharBuffer operator+(const char* other) const {
             CharBuffer tmp = *this;
             tmp += other;
             return tmp;
         }
-        CharBuffer operator+(char chr) const {
+        [[nodiscard]] CharBuffer operator+(char chr) const {
             CharBuffer tmp = *this;
             tmp += chr;
             return tmp;
         }
-        bool operator==(const CharBuffer& other) const {
+        [[nodiscard]] bool operator==(const CharBuffer& other) const {
             if (size != other.size) return false;
             for (size_t i = 0; i < size; i++)
                 if (At(i) != other.At(i)) return false;
             return true;
         }
-        bool operator==(const char* other) const {
+        [[nodiscard]] bool operator==(const char* other) const {
             return *this == CharBuffer(other);
         }
-        bool operator!=(const CharBuffer& other) const {
+        [[nodiscard]] bool operator!=(const CharBuffer& other) const {
             return !(*this == other);
         }
-        bool operator!=(const char* other) const {
+        [[nodiscard]] bool operator!=(const char* other) const {
             return !(*this == other);
         }
     };

@@ -10,7 +10,7 @@ struct Player : Entity<T> {
     MathLib::Array<AbsoluteDialogIndex> heardDialogs;
 
     Player(MathLib::DummyRenderer& image, size_t health, const MathLib::Matrix<T>& position) : Entity<T>(image, health, position) {}
-    bool AddHeardDialog(const AbsoluteDialogIndex& dialog) {
+    [[nodiscard]] bool AddHeardDialog(const AbsoluteDialogIndex& dialog) {
         for (const AbsoluteDialogIndex& heardDialog : heardDialogs)
             if (heardDialog == dialog) return true;
         return heardDialogs.Add(dialog);
@@ -18,7 +18,7 @@ struct Player : Entity<T> {
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(MathLib::Writeable& file) const override {
+    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override {
         if (!Entity<T>::Save(file) || !file.WriteBuffer(statistics, SizeOfArray(statistics) * sizeof(size_t)) || !file.Write<size_t>(heardDialogs.GetSize())) return false;
         for (const AbsoluteDialogIndex& dialog : heardDialogs)
             if (!dialog.Save(file)) return false;
@@ -27,7 +27,7 @@ struct Player : Entity<T> {
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(MathLib::Readable& file) override {
+    [[nodiscard]] virtual bool Load(MathLib::Readable& file) override {
         size_t tmp = 0;
         if (!Entity<T>::Load(file) || !file.ReadBuffer(statistics, SizeOfArray(statistics) * sizeof(size_t)) || !file.Read<size_t>(tmp)) return false;
         heardDialogs = MathLib::Array<AbsoluteDialogIndex>(tmp);

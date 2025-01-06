@@ -8,7 +8,7 @@ namespace MathLib {
         Shape(const Matrix<T>& pos) : position(pos) {
             EmptyBenchmark
         }
-        virtual bool CollidesWith(const Shape<T>& other) const = 0;
+        [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const = 0;
 
         Matrix<T> position;
     };

@@ -34,7 +34,7 @@ struct PS2Mouse : PS2Device, InterruptDevice {
     PS2Mouse(bool second);
     virtual ~PS2Mouse(void) override;
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;
-    bool SetSampleRate(uint8_t sampleRate);
+    [[nodiscard]] bool SetSampleRate(uint8_t sampleRate);
 
     private:
     Type type;

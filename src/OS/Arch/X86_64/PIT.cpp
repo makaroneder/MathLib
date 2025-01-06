@@ -1,11 +1,12 @@
 #ifdef __x86_64__
 #include "PIT.hpp"
 #include "IO.hpp"
+#include <Host.hpp>
 
 PIT::PIT(void) {
     SetInterrupts(false);
     WritePort<uint8_t>((uint16_t)Ports::CommandRegister, ((uint8_t)OperatingMode::RateGenerator << 1) | ((uint8_t)AccessMode::LowAndHighByte << 4) | ((uint8_t)Channel::Channel0 << 6));
-    SetReloadValue(UINT16_MAX + 1);
+    if (!SetReloadValue(UINT16_MAX + 1)) MathLib::Panic("Failed to set PIT reaload value");
     RegisterInterruptDevice(GetIRQBase(), this);
     SetInterrupts(true);
 }

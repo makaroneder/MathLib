@@ -63,35 +63,35 @@ namespace MathLib {
         }                                                                               \
         addrAction                                                                      \
     }
-    #define AnyRegMathOperation(op, operation, size, cf, of, arg)                       \
-    case op: {                                                                          \
-        const Expected<uint8_t> tmp = Fetch<uint8_t>();                                 \
-        if (!tmp.HasValue()) ReturnFromBenchmark(false)                                 \
-        const X86ModRM modrm = tmp.Get();                                               \
-        uint##size##_t result;                                                          \
-        uint##size##_t a;                                                               \
-        uint##size##_t b;                                                               \
-        ModRMOperation({                                                                \
-            Register* src = GetRegister(modrm.reg);                                     \
-            if (!src) ReturnFromBenchmark(false)                                        \
-            a = reg->Get##size(false);                                                  \
-            b = src->Get##size(false) + arg;                                            \
-            result = a operation b;                                                     \
-            reg->Set##size(result, false);                                              \
-        }, {                                                                            \
-            Register* src = GetRegister(modrm.reg);                                     \
-            if (!src) ReturnFromBenchmark(false)                                        \
-            const Expected<uint##size##_t> tmp = ReadPositioned<uint##size##_t>(addr);  \
-            if (!tmp.HasValue()) ReturnFromBenchmark(false)                             \
-            a = tmp.Get();                                                              \
-            b = src->Get##size(false) + arg;                                            \
-            result = a operation b;                                                     \
-            WritePositioned<uint##size##_t>(result, addr);                              \
-        })                                                                              \
-        UpdateFlags(result, a, b);                                                      \
-        state.flags.carry = cf;                                                         \
-        state.flags.overflow = of;                                                      \
-        ReturnFromBenchmark(true)                                                       \
+    #define AnyRegMathOperation(op, operation, size, cf, of, arg)                           \
+    case op: {                                                                              \
+        const Expected<uint8_t> tmp = Fetch<uint8_t>();                                     \
+        if (!tmp.HasValue()) ReturnFromBenchmark(false)                                     \
+        const X86ModRM modrm = tmp.Get();                                                   \
+        uint##size##_t result;                                                              \
+        uint##size##_t a;                                                                   \
+        uint##size##_t b;                                                                   \
+        ModRMOperation({                                                                    \
+            Register* src = GetRegister(modrm.reg);                                         \
+            if (!src) ReturnFromBenchmark(false)                                            \
+            a = reg->Get##size(false);                                                      \
+            b = src->Get##size(false) + arg;                                                \
+            result = a operation b;                                                         \
+            reg->Set##size(result, false);                                                  \
+        }, {                                                                                \
+            Register* src = GetRegister(modrm.reg);                                         \
+            if (!src) ReturnFromBenchmark(false)                                            \
+            const Expected<uint##size##_t> tmp = ReadPositioned<uint##size##_t>(addr);      \
+            if (!tmp.HasValue()) ReturnFromBenchmark(false)                                 \
+            a = tmp.Get();                                                                  \
+            b = src->Get##size(false) + arg;                                                \
+            result = a operation b;                                                         \
+            if (!WritePositioned<uint##size##_t>(result, addr)) ReturnFromBenchmark(false); \
+        })                                                                                  \
+        UpdateFlags(result, a, b);                                                          \
+        state.flags.carry = cf;                                                             \
+        state.flags.overflow = of;                                                          \
+        ReturnFromBenchmark(true)                                                           \
     }
     #define JumpIf(op, req, type)                                                       \
     case op: {                                                                          \
@@ -118,12 +118,10 @@ namespace MathLib {
             default: ReturnFromBenchmark(false)                                         \
         }, switch (modrm.reg) {                                                         \
             case 0b010: {                                                               \
-                WritePositioned<uint##size##_t>(~tmp.Get(), addr);                      \
-                ReturnFromBenchmark(true)                                               \
+                ReturnFromBenchmark(WritePositioned<uint##size##_t>(~tmp.Get(), addr)); \
             }                                                                           \
             case 0b011: {                                                               \
-                WritePositioned<uint##size##_t>(-tmp.Get(), addr);                      \
-                ReturnFromBenchmark(true)                                               \
+                ReturnFromBenchmark(WritePositioned<uint##size##_t>(-tmp.Get(), addr)); \
             }                                                                           \
             default: ReturnFromBenchmark(false)                                         \
         })                                                                              \

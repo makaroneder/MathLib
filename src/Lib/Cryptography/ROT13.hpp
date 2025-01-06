@@ -5,7 +5,7 @@
 
 namespace MathLib {
     struct ROT13 : SpecialCaseCipher<CaesarCipher> {
-        virtual Expected<String> GetKey(const String& baseKey) const override;
+        [[nodiscard]] virtual Expected<String> GetKey(const String& baseKey) const override;
     };
 }
 

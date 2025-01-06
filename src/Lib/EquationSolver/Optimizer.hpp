@@ -13,36 +13,36 @@ namespace MathLib {
         Optimizer(const Array<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Array<Variable>& vars = Array<Variable>());
         Optimizer(Optimizer* parent);
         void Destroy(void);
-        FunctionNode GetFunction(const String& name) const;
+        [[nodiscard]] FunctionNode GetFunction(const String& name) const;
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
-        Node* Optimize(const Node* node);
+        [[nodiscard]] Node* Optimize(const Node* node);
 
         private:
         Optimizer* parent;
 
-        BuiltinFunction* GetBuiltinFunctionInternal(const String& name);
-        FunctionNode* GetFunctionInternal(const String& name);
-        Variable* GetVariableInternal(const String& name);
-        Node* OptimizeComparison(const Node* node, const Array<Node::Type>& validTypes, Node::Type defaultType);
-        Node* OptimizeProgram(const Node* node);
+        [[nodiscard]] BuiltinFunction* GetBuiltinFunctionInternal(const String& name);
+        [[nodiscard]] FunctionNode* GetFunctionInternal(const String& name);
+        [[nodiscard]] Variable* GetVariableInternal(const String& name);
+        [[nodiscard]] Node* OptimizeComparison(const Node* node, const Array<Node::Type>& validTypes, Node::Type defaultType);
+        [[nodiscard]] Node* OptimizeProgram(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
-        Node* OptimizeComma(const Node* node);
+        [[nodiscard]] Node* OptimizeComma(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
-        Node* OptimizeVariable(const Node* node);
+        [[nodiscard]] Node* OptimizeVariable(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
-        Node* OptimizeFunction(const Node* node);
+        [[nodiscard]] Node* OptimizeFunction(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
-        Node* OptimizeInternal(const Node* node);
+        [[nodiscard]] Node* OptimizeInternal(const Node* node);
     };
 }
 

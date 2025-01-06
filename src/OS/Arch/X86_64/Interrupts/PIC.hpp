@@ -6,13 +6,13 @@
 
 struct PIC : MathLib::Allocatable {
     PIC(void);
-    virtual uint8_t GetBase(void) const = 0;
-    virtual bool SendEndOfInterrupt(uint8_t irq) = 0;
+    [[nodiscard]] virtual uint8_t GetBase(void) const = 0;
+    [[nodiscard]] virtual bool SendEndOfInterrupt(uint8_t irq) = 0;
     void SetIRQMask(uint8_t irq, bool value);
-    bool UpdateMask(void);
+    [[nodiscard]] bool UpdateMask(void);
 
     protected:
-    virtual bool SetMask(uint16_t mask) = 0;
+    [[nodiscard]] virtual bool SetMask(uint16_t mask) = 0;
 
     private:
     uint16_t mask;

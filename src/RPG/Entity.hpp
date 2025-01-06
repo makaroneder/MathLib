@@ -12,16 +12,16 @@ struct Entity : MathLib::Saveable {
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(MathLib::Writeable& file) const override {
+    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override {
         return file.Write<size_t>(health) && position.Save(file);
     }
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(MathLib::Readable& file) override {
+    [[nodiscard]] virtual bool Load(MathLib::Readable& file) override {
         return file.Read<size_t>(health) && position.Load(file);
     }
-    bool Draw(MathLib::Renderer& renderer) const {
+    [[nodiscard]] bool Draw(MathLib::Renderer& renderer) const {
         const MathLib::Matrix<T> rotation = MathLib::CreateVector<T>(0, 0, 0);
         #ifdef ShowHitbox
         renderer.DrawCircle2D<T>(position, hitboxRadius, 0x00ff00ff);
@@ -29,7 +29,7 @@ struct Entity : MathLib::Saveable {
         image.position = position;
         return renderer.DrawImage<T>(image, rotation);
     }
-    bool Collides(const MathLib::Matrix<T>& pos) const {
+    [[nodiscard]] bool Collides(const MathLib::Matrix<T>& pos) const {
         return (pos - position).GetLength() <= hitboxRadius * 2;
     }
 

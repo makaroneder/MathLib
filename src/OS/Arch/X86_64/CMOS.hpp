@@ -31,7 +31,7 @@ struct CMOS {
     void SetNMI(bool nmi_);
 
     protected:
-    uint8_t Read(Register reg) const;
+    [[nodiscard]] uint8_t Read(Register reg) const;
     void Write(Register reg, uint8_t value);
 
     private:

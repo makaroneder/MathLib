@@ -13,7 +13,7 @@ namespace MathLib {
 
         MathFSBootSector(void);
         MathFSBootSector(uint64_t root);
-        bool IsValid(void) const;
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

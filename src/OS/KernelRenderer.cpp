@@ -6,10 +6,10 @@ KernelRenderer::KernelRenderer(size_t width, size_t height, uint32_t* framebuffe
 bool KernelRenderer::Update(void) {
     if (framebuffer) {
         const size_t width = GetWidth();
-        const size_t height =GetHeight();
+        const size_t height = GetHeight();
         for (size_t y = 0; y < height; y++) {
             for (size_t x = 0; x < width; x++) {
-                const MathLib::Color color = pixels.At(x, y);
+                const MathLib::Color color = At(x, y);
                 framebuffer[y * width + x] = (color.rgba.r << fieldPosition.rgba.r) | (color.rgba.g << fieldPosition.rgba.g) | (color.rgba.b << fieldPosition.rgba.b);
             }
         }

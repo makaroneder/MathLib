@@ -9,7 +9,7 @@ namespace MathLib {
     /// @param end Number of iterations
     /// @return Gamma of the complex number
     template <typename T>
-    T Gamma(const T& z, const size_t& end = 2000) {
+    [[nodiscard]] T Gamma(const T& z, const size_t& end = 2000) {
         StartBenchmark
         T ret = (T)1 / z;
         for (size_t n = 1; n < end; n++)
@@ -22,7 +22,7 @@ namespace MathLib {
     /// @param a Level of multifactorial
     /// @return Factorial of the complex number
     template <typename T>
-    T Factorial(const T& z, const T& a) {
+    [[nodiscard]] T Factorial(const T& z, const T& a) {
         StartBenchmark
         ReturnFromBenchmark(Pow(a, (z - 1) / a) * Gamma<T>(z / a + 1) / Gamma<T>((T)1 / a + 1));
     }

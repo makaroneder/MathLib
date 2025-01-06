@@ -6,10 +6,10 @@ namespace MathLib {
     template <typename T>
     struct Iterator : Allocatable {
         Iterator(T* data) : data(data) {}
-        T& operator*(void) const {
+        [[nodiscard]] T& operator*(void) const {
             return *data;
         }
-        T* operator->(void) {
+        [[nodiscard]] T* operator->(void) {
             return data;
         }
         Iterator<T>& operator++(void) {
@@ -21,22 +21,15 @@ namespace MathLib {
             data++;
             return tmp;
         }
-        bool operator==(const Iterator<T>& other) const {
+        [[nodiscard]] bool operator==(const Iterator<T>& other) const {
             return data == other.data;
         }
-        bool operator!=(const Iterator<T>& other) const {
+        [[nodiscard]] bool operator!=(const Iterator<T>& other) const {
             return data != other.data;
         }
 
         private:
         T* data;
-    };
-    template <typename T>
-    struct Iteratable : Allocatable {
-        virtual Iterator<const T> begin(void) const = 0;
-        virtual Iterator<const T> end(void) const = 0;
-        virtual Iterator<T> begin(void) = 0;
-        virtual Iterator<T> end(void) = 0;
     };
 }
 

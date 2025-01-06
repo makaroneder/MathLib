@@ -4,7 +4,7 @@
 /// @brief Converts string to number with size postfixes
 /// @param size String to convert
 /// @return Number
-size_t ParseSize(const MathLib::String& size) {
+[[nodiscard]] size_t ParseSize(const MathLib::String& size) {
     switch (size.At(size.GetSize() - 1)) {
         case 'B': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1));
         case 'K': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * 1024;

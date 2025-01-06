@@ -8,23 +8,23 @@ namespace MathLib {
         Interval(const T& min_ = 0, const T& max_ = 0) : min(min_), max(max_) {
             EmptyBenchmark
         }
-        T GetMin(void) const {
+        [[nodiscard]] T GetMin(void) const {
             StartBenchmark
             ReturnFromBenchmark(min);
         }
-        T GetMax(void) const {
+        [[nodiscard]] T GetMax(void) const {
             StartBenchmark
             ReturnFromBenchmark(max);
         }
-        T GetSize(void) const {
+        [[nodiscard]] T GetSize(void) const {
             StartBenchmark
             ReturnFromBenchmark(max - min);
         }
-        bool Contains(const T& x) const {
+        [[nodiscard]] bool Contains(const T& x) const {
             StartBenchmark
             ReturnFromBenchmark(IsBetween(x, min, max));
         }
-        T Clamp(const T& x) const {
+        [[nodiscard]] T Clamp(const T& x) const {
             StartBenchmark
             if (x < min) ReturnFromBenchmark(min)
             else if (x > max) ReturnFromBenchmark(max)

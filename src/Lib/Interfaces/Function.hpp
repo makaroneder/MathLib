@@ -11,15 +11,15 @@ namespace MathLib {
         Function(void* data) : data(data) {
             EmptyBenchmark
         }
-        const void* GetData(void) const {
+        [[nodiscard]] const void* GetData(void) const {
             StartBenchmark
             ReturnFromBenchmark(data);
         }
-        Ret operator()(Args... args) const {
+        [[nodiscard]] Ret operator()(Args... args) const {
             StartBenchmark
             ReturnFromBenchmark(Invoke(data, args...));
         }
-        virtual Ret Invoke(const void* data, Args... args) const = 0;
+        [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const = 0;
 
         private:
         void* data;

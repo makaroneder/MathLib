@@ -8,7 +8,7 @@ struct DivisionError : Exception {
     /// @brief Triggers division error
     /// @param regs Register values used to overwrite real registers
     static void Trigger(Registers regs);
-    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
+    [[nodiscard]] virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

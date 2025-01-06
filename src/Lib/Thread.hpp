@@ -9,7 +9,7 @@ namespace MathLib {
         virtual void Join(void) = 0;
         void RunAndJoin(const Function<void, Interval<ssize_t>>& function, const Interval<ssize_t>& interval);
     };
-    Array<Interval<ssize_t>> SplitJob(const Interval<ssize_t>& interval, size_t threads);
+    [[nodiscard]] Array<Interval<ssize_t>> SplitJob(const Interval<ssize_t>& interval, size_t threads);
 }
 
 #endif

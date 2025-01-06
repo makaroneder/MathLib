@@ -86,16 +86,16 @@ struct HBAPort {
         Busy = 7,
     };
 
-    bool IsValid(void) const;
-    Type GetType(void) const;
+    [[nodiscard]] bool IsValid(void) const;
+    [[nodiscard]] Type GetType(void) const;
     void Configure(uint8_t* buffer);
-    bool AccessPort(size_t sector, uint32_t count, void* buff, bool write);
-    bool GetSize(size_t& sectors, size_t& bytesPerSector);
+    [[nodiscard]] bool AccessPort(size_t sector, uint32_t count, void* buff, bool write);
+    [[nodiscard]] bool GetSize(size_t& sectors, size_t& bytesPerSector);
 
     private:
     void StartCommand(void);
     void StopCommand(void);
-    uint8_t FindCommandSlot(void) const;
+    [[nodiscard]] uint8_t FindCommandSlot(void) const;
 
     uint32_t commandListBase;
     uint32_t commandListBaseUpper;

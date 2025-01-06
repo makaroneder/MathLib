@@ -30,10 +30,11 @@ int main(int argc, char** argv) {
         MathLib::Array<MathLib::complex_t> domain;
         MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> func;
         if (funcNode.dataType == "R") {
-            for (MathLib::num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(MathLib::complex_t(x, 0));
+            for (MathLib::num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier)
+                if (!domain.Add(MathLib::complex_t(x, 0))) MathLib::Panic("Failed to add point to domain");
             func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [funcNode, optimizer](const void*, MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
-                tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(z.GetReal()), true));
+                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(z.GetReal()), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
                 MathLib::Node* n = tmp.Optimize(funcNode.body);
                 const MathLib::Array<MathLib::complex_t> complexRet = n->ToNumber();
                 delete n;
@@ -42,13 +43,16 @@ int main(int argc, char** argv) {
         }
         else if (funcNode.dataType == "C") {
             for (MathLib::num_t y = -4; y <= 4; y += 1 / renderer.pointMultiplier) {
-                if (MathLib::FloatsEqual<MathLib::num_t>(y, MathLib::Round(y)))
-                    for (MathLib::num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier) domain.Add(MathLib::complex_t(x, y));
-                else for (MathLib::num_t x = -4; x <= 4; x++) domain.Add(MathLib::complex_t(x, y));
+                if (MathLib::FloatsEqual<MathLib::num_t>(y, MathLib::Round(y))) {
+                    for (MathLib::num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier)
+                        if (!domain.Add(MathLib::complex_t(x, y))) MathLib::Panic("Failed to add point to domain");
+                }
+                else for (MathLib::num_t x = -4; x <= 4; x++)
+                    if (!domain.Add(MathLib::complex_t(x, y))) MathLib::Panic("Failed to add point to domain");
             }
             func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [funcNode, optimizer](const void*, MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
-                tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true));
+                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
                 MathLib::Node* n = tmp.Optimize(funcNode.body);
                 const MathLib::complex_t ret = n->ToNumber().At(0);
                 delete n;

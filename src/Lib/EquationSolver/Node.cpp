@@ -84,17 +84,12 @@ namespace MathLib {
             }
             else while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.')) real += value[i++];
             SkipWhiteSpace(value, i);
-            if (i >= value.GetSize()) {
-                ret.Add(complex_t(StringToNumber(real), 0));
-                ReturnFromBenchmark(ret);
-            }
+            if (i >= value.GetSize())
+                ReturnFromBenchmark(ret.Add(complex_t(StringToNumber(real), 0)) ? ret : Array<complex_t>())
             else if (value[i] != '+') {
-                if (value[i] == 'i') {
-                    ret.Add(complex_t(0, real.IsEmpty() ? 1 : (real == "-" ? -1 : StringToNumber(real))));
-                    ReturnFromBenchmark(ret);
-                }
-                ret.Add(complex_t(StringToNumber(real), 0));
-                ReturnFromBenchmark(ret);
+                if (value[i] == 'i')
+                    ReturnFromBenchmark(ret.Add(complex_t(0, real.IsEmpty() ? 1 : (real == "-" ? -1 : StringToNumber(real)))) ? ret : Array<complex_t>())
+                else ReturnFromBenchmark(ret.Add(complex_t(StringToNumber(real), 0)) ? ret : Array<complex_t>());
             }
             i++;
             SkipWhiteSpace(value, i);
@@ -114,8 +109,7 @@ namespace MathLib {
             else while (i < value.GetSize() && (IsDigit(value[i]) || value[i] == '.')) imag += value[i++];
             SkipWhiteSpace(value, i);
             if (value[i++] != 'i') ReturnFromBenchmark(ret);
-            ret.Add(complex_t(StringToNumber(real), StringToNumber(imag)));
-            ReturnFromBenchmark(ret);
+            ReturnFromBenchmark(ret.Add(complex_t(StringToNumber(real), StringToNumber(imag))) ? ret : Array<complex_t>());
         }
         else if (type == Type::Array) {
             const Array<const Node*> values = CommaToArray(left);

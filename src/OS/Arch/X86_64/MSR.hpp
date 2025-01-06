@@ -13,9 +13,9 @@ enum class EFER : uint8_t {
     FastFXSave,
     TranslationCacheExtension,
 };
-bool HasMSR(void);
-MathLib::Expected<uint64_t> GetMSR(uint32_t msr);
-bool SetMSR(uint32_t msr, uint64_t value);
+[[nodiscard]] bool HasMSR(void);
+[[nodiscard]] MathLib::Expected<uint64_t> GetMSR(uint32_t msr);
+[[nodiscard]] bool SetMSR(uint32_t msr, uint64_t value);
 
 #endif
 #endif

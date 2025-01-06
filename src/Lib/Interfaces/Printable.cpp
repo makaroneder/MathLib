@@ -5,4 +5,8 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(printable.ToString());
     }
+    String ToString(const String& string) {
+        StartBenchmark
+        ReturnFromBenchmark(string);
+    }
 }

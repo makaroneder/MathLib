@@ -31,7 +31,7 @@ namespace MathLib {
     };
     /// @brief Creates default variables for equation solver
     /// @return Default variables
-    Array<Variable> CreateDefaultVariables(void);
+    [[nodiscard]] Array<Variable> CreateDefaultVariables(void);
 }
 
 #endif

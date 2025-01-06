@@ -11,6 +11,8 @@ namespace MathLib {
         uint16_t duration;
         uint16_t reserved;
         uint32_t chunks32;
+
+        [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }
 

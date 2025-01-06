@@ -1,10 +1,11 @@
 #ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "Multiboot1.hpp"
+#include "../VGA.hpp"
 #include <Logger.hpp>
 #include <String.hpp>
 
-void InitMultiboot1(Multiboot1Info* info, RangeMemoryManager& rangeMemoryManager) {
+void InitMultiboot1(Multiboot1Info* info) {
     LogString("Multiboot1 signature detected\n");
     if (info->hasBootloaderName) LogString(MathLib::String("Bootloader: ") + (const char*)(uintptr_t)info->bootloaderName + '\n');
     if (info->hasAPM) LogString(((MultibootAPM*)(uintptr_t)info->apm)->ToString());
@@ -59,8 +60,10 @@ void InitMultiboot1(Multiboot1Info* info, RangeMemoryManager& rangeMemoryManager
     }
     if (info->hasFramebuffer) {
         LogString(info->framebuffer.ToString());
-        if (info->framebuffer.type == MultibootFramebuffer::Type::RGB && info->framebuffer.bitsPerPixel == 32)
+        if (info->framebuffer.type == MultibootFramebuffer::Type::RGB && info->framebuffer.bitsPerPixel == sizeof(uint32_t) * 8)
             renderer = new KernelRenderer(info->framebuffer.width, info->framebuffer.height, (uint32_t*)info->framebuffer.address, MathLib::Color(info->redFieldPos, info->greenFieldPos, info->blueFieldPos, 0));
+        else if (info->framebuffer.type == MultibootFramebuffer::Type::EGA && info->framebuffer.bitsPerPixel == sizeof(uint16_t) * 2)
+            textUI = new VGA(VGA::colors[(uint8_t)VGA::Color::Black], VGA::colors[(uint8_t)VGA::Color::Gray], (uint8_t*)info->framebuffer.address, info->framebuffer.width, info->framebuffer.height);
     }
     if (info->hasMemoryMap) {
         const size_t entries = info->memoryMapLength / sizeof(Multiboot1MemoryMapEntry);
@@ -71,8 +74,7 @@ void InitMultiboot1(Multiboot1Info* info, RangeMemoryManager& rangeMemoryManager
             LogString(MathLib::String("\tSize: ") + MathLib::ToString(entry->length) + '\n');
             LogString(MathLib::String("\tType: ") + (entry->type < MultibootMemoryMapEntryType::TypeCount ? multibootMemoryMapEntryTypeStr[(uint32_t)entry->type] : MathLib::String("Unknown (0x") + MathLib::ToString((uint32_t)entry->type, 16) + ')') + '\n');
             LogString("}\n");
-            if (entry->type == MultibootMemoryMapEntryType::Available)
-                rangeMemoryManager.AddRegion(MathLib::Interval<uintptr_t>(entry->address, entry->address + entry->length));
+            // TODO: Add region
         }
     }
 }

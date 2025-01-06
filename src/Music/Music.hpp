@@ -8,16 +8,17 @@ struct Music : MathLib::Saveable {
     Music(void) {}
     Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Array<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
         for (const MusicNote<T>& note : notes) {
-            const size_t numSamples = (note.duration * sampleRate).GetValue();
+            const size_t sampleCount = (note.duration * sampleRate).GetValue();
             const MathLib::Hertz<T> frequency = note.GetFrequency();
-            for (size_t j = 0; j < numSamples; j++)
-                samples.Add((int16_t)(amplitude * MathLib::Sin((frequency * 2 * MathLib::pi * j / sampleRate).GetValue())));
+            samples = MathLib::Array<int16_t>(sampleCount);
+            for (size_t i = 0; i < sampleCount; i++)
+                samples.At(i) = (int16_t)(amplitude * MathLib::Sin((frequency * 2 * MathLib::pi * i / sampleRate).GetValue()));
         }
     }
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(MathLib::Writeable& file) const override {
+    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override {
         return (
             file.WriteBuffer("RIFF", 4) &&
             file.Write<uint32_t>(36 + samples.GetSize() * sizeof(int16_t)) &&
@@ -38,7 +39,7 @@ struct Music : MathLib::Saveable {
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(MathLib::Readable& file) override {
+    [[nodiscard]] virtual bool Load(MathLib::Readable& file) override {
         char buff[5] = { '\0', };
         uint32_t size;
         uint32_t tmp32;

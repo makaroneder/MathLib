@@ -21,7 +21,7 @@ struct GDTEntry {
     uint8_t base2;
 
     void SetBase(uint32_t base);
-    bool SetLimit(uint32_t limit);
+    [[nodiscard]] bool SetLimit(uint32_t limit);
 } __attribute__((packed));
 
 #endif

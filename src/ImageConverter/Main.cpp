@@ -3,7 +3,7 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::String& type) {
+[[nodiscard]] bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::String& type) {
     if (type == "P6") return renderer.SetImage<MathLib::P6>();
     else if (type == "TGA") return renderer.SetImage<MathLib::TGA>();
     else if (type == "Aseprite") return renderer.SetImage<MathLib::Aseprite>();
@@ -23,8 +23,9 @@ int main(int argc, char** argv) {
         if (!dummyRenderer.LoadFromPath(fs, cmdLine.GetEntry("input").Get("No input specified"))) MathLib::Panic("Failed to load image data");
         if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("outputType").Get("No output type specified"))) MathLib::Panic("Invalid outputType");
         if (!dummyRenderer.SaveFromPath(fs, cmdLine.GetEntry("output").Get("No output specified"))) MathLib::Panic("Failed to save image data");
-        renderer.DrawImage<MathLib::num_t>(dummyRenderer, MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
-        while (renderer.GetEvent().type != MathLib::Event::Type::Quit) renderer.Update();
+        if (!renderer.DrawImage<MathLib::num_t>(dummyRenderer, MathLib::CreateVector<MathLib::num_t>(0, 0, 0))) MathLib::Panic("Failed to render image");
+        while (renderer.GetEvent().type != MathLib::Event::Type::Quit)
+            if (!renderer.Update()) MathLib::Panic("Failed to update UI");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

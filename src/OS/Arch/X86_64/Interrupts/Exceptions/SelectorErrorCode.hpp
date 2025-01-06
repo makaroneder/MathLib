@@ -14,7 +14,7 @@ struct SelectorErrorCode {
     uint8_t table : 2;
     uint16_t index : 13;
 
-    MathLib::String ToString(const MathLib::String& padding = "") const;
+    [[nodiscard]] MathLib::String ToString(const MathLib::String& padding = "") const;
 } __attribute__((packed));
 
 #endif

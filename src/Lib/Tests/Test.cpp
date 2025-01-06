@@ -1,4 +1,6 @@
 #include "Test.hpp"
+#include "../MinMax.hpp"
+#include "../Interval.hpp"
 #include "../Math/Matrix.hpp"
 #include "../Math/Sigmoid.hpp"
 #include "../Math/Factorial.hpp"
@@ -110,10 +112,10 @@ namespace MathLib {
         TestOperation(test, FloatsEqual<num_t>(Abs(complex_t(0, 1)), 1));
         TestOperation(test, FloatsEqual<num_t>(Abs(complex_t(-1, 0)), 1));
         TestOperation(test, FloatsEqual<num_t>(Abs(complex_t(1, 0)), 1));
-        TestOperation(test, FloatsEqual<num_t>(Max(1, 0), 1));
-        TestOperation(test, FloatsEqual<num_t>(Max(0, 1), 1));
-        TestOperation(test, FloatsEqual<num_t>(Min(1, 0), 0));
-        TestOperation(test, FloatsEqual<num_t>(Min(0, 1), 0));
+        TestOperation(test, FloatsEqual<num_t>(Max<num_t>(1, 0), 1));
+        TestOperation(test, FloatsEqual<num_t>(Max<num_t>(0, 1), 1));
+        TestOperation(test, FloatsEqual<num_t>(Min<num_t>(1, 0), 0));
+        TestOperation(test, FloatsEqual<num_t>(Min<num_t>(0, 1), 0));
         TestOperation(test, FloatsEqual<num_t>(Pow(0, 0), 1));
         TestOperation(test, FloatsEqual<num_t>(Pow(1, 0), 1));
         TestOperation(test, FloatsEqual<num_t>(Pow(0, 1), 0));
@@ -187,10 +189,10 @@ namespace MathLib {
         TestOperation(test, Interval<size_t>(1, 3).Clamp(4) == 3);
         TestOperation(test, Kilometre<num_t>(1) == Metre<num_t>(1000));
         TestOperation(test, (Second<num_t>(1) * Second<num_t>(1)) == Second<num_t>(1).Pow(2));
-        TestOperation(test, FloatsEqual<num_t>(Matrix<num_t>(1, 1, MakeArrayFromSingle<num_t>(2)).Normalize().GetLength(), 1));
-        TestOperation(test, !Matrix<num_t>(1, 1, MakeArrayFromSingle<num_t>(0)).Normalize().GetLength());
-        TestOperation(test, !Matrix<num_t>(1, 1, MakeArrayFromSingle<num_t>(0)).GetInverse().HasValue());
-        TestOperation(test, Matrix<num_t>(1, 1, MakeArrayFromSingle<num_t>(1)).GetInverse().HasValue());
+        TestOperation(test, FloatsEqual<num_t>(matrix_t(1, 1, MakeArrayFromSingle<num_t>(2)).Normalize().GetLength(), 1));
+        TestOperation(test, !matrix_t(1, 1, MakeArrayFromSingle<num_t>(0)).Normalize().GetLength());
+        TestOperation(test, !matrix_t(1, 1, MakeArrayFromSingle<num_t>(0)).GetInverse().HasValue());
+        TestOperation(test, matrix_t(1, 1, MakeArrayFromSingle<num_t>(1)).GetInverse().HasValue());
         ReturnFromBenchmark(test);
     }
 }

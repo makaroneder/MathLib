@@ -11,11 +11,14 @@ namespace MathLib {
         DummyRenderer(size_t width, size_t height);
         /// @brief Does nothing
         /// @return Status
-        virtual bool Update(void) override;
+        [[nodiscard]] virtual bool Update(void) override;
         /// @brief Does nothing
         /// @return Event
-        virtual Event GetEvent(void) override;
+        [[nodiscard]] virtual Event GetEvent(void) override;
     };
+    #define LoadImage(name, path_)                                  \
+        MathLib::DummyRenderer name = MathLib::DummyRenderer(0, 0); \
+        if (!name.SetImage<MathLib::TGA>() || !name.LoadFromPath(fs, path + path_)) MathLib::Panic("Failed to load image")
 }
 
 #endif

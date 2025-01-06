@@ -7,7 +7,7 @@ struct AtExitFunction : MathLib::Allocatable {
     void* dso;
 
     AtExitFunction(Function function = nullptr, void* arg = nullptr, void* dso = nullptr);
-    bool operator==(void* func) const;
+    [[nodiscard]] bool operator==(void* func) const;
     void operator()(void);
 };
 AtExitFunction atExitFunctions[128];

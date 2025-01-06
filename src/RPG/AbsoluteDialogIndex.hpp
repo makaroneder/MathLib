@@ -9,16 +9,16 @@ struct AbsoluteDialogIndex : MathLib::Saveable, MathLib::Printable {
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    virtual bool Save(MathLib::Writeable& file) const override;
+    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override;
     /// @brief Loads data
     /// @param file File to load data from
     /// @return Status
-    virtual bool Load(MathLib::Readable& file) override;
+    [[nodiscard]] virtual bool Load(MathLib::Readable& file) override;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
-    bool operator==(const AbsoluteDialogIndex& other) const;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] bool operator==(const AbsoluteDialogIndex& other) const;
 
     private:
     size_t npc;

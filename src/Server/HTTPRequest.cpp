@@ -24,12 +24,12 @@ HTTPRequest::HTTPRequest(MathLib::String str) {
             MathLib::Array<MathLib::String> tmp = MathLib::Split(line, ":", true);
             size_t off = 0;
             while (tmp.At(1).At(off) == ' ') off++;
-            headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)));
+            if (!headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)))) MathLib::Panic("Failed to add HTTP header");
         }
         for (size_t i = bodyIndex; i < size; i++) body += lines.At(i) + "\n";
     }
 }
-MathLib::String HTTPRequest::Raw(void) const {
+MathLib::String HTTPRequest::GetRaw(void) const {
     MathLib::String ret = method + " " + target + " " + version + "\r\n";
     for (const HTTPHeader& header : headers) ret += header.name + ": " + header.value + "\r\n";
     return ret + "\r\n" + body;

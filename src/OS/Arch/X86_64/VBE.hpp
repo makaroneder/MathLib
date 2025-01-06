@@ -15,7 +15,7 @@ struct VBEInfo {
     uint16_t memory;
     uint32_t resv[123];
 
-    bool IsValid(void) const;
+    [[nodiscard]] bool IsValid(void) const;
 } __attribute__((packed));
 struct VBEModeInfo {
     uint8_t reserved1 : 7;

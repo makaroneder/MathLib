@@ -5,8 +5,8 @@
 
 struct MachineCheck : Exception {
     MachineCheck(void);
-    static bool Enable(void);
-    virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
+    [[nodiscard]] static bool Enable(void);
+    [[nodiscard]] virtual MathLib::String GetPanicMessage(uintptr_t error) const override;
 };
 
 #endif

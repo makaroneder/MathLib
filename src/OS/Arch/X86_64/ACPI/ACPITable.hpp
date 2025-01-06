@@ -14,7 +14,7 @@ struct ACPITable {
     uint32_t creatorID;
     uint32_t creatorRevision;
 
-    bool IsValid(void) const;
+    [[nodiscard]] bool IsValid(void) const;
 } __attribute__((packed));
 
 #endif

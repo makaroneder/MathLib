@@ -12,19 +12,19 @@ namespace MathLib {
         Ray(Line<T> line) : LineShape<T>(line.start), direction((line.end - line.start).Normalize()) {
             EmptyBenchmark
         }
-        Matrix<T> At(const T& t) const {
+        [[nodiscard]] Matrix<T> At(const T& t) const {
             StartBenchmark
             ReturnFromBenchmark(this->position + direction * t);
         }
-        Matrix<T> GetDirection(void) const {
+        [[nodiscard]] Matrix<T> GetDirection(void) const {
             return direction;
         }
-        virtual bool CollidesWith(const Shape<T>&) const override {
+        [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
             StartBenchmark
             ReturnFromBenchmark(false);
         }
-        virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
+        [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
             StartBenchmark
             ReturnFromBenchmark(MakeArrayFromSingle<Line<T>>(Line<T>(this->position, RotateVector<T>(At(1), this->position, rotation))));
         }

@@ -25,7 +25,7 @@ namespace MathLib {
     /// @param line line to convert
     /// @return Converted line
     template <typename T, typename F>
-    Line<F> ConvertLine(const Line<T>& line) {
+    [[nodiscard]] Line<F> ConvertLine(const Line<T>& line) {
         StartBenchmark
         ReturnFromBenchmark(Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end)));
     }

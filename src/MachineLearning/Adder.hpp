@@ -6,7 +6,7 @@
 /// @tparam T Type of number
 /// @return State
 template <typename T>
-NeuralNetworkState<T> GetDefaultState(void) {
+[[nodiscard]] NeuralNetworkState<T> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
     const size_t rows = n * n;
@@ -24,7 +24,7 @@ NeuralNetworkState<T> GetDefaultState(void) {
     return state;
 }
 template <typename T>
-MathLib::String StateToString(NeuralNetworkState<T>& state) {
+[[nodiscard]] MathLib::String StateToString(NeuralNetworkState<T>& state) {
     const size_t bits = state.trainingDataInput.GetWidth() / 2;
     const size_t n = 1 << bits;
     MathLib::String ret;
@@ -34,7 +34,7 @@ MathLib::String StateToString(NeuralNetworkState<T>& state) {
                 state.neuralNetwork.GetInput().At(i, 0) = (y >> i) & 1;
                 state.neuralNetwork.GetInput().At(i + bits, 0) = (x >> i) & 1;
             }
-            state.Forward();
+            if (!state.Forward()) return "";
             size_t z = 0;
             for (size_t i = 0; i < state.trainingDataOutput.GetWidth(); i++) z |= (state.neuralNetwork.GetOutput().At(i, 0) > 0.5) << i;
             ret += MathLib::String("[") + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(z) + '\n';

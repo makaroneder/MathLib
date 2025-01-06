@@ -1,5 +1,6 @@
 #include "Circuit.hpp"
 
+Circuit::Circuit(void) {}
 Circuit::Circuit(const MathLib::Array<CircuitElementConnection>& children) : CircuitElement(children) {}
 MathLib::Expected<MathLib::Bitmap> Circuit::Evaluate(void) const {
     MathLib::Bitmap ret = MathLib::Bitmap(children.GetSize());

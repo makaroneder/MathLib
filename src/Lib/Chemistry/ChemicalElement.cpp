@@ -26,7 +26,7 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(padding + symbol + (count == 1 ? "" : MathLib::ToString(count)));
     }
-    ChemicalElement ChemicalElement::operator*=(size_t num) {
+    ChemicalElement& ChemicalElement::operator*=(size_t num) {
         StartBenchmark
         count *= num;
         ReturnFromBenchmark(*this);

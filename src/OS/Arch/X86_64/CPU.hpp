@@ -3,7 +3,7 @@
 #define CPU_H
 #include <stdint.h>
 
-uintptr_t GetFlags(void);
+[[nodiscard]] uintptr_t GetFlags(void);
 void SetFlags(uintptr_t flags);
 
 #endif

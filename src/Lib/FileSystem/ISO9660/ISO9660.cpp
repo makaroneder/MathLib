@@ -77,7 +77,10 @@ namespace MathLib {
         Array<ISO9660DirectoryEntry*> rawRet = ReadDirectoryEntry(entry.Get());
         Array<FileInfo> ret;
         for (ISO9660DirectoryEntry*& tmp : rawRet) {
-            ret.Add(FileInfo(tmp->directory ? FileInfo::Type::Directory : FileInfo::Type::File, tmp->GetName()));
+            if (!ret.Add(FileInfo(tmp->directory ? FileInfo::Type::Directory : FileInfo::Type::File, tmp->GetName()))) {
+                delete tmp;
+                ReturnFromBenchmark(Array<FileInfo>());
+            }
             delete tmp;
         }
         ReturnFromBenchmark(ret);

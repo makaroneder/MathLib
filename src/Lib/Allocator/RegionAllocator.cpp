@@ -50,7 +50,7 @@ namespace MathLib {
         while (pos < size) {
             Region* region = (Region*)((uintptr_t)buffer + pos);
             pos += region->size + sizeof(Region);
-            if (region == ptr) {
+            if ((uintptr_t)region == (uintptr_t)ptr - sizeof(Region)) {
                 if (region->free) ReturnFromBenchmark(false);
                 region->free = true;
                 found = true;

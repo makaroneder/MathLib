@@ -26,20 +26,20 @@ namespace MathLib {
         }
         /// @brief Returns scalar part of quaternion
         /// @return Scalar part of quaternion
-        T GetScalar(void) const {
+        [[nodiscard]] T GetScalar(void) const {
             StartBenchmark
             ReturnFromBenchmark(a);
         }
         /// @brief Returns vector part of quaternion
         /// @return Vector part of quaternion
-        Matrix<T> GetVector(void) const {
+        [[nodiscard]] Matrix<T> GetVector(void) const {
             StartBenchmark
             ReturnFromBenchmark(CreateVector<T>(b, c, d));
         }
         /// @brief Converts quaternion to string
         /// @param padding String to pad with
         /// @return String representation
-        virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
             String ret = FloatsEqual<T>(a, 0) ? "" : MathLib::ToString(a);
             if (FloatsEqual<T>(b, 1)) ret += ret.IsEmpty() ? "i" : " + i";
@@ -53,7 +53,7 @@ namespace MathLib {
         /// @brief (a + bi + cj + dk) * (e + fi + gj + hk) = (ae - bf - cg - dh) + (af + be + ch - dg)i + (ag - bh + ce + df)j + (ah + bg - cf + de)k
         /// @param other Other quaternion
         /// @return New quaternion
-        Quaternion<T> operator*(const Quaternion<T>& other) const {
+        [[nodiscard]] Quaternion<T> operator*(const Quaternion<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(Quaternion<T>(
                 a * other.a - b * other.b - c * other.c - d * other.d,
@@ -64,19 +64,19 @@ namespace MathLib {
         }
         /// @brief |q|^2 = a^2 + b^2 + c^2 + d^2
         /// @return Squared norm of quaternion
-        T GetNormSquared(void) const {
+        [[nodiscard]] T GetNormSquared(void) const {
             StartBenchmark
             ReturnFromBenchmark(a * a + b * b + c * c + d * d);
         }
         /// @brief |q| = sqrt(a^2 + b^2 + c^2 + d^2)
         /// @return Norm of quaternion
-        T GetNorm(void) const {
+        [[nodiscard]] T GetNorm(void) const {
             StartBenchmark
             ReturnFromBenchmark(Sqrt(GetNormSquared()));
         }
         /// @brief ln(q) = ln(|q|) + v / |v| * arccos(a / |q|)
         /// @return Logarithm of quaternion
-        Expected<Quaternion<T>> Log(void) const {
+        [[nodiscard]] Expected<Quaternion<T>> Log(void) const {
             StartBenchmark
             const Matrix<T> v = GetVector();
             const T norm = GetNorm();
@@ -84,7 +84,7 @@ namespace MathLib {
         }
         /// @brief e^q = e^a * (cos(|v|) + v / |v| * sin(|v|))
         /// @return Exponential of quaternion
-        Quaternion<T> Exponential(void) const {
+        [[nodiscard]] Quaternion<T> Exponential(void) const {
             StartBenchmark
             const Matrix<T> v = GetVector();
             const T len = v.GetLength();
@@ -93,7 +93,7 @@ namespace MathLib {
         /// @brief q^n = exp(ln(q) * n)
         /// @param n Exponent
         /// @return Power of quaternion
-        Expected<Quaternion<T>> Pow(const T& n) const {
+        [[nodiscard]] Expected<Quaternion<T>> Pow(const T& n) const {
             StartBenchmark
             if (n < 0) {
                 const Expected<Quaternion<T>> tmp = GetInverse();
@@ -107,14 +107,14 @@ namespace MathLib {
         /// @brief q^n = exp(ln(q) * n)
         /// @param n Exponent quaternion
         /// @return Power of quaternion
-        Quaternion<T> Pow(const Quaternion<T>& n) const {
+        [[nodiscard]] Quaternion<T> Pow(const Quaternion<T>& n) const {
             StartBenchmark
             const Expected<Quaternion<T>> tmp = Log();
             ReturnFromBenchmark(tmp.HasValue() ? Expected<Quaternion<T>>((tmp.Get() * n).Exponential()) : Expected<Quaternion<T>>());
         }
         /// @brief q^-1 = (a - bi - cj - dk) / |q|^2
         /// @return Inverse of quaternion
-        Expected<Quaternion<T>> GetInverse(void) const {
+        [[nodiscard]] Expected<Quaternion<T>> GetInverse(void) const {
             StartBenchmark
             const T tmp = GetNormSquared();
             ReturnFromBenchmark(FloatsEqual<T>(tmp, 0) ? Expected<Quaternion<T>>() : Expected<Quaternion<T>>(Quaternion<T>(a, -b, -c, -d) / tmp));
@@ -157,7 +157,7 @@ namespace MathLib {
     /// @param rotation Vector containing axis to rotate around
     /// @return Rotated 3D vector
     template <typename T>
-    Matrix<T> RotateVector(const Matrix<T>& point, const Matrix<T>& origin, const Matrix<T>& rotation) {
+    [[nodiscard]] Matrix<T> RotateVector(const Matrix<T>& point, const Matrix<T>& origin, const Matrix<T>& rotation) {
         StartBenchmark
         const T angle = rotation.GetLength();
         if (FloatsEqual<T>(angle, 0)) ReturnFromBenchmark(point);
@@ -170,7 +170,7 @@ namespace MathLib {
     /// @param b B
     /// @return Cross product of vector A and B
     template <typename T>
-    Matrix<T> CrossProduct(const Matrix<T>& a, const Matrix<T>& b) {
+    [[nodiscard]] Matrix<T> CrossProduct(const Matrix<T>& a, const Matrix<T>& b) {
         StartBenchmark
         ReturnFromBenchmark((Quaternion<T>(0, a) * Quaternion<T>(0, b)).GetVector());
     }

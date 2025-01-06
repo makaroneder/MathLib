@@ -8,11 +8,11 @@
 
 // TODO: Nor, Nand, Xnor
 
-#define MakeElement(name, element)              \
-    elements.Add(element);                      \
+#define MakeElement(name, element)                                                      \
+    if (!elements.Add(element)) MathLib::Panic("Failed to add element to the circuit"); \
     const size_t name = elements.GetSize() - 1
 
-size_t Create1BitAdder(CircuitElementConnection a, CircuitElementConnection b, CircuitElementConnection carryIn) {
+[[nodiscard]] size_t Create1BitAdder(CircuitElementConnection a, CircuitElementConnection b, CircuitElementConnection carryIn) {
     MakeElement(xor1, new XorGate(std::vector<CircuitElementConnection> { a, b, }));
     MakeElement(and1, new AndGate(std::vector<CircuitElementConnection> { a, b, }));
     MakeElement(sum, new XorGate(std::vector<CircuitElementConnection> { CircuitElementConnection(xor1, 0), carryIn, }));
@@ -24,14 +24,13 @@ size_t Create1BitAdder(CircuitElementConnection a, CircuitElementConnection b, C
     }));
     return ret;
 }
-Circuit CreateAdder(uint8_t bits, size_t a, size_t b, const CircuitElementConnection& carryIn, const CircuitElementConnection& low, const CircuitElementConnection& high) {
+[[nodiscard]] MathLib::Expected<Circuit> CreateAdder(uint8_t bits, size_t a, size_t b, const CircuitElementConnection& carryIn, const CircuitElementConnection& low, const CircuitElementConnection& high) {
     MathLib::Array<CircuitElementConnection> adders;
     for (uint8_t i = 0; i < bits; i++) {
         const size_t element = Create1BitAdder(a & (1 << i) ? high : low, b & (1 << i) ? high : low, i ? CircuitElementConnection(adders.At(i - 1).index, 1) : carryIn);
-        adders.Add(CircuitElementConnection(element, 0));
-        if (i + 1 == bits) adders.Add(CircuitElementConnection(element, 1));
+        if (!adders.Add(CircuitElementConnection(element, 0)) || !(i + 1 == bits && !adders.Add(CircuitElementConnection(element, 1)))) return MathLib::Expected<Circuit>();
     }
-    return Circuit(adders);
+    return MathLib::Expected<Circuit>(Circuit(adders));
 }
 
 /// @brief Entry point for this program
@@ -46,7 +45,7 @@ int main(int, char**) {
         const size_t a = 0b1111;
         const size_t b = 0b0001;
         const CircuitElementConnection carryIn = CircuitElementConnection(low, 0);
-        const Circuit circuit = CreateAdder(bits, a, b, carryIn, CircuitElementConnection(low, 0), CircuitElementConnection(high, 0));
+        const Circuit circuit = CreateAdder(bits, a, b, carryIn, CircuitElementConnection(low, 0), CircuitElementConnection(high, 0)).Get("Failed to create adder");
         std::cout << circuit << std::endl;
         const MathLib::Bitmap bitmap = circuit.Evaluate().Get("Failed to run circuit");
         for (size_t i = 0; i < bitmap.GetSize(); i++) std::cout << ConstGate(bitmap.Get(i).Get("Failed to run circuit")) << std::endl;

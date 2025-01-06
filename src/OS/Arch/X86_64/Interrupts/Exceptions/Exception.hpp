@@ -33,7 +33,7 @@ struct Exception : InterruptDevice {
     Exception(Type type);
     virtual ~Exception(void) override;
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;
-    virtual MathLib::String GetPanicMessage(uintptr_t error) const = 0;
+    [[nodiscard]] virtual MathLib::String GetPanicMessage(uintptr_t error) const = 0;
 
     private:
     Type type;

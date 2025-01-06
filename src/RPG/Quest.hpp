@@ -4,17 +4,16 @@
 
 struct Quest : MathLib::Printable {
     Quest(const MathLib::String& name, const MathLib::String& description, const MathLib::Array<QuestStep>& steps);
-    bool IsHidden(void) const;
+    [[nodiscard]] bool IsHidden(void) const;
     template <typename T>
-    bool Check(const Player<T>& player) {
+    void Check(const Player<T>& player) {
         for (; step < steps.GetSize(); step++)
-            if (!steps.At(step).Check(player)) return false;
-        return true;
+            if (!steps.At(step).Check(player)) break;
     }
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 
     private:
     MathLib::String name;

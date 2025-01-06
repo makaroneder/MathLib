@@ -14,23 +14,23 @@ namespace MathLib {
             buffer.reserve(size);
             for (size_t i = 0; i < size; i++) buffer.push_back(arr[i]);
         }
-        virtual T At(size_t index) const override {
+        [[nodiscard]] virtual T At(size_t index) const override {
             return buffer.at(index);
         }
-        virtual T& At(size_t index) override {
+        [[nodiscard]] virtual T& At(size_t index) override {
             return buffer.at(index);
         }
-        virtual bool Add(const T& val) override {
+        [[nodiscard]] virtual bool Add(const T& val) override {
             buffer.push_back(val);
             return true;
         }
-        virtual size_t GetSize(void) const override {
+        [[nodiscard]] virtual size_t GetSize(void) const override {
             return buffer.size();
         }
-        virtual const T* GetValue(void) const override {
+        [[nodiscard]] virtual const T* GetValue(void) const override {
             return buffer.data();
         }
-        std::vector<T> ToVector(void) const {
+        [[nodiscard]] std::vector<T> ToVector(void) const {
             return buffer;
         }
 

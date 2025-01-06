@@ -9,7 +9,7 @@ namespace MathLib {
     num_t Pow(num_t x, num_t y);
     num_t InversedTan2(num_t y, num_t x);
     template <typename T>
-    String CoefficientToString(const T& x, const String& symbol) {
+    [[nodiscard]] String CoefficientToString(const T& x, const String& symbol) {
         StartBenchmark
         if (FloatsEqual<T>(x, 0)) ReturnFromBenchmark("")
         else if (FloatsEqual<T>(x, 1)) ReturnFromBenchmark(symbol)
@@ -22,79 +22,79 @@ namespace MathLib {
         Complex<T>(const T& re = 0, const T& im = 0) : real(re), imaginary(im) {
             EmptyBenchmark
         }
-        T GetReal(void) const {
+        [[nodiscard]] T GetReal(void) const {
             StartBenchmark
             ReturnFromBenchmark(real);
         }
-        T GetImaginary(void) const {
+        [[nodiscard]] T GetImaginary(void) const {
             StartBenchmark
             ReturnFromBenchmark(imaginary);
         }
-        T GetLengthSquared(void) const {
+        [[nodiscard]] T GetLengthSquared(void) const {
             StartBenchmark
             ReturnFromBenchmark(real * real + imaginary * imaginary);
         }
-        T GetLength(void) const {
+        [[nodiscard]] T GetLength(void) const {
             StartBenchmark
             ReturnFromBenchmark(Sqrt(GetLengthSquared()));
         }
-        Complex<T> GetInverse(void) const {
+        [[nodiscard]] Complex<T> GetInverse(void) const {
             StartBenchmark
             const T tmp = GetLengthSquared();
             ReturnFromBenchmark(Complex<T>(real / tmp, -imaginary / tmp));
         }
-        T GetArgument(void) const {
+        [[nodiscard]] T GetArgument(void) const {
             StartBenchmark
             ReturnFromBenchmark(InversedTan2(imaginary, real));
         }
-        T ToReal(void) const {
+        [[nodiscard]] T ToReal(void) const {
             StartBenchmark
             ReturnFromBenchmark(FloatsEqual<T>(imaginary, 0) ? real : MakeNaN());
         }
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
             if (FloatsEqual<T>(real, 0)) ReturnFromBenchmark(padding + (FloatsEqual<T>(imaginary, 0) ? "0" : CoefficientToString(imaginary, "i")))
             else if (FloatsEqual<T>(imaginary, 0)) ReturnFromBenchmark(padding + MathLib::ToString(real))
             else ReturnFromBenchmark(padding + MathLib::ToString(real) + " + " + MathLib::ToString(imaginary) + 'i')
         }
-        Complex<T> operator/(const Complex<T>& other) const {
+        [[nodiscard]] Complex<T> operator/(const Complex<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(*this * other.GetInverse());
         }
-        Complex<T> operator*(const Complex<T>& other) const {
+        [[nodiscard]] Complex<T> operator*(const Complex<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(Complex<T>(real * other.real - imaginary * other.imaginary, real * other.imaginary + imaginary * other.real));
         }
-        Complex<T> operator/=(const Complex<T>& other) {
+        Complex<T>& operator/=(const Complex<T>& other) {
             StartBenchmark
             const Complex<T> tmp = *this / other;
             real = tmp.real;
             imaginary = tmp.imaginary;
-            ReturnFromBenchmark(tmp);
+            ReturnFromBenchmark(*this);
         }
-        Complex<T> operator*=(const Complex<T>& other) {
+        Complex<T>& operator*=(const Complex<T>& other) {
             StartBenchmark
             const Complex<T> tmp = *this * other;
             real = tmp.real;
             imaginary = tmp.imaginary;
-            ReturnFromBenchmark(tmp);
+            ReturnFromBenchmark(*this);
         }
-        bool operator==(const Complex<T>& other) const {
+        [[nodiscard]] bool operator==(const Complex<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(FloatsEqual<T>(real, other.real) && FloatsEqual<T>(imaginary, other.imaginary));
         }
-        explicit operator num_t(void) const {
+        [[nodiscard]] explicit operator num_t(void) const {
             StartBenchmark
             ReturnFromBenchmark(ToReal());
         }
-        explicit operator size_t(void) const {
+        [[nodiscard]] explicit operator size_t(void) const {
             StartBenchmark
             ReturnFromBenchmark((size_t)ToReal());
         }
-        explicit operator ssize_t(void) const {
+        [[nodiscard]] explicit operator ssize_t(void) const {
             StartBenchmark
             ReturnFromBenchmark((ssize_t)ToReal());
         }
@@ -121,12 +121,12 @@ namespace MathLib {
         }
     };
     template <typename T>
-    Complex<T> operator/(const T& scalar, const Complex<T>& complex) {
+    [[nodiscard]] Complex<T> operator/(const T& scalar, const Complex<T>& complex) {
         StartBenchmark
         ReturnFromBenchmark(complex.GetInverse() * scalar);
     }
     template <typename T>
-    bool operator<(const T& scalar, const Complex<T>& complex) {
+    [[nodiscard]] bool operator<(const T& scalar, const Complex<T>& complex) {
         StartBenchmark
         ReturnFromBenchmark(FloatsEqual<T>(complex.GetImaginary(), 0) && scalar < complex.GetReal())
     }

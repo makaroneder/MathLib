@@ -3,7 +3,7 @@
 #define ACPI_H
 #include "RSDP.hpp"
 
-bool InitACPI(const RSDP* rsdp, bool nmi);
+[[nodiscard]] bool InitACPI(const RSDP* rsdp, bool nmi);
 
 #endif
 #endif

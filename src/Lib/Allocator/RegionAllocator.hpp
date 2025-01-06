@@ -14,9 +14,9 @@ namespace MathLib {
         } __attribute__((packed));
         RegionAllocator(void* buffer, size_t size);
         RegionAllocator(Allocator* allocator, size_t size);
-        virtual void* Alloc(size_t size) override;
-        virtual bool Dealloc(void* ptr) override;
-        virtual size_t GetFreeMemory(void) const override;
+        [[nodiscard]] virtual void* Alloc(size_t size) override;
+        [[nodiscard]] virtual bool Dealloc(void* ptr) override;
+        [[nodiscard]] virtual size_t GetFreeMemory(void) const override;
     };
 }
 

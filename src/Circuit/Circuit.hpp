@@ -3,12 +3,13 @@
 #include "CircuitElement.hpp"
 
 struct Circuit : CircuitElement {
+    Circuit(void);
     Circuit(const MathLib::Array<CircuitElementConnection>& children);
-    virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const override;
+    [[nodiscard]] virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const override;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 };
 
 #endif

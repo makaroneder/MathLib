@@ -15,10 +15,10 @@ namespace MathLib {
         virtual ~SDL2Renderer(void) override;
         /// @brief Copies pixels from memory to screen
         /// @return Status
-        virtual bool Update(void) override;
+        [[nodiscard]] virtual bool Update(void) override;
         /// @brief Gets current event
         /// @return Event
-        virtual Event GetEvent(void) override;
+        [[nodiscard]] virtual Event GetEvent(void) override;
 
         private:
         /// @brief Window

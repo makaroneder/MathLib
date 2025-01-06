@@ -8,12 +8,13 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        virtual String ToString(const String& padding = "") const = 0;
+        [[nodiscard]] virtual String ToString(const String& padding = "") const = 0;
     };
     /// @brief Converts struct to string
     /// @param printable Struct to convert
     /// @return String representation
-    String ToString(const Printable& printable);
+    [[nodiscard]] String ToString(const Printable& printable);
+    [[nodiscard]] String ToString(const String& string);
 }
 
 #endif

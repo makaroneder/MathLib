@@ -1,10 +1,11 @@
 #ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "Multiboot2.hpp"
+#include "../VGA.hpp"
 #include <Logger.hpp>
 #include <String.hpp>
 
-RSDP* InitMultiboot2(Multiboot2Info* info, RangeMemoryManager& rangeMemoryManager) {
+RSDP* InitMultiboot2(Multiboot2Info* info) {
     RSDP* rsdp = nullptr;
     LogString("Multiboot2 signature detected\n");
     for (Multiboot2Tag* tag = info->tags; tag->type != Multiboot2Tag::Type::FinalTag; tag = (Multiboot2Tag*)((uint8_t*)tag + ((tag->size + 7) & ~7))) {
@@ -46,8 +47,10 @@ RSDP* InitMultiboot2(Multiboot2Info* info, RangeMemoryManager& rangeMemoryManage
             case Multiboot2Tag::Type::Framebuffer: {
                 const Multiboot2TagFramebuffer* framebuffer = (const Multiboot2TagFramebuffer*)tag;
                 LogString(framebuffer->framebuffer.ToString());
-                if (framebuffer->framebuffer.type == MultibootFramebuffer::Type::RGB && framebuffer->framebuffer.bitsPerPixel == 32)
+                if (framebuffer->framebuffer.type == MultibootFramebuffer::Type::RGB && framebuffer->framebuffer.bitsPerPixel == sizeof(uint32_t) * 8)
                     renderer = new KernelRenderer(framebuffer->framebuffer.width, framebuffer->framebuffer.height, (uint32_t*)framebuffer->framebuffer.address, MathLib::Color(framebuffer->redFieldPosition, framebuffer->greenFieldPosition, framebuffer->blueFieldPosition, 0));
+                else if (framebuffer->framebuffer.type == MultibootFramebuffer::Type::EGA && framebuffer->framebuffer.bitsPerPixel == sizeof(uint16_t) * 8)
+                    textUI = new VGA(VGA::colors[(uint8_t)VGA::Color::Black], VGA::colors[(uint8_t)VGA::Color::Gray], (uint8_t*)framebuffer->framebuffer.address, framebuffer->framebuffer.width, framebuffer->framebuffer.height);
                 break;
             }
             case Multiboot2Tag::Type::MemoryMap: {
@@ -63,8 +66,7 @@ RSDP* InitMultiboot2(Multiboot2Info* info, RangeMemoryManager& rangeMemoryManage
                     LogString(MathLib::String("\t\tSize: ") + MathLib::ToString(entry->length) + '\n');
                     LogString(MathLib::String("\t\tType: ") + (entry->type < MultibootMemoryMapEntryType::TypeCount ? multibootMemoryMapEntryTypeStr[(uint32_t)entry->type] : MathLib::String("Unknown (0x") + MathLib::ToString((uint32_t)entry->type, 16) + ')') + '\n');
                     LogString("\t}\n");
-                    if (entry->type == MultibootMemoryMapEntryType::Available)
-                        rangeMemoryManager.AddRegion(MathLib::Interval<uintptr_t>(entry->address, entry->address + entry->length));
+                    // TODO: Add region
                 }
                 LogString("}\n");
                 break;

@@ -8,7 +8,7 @@ namespace MathLib {
         uint8_t colorCount;
         AsepriteOldPaletteChunkPacketColor colors[];
 
-        uint16_t GetColorCount(void) const;
+        [[nodiscard]] uint16_t GetColorCount(void) const;
     } __attribute__((packed));
 }
 

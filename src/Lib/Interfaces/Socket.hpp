@@ -5,8 +5,8 @@
 
 namespace MathLib {
     struct Socket : Readable, Writeable {
-        virtual bool Bind(int port) = 0;
-        virtual Socket* GetConnection(void) = 0;
+        [[nodiscard]] virtual bool Bind(int port) = 0;
+        [[nodiscard]] virtual Socket* GetConnection(void) = 0;
     };
 }
 

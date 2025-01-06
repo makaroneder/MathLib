@@ -21,10 +21,10 @@ namespace MathLib {
         String token;
         while ((pos = str.Find(delim)) != SIZE_MAX) {
             token = SubString(str, 0, pos + delim.GetSize() * preserveDelim);
-            ret.Add(token);
+            if (!ret.Add(token)) ReturnFromBenchmark(Array<String>());
             str = Erase(str, 0, pos + delim.GetSize());
         }
-        ret.Add(str);
+        if (!ret.Add(str)) ReturnFromBenchmark(Array<String>());
         ReturnFromBenchmark(ret);
     }
     String BoolToString(bool x) {
@@ -33,8 +33,8 @@ namespace MathLib {
     }
     String ToString(size_t x, size_t base, size_t size) {
         StartBenchmark
-        if (!x) ReturnFromBenchmark("0");
         String buff;
+        if (!x) buff = "0";
         while (x) {
             const size_t n = x % base;
             x /= base;
@@ -46,5 +46,20 @@ namespace MathLib {
         for (size_t i = buff.GetSize() - 1; i > 0; i--) ret += buff.At(i);
         ret += buff[0];
         ReturnFromBenchmark(ret);
+    }
+    String DumpMemory(uintptr_t addr, size_t size, size_t lineSize) {
+        String ret;
+        const uint8_t* buff = (const uint8_t*)addr;
+        for (size_t y = 0; y < size; y += lineSize) {
+            for (size_t x = 0; x < lineSize; x++)
+                ret += (y + x < size ? ToString(buff[y + x], 16, 2) : "??") + ' ';
+            ret += '\t';
+            for (size_t x = 0; x < lineSize; x++) {
+                ret += y + x < size ? (IsAlphaDigit(buff[y + x]) ? (char)buff[y + x] : '.') : '?';
+                ret += ' ';
+            }
+            ret.At(ret.GetSize() - 1) = '\n';
+        }
+        return ret;
     }
 }

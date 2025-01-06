@@ -6,7 +6,7 @@
 MathLib::Array<HTTPHeader> resources = std::vector<HTTPHeader> {
     HTTPHeader("/", "<h1>Amongus</h1>"),
 };
-HTTPHeader* GetResource(MathLib::String name) {
+[[nodiscard]] HTTPHeader* GetResource(MathLib::String name) {
     for (HTTPHeader& resource : resources)
         if (resource.name == name) return &resource;
     return nullptr;
@@ -35,24 +35,23 @@ int main(int argc, char** argv) {
             HTTPResponse response;
             if (request.method == "GET") {
                 HTTPHeader* resource = GetResource(request.target);
-                response = resource ? HTTPResponse::FromHTML(resource->value) : HTTPResponse::FromStatus(HTTPStatus::NotFound, MathLib::String("Requested resource does not exist: ") + request.target);
+                response = resource ? HTTPResponse::FromHTML(resource->value) : HTTPResponse::FromStatus(HTTPStatus::NotFound, request.target + " does not exist");
             }
             else if (request.method == "HEAD") {
                 HTTPHeader* resource = GetResource(request.target);
                 if (resource != nullptr) {
                     response = HTTPResponse::FromHTML(resource->value);
-                    response.status = httpStatusStr[(size_t)HTTPStatus::NoContent];
                     response.body = "";
                 }
-                else response = HTTPResponse::FromStatus(HTTPStatus::NotFound, MathLib::String("Requested resource does not exist: ") + request.target);
+                else response = HTTPResponse::FromStatus(HTTPStatus::NotFound, request.target + " does not exist");
             }
             else if (request.method == "OPTIONS") {
                 response = HTTPResponse::FromStatus(HTTPStatus::NoContent, "OK");
-                response.headers.Add(HTTPHeader("Allow", "OPTIONS, GET, HEAD"));
+                if (!response.headers.Add(HTTPHeader("Allow", "OPTIONS, GET, HEAD"))) MathLib::Panic("Failed to add resonse header");
             }
             else response = HTTPResponse::FromStatus(HTTPStatus::NotImplemented, MathLib::String("Unknown request: ") + request.method);
             std::cout << response << std::flush;
-            if (!client->Puts(response.Raw())) {
+            if (!client->Puts(response.GetRaw())) {
                 delete client;
                 MathLib::Panic("Failed to write data to client");
             }

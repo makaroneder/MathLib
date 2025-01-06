@@ -3,7 +3,7 @@
 #include <numeric>
 
 template <typename T>
-T GreatestCommonDivisor(T a, T b) {
+[[nodiscard]] T GreatestCommonDivisor(T a, T b) {
     while (MathLib::Abs(b) > MathLib::eps) {
         const T tmp = b;
         b = std::fmod(a, b);
@@ -12,27 +12,23 @@ T GreatestCommonDivisor(T a, T b) {
     return a;
 }
 template <typename T>
-T LeastCommonMultiple(const T& a, const T& b) {
+[[nodiscard]] T LeastCommonMultiple(const T& a, const T& b) {
     if (MathLib::FloatsEqual<T>(a, 0)) return b;
     else if (MathLib::FloatsEqual<T>(b, 0)) return a;
     else return MathLib::Abs(a * b) / GreatestCommonDivisor<T>(a, b);
 }
 template <typename T>
-T LeastCommonMultiple(const MathLib::Array<T>& array) {
+[[nodiscard]] T LeastCommonMultiple(const MathLib::Array<T>& array) {
     if (array.IsEmpty()) return 0;
     T ret = array.At(0);
     for (size_t i = 1; i < array.GetSize(); i++) ret = LeastCommonMultiple<T>(ret, array.At(i));
     return ret;
 }
-MathLib::Array<ssize_t> GetDivisors(size_t p) {
+[[nodiscard]] MathLib::Array<ssize_t> GetDivisors(size_t p) {
     if (!p) return MathLib::MakeArrayFromSingle<ssize_t>(0);
     MathLib::Array<ssize_t> ret;
-    for (size_t i = 1; i <= p; i++) {
-        if (!(p % i)) {
-            ret.Add(i);
-            ret.Add(-i);
-        }
-    }
+    for (size_t i = 1; i <= p; i++)
+        if (!(p % i) && (!ret.Add(i) || !ret.Add(-i))) return MathLib::Array<ssize_t>();
     return ret;
 }
 
@@ -42,19 +38,19 @@ struct Polynomial : MathLib::Printable {
     CreateExponential(Polynomial<T>, true, Polynomial<T>(MathLib::MakeArrayFromSingle<T>(1)))
     Polynomial(void) {}
     Polynomial(MathLib::Array<T> coefficients) : coefficients(coefficients) {}
-    size_t GetDegree(void) const {
+    [[nodiscard]] size_t GetDegree(void) const {
         return coefficients.GetSize() - 1;
     }
-    size_t GetTermCount(void) const {
+    [[nodiscard]] size_t GetTermCount(void) const {
         size_t ret = 0;
         for (const T& x : coefficients) ret += !MathLib::FloatsEqual<T>(x, 0);
         return ret;
     }
-    T At(size_t x) const {
+    [[nodiscard]] T At(size_t x) const {
         return coefficients.At(x);
     }
     template <typename F>
-    F Calculate(const F& x) const {
+    [[nodiscard]] F Calculate(const F& x) const {
         F ret = 0;
         for (size_t i = 0; i < coefficients.GetSize(); i++)
             ret += MathLib::Pow(x, i) * coefficients.At(i);
@@ -76,7 +72,7 @@ struct Polynomial : MathLib::Printable {
         }
     }
     template <typename F>
-    MathLib::Array<F> Solve(void) const {
+    [[nodiscard]] MathLib::Array<F> Solve(void) const {
         Polynomial<T> tmp = *this * LeastCommonMultiple<T>(coefficients);
         MathLib::Array<F> ret;
         while (true) {
@@ -87,7 +83,7 @@ struct Polynomial : MathLib::Printable {
                 for (const ssize_t& q : qDivs) {
                     const F t = p / q;
                     if (MathLib::FloatsEqual<F>(Calculate(t), 0) && !ret.Contains(t)) {
-                        ret.Add(t);
+                        if (!ret.Add(t)) return MathLib::Array<F>();
                         any = true;
                         MathLib::Array<T> arr = MathLib::Array<T>(2);
                         arr.At(0) = -(T)t;
@@ -101,14 +97,13 @@ struct Polynomial : MathLib::Printable {
                     const F delta = MathLib::Pow(tmp.coefficients.At(1), 2) - tmp.coefficients.At(2) * tmp.coefficients.At(0) * 4;
                     const F x1 = (-F(tmp.coefficients.At(1)) - MathLib::Sqrt(delta)) / (tmp.coefficients.At(2) * 2);
                     const F x2 = (-F(tmp.coefficients.At(1)) + MathLib::Sqrt(delta)) / (tmp.coefficients.At(2) * 2);
-                    if (!ret.Contains(x1)) ret.Add(x1);
-                    if (!ret.Contains(x2)) ret.Add(x2);
+                    if ((!ret.Contains(x1) && !ret.Add(x1)) || (!ret.Contains(x2) && !ret.Add(x2))) return MathLib::Array<F>();
                 }
                 return ret;
             }
         }
     }
-    MathLib::Expected<Polynomial<T>> Composition(const Polynomial<T>& other) const {
+    [[nodiscard]] MathLib::Expected<Polynomial<T>> Composition(const Polynomial<T>& other) const {
         Polynomial<T> ret = MathLib::Array<T>(coefficients.GetSize() + other.coefficients.GetSize() - 1);
         for (size_t i = 0; i < coefficients.GetSize(); i++) {
             const MathLib::Expected<Polynomial<T>> tmp = other.UnsignedPow(i);
@@ -117,33 +112,33 @@ struct Polynomial : MathLib::Printable {
         }
         return MathLib::Expected<Polynomial<T>>(ret);
     }
-    Polynomial<T> Derivative(void) const {
+    [[nodiscard]] Polynomial<T> Derivative(void) const {
         Polynomial<T> ret = Polynomial<T>(GetDegree());
         for (size_t i = 1; i < coefficients.GetSize(); i++)
             ret.coefficients.At(i - 1) += coefficients.At(i) * i;
         return ret;
     }
-    Polynomial<T> AntiDerivative(const T& constantOfIntegration) const {
+    [[nodiscard]] Polynomial<T> AntiDerivative(const T& constantOfIntegration) const {
         Polynomial<T> ret = Polynomial<T>(coefficients.GetSize() + 1);
         ret.coefficients.At(0) = constantOfIntegration;
         for (size_t i = 0; i < coefficients.GetSize(); i++)
             ret.coefficients.At(i + 1) += coefficients.At(i) / (i + 1);
         return ret;
     }
-    Polynomial<T> operator*(const Polynomial<T>& other) const {
+    [[nodiscard]] Polynomial<T> operator*(const Polynomial<T>& other) const {
         Polynomial<T> ret = MathLib::Array<T>(coefficients.GetSize() + other.coefficients.GetSize() - 1);
         for (size_t i = 0; i < coefficients.GetSize(); i++)
             for (size_t j = 0; j < other.coefficients.GetSize(); j++)
                 ret.coefficients.At(i + j) += coefficients.At(i) * other.coefficients.At(j);
         return ret;
     }
-    Polynomial<T> operator/(const Polynomial<T>& other) const {
+    [[nodiscard]] Polynomial<T> operator/(const Polynomial<T>& other) const {
         Polynomial<T> unused;
         Polynomial<T> ret;
         Divide(other, ret, unused);
         return ret;
     }
-    Polynomial<T> operator%(const Polynomial<T>& other) const {
+    [[nodiscard]] Polynomial<T> operator%(const Polynomial<T>& other) const {
         Polynomial<T> unused;
         Polynomial<T> ret;
         Divide(other, unused, ret);
@@ -158,7 +153,7 @@ struct Polynomial : MathLib::Printable {
     Polynomial<T>& operator%=(const Polynomial<T>& other) {
         return *this = *this % other;
     }
-    bool operator==(const Polynomial<T>& other) const {
+    [[nodiscard]] bool operator==(const Polynomial<T>& other) const {
         if (coefficients.GetSize() != other.coefficients.GetSize()) return false;
         for (size_t i = 0; i < coefficients.GetSize(); i++)
             if (!MathLib::FloatsEqual<T>(coefficients.At(i), other.coefficients.At(i))) return false;
@@ -167,7 +162,7 @@ struct Polynomial : MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
         MathLib::String ret;
         for (size_t i = GetDegree(); i; i--) {
             const MathLib::String tmp = MathLib::CoefficientToString(coefficients.At(i), "x");
@@ -202,7 +197,7 @@ struct Polynomial : MathLib::Printable {
     }
 };
 template <typename T>
-MathLib::Expected<Polynomial<T>> SplitPolynomial(const MathLib::Node* node) {
+[[nodiscard]] MathLib::Expected<Polynomial<T>> SplitPolynomial(const MathLib::Node* node) {
     const MathLib::Expected<Polynomial<T>> left = node->left ? SplitPolynomial<T>(node->left) : MathLib::Expected<Polynomial<T>>();
     const MathLib::Expected<Polynomial<T>> right = node->right ? SplitPolynomial<T>(node->right) : MathLib::Expected<Polynomial<T>>();
     switch (node->type) {

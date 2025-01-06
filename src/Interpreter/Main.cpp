@@ -3,7 +3,7 @@
 
 // TODO: logical and, logical or, for loops, structs, pointers
 
-MathLib::Node* Print(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     if (args.GetSize() != 1) return nullptr;
     if (args.At(0)->type == MathLib::Node::Type::Constant) std::cout << args.At(0)->ToNumber().At(0) << std::flush;
     else if (args.At(0)->type == MathLib::Node::Type::String) std::cout << args.At(0)->value << std::flush;
@@ -36,8 +36,7 @@ int main(int argc, char** argv) {
         MathLib::FunctionNode main = optimizer.GetFunction("Main");
         MathLib::Array<MathLib::Node*> args = MathLib::Array<MathLib::Node*>(argc - 1);
         for (int i = 1; i < argc; i++) args.At(i - 1) = new MathLib::Node(MathLib::Node::Type::String, argv[i]);
-        optimizer.variables.Add(MathLib::Variable(main.arguments[0].name, main.arguments[0].dataType, MathLib::ToString(argc - 1), true));
-        optimizer.variables.Add(MathLib::Variable(main.arguments[1].name, main.arguments[1].dataType, MathLib::ArrayToComma(args), true));
+        if (!optimizer.variables.Add(MathLib::Variable(main.arguments[0].name, main.arguments[0].dataType, MathLib::ToString(argc - 1), true)) || !optimizer.variables.Add(MathLib::Variable(main.arguments[1].name, main.arguments[1].dataType, MathLib::ArrayToComma(args), true))) MathLib::Panic("Failed to add variables for Main function");
         MathLib::Node* tmp = optimizer.Optimize(main.body);
         if (tmp->type != MathLib::Node::Type::Constant) MathLib::Panic("Invalid type of return value from Main");
         if (!tmp->ToNumber().At(0).ToReal()) MathLib::Panic("Unexpected return value from Main");

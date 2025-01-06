@@ -25,7 +25,7 @@ HTTPResponse::HTTPResponse(MathLib::String str) {
             MathLib::Array<MathLib::String> tmp = MathLib::Split(line, ":", true);
             size_t off = 0;
             while (tmp.At(1).At(off) == ' ') off++;
-            headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)));
+            if (!headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)))) MathLib::Panic("Failed to add HTTP header");
         }
         for (size_t i = bodyIndex; i < size; i++) body += lines.At(i) + "\n";
     }
@@ -33,18 +33,18 @@ HTTPResponse::HTTPResponse(MathLib::String str) {
 HTTPResponse HTTPResponse::FromStatus(HTTPStatus status, MathLib::String desc) {
     HTTPResponse ret = HTTPResponse();
     ret.version = "HTTP/1.1";
-    ret.status = httpStatusStr[(size_t)status];
+    ret.status = MathLib::ToString((size_t)status, 10);
     ret.description = desc;
     return ret;
 }
 HTTPResponse HTTPResponse::FromHTML(MathLib::String str) {
     HTTPResponse ret = FromStatus(HTTPStatus::Success, "OK");
-    ret.headers.Add(HTTPHeader("Content-Type", "text/html; charset=utf-8"));
-    ret.headers.Add(HTTPHeader("Content-Length", MathLib::ToString(str.GetSize())));
+    if (!ret.headers.Add(HTTPHeader("Content-Type", "text/html; charset=utf-8"))) return HTTPResponse();
+    if (!ret.headers.Add(HTTPHeader("Content-Length", MathLib::ToString(str.GetSize())))) return HTTPResponse();
     ret.body = str;
     return ret;
 }
-MathLib::String HTTPResponse::Raw(void) const {
+MathLib::String HTTPResponse::GetRaw(void) const {
     MathLib::String ret = version + " " + status + " " + description + "\r\n";
     for (const HTTPHeader& header : headers) ret += header.name + ": " + header.value + "\r\n";
     return ret + "\r\n" + body;

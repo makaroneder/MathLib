@@ -1,7 +1,7 @@
 #include <MathLib.hpp>
 #include <iostream>
 
-MathLib::Node* Encrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Encrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args)
         if (arg->type != MathLib::Node::Type::String) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().EncryptString(args.At(1)->value, args.At(2)->value));
@@ -10,7 +10,7 @@ MathLib::Node* Encrypt(const void*, const MathLib::Array<const MathLib::Node*>& 
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().EncryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
-MathLib::Node* Decrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Decrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args)
         if (arg->type != MathLib::Node::Type::String) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().DecryptString(args.At(1)->value, args.At(2)->value));
@@ -19,7 +19,7 @@ MathLib::Node* Decrypt(const void*, const MathLib::Array<const MathLib::Node*>& 
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().DecryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
-MathLib::Node* Print(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args) {
         if (arg->type != MathLib::Node::Type::String) return nullptr;
         std::cout << arg->value;

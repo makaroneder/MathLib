@@ -1,5 +1,6 @@
 #include "Arch.hpp"
 #include <Math/Constants.hpp>
+#include <Host.hpp>
 
 MathLib::num_t GenericSqrt(MathLib::num_t x) {
     if (x < 0) return MathLib::MakeNaN();

@@ -1,14 +1,15 @@
 #ifdef __x86_64__
 #include "RTC.hpp"
+#include <Host.hpp>
 
 RTC::RTC(bool nmi_, Register centuryRegister) : CMOS(false), centuryRegister(centuryRegister) {
     SetInterrupts(false);
     RegisterInterruptDevice(GetIRQBase() + 8, this);
     Write(Register::StatusRegisterB, Read(Register::StatusRegisterB) | (1 << 6));
-    SetRate(3);
+    if (!SetRate(3)) MathLib::Panic("Failed to set RTC rate");
     SetNMI(nmi_);
     SetInterrupts(true);
-    Read(Register::StatusRegisterC);
+    (void)Read(Register::StatusRegisterC);
 }
 RTC::~RTC(void) {
     RegisterInterruptDevice(GetIRQBase() + 8, nullptr);
@@ -27,7 +28,7 @@ bool RTC::SetRate(uint8_t rate) {
     return true;
 }
 void RTC::OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) {
-    Read(Register::StatusRegisterC);
+    (void)Read(Register::StatusRegisterC);
     InterruptTimer::OnInterrupt(interrupt, regs, error);
 }
 MathLib::num_t RTC::GetFrequency(void) const {

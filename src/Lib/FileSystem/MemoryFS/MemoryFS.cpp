@@ -46,7 +46,8 @@ namespace MathLib {
         const size_t s = resources.At(files.At(file).resource).buffer.GetSize() < size + position ? resources.At(files.At(file).resource).buffer.GetSize() - position : size;
         const uint8_t* buff8 = (const uint8_t*)buffer;
         for (size_t i = 0; i < s; i++) resources.At(files.At(file).resource).buffer.At(i + position) = buff8[i];
-        for (size_t i = s; i < size; i++) resources.At(files.At(file).resource).buffer.Add(buff8[i]);
+        for (size_t i = s; i < size; i++)
+            if (!resources.At(files.At(file).resource).buffer.Add(buff8[i])) ReturnFromBenchmark(s + i - 1);
         ReturnFromBenchmark(size);
     }
     size_t MemoryFS::GetSize(size_t file) {

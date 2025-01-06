@@ -9,7 +9,7 @@ namespace MathLib {
     /// @param k Number of elements to select
     /// @return Number of ways to select k elements from n elements set
     template <typename T>
-    T Combination(const T& n, const T& k) {
+    [[nodiscard]] T Combination(const T& n, const T& k) {
         StartBenchmark
         ReturnFromBenchmark(Factorial<T>(n, 1) / (Factorial<T>(k, 1) * Factorial<T>(n - k, 1)));
     }

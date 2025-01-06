@@ -7,12 +7,12 @@
 struct E9 : MathLib::Writeable {
     /// @brief Checks if E9 logger is present
     /// @return Presence of E9 logger
-    static bool IsPresent(void);
+    [[nodiscard]] static bool IsPresent(void);
     /// @brief Writes data to the buffer
     /// @param buffer Buffer to write data to
     /// @param size Size of the buffer
     /// @return Size of written bytes
-    virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
+    [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
 };
 
 #endif

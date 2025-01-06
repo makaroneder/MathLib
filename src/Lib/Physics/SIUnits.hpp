@@ -2,6 +2,7 @@
 #define MathLib_Physics_SIUnits_H
 #include "../Math/MathObject.hpp"
 #include "../Math/Constants.hpp"
+#include "../Host.hpp"
 
 namespace MathLib {
     template <typename T>
@@ -39,17 +40,17 @@ namespace MathLib {
             this->baseUnits[BaseUnit::Time] = baseUnits_[BaseUnit::Time];
             EndBenchmark
         }
-        virtual T GetValue(void) const {
+        [[nodiscard]] virtual T GetValue(void) const {
             StartBenchmark
             ReturnFromBenchmark(count);
         }
-        T GetBaseUnit(const size_t& i) const {
+        [[nodiscard]] T GetBaseUnit(const size_t& i) const {
             StartBenchmark
             ReturnFromBenchmark(baseUnits[i]);
         }
-        virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
-            if (!count) ReturnFromBenchmark(padding + '0');
+            if (FloatsEqual<T>(count, 0)) ReturnFromBenchmark(padding + '0');
             String str = CoefficientToString(count, "");
             bool first = true;
             for (size_t i = 0; i < BaseUnit::End; i++) {
@@ -62,7 +63,7 @@ namespace MathLib {
             }
             ReturnFromBenchmark(padding + ((first && count == 1) ? "1" : str));
         }
-        Unit<T> Pow(const T& scalar) const {
+        [[nodiscard]] Unit<T> Pow(const T& scalar) const {
             StartBenchmark
             ReturnFromBenchmark(Unit<T>(
                 MathLib::Pow(count, scalar),
@@ -75,7 +76,7 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Time] * scalar
             ));
         }
-        Unit<T> operator*(const Unit<T>& other) const {
+        [[nodiscard]] Unit<T> operator*(const Unit<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(Unit<T>(
                 count * other.count,
@@ -88,7 +89,7 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Time] + other.baseUnits[BaseUnit::Time]
             ));
         }
-        Unit<T> operator/(const Unit<T>& other) const {
+        [[nodiscard]] Unit<T> operator/(const Unit<T>& other) const {
             StartBenchmark
             ReturnFromBenchmark(Unit<T>(
                 count / other.count,
@@ -101,19 +102,19 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Time] - other.baseUnits[BaseUnit::Time]
             ));
         }
-        Unit<T> operator*=(const Unit<T>& other) {
+        Unit<T>& operator*=(const Unit<T>& other) {
             StartBenchmark
             count *= other.count;
             for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] += other.baseUnits[i];
             ReturnFromBenchmark(*this);
         }
-        Unit<T> operator/=(const Unit<T>& other) {
+        Unit<T>& operator/=(const Unit<T>& other) {
             StartBenchmark
             count /= other.count;
             for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] -= other.baseUnits[i];
             ReturnFromBenchmark(*this);
         }
-        bool operator==(const Unit<T>& other) const {
+        [[nodiscard]] bool operator==(const Unit<T>& other) const {
             StartBenchmark
             bool ret = true;
             for (size_t i = 0; i < BaseUnit::End && ret; i++) ret = this->baseUnits[i] == other.baseUnits[i];
@@ -152,7 +153,7 @@ namespace MathLib {
                 if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");
             EndBenchmark
         }
-        virtual T GetValue(void) const override {
+        [[nodiscard]] virtual T GetValue(void) const override {
             StartBenchmark
             ReturnFromBenchmark(this->count * 1000);
         }
@@ -183,11 +184,11 @@ namespace MathLib {
                 if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");                       \
             EndBenchmark                                                                                                \
         }                                                                                                               \
-        base<T> ToBaseUnit(void) const {                                                                                \
+        [[nodiscard]] base<T> ToBaseUnit(void) const {                                                                  \
             StartBenchmark                                                                                              \
             ReturnFromBenchmark(base<T>(this->count));                                                                  \
         }                                                                                                               \
-        virtual T GetValue(void) const override {                                                                       \
+        [[nodiscard]] virtual T GetValue(void) const override {                                                         \
             StartBenchmark                                                                                              \
             ReturnFromBenchmark(this->count / (mul));                                                                   \
         }                                                                                                               \

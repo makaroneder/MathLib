@@ -23,14 +23,14 @@ namespace MathLib {
     size_t MathFS::OpenInternal(const String& path, OpenMode mode) {
         StartBenchmark
         MathFSFileHeader prev = MathFSFileHeader();
-        disk.ReadPositioned<MathFSFileHeader>(prev, root * 512);
+        if (!disk.ReadPositioned<MathFSFileHeader>(prev, root * 512)) ReturnFromBenchmark(SIZE_MAX);
         const Array<String> split = Split(path, "/", false);
         for (const String& name : split) {
             bool found = false;
             if (prev.type != MathFSFileHeader::Type::Directory) ReturnFromBenchmark(SIZE_MAX);
             for (size_t i = 0; i < prev.size && !found; i += sizeof(MathFSFileHeader)) {
                 MathFSFileHeader header = MathFSFileHeader();
-                disk.ReadPositioned<MathFSFileHeader>(header, prev.lba * 512 + i);
+                if (!disk.ReadPositioned<MathFSFileHeader>(header, prev.lba * 512 + i)) ReturnFromBenchmark(SIZE_MAX);
                 if (String(header.name) == name) {
                     prev = header;
                     found = true;

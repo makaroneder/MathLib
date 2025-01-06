@@ -14,13 +14,13 @@ struct Date : MathLib::Printable {
     uint8_t month;
     size_t year;
 
-    bool IsValid(void) const;
-    bool operator==(const Date& other) const;
-    bool operator!=(const Date& other) const;
+    [[nodiscard]] bool IsValid(void) const;
+    [[nodiscard]] bool operator==(const Date& other) const;
+    [[nodiscard]] bool operator!=(const Date& other) const;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 };
 
 #endif

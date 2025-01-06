@@ -73,14 +73,14 @@ IMGCONVOUTPUT ?= $(BUILDDIR)/ImageConverter.ppm
 IMGCONVARGS = -inputType $(IMGCONVINPUTTYPE) -input $(IMGCONVINPUT) -outputType $(IMGCONVOUTPUTTYPE) -output $(IMGCONVOUTPUT)
 ELFPROGRAM ?= $(BUILDDIR)/ELFParser.out
 ELFARGS = -program $(ELFPROGRAM)
+4DPROGRAM ?= $(SRCDIR)/TestPrograms/4D/Tesseract.txt
+4DARGS ?= -program $(4DPROGRAM)
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
 OSLINKER = $(SRCDIR)/OS/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -T $(OSLINKER) -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map
 OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img
-
-include $(BUILDDIR)/Build.mk
 
 clean:
 	@mkdir -p $(BUILDDIR)
@@ -89,3 +89,5 @@ clean:
 	@rm $(SRCDIR)/Lib/MathLib.hpp
 	@echo "==> Deleted compiled files"
 .PHONY: clean
+
+include $(BUILDDIR)/Build.mk

@@ -4,11 +4,11 @@
 
 struct HTTPRequest : MathLib::Printable {
     HTTPRequest(MathLib::String str = "");
-    MathLib::String Raw(void) const;
+    [[nodiscard]] MathLib::String GetRaw(void) const;
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
 
     MathLib::String method;
     MathLib::String target;

@@ -10,7 +10,7 @@ namespace MathLib {
     /// @brief Tokenizes string into nodes
     /// @param str String to tokenize
     /// @return Tokenized string
-    Node* Tokenize(const String& str);
+    [[nodiscard]] Node* Tokenize(const String& str);
 }
 
 #endif

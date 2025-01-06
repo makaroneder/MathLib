@@ -21,7 +21,7 @@ struct PCIHeader {
     uint8_t startBIST : 1;
     bool bistCapable : 1;
 
-    bool IsValid(void) const;
+    [[nodiscard]] bool IsValid(void) const;
 } __attribute__((packed));
 
 #endif

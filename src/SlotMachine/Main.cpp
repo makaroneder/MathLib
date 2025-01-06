@@ -2,6 +2,7 @@
 #include "Symbol.hpp"
 #include "Consumable.hpp"
 #include <MathLib.hpp>
+#include <Pair.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -73,7 +74,7 @@ int main(int, char**) {
                         for (size_t i = 0; i < symbolIndexes.GetSize() - 1 && special; i++)
                             special = (symbolIndexes.At(i) == symbolIndexes.At(i + 1));
                         if (special) specialTime = 0;
-                        MathLib::Array<std::pair<Symbol, size_t>> scores;
+                        MathLib::Array<MathLib::Pair<Symbol, size_t>> scores;
                         for (const size_t& i : symbolIndexes) {
                             bool found = false;
                             for (size_t j = 0; j < scores.GetSize(); j++) {
@@ -83,10 +84,10 @@ int main(int, char**) {
                                     break;
                                 }
                             }
-                            if (!found) scores.Add(std::make_pair(symbols[i], 0));
+                            if (!found && !scores.Add(MathLib::Pair<Symbol, size_t>(symbols[i], 0))) MathLib::Panic("Failed to add score");
                         }
                         score -= bet;
-                        for (const std::pair<Symbol, size_t>& pair : scores) score += multiplier * bet * pair.first.multiplier.At(MathLib::Min(pair.second + rankIncreaser, pair.first.multiplier.GetSize()));
+                        for (const MathLib::Pair<Symbol, size_t>& pair : scores) score += multiplier * bet * pair.first.multiplier.At(MathLib::Min<size_t>(pair.second + rankIncreaser, pair.first.multiplier.GetSize()));
                         multiplier = 1;
                         rankIncreaser = 0;
                         break;

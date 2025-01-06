@@ -7,8 +7,8 @@
 namespace MathLib {
     struct MBR {
         MBR(ByteDevice& base);
-        size_t GetSectorSize(void) const;
-        Array<Interval<size_t>> GetPartitionRanges(void) const;
+        [[nodiscard]] size_t GetSectorSize(void) const;
+        [[nodiscard]] Array<Interval<size_t>> GetPartitionRanges(void) const;
 
         private:
         ByteDevice& base;

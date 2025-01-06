@@ -8,7 +8,7 @@ struct SCI : InterruptDevice {
     SCI(void);
     SCI(FADT* fadt);
     ~SCI(void);
-    bool Reboot(void);
+    [[nodiscard]] bool Reboot(void);
     virtual void OnInterrupt(uintptr_t, Registers*, uintptr_t) override;
 
     private:

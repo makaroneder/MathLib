@@ -31,18 +31,18 @@ struct Rope : MathLib::LineShape<T> {
             }
         }
     }
-    virtual MathLib::Array<MathLib::Line<T>> ToLines(const MathLib::Matrix<T>& rotation) const override {
-        MathLib::Array<MathLib::Line<T>> lines;
+    [[nodiscard]] virtual MathLib::Array<MathLib::Line<T>> ToLines(const MathLib::Matrix<T>& rotation) const override {
+        MathLib::Array<MathLib::Line<T>> lines = MathLib::Array<MathLib::Line<T>>((particles.GetSize() - 1) * 2);
         MathLib::Line<T> prev = particles.At(0).ToLines(rotation).At(0);
         for (size_t i = 1; i < particles.GetSize(); i++) {
             const MathLib::Line<T> tmp = particles.At(i).ToLines(rotation).At(0);
-            lines.Add(MathLib::Line<T>(MathLib::RotateVector<T>(prev.start + this->position, particles.At(0).GetPreviousPosition(), rotation), MathLib::RotateVector<T>(tmp.start + this->position, particles.At(0).GetPreviousPosition(), rotation)));
-            lines.Add(MathLib::Line<T>(MathLib::RotateVector<T>(prev.end + this->position, particles.At(0).position, rotation), MathLib::RotateVector<T>(tmp.end + this->position, particles.At(0).position, rotation)));
+            lines.At((i - 1) * 2) = MathLib::Line<T>(MathLib::RotateVector<T>(prev.start + this->position, particles.At(0).GetPreviousPosition(), rotation), MathLib::RotateVector<T>(tmp.start + this->position, particles.At(0).GetPreviousPosition(), rotation));
+            lines.At((i - 1) * 2 + 1) = MathLib::Line<T>(MathLib::RotateVector<T>(prev.end + this->position, particles.At(0).position, rotation), MathLib::RotateVector<T>(tmp.end + this->position, particles.At(0).position, rotation));
             prev = tmp;
         }
         return lines;
     }
-    virtual bool CollidesWith(const MathLib::Shape<T>&) const override {
+    [[nodiscard]] virtual bool CollidesWith(const MathLib::Shape<T>&) const override {
         // TODO:
         return false;
     }

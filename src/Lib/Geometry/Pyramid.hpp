@@ -11,12 +11,12 @@ namespace MathLib {
         Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {
             EmptyBenchmark
         }
-        virtual bool CollidesWith(const Shape<T>&) const override {
+        [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
             StartBenchmark
             ReturnFromBenchmark(false);
         }
-        virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
+        [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
             StartBenchmark
             const T sizeX = GetX(sizes) / 2;
             const T sizeY = GetY(sizes) / 2;

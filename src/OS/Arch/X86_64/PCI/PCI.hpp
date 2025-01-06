@@ -4,7 +4,7 @@
 #include "../ACPI/MCFG.hpp"
 
 // TODO: Add PCI header type 1 and 2
-bool InitPCI(const MCFG* mcfg);
+[[nodiscard]] bool InitPCI(const MCFG* mcfg);
 
 #endif
 #endif

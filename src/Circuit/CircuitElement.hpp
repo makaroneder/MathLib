@@ -6,7 +6,7 @@
 struct CircuitElement : MathLib::Printable {
     CircuitElement(void);
     CircuitElement(const MathLib::Array<CircuitElementConnection>& children);
-    virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const = 0;
+    [[nodiscard]] virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const = 0;
 
     protected:
     MathLib::Array<CircuitElementConnection> children;

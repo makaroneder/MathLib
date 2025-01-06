@@ -7,12 +7,11 @@ namespace MathLib {
         ChemicalReactionElement(void);
         ChemicalReactionElement(const String& symbol, size_t size);
         void SetCount(const Array<size_t>& counts, size_t start);
-        size_t GetCoefficients(void) const;
-        String GetSymbol(void) const;
-        virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] size_t GetCoefficients(void) const;
+        [[nodiscard]] String GetSymbol(void) const;
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
 
         Matrix<ssize_t> coefficients;
-
         private:
         String symbol;
     };

@@ -12,7 +12,7 @@ bool Await8042(bool write) {
     while (timeout-- && ReadPort<uint8_t>(0x64) & (1 << write)) {}
     return timeout;
 }
-bool Write8042(uint16_t value) {
+[[nodiscard]] bool Write8042(uint16_t value) {
     if (!Await8042(true)) return false;
     WritePort<uint8_t>(0x64, value);
     const uint8_t tmp = value >> 8;
@@ -22,13 +22,13 @@ bool Write8042(uint16_t value) {
     }
     return true;
 }
-MathLib::Expected<uint8_t> Read8042(uint8_t cmd) {
+[[nodiscard]] MathLib::Expected<uint8_t> Read8042(uint8_t cmd) {
     return Write8042(cmd) ? MathLib::Expected<uint8_t>(ReadPort<uint8_t>(0x60)) : MathLib::Expected<uint8_t>();
 }
-MathLib::String PS2PortToString(bool second) {
+[[nodiscard]] MathLib::String PS2PortToString(bool second) {
     return MathLib::String(second ? "second" : "first") + " PS2 port";
 }
-bool EnableDevice(bool second) {
+[[nodiscard]] bool EnableDevice(bool second) {
     PS2Device device = PS2Device(second);
     const MathLib::Expected<uint8_t> tmp = device.SendCommand(0xf6);
     if (!tmp.HasValue() || tmp.Get() != (uint8_t)PS2Device::Response::Acknowledge) return false;
@@ -81,24 +81,17 @@ bool EnableDevice(bool second) {
     return true;
 }
 void InitPS2(void) {
-    if (!Write8042(0xad)) return;
-    if (!Write8042(0xa7)) return;
-    if (!Await8042(false)) return;
-    ReadPort<uint8_t>(0x60);
+    if (!Write8042(0xad) || !Write8042(0xa7) || !Await8042(false)) return;
+    while (ReadPort<uint8_t>(0x64) & 1) (void)ReadPort<uint8_t>(0x60);
     MathLib::Expected<uint8_t> tmp = Read8042(0x20);
     if (!tmp.HasValue()) return;
     if (!Write8042(0x60 | (tmp.Get() & ~(1 << 6 | 1 << 4 | 1 << 0)) << 8)) return;
     tmp = Read8042(0xaa);
-    if (!tmp.HasValue()) return;
-    if (tmp.Get() != 0x55) return;
-    if (!Write8042(0xa8)) return;
+    if (!tmp.HasValue() || tmp.Get() != 0x55 || !Write8042(0xa8)) return;
     tmp = Read8042(0x20);
     if (!tmp.HasValue()) return;
     const bool doubleDev = !(tmp.Get() & (1 << 5));
-    if (doubleDev) {
-        if (!Write8042(0xa7)) return;
-        if (!Write8042(0x60 | (tmp.Get() & ~(1 << 5 | 1 << 1)) << 8)) return;
-    }
+    if (doubleDev && (!Write8042(0xa7) || !Write8042(0x60 | (tmp.Get() & ~(1 << 5 | 1 << 1)) << 8))) return;
     tmp = Read8042(0xab);
     if (tmp.HasValue() && !tmp.Get() && Write8042(0xae)) {
         tmp = Read8042(0x20);

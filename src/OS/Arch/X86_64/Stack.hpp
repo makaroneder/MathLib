@@ -7,7 +7,7 @@ struct StackFrame {
     StackFrame* bp;
     uintptr_t ip;
 } __attribute__((packed));
-MathLib::String StackFrameToString(const StackFrame* frame);
+[[nodiscard]] MathLib::String StackFrameToString(const StackFrame* frame);
 
 #endif
 #endif

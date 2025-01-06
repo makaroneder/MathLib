@@ -18,20 +18,20 @@ namespace MathLib {
                 Array<ChemicalElement>& acid = input.At(0).IsAcid() ? l0 : l1;
                 Array<ChemicalElement> elements;
                 for (size_t i = 0; i < hydroxide.GetSize() - 2; i++)
-                    elements.Add(ChemicalElement(hydroxide.At(i), hydroxide.At(i).GetCount() * acid.At(0).GetCount()));
+                    if (!elements.Add(ChemicalElement(hydroxide.At(i), hydroxide.At(i).GetCount() * acid.At(0).GetCount()))) ReturnFromBenchmark(Expected<ChemicalReaction>());
                 for (size_t i = 1; i < acid.GetSize(); i++)
-                    elements.Add(ChemicalElement(acid.At(i), acid.At(i).GetCount() * hydroxide.At(hydroxide.GetSize() - 1).GetCount()));
-                ret.Add(ChemicalMolecule(elements, 1));
+                    if (!elements.Add(ChemicalElement(acid.At(i), acid.At(i).GetCount() * hydroxide.At(hydroxide.GetSize() - 1).GetCount()))) ReturnFromBenchmark(Expected<ChemicalReaction>());
+                if (!ret.Add(ChemicalMolecule(elements, 1))) ReturnFromBenchmark(Expected<ChemicalReaction>());
                 Array<ChemicalElement> arr = Array<ChemicalElement>(2);
                 arr.At(0) = Hydrogen(2);
                 arr.At(1) = Oxygen(1);
-                ret.Add(ChemicalMolecule(arr, 1));
+                if (!ret.Add(ChemicalMolecule(arr, 1))) ReturnFromBenchmark(Expected<ChemicalReaction>());
             }
             else if ((input.At(0).IsMetal() && input.At(1).IsNonMetal()) || (input.At(1).IsMetal() && input.At(0).IsNonMetal())) {
                 Array<ChemicalElement> arr = Array<ChemicalElement>(2);
                 arr.At(0) = ChemicalElement((input.At(0).IsMetal() ? l0 : l1).At(0), 1);
                 arr.At(1) = ChemicalElement((input.At(0).IsNonMetal() ? l0 : l1).At(0), 1);
-                ret.Add(ChemicalMolecule(arr, 1));
+                if (!ret.Add(ChemicalMolecule(arr, 1))) ReturnFromBenchmark(Expected<ChemicalReaction>());
             }
         }
         ReturnFromBenchmark(ret.GetSize() ? Expected<ChemicalReaction>(ChemicalReaction(input, ret)) : Expected<ChemicalReaction>());
@@ -54,7 +54,7 @@ namespace MathLib {
                 if (!found) {
                     ChemicalReactionElement rElement = ChemicalReactionElement(element.GetSymbol(), molecules.GetSize());
                     rElement.coefficients.At(i, 0) = element.GetCount();
-                    elements.Add(rElement);
+                    if (!elements.Add(rElement)) ReturnFromBenchmark(Array<ChemicalReactionElement>());
                 }
             }
         }
@@ -65,8 +65,8 @@ namespace MathLib {
         const Array<ChemicalReactionElement> l = GetReactionElements(true);
         const Array<ChemicalReactionElement> r = GetReactionElements(false);
         const size_t size = left.GetSize() + right.GetSize() - 1;
-        Matrix<num_t> a = Matrix<num_t>(size, size);
-        Matrix<num_t> b = Matrix<num_t>(1, size);
+        matrix_t a = matrix_t(size, size);
+        matrix_t b = matrix_t(1, size);
         size_t sub = 0;
         for (size_t y = 0; y < l.GetSize(); y++) {
             if ((y - sub) == size) break;
@@ -81,10 +81,10 @@ namespace MathLib {
             }
             for (size_t x = 0; x < v.GetWidth() - 1; x++) a.At(x + w, y - sub) = -v.At(x, 0);
             b.At(0, y - sub) = v.At(v.GetWidth() - 1, 0);
-            Matrix<num_t> tmp = Matrix<num_t>(size, 1);
+            matrix_t tmp = matrix_t(size, 1);
             for (size_t j = 0; j < size; j++) tmp.At(j, 0) = a.At(j, y - sub);
             for (size_t i = 0; i < (y - sub); i++) {
-                Matrix<num_t> a1 = Matrix<num_t>(size, 1);
+                matrix_t a1 = matrix_t(size, 1);
                 for (size_t j = 0; j < size; j++) a1.At(j, 0) = a.At(j, i);
                 if (a1.IsMultipleOf(tmp)) {
                     sub++;
@@ -92,15 +92,15 @@ namespace MathLib {
                 }
             }
         }
-        Expected<Matrix<num_t>> tmp = a.GetInverse();
+        Expected<matrix_t> tmp = a.GetInverse();
         if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
         tmp = tmp.Get() * b;
         if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
-        const Matrix<num_t> x = tmp.Get();
+        const matrix_t x = tmp.Get();
         for (size_t i = 1; true; i++) {
             tmp = x * i;
             if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
-            const Matrix<num_t> tmpMat = tmp.Get();
+            const matrix_t tmpMat = tmp.Get();
             bool ok = true;
             for (size_t y = 0; y < tmpMat.GetHeight() && ok; y++)
                 if (!FloatsEqual<num_t>(tmpMat.At(0, y), Round(tmpMat.At(0, y)))) ok = false;

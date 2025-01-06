@@ -16,7 +16,6 @@
 #include <Logger.hpp>
 #include <String.hpp>
 
-RangeMemoryManager rangeMemoryManager;
 bool InitArch(uintptr_t signature, void* info) {
     if (E9::IsPresent()) MathLib::logger = new E9();
     LogString("Logger initialized\n");
@@ -29,13 +28,11 @@ bool InitArch(uintptr_t signature, void* info) {
     CPUID(0x7, nullptr, &b, nullptr, nullptr);
     if (b & 1 << (uint8_t)CPUIDBits::B7SMEP) {
         const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
-        if (!tmp.HasValue()) return false;
-        SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable);
+        if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable)) return false;
     }
     if (b & 1 << (uint8_t)CPUIDBits::B7SMAP) {
         const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
-        if (!tmp.HasValue()) return false;
-        SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable);
+        if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable)) return false;
     }
     if (!InitInterrupts(0x20, 0x08)) return false;
     PIT* pit = new PIT();
@@ -43,10 +40,9 @@ bool InitArch(uintptr_t signature, void* info) {
     pit->SetFunction(MathLib::FunctionPointer<void, Registers*>(nullptr, &Schedule));
     mainTimer = pit;
     RSDP* rsdp = nullptr;
-    if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info, rangeMemoryManager);
-    else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info, rangeMemoryManager);
+    if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info);
+    else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info);
     else LogString(MathLib::String("Unknown bootloader signature: 0x") + MathLib::ToString(signature, 16) + '\n');
-    if (rangeMemoryManager.GetSize()) memoryManager = &rangeMemoryManager;
     // TODO: Create new paging structure
     if (!rsdp) rsdp = FindRSDP();
     if (!InitACPI(rsdp, true)) return false;

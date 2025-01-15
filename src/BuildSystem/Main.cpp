@@ -6,7 +6,11 @@
 #include "FileSearch.cpp"
 #include "FileTranslation.cpp"
 #endif
-#include <MathLib.hpp>
+#include <EquationSolver/Preprocesor.hpp>
+#include <EquationSolver/Tokenizer.hpp>
+#include <EquationSolver/Optimizer.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/File.hpp>
 #include <iostream>
 
 MathLib::HostFileSystem fileSystem;
@@ -28,13 +32,13 @@ MathLib::String nonPhonyTargets = "";
     if (args.GetSize() != 3) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
-    return fileTranslations.Add(FileTranslation(args.At(0)->value, args.At(1)->value, args.At(2)->value)) ? new MathLib::Node(MathLib::Node::Type::String, MathLib::String("$(FILETRANSLATION") + MathLib::ToString(fileTranslations.GetSize()) + ") ") : nullptr;
+    return fileTranslations.Add(FileTranslation(args.At(0)->value, args.At(1)->value, args.At(2)->value)) ? new MathLib::Node(MathLib::Node::Type::String, "$(FILETRANSLATION"_M + MathLib::ToString(fileTranslations.GetSize()) + ") ") : nullptr;
 }
 [[nodiscard]] MathLib::Node* FindFiles(const void*, const MathLib::Array<const MathLib::Node*>& args) {
     if (args.GetSize() != 2) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
-    return fileSearchs.Add(FileSearch(args.At(0)->value, args.At(1)->value)) ? new MathLib::Node(MathLib::Node::Type::String, MathLib::String("$(FILESEARCH") + MathLib::ToString(fileSearchs.GetSize()) + ") ") : nullptr;
+    return fileSearchs.Add(FileSearch(args.At(0)->value, args.At(1)->value)) ? new MathLib::Node(MathLib::Node::Type::String, "$(FILESEARCH"_M + MathLib::ToString(fileSearchs.GetSize()) + ") ") : nullptr;
 }
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
@@ -42,7 +46,7 @@ MathLib::String nonPhonyTargets = "";
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 3) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <input file> <output file>");
+        if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output file>");
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fileSystem, argv[1]));
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
@@ -62,19 +66,19 @@ int main(int argc, char** argv) {
         optimizer.Destroy();
         MathLib::File output = fileSystem.Open(argv[2], MathLib::OpenMode::Write);
         for (size_t i = 0; i < fileSearchs.GetSize(); i++)
-            if (!output.Puts(MathLib::String("FILESEARCH") + MathLib::ToString(i + 1) + " = $(shell find " + fileSearchs.At(i).directory + " -type f -name \"*" + fileSearchs.At(i).extension + "\")\n")) MathLib::Panic("Failed to write output data");
+            if (!output.Puts("FILESEARCH"_M + MathLib::ToString(i + 1) + " = $(shell find " + fileSearchs.At(i).directory + " -type f -name \"*" + fileSearchs.At(i).extension + "\")\n")) MathLib::Panic("Failed to write output data");
         for (size_t i = 0; i < fileTranslations.GetSize(); i++)
-            if (!output.Puts(MathLib::String("FILETRANSLATION") + MathLib::ToString(i + 1) + " = $(patsubst " + fileTranslations.At(i).outputFormat + ", " + fileTranslations.At(i).inputFormat + ", " + fileTranslations.At(i).sources + ")\n")) MathLib::Panic("Failed to write output data");
-        if (!output.Puts(MathLib::String("all: ") + nonPhonyTargets + "\n.PHONY: all\n")) MathLib::Panic("Failed to write output data");
+            if (!output.Puts("FILETRANSLATION"_M + MathLib::ToString(i + 1) + " = $(patsubst " + fileTranslations.At(i).outputFormat + ", " + fileTranslations.At(i).inputFormat + ", " + fileTranslations.At(i).sources + ")\n")) MathLib::Panic("Failed to write output data");
+        if (!output.Puts("all: "_M + nonPhonyTargets + "\n.PHONY: all\n")) MathLib::Panic("Failed to write output data");
         for (const Target& target : targets) {
             #ifdef Debug
             std::cout << target << std::endl;
             #endif
-            if (!output.Puts(target.name + ": " + target.deps + '\n') || (!target.phony && !output.Puts("\t@mkdir -p $(@D)\n")) || !output.Puts(MathLib::String("\t@") + target.command + '\n')) MathLib::Panic("Failed to write output data");
+            if (!output.Puts(target.name + ": " + target.deps + '\n') || (!target.phony && !output.Puts("\t@mkdir -p $(@D)\n")) || !output.Puts("\t@"_M + target.command + '\n')) MathLib::Panic("Failed to write output data");
             if (!target.phony) {
                 if (!output.Puts("\t@echo \"==> Created: $@\"\n")) MathLib::Panic("Failed to write output data");
             }
-            else if (!output.Puts(MathLib::String(".PHONY: ") + target.name + '\n')) MathLib::Panic("Failed to write output data");
+            else if (!output.Puts(".PHONY: "_M + target.name + '\n')) MathLib::Panic("Failed to write output data");
         }
         return EXIT_SUCCESS;
     }

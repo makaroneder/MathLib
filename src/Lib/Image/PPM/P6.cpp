@@ -5,7 +5,7 @@ namespace MathLib {
     P6::P6(size_t width, size_t height) : SaveableImage(width, height) {
         EmptyBenchmark
     }
-    bool P6::Save(Writeable& file) const {
+    bool P6::Save(Writable& file) const {
         StartBenchmark
         if (!file.Puts("P6\n") || !file.Puts(ToString(pixels.GetWidth())) || !file.Puts(" ") || !file.Puts(ToString(pixels.GetHeight())) || !file.Puts(" 255\n")) ReturnFromBenchmark(false);
         for (size_t y = 0; y < pixels.GetHeight(); y++) {

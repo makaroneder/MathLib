@@ -77,7 +77,7 @@ extern "C" void __ubsan_handle_type_mismatch(TypeMismatchInfo<uintptr_t>* info, 
                 break;
             }
         }
-        tmp += MathLib::String(" 0x") + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
+        tmp += " 0x"_M + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
     }
     MathLib::Panic(MathLib::String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
 }
@@ -133,7 +133,7 @@ extern "C" void __ubsan_handle_type_mismatch_v1(TypeMismatchInfo<uint8_t>* info,
                 break;
             }
         }
-        tmp += MathLib::String(" 0x") + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
+        tmp += " 0x"_M + MathLib::ToString(ptr, 16) + " with not enough space for " + info->typeDescriptor->name;
     }
     MathLib::Panic(MathLib::String(__func__) + ' ' + SourceLocationToString(info) + ' ' + tmp + '\n');
 }

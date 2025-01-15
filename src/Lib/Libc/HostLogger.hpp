@@ -1,11 +1,11 @@
 #ifndef Freestanding
 #ifndef MathLib_Libc_Logger_H
 #define MathLib_Libc_Logger_H
-#include "../Interfaces/Writeable.hpp"
+#include "../Interfaces/Writable.hpp"
 #include <ostream>
 
 namespace MathLib {
-    struct HostLogger : Writeable {
+    struct HostLogger : Writable {
         HostLogger(std::ostream& stream);
         /// @brief Writes data to the buffer
         /// @param buffer Buffer to write data to

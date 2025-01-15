@@ -71,8 +71,8 @@ MathLib::String ELFProgramHeader::ToString(const MathLib::String& padding) const
             else ret += "Unknown";
         }
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint32_t)type, 16) + ")\n" + padding + "\tExecutable: " + MathLib::BoolToString(executable) + '\n';
-    ret += padding + "\tWriteable: " + MathLib::BoolToString(writeable) + '\n';
+    ret += " (0x"_M + MathLib::ToString((uint32_t)type, 16) + ")\n" + padding + "\tExecutable: " + MathLib::BoolToString(executable) + '\n';
+    ret += padding + "\tWritable: " + MathLib::BoolToString(Writable) + '\n';
     ret += padding + "\tReadable: " + MathLib::BoolToString(readable) + '\n';
     ret += padding + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n';
     ret += padding + "\tOffset: 0x" + MathLib::ToString(offset, 16) + '\n';

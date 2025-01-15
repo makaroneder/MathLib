@@ -14,6 +14,7 @@ namespace MathLib {
         /// @brief Returns height of the image
         /// @return Height of the image
         [[nodiscard]] size_t GetHeight(void) const;
+        [[nodiscard]] size_t GetSize(void) const;
         /// @brief Fills image
         /// @param color Color to fill the image with
         void Fill(uint32_t color);

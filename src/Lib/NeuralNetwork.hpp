@@ -204,7 +204,7 @@ namespace MathLib {
         /// @brief Saves neural network data
         /// @param file File to save neural network data into
         /// @return Status
-        [[nodiscard]] virtual bool Save(Writeable& file) const override {
+        [[nodiscard]] virtual bool Save(Writable& file) const override {
             StartBenchmark
             if (!file.Write<ActivationFunction>(activation) || !file.Write<size_t>(count) || !GetInput().Save(file)) ReturnFromBenchmark(false);
             for (size_t i = 0; i < count; i++)

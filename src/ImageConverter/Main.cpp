@@ -1,5 +1,10 @@
 #define SDL_MAIN_HANDLED
-#include <MathLib.hpp>
+#include <Image/Aseprite/Aseprite.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <DummyRenderer.hpp>
+#include <Image/TGA/TGA.hpp>
+#include <Image/PPM/P6.hpp>
+#include <CommandLine.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 

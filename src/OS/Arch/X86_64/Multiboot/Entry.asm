@@ -67,7 +67,6 @@ Multiboot2Header:
     .end:
 
 section .bss
-PreserveBSSStart:
 align 4096
 P4Table: resb 4096
 P3Table: resb 4096
@@ -76,7 +75,6 @@ align 16
 Stack:
     .bottom: resb 2 * 4096
     .top:
-PreserveBSSEnd:
 
 section .rodata
 GDT:
@@ -110,8 +108,15 @@ global Entry
 Entry:
     cli
     mov esp, Stack.top
-    mov edi, eax
+    mov edx, eax
+    mov edi, bssStart
+    mov ecx, end
+    sub ecx, edi
+    xor al, al
+    cld
+    rep stosb
     mov esi, ebx
+    mov edi, edx
     ; Check if CPUID is supported
     pushfd
     pop eax
@@ -201,18 +206,6 @@ Entry64:
     xor rbp, rbp
     push rdi
     push rsi
-    mov rdi, bssStart
-    mov rcx, PreserveBSSStart
-    sub rcx, rdi
-    xor al, al
-    cld
-    rep stosb
-    mov rdi, PreserveBSSEnd
-    mov rcx, end
-    sub rcx, rdi
-    xor al, al
-    cld
-    rep stosb
     call _init
     pop rsi
     pop rdi

@@ -3,7 +3,7 @@
 #else
 #include "LogicGates.hpp"
 #endif
-#include <MathLib.hpp>
+#include <Libc/HostFileSystem.hpp>
 #include <iostream>
 #include <unistd.h>
 
@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
         #else
         srand(time(nullptr));
         #endif
-        if (argc < 3) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <file> <iteration count>");
+        if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <file> <iteration count>");
         MathLib::HostFileSystem fs;
         const size_t printStatements = 10;
         const size_t limit = (size_t)MathLib::StringToNumber(argv[2]);

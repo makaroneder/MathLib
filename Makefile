@@ -36,17 +36,25 @@ $(BUILDDIR)/libExtras.a: $(OBJS)
 	@mkdir -p $(@D)
 	@$(AR) $(ARFLAGS) $@ $^
 	@echo "==> Created: $@"
+$(BUILDDIR)/libMath.a: $(BUILDDIR)/Lib/LibStub.o
+	@mkdir -p $(@D)
+	@$(AR) $(ARFLAGS) $@ $<
+	@echo "==> Created: $@"
+$(BUILDDIR)/Lib/LibStub.o: $(SRCDIR)/LibStub/Main.cpp $(SRCDIR)/Lib/MathLib.hpp
+	@mkdir -p $(@D)
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@echo "==> Created: $@"
 $(BUILDDIR)/Lib/%.o: $(SRCDIR)/Lib/%.psf Makefile
 	@mkdir -p $(@D)
 	@$(OBJCPY) $(OBJCPYFLAGS) $< $@
 	@echo "==> Created: $@"
-$(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX)
+$(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX) Makefile
 	@mkdir -p $(@D)
 	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
 	@echo "==> Created: $@"
-$(BUILDDIR)/TmpBuild.out: $(SRCDIR)/BuildSystem/Main.cpp $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libExtras.a
+$(BUILDDIR)/TmpBuild.out: $(SRCDIR)/BuildSystem/Main.cpp $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libExtras.a $(BUILDDIR)/libMath.a
 	@mkdir -p $(@D)
-	@$(CXX) $(CXXFLAGS) -DIncludeSources $< -o $@ -L $(BUILDDIR) -l Extras
+	@$(CXX) $(CXXFLAGS) -DIncludeSources $< -o $@ -L $(BUILDDIR) -l Extras -l Math
 	@echo "==> Created: $@"
 $(BUILDDIR)/Build.mk: $(BUILDDIR)/TmpBuild.out Build.txt
 	@mkdir -p $(@D)

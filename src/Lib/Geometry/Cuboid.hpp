@@ -45,15 +45,17 @@ namespace MathLib {
             ReturnFromBenchmark(ret);
         }
         [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Matrix<T>& dimensions) {
+            StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(2);
             ret.At(0) = Matrix<T>(1, 1, MakeArrayFromSingle<T>(GetX(dimensions)));
             ret.At(1) = Matrix<T>(1, 1, MakeArrayFromSingle<T>(-GetX(dimensions)));
             for (size_t i = 1; i < dimensions.GetWidth(); i++) ret = GenerateVertices(ret, dimensions.At(i, 0));
-            return ret;
+            ReturnFromBenchmark(ret);
         }
 
         private:
         [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Array<Matrix<T>>& prev, const T& dimension) {
+            StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(prev.GetSize() * 2);
             for (size_t i = 0; i < prev.GetSize(); i++) {
                 Array<T> tmp = Array<T>(prev.At(i).GetWidth() + 1);
@@ -64,7 +66,7 @@ namespace MathLib {
                 point.At(prev.At(i).GetWidth(), 0) = -dimension;
                 ret.At(2 * i + 1) = point;
             }
-            return ret;
+            ReturnFromBenchmark(ret);
         }
     };
 }

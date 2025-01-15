@@ -2,10 +2,10 @@
 #define MathLib_Interfaces_ByteDevice_H
 #include "../SeekMode.hpp"
 #include "Readable.hpp"
-#include "Writeable.hpp"
+#include "Writable.hpp"
 
 namespace MathLib {
-    struct ByteDevice : Readable, Writeable {
+    struct ByteDevice : Readable, Writable {
         ByteDevice(void);
         /// @brief Returns size
         /// @return Size

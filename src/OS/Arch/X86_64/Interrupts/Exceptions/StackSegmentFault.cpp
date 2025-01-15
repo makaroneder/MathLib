@@ -5,7 +5,7 @@
 
 StackSegmentFault::StackSegmentFault(void) : Exception(Type::StackSegmentFault) {}
 MathLib::String StackSegmentFault::GetPanicMessage(uintptr_t error) const {
-    return MathLib::String("Stack segment error detected\n") + ((SelectorErrorCode*)&error)->ToString() + '\n';
+    return "Stack segment error detected\n"_M + ((SelectorErrorCode*)&error)->ToString() + '\n';
 }
 
 #endif

@@ -2,11 +2,6 @@
 #include "../Host.hpp"
 
 namespace MathLib {
-    void SkipWhiteSpace(const String& str, size_t& i) {
-        StartBenchmark
-        while (i < str.GetSize() && IsWhiteSpace(str.At(i))) i++;
-        EndBenchmark
-    }
     /// @brief Converts a string to a node type
     /// @param str String to tokenize
     /// @param i Current position in the string

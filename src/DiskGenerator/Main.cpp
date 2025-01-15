@@ -1,4 +1,8 @@
-#include <MathLib.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/File.hpp>
+#include <CommandLine.hpp>
+#include <MBR/MBR.hpp>
+#include <String.hpp>
 #include <iostream>
 
 /// @brief Converts string to number with size postfixes

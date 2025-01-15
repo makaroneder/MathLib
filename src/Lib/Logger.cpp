@@ -1,5 +1,5 @@
 #include "Logger.hpp"
 
 namespace MathLib {
-    Writeable* logger = nullptr;
+    Writable* logger = nullptr;
 }

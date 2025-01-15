@@ -1,7 +1,9 @@
 #include "AsepriteFrameHeader.hpp"
+#include "../../Typedefs.hpp"
 
 namespace MathLib {
     bool AsepriteFrameHeader::IsValid(void) const {
-        return signature == expectedSignature;
+        StartBenchmark
+        ReturnFromBenchmark(signature == expectedSignature);
     }
 }

@@ -1,5 +1,5 @@
 #include "Music.hpp"
-#include <MathLib.hpp>
+#include <Libc/HostFileSystem.hpp>
 #include <iostream>
 
 /// @brief Entry point for this program
@@ -8,7 +8,7 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 2) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <output file>");
+        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <output file>");
         MathLib::HostFileSystem fs;
         const Music<MathLib::num_t> music = Music<MathLib::num_t>(44100, 32767, std::vector<MusicNote<MathLib::num_t>> {
             MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::E3, 0.4), MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::None, 0.5),

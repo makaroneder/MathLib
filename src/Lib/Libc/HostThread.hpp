@@ -1,4 +1,5 @@
 #ifndef Freestanding
+#ifndef __MINGW32__
 #ifndef MathLib_Libc_HostThread_H
 #define MathLib_Libc_HostThread_H
 #include "../Thread.hpp"
@@ -15,5 +16,6 @@ namespace MathLib {
     };
 }
 
+#endif
 #endif
 #endif

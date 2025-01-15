@@ -39,6 +39,10 @@ namespace MathLib {
     /// @param chr Character to check
     /// @return Is character white space
     [[nodiscard]] bool IsWhiteSpace(char chr);
+    /// @brief Skips whitespace characters
+    /// @param str String to skip
+    /// @param i Current position in the string
+    void SkipWhiteSpace(const String& str, size_t& i);
     [[nodiscard]] bool IsHexDigit(char chr);
     [[nodiscard]] bool IsAlphaDigit(char chr);
     [[nodiscard]] size_t BitwiseAnd(size_t x, size_t y);

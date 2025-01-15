@@ -18,7 +18,7 @@ struct Music : MathLib::Saveable {
     /// @brief Saves data
     /// @param file File to save data into
     /// @return Status
-    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override {
+    [[nodiscard]] virtual bool Save(MathLib::Writable& file) const override {
         return (
             file.WriteBuffer("RIFF", 4) &&
             file.Write<uint32_t>(36 + samples.GetSize() * sizeof(int16_t)) &&

@@ -12,6 +12,10 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(pixels.GetHeight());
     }
+    size_t Image::GetSize(void) const {
+        StartBenchmark
+        ReturnFromBenchmark(GetWidth() * GetHeight());
+    }
     void Image::Fill(uint32_t color) {
         StartBenchmark
         pixels.Fill(color);

@@ -68,6 +68,23 @@ namespace MathLib {
             }
             ReturnFromBenchmark(true);
         }
+        template <typename T>
+        void DrawImage(const Image& image, const Matrix<T>& pos) {
+            Matrix<ssize_t> tmp = ConvertMatrix<T, ssize_t>(PositionToIndex<T>(pos - ConvertMatrix<num_t, T>(position)));
+            GetX(tmp) -= image.GetWidth() / 2;
+            GetY(tmp) -= image.GetHeight() / 2;
+            for (size_t y = 0; y < image.GetHeight(); y++) {
+                const ssize_t wy = GetY(tmp) + y;
+                if (wy < 0) continue;
+                else if ((size_t)wy >= GetHeight()) break;
+                for (size_t x = 0; x < image.GetWidth(); x++) {
+                    const ssize_t wx = GetX(tmp) + x;
+                    if (wx < 0) continue;
+                    else if ((size_t)wx >= GetWidth()) break;
+                    else At(wx, wy) = image.At(x, y);
+                }
+            }
+        }
         /// @brief Draws a line
         /// @tparam T Type of number
         /// @param line Line to draw
@@ -288,11 +305,10 @@ namespace MathLib {
         void DrawFunction(const Array<Line<T>>& values, uint32_t color) {
             StartBenchmark
             for (size_t i = 0; i < values.GetSize(); i++) {
-                #ifdef FillGapsInFunctions
-                if (!IsNaN(GetX(values.At(i).start))) DrawLine<T>(Line<T>(values.At(i).start, values.At(i).end), color);
-                #else
-                SetPixel<T>(values.At(i).end, color);
-                #endif
+                if (fillGapsInFunctions) {
+                    if (!IsNaN(GetX(values.At(i).start))) DrawLine<T>(Line<T>(values.At(i).start, values.At(i).end), color);
+                }
+                else SetPixel<T>(values.At(i).end, color);
             }
             EndBenchmark
         }
@@ -387,7 +403,7 @@ namespace MathLib {
         /// @brief Saves data as image
         /// @param file File to save data into
         /// @return Status
-        [[nodiscard]] virtual bool Save(Writeable& file) const override;
+        [[nodiscard]] virtual bool Save(Writable& file) const override;
         /// @brief Loads data from image
         /// @param file File to load data from
         /// @return Status
@@ -397,6 +413,7 @@ namespace MathLib {
         matrix_t position;
         /// @brief Scale
         num_t pointMultiplier;
+        bool fillGapsInFunctions;
 
         private:
         /// @brief Image for saving and loading

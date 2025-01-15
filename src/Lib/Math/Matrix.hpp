@@ -19,7 +19,7 @@ namespace MathLib {
         /// @param height Height of matrix
         Matrix(size_t width = 0, size_t height = 0) : width(width), height(height), ptr(Array<T>(width * height)) {
             StartBenchmark
-            Fill(0);
+            Fill(T());
             EndBenchmark
         }
         /// @brief Creates a new matrix
@@ -296,7 +296,7 @@ namespace MathLib {
         /// @brief Saves matrix data
         /// @param file File to save matrix data into
         /// @return Status
-        [[nodiscard]] virtual bool Save(Writeable& file) const override {
+        [[nodiscard]] virtual bool Save(Writable& file) const override {
             StartBenchmark
             if (!file.Write<size_t>(width) || !file.Write<size_t>(height)) ReturnFromBenchmark(false);
             const size_t size = ptr.GetSize();

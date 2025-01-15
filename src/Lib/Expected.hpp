@@ -25,6 +25,11 @@ namespace MathLib {
         T value;
         bool error;
     };
+    template <typename T>
+    [[nodiscard]] String ToString(const Expected<T>& expected) {
+        StartBenchmark
+        ReturnFromBenchmark(expected.HasValue() ? MathLib::ToString(expected.Get()) : "No value");
+    }
 }
 
 #endif

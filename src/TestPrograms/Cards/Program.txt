@@ -1,0 +1,3 @@
+hands(n : N) : N = 5
+discards(n : N) : N = 3
+points(n : N) : N = 50 * 2^n

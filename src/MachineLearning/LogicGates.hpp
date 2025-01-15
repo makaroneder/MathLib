@@ -27,7 +27,7 @@ template <typename T>
             state.neuralNetwork.GetInput().At(0, 0) = y;
             state.neuralNetwork.GetInput().At(1, 0) = x;
             if (!state.Forward()) return "";
-            ret += MathLib::String("[") + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(state.neuralNetwork.GetOutput().At(0, 0)) + '\n';
+            ret += '['_M + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(state.neuralNetwork.GetOutput().At(0, 0)) + '\n';
         }
     }
     return ret;

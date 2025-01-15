@@ -1,6 +1,6 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
-#include <MathLib.hpp>
+#include <Libc/HostSocket.hpp>
 #include <iostream>
 
 MathLib::Array<HTTPHeader> resources = std::vector<HTTPHeader> {
@@ -17,7 +17,7 @@ MathLib::Array<HTTPHeader> resources = std::vector<HTTPHeader> {
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 2) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <port>");
+        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <port>");
         MathLib::HostSocket server = MathLib::HostSocket();
         if (!server.Bind(atoi(argv[1]))) MathLib::Panic("Failed to bind socket to local address");
         std::cout << "Waiting for a client to connect on http://localhost:" << argv[1] << std::endl;
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
                 response = HTTPResponse::FromStatus(HTTPStatus::NoContent, "OK");
                 if (!response.headers.Add(HTTPHeader("Allow", "OPTIONS, GET, HEAD"))) MathLib::Panic("Failed to add resonse header");
             }
-            else response = HTTPResponse::FromStatus(HTTPStatus::NotImplemented, MathLib::String("Unknown request: ") + request.method);
+            else response = HTTPResponse::FromStatus(HTTPStatus::NotImplemented, "Unknown request: "_M + request.method);
             std::cout << response << std::flush;
             if (!client->Puts(response.GetRaw())) {
                 delete client;

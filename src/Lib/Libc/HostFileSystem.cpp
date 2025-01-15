@@ -1,11 +1,13 @@
 #ifndef Freestanding
 #include "HostFileSystem.hpp"
+#ifndef __MINGW32__
 #if __cplusplus >= 201703
     #include <filesystem>
     namespace fs = std::filesystem;
 #else
     #include <experimental/filesystem>
     namespace fs = std::experimental::filesystem;
+#endif
 #endif
 
 namespace MathLib {
@@ -68,6 +70,7 @@ namespace MathLib {
     }
     Array<FileInfo> HostFileSystem::ReadDirectory(const String& path_) {
         StartBenchmark
+        #ifndef __MINGW32__
         const String path = String(fs::current_path().c_str()) + '/' + path_;
         if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) ReturnFromBenchmark(Array<FileInfo>());
         Array<FileInfo> ret;
@@ -78,6 +81,10 @@ namespace MathLib {
             if (!ret.Add(FileInfo(type, entry.path().filename().string()))) ReturnFromBenchmark(Array<FileInfo>());
         }
         ReturnFromBenchmark(ret);
+        #else
+        (void)path_;
+        ReturnFromBenchmark(Array<FileInfo>());
+        #endif
     }
     FILE* HostFileSystem::GetFile(size_t file) {
         StartBenchmark

@@ -31,6 +31,11 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r');
     }
+    void SkipWhiteSpace(const String& str, size_t& i) {
+        StartBenchmark
+        while (i < str.GetSize() && IsWhiteSpace(str.At(i))) i++;
+        EndBenchmark
+    }
     bool IsHexDigit(char chr) {
         StartBenchmark
         ReturnFromBenchmark(IsDigit(chr) || (chr >= 'a' && chr <= 'f') || (chr >= 'A' && chr <= 'F'));

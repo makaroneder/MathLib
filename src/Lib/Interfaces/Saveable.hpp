@@ -9,7 +9,7 @@ namespace MathLib {
         /// @brief Saves data
         /// @param file File to save data into
         /// @return Status
-        [[nodiscard]] virtual bool Save(Writeable& file) const = 0;
+        [[nodiscard]] virtual bool Save(Writable& file) const = 0;
         /// @brief Loads data
         /// @param file File to load data from
         /// @return Status

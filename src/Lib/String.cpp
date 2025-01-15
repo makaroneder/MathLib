@@ -1,4 +1,5 @@
 #include "String.hpp"
+#include "Host.hpp"
 
 namespace MathLib {
     String Erase(String str, size_t pos, size_t len) {
@@ -48,6 +49,7 @@ namespace MathLib {
         ReturnFromBenchmark(ret);
     }
     String DumpMemory(uintptr_t addr, size_t size, size_t lineSize) {
+        StartBenchmark
         String ret;
         const uint8_t* buff = (const uint8_t*)addr;
         for (size_t y = 0; y < size; y += lineSize) {
@@ -60,6 +62,6 @@ namespace MathLib {
             }
             ret.At(ret.GetSize() - 1) = '\n';
         }
-        return ret;
+        ReturnFromBenchmark(ret);
     }
 }

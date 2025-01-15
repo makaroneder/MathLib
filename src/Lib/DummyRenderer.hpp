@@ -16,9 +16,6 @@ namespace MathLib {
         /// @return Event
         [[nodiscard]] virtual Event GetEvent(void) override;
     };
-    #define LoadImage(name, path_)                                  \
-        MathLib::DummyRenderer name = MathLib::DummyRenderer(0, 0); \
-        if (!name.SetImage<MathLib::TGA>() || !name.LoadFromPath(fs, path + path_)) MathLib::Panic("Failed to load image")
 }
 
 #endif

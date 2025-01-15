@@ -1,7 +1,9 @@
 #include "ELFHeader.hpp"
 #include "ELFSectionHeader.hpp"
 #include "ELFProgramHeader.hpp"
-#include <MathLib.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/File.hpp>
+#include <CommandLine.hpp>
 #include <iostream>
 
 /// @brief Entry point for this program

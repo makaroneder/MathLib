@@ -38,7 +38,7 @@ struct NeuralNetworkState : MathLib::Saveable {
     constexpr void Learn(const MathLib::NeuralNetwork<T>& diff) {
         neuralNetwork.Learn(diff, rate);
     }
-    [[nodiscard]] virtual bool Save(MathLib::Writeable& file) const override {
+    [[nodiscard]] virtual bool Save(MathLib::Writable& file) const override {
         return file.Write<T>(rate) && trainingDataInput.Save(file) && trainingDataOutput.Save(file) && neuralNetwork.Save(file);
     }
     [[nodiscard]] virtual bool Load(MathLib::Readable& file) override {

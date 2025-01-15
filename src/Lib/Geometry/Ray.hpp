@@ -17,7 +17,8 @@ namespace MathLib {
             ReturnFromBenchmark(this->position + direction * t);
         }
         [[nodiscard]] Matrix<T> GetDirection(void) const {
-            return direction;
+            StartBenchmark
+            ReturnFromBenchmark(direction);
         }
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:

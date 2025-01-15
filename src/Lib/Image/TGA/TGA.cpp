@@ -9,7 +9,7 @@ namespace MathLib {
     TGA::TGA(size_t width, size_t height) : SaveableImage(width, height) {
         EmptyBenchmark
     }
-    bool TGA::Save(Writeable& file) const {
+    bool TGA::Save(Writable& file) const {
         StartBenchmark
         TGAHeader header = {};
         header.idLength = identifier.GetSize();

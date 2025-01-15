@@ -24,7 +24,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         }
         default: ret += "Unknown";
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint8_t)bitMode, 16) + ")\n";
+    ret += " (0x"_M + MathLib::ToString((uint8_t)bitMode, 16) + ")\n";
     ret += padding + "\tEndianness: ";
     switch (endianness) {
         case Endianness::Invalid: {
@@ -41,7 +41,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         }
         default: ret += "Unknown";
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint8_t)endianness, 16) + ")\n";
+    ret += " (0x"_M + MathLib::ToString((uint8_t)endianness, 16) + ")\n";
     ret += padding + "\tHeader version: " + MathLib::ToString(headerVersion, 10) + '\n';
     ret += padding + "\tABI: ";
     switch (abi) {
@@ -103,7 +103,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         }
         default: ret += "Unknown";
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint8_t)abi, 16) + ")\n";
+    ret += " (0x"_M + MathLib::ToString((uint8_t)abi, 16) + ")\n";
     ret += padding + "\tABI version: " + MathLib::ToString(abiVersion, 10) + '\n';
     uint64_t tmp = 0;
     MathLib::MemoryCopy(reserved, &tmp, SizeOfArray(reserved));
@@ -140,7 +140,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         }
         default: ret += "Unknown";
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint16_t)type, 16) + ")\n";
+    ret += " (0x"_M + MathLib::ToString((uint16_t)type, 16) + ")\n";
     ret += padding + "\tArch: ";
     switch (arch) {
         case Arch::None: {
@@ -193,7 +193,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         }
         default: ret += "Unknown";
     }
-    ret += MathLib::String(" (0x") + MathLib::ToString((uint16_t)arch, 16) + ")\n";
+    ret += " (0x"_M + MathLib::ToString((uint16_t)arch, 16) + ")\n";
     ret += padding + "\tVersion: " + MathLib::ToString(version, 10) + '\n';
     ret += padding + "\tEntry: 0x" + MathLib::ToString(entry, 16) + '\n';
     ret += padding + "\tProgram header: 0x" + MathLib::ToString(programHeader, 16) + '\n';

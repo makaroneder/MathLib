@@ -42,13 +42,13 @@ bool InitArch(uintptr_t signature, void* info) {
     RSDP* rsdp = nullptr;
     if (signature == 0x2badb002) InitMultiboot1((Multiboot1Info*)info);
     else if (signature == 0x36d76289) rsdp = InitMultiboot2((Multiboot2Info*)info);
-    else LogString(MathLib::String("Unknown bootloader signature: 0x") + MathLib::ToString(signature, 16) + '\n');
+    else LogString("Unknown bootloader signature: 0x"_M + MathLib::ToString(signature, 16) + '\n');
     // TODO: Create new paging structure
     if (!rsdp) rsdp = FindRSDP();
     if (!InitACPI(rsdp, true)) return false;
     const CMOSFloppyData floppyData = cmos->GetFloppyData();
-    LogString(MathLib::String("CMOS master floppy data: 0x") + MathLib::ToString(floppyData.master, 16) + '\n');
-    LogString(MathLib::String("CMOS slave floppy data: 0x") + MathLib::ToString(floppyData.slave, 16) + '\n');
+    LogString("CMOS master floppy data: 0x"_M + MathLib::ToString(floppyData.master, 16) + '\n');
+    LogString("CMOS slave floppy data: 0x"_M + MathLib::ToString(floppyData.slave, 16) + '\n');
     #ifdef TriggerDivisionError
     {
         Registers regs;
@@ -72,7 +72,7 @@ bool InitArch(uintptr_t signature, void* info) {
     return true;
 }
 [[noreturn]] void ShutdownArch(void) {
-    // TODO: Perform APCI shutdown
+    // TODO: Perform ACPI shutdown
     // Bochs shutdown
     WritePort<uint16_t>(0xb004, 0x2000);
     // QEMU shutdown

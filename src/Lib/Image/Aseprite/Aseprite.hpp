@@ -11,7 +11,7 @@ namespace MathLib {
         /// @brief Saves data as PPM P6 image
         /// @param file File to save data into
         /// @return Status
-        [[nodiscard]] virtual bool Save(Writeable& file) const override;
+        [[nodiscard]] virtual bool Save(Writable& file) const override;
         /// @brief Loads data from PPM P6 image
         /// @param file File to load data from
         /// @return Status

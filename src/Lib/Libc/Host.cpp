@@ -2,12 +2,46 @@
 #include "../Host.hpp"
 #include "HostThread.hpp"
 #include <complex>
+#include <time.h>
+#ifndef __MINGW32__
 #include <thread>
+#endif
 #define ToStdComplex(x) std::complex<num_t>(x.GetReal(), x.GetImaginary())
 #define FromStdComplex(x) complex_t(x.real(), x.imag())
 
 namespace MathLib {
+    #ifdef __MINGW32__
+    size_t GetThreadCount(void) {
+        StartBenchmark
+        ReturnFromBenchmark(0);
+    }
+    Thread* AllocThread(void) {
+        StartBenchmark
+        ReturnFromBenchmark(nullptr);
+    }
+    void DeallocThread(Thread*) {
+        StartBenchmark
+        EndBenchmark
+    }
+    #else
     size_t threadCount = std::thread::hardware_concurrency();
+    size_t GetThreadCount(void) {
+        StartBenchmark
+        ReturnFromBenchmark(threadCount);
+    }
+    Thread* AllocThread(void) {
+        StartBenchmark
+        if (!threadCount) ReturnFromBenchmark(nullptr);
+        threadCount--;
+        ReturnFromBenchmark(new HostThread());
+    }
+    void DeallocThread(Thread* thread) {
+        StartBenchmark
+        threadCount++;
+        delete thread;
+        EndBenchmark
+    }
+    #endif
     std::ostream& operator<<(std::ostream& stream, const String& string) {
         StartBenchmark
         ReturnFromBenchmark(stream << string.GetValue());
@@ -29,23 +63,8 @@ namespace MathLib {
         ReturnFromBenchmark((num_t)ix == x ? std::to_string(ix) : std::to_string(x));
     }
     num_t GetTime(void) {
-        return (num_t)clock() / CLOCKS_PER_SEC;
-    }
-    size_t GetThreadCount(void) {
         StartBenchmark
-        ReturnFromBenchmark(threadCount);
-    }
-    Thread* AllocThread(void) {
-        StartBenchmark
-        if (!threadCount) ReturnFromBenchmark(nullptr);
-        threadCount--;
-        ReturnFromBenchmark(new HostThread());
-    }
-    void DeallocThread(Thread* thread) {
-        StartBenchmark
-        threadCount++;
-        delete thread;
-        EndBenchmark
+        ReturnFromBenchmark((num_t)clock() / CLOCKS_PER_SEC);
     }
     num_t MakeNaN(void) {
         StartBenchmark

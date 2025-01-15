@@ -5,7 +5,7 @@
 
 InvalidTSS::InvalidTSS(void) : Exception(Type::InvalidTSS) {}
 MathLib::String InvalidTSS::GetPanicMessage(uintptr_t error) const {
-    return MathLib::String("Invalid TSS used\n") + ((SelectorErrorCode*)&error)->ToString() + '\n';
+    return "Invalid TSS used\n"_M + ((SelectorErrorCode*)&error)->ToString() + '\n';
 }
 
 #endif

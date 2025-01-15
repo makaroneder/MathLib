@@ -13,10 +13,8 @@ using ssize_t = intptr_t;
 #endif
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IsBetween(x, a, b) ((x) >= (a) && (x) <= (b))
-#define StartBenchmark                                                                              \
-    if (!MathLib::BenchmarkStart(__PRETTY_FUNCTION__)) MathLib::Panic("Failed to start benchmark"); \
-    const MathLib::num_t benchmarkTimeStart = MathLib::benchmark ? MathLib::GetTime() : 0;
-#define EndBenchmark if (!MathLib::BenchmarkEnd(__PRETTY_FUNCTION__, benchmarkTimeStart)) MathLib::Panic("Failed to end benchmark");
+#define StartBenchmark if (!MathLib::BenchmarkStart(__PRETTY_FUNCTION__)) MathLib::Panic("Failed to start benchmark");
+#define EndBenchmark if (!MathLib::BenchmarkEnd()) MathLib::Panic("Failed to end benchmark");
 #define ReturnFromBenchmark(ret) {  \
     EndBenchmark                    \
     return ret;                     \
@@ -46,15 +44,18 @@ namespace MathLib {
     using num_t = long double;
     /// @brief Default error tolerance
     extern num_t eps;
-    extern bool benchmark;
 
     [[noreturn]] void Panic(const char*);
     [[nodiscard]] num_t Abs(num_t x);
     [[nodiscard]] num_t Sqrt(num_t x);
     [[nodiscard]] num_t RandomFloat(void);
     [[nodiscard]] num_t GetTime(void);
+    void StartBenchmarking(void);
     [[nodiscard]] bool BenchmarkStart(const char* function);
-    [[nodiscard]] bool BenchmarkEnd(const char* function, num_t time);
+    [[nodiscard]] bool BenchmarkEnd(void);
+    template <typename T>
+    struct Tree;
+    [[nodiscard]] Tree<num_t> StopBenchmarking(void);
 
     /// @brief Makes array with specified single element
     /// @tparam T Type of element
@@ -132,5 +133,7 @@ namespace MathLib {
         ReturnFromBenchmark(ret);
     }
 }
+MathLib::String operator""_M(const char* str, size_t size);
+MathLib::String operator""_M(char chr);
 
 #endif

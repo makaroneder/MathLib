@@ -3,7 +3,6 @@
 #include "AndGate.hpp"
 #include "XorGate.hpp"
 #include "OrGate.hpp"
-#include <MathLib.hpp>
 #include <iostream>
 
 // TODO: Nor, Nand, Xnor

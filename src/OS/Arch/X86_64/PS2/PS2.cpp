@@ -33,50 +33,50 @@ bool Await8042(bool write) {
     const MathLib::Expected<uint8_t> tmp = device.SendCommand(0xf6);
     if (!tmp.HasValue() || tmp.Get() != (uint8_t)PS2Device::Response::Acknowledge) return false;
     const MathLib::Expected<uint16_t> type = device.GetID();
-    if (!type.HasValue()) LogString(MathLib::String("Found AT keyboard on ") + PS2PortToString(second) + '\n');
+    if (!type.HasValue()) LogString("Found AT keyboard on "_M + PS2PortToString(second) + '\n');
     else switch (type.Get()) {
         case 0x0000:
         case 0x0003:
         case 0x0004: {
-            LogString(MathLib::String("Found mouse on ") + PS2PortToString(second) + '\n');
+            LogString("Found mouse on "_M + PS2PortToString(second) + '\n');
             new PS2Mouse(second);
             break;
         }
         case 0xab83:
         case 0xabc1: {
-            LogString(MathLib::String("Found MF2 keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found MF2 keyboard on "_M + PS2PortToString(second) + '\n');
             new PS2Keyboard(second);
             break;
         }
         case 0xab84: {
-            LogString(MathLib::String("Found IBM ThinkPad on ") + PS2PortToString(second) + '\n');
+            LogString("Found IBM ThinkPad on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xab85: {
-            LogString(MathLib::String("Found NCD N-97 keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found NCD N-97 keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xab86: {
-            LogString(MathLib::String("Found 122-key keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found 122-key keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xab90: {
-            LogString(MathLib::String("Found japanese 'G' keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found japanese 'G' keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xab91: {
-            LogString(MathLib::String("Found japanese 'P' keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found japanese 'P' keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xab92: {
-            LogString(MathLib::String("Found japanese 'A' keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found japanese 'A' keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
         case 0xaca1: {
-            LogString(MathLib::String("Found NCD sun layout keyboard on ") + PS2PortToString(second) + '\n');
+            LogString("Found NCD sun layout keyboard on "_M + PS2PortToString(second) + '\n');
             break;
         }
-        default: LogString(MathLib::String("Found unknown device (0x") + MathLib::ToString(type.Get(), 16) + ") on " + PS2PortToString(second) + '\n');
+        default: LogString("Found unknown device (0x"_M + MathLib::ToString(type.Get(), 16) + ") on " + PS2PortToString(second) + '\n');
     }
     return true;
 }

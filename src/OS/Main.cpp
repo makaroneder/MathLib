@@ -27,7 +27,7 @@ MathLib::Expected<char> WaitForKey(void) {
 }
 void MainTask(const void*, size_t task) {
     MathLib::String command = "";
-    LogString(MathLib::String("Running in task ") + MathLib::ToString(task) + '\n');
+    LogString("Running in task "_M + MathLib::ToString(task) + '\n');
     if (!textUI->Puts("> ")) MathLib::Panic("Failed to print data to text UI");
     // TODO: Split output of commands so we can read it if it's too long
     // TODO: Add option to chain commands
@@ -57,8 +57,8 @@ void MainTask(const void*, size_t task) {
                     else if (args.At(0) == "ls") output = vfs.ListFiles(args.GetSize() > 1 ? args.At(1) : "");
                     else if (args.At(0) == "read") output = args.GetSize() < 2 ? "Usage: read <path>\n" : vfs.Open(args.At(1), MathLib::OpenMode::Read).ReadUntil('\0') + '\n';
                     else if (args.At(0) == "date") output = dateKeeper->GetDate().ToString() + '\n';
-                    else if (args.At(0) == "memory") output = MathLib::String("Free memory: ") + MathLib::ToString(allocator.GetFreeMemory()) + '\n';
-                    else if (args.At(0) == "info") output = MathLib::String("Creation date: ") + __TIMESTAMP__ + '\n';
+                    else if (args.At(0) == "memory") output = "Free memory: "_M + MathLib::ToString(allocator.GetFreeMemory()) + '\n';
+                    else if (args.At(0) == "info") output = "Creation date: "_M + creationData.ToString() + '\n';
                     else if (args.At(0) == "dumpMemory") {
                         if (args.GetSize() < 3) output = "Usage: dumpMemory <address> <size> [line size]\n";
                         else {
@@ -79,7 +79,7 @@ void MainTask(const void*, size_t task) {
                             output = MathLib::DumpMemory((uintptr_t)buff, size, lineSize);
                         }
                     }
-                    else output = MathLib::String("Unknown command: '") + args.At(0) + "'\n";
+                    else output = "Unknown command: '"_M + args.At(0) + "'\n";
                     if (!textUI->Puts(output)) MathLib::Panic("Failed to print data to text UI");
                 }
                 command = "";
@@ -111,12 +111,12 @@ extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
         MathLib::ISO9660* iso9660 = new MathLib::ISO9660(*disks.At(i));
         if (!iso9660) MathLib::Panic("Failed to allocate file system");
         else if (iso9660->IsValid()) {
-            LogString(MathLib::String("Found ISO9660 file system on disk ") + MathLib::ToString(i) + '\n');
-            if (!vfs.AddFileSystem(MathLib::VFSEntry(iso9660, MathLib::String("iso9660fs") + MathLib::ToString(iso9660fs++)))) MathLib::Panic("Failed to add file system to VFS");
+            LogString("Found ISO9660 file system on disk "_M + MathLib::ToString(i) + '\n');
+            if (!vfs.AddFileSystem(MathLib::VFSEntry(iso9660, "iso9660fs"_M + MathLib::ToString(iso9660fs++)))) MathLib::Panic("Failed to add file system to VFS");
         }
         else delete iso9660;
     }
-    LogString(MathLib::String("Boot time: ") + MathLib::Second<MathLib::num_t>(MathLib::GetTime()).ToString() + '\n');
+    LogString("Boot time: "_M + MathLib::Second<MathLib::num_t>(MathLib::GetTime()).ToString() + '\n');
     renderer->Fill(0);
     if (!renderer->Update()) MathLib::Panic("Failed to update renderer");
     if (!StartScheduler(MathLib::FunctionPointer<void, size_t>(nullptr, &MainTask))) MathLib::Panic("Failed to start scheduler");

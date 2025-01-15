@@ -1,5 +1,9 @@
+#include <EquationSolver/Preprocesor.hpp>
+#include <EquationSolver/Optimizer.hpp>
+#include <EquationSolver/Tokenizer.hpp>
 #include <Geometry/Hyperrectangle.hpp>
-#include <MathLib.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <CommandLine.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 

@@ -3,7 +3,7 @@
 #include <Interfaces/ByteDevice.hpp>
 #include <SingleTypePair.hpp>
 
-struct TextUI : MathLib::Writeable {
+struct TextUI : MathLib::Writable {
     TextUI(uint32_t bgColor, uint32_t fgColor);
     [[nodiscard]] size_t GetSize(void) const;
     [[nodiscard]] virtual size_t GetWidth(void) const = 0;

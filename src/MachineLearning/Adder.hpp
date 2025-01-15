@@ -37,7 +37,7 @@ template <typename T>
             if (!state.Forward()) return "";
             size_t z = 0;
             for (size_t i = 0; i < state.trainingDataOutput.GetWidth(); i++) z |= (state.neuralNetwork.GetOutput().At(i, 0) > 0.5) << i;
-            ret += MathLib::String("[") + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(z) + '\n';
+            ret += '['_M + MathLib::ToString(y) + ", " + MathLib::ToString(x) + "] => " + MathLib::ToString(z) + '\n';
         }
     }
     return ret;

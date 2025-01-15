@@ -1,6 +1,7 @@
 #ifndef MathLib_Interval_H
 #define MathLib_Interval_H
 #include "Typedefs.hpp"
+#include "MinMax.hpp"
 
 namespace MathLib {
     template <typename T>
@@ -26,9 +27,7 @@ namespace MathLib {
         }
         [[nodiscard]] T Clamp(const T& x) const {
             StartBenchmark
-            if (x < min) ReturnFromBenchmark(min)
-            else if (x > max) ReturnFromBenchmark(max)
-            else ReturnFromBenchmark(x)
+            ReturnFromBenchmark(MathLib::Clamp(x, min, max));
         }
 
         private:

@@ -11,174 +11,198 @@ namespace MathLib {
             TreeElement* parent;
             Array<TreeElement*> children;
         
-            TreeElement(const Tree<T>& self, TreeElement* parent) : self(self), parent(parent) {}
+            TreeElement(const Tree<T>& self, TreeElement* parent) : self(self), parent(parent) {
+                EmptyBenchmark
+            }
             ~TreeElement(void) {
+                StartBenchmark
                 for (TreeElement*& child : children) delete child;
+                EndBenchmark
             }
             [[nodiscard]] const TreeElement* Find(const String& name) const {
-                if (self.name == name) return this;
+                StartBenchmark
+                if (self.name == name) ReturnFromBenchmark(this);
                 for (const TreeElement* const& child : children) {
                     const TreeElement* tmp = child->Find(name);
-                    if (tmp) return tmp;
+                    if (tmp) ReturnFromBenchmark(tmp);
                 }
-                return nullptr;
+                ReturnFromBenchmark(nullptr);
             }
             [[nodiscard]] bool AddChild(TreeElement* child) {
-                if (!child) return false;
+                StartBenchmark
+                if (!child) ReturnFromBenchmark(false);
                 child->parent = this;
-                return children.Add(child);
+                ReturnFromBenchmark(children.Add(child));
             }
         };
         String name;
         T data;
         Array<Tree<T>> children;
 
-        Tree(void) {}
-        Tree(const String& name, const T& data) : name(name), data(data) {}
-        Tree(const String& name, const T& data, const Array<Tree<T>>& children) : name(name), data(data), children(children) {}
+        Tree(void) {
+            EmptyBenchmark
+        }
+        Tree(const String& name, const T& data) : name(name), data(data) {
+            EmptyBenchmark
+        }
+        Tree(const String& name, const T& data, const Array<Tree<T>>& children) : name(name), data(data), children(children) {
+            EmptyBenchmark
+        }
         [[nodiscard]] Tree<T> AddNamePostfix(const String& namePostfix) const {
+            StartBenchmark
             Tree<T> ret = *this;
             ret.name += namePostfix;
             for (Tree<T>& child : ret.children) child = child.AddNamePostfix(namePostfix);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         [[nodiscard]] bool Add(const Tree<T>& tree, const String& namePostfix = "") {
-            return children.Add(tree.AddNamePostfix(namePostfix));
+            StartBenchmark
+            ReturnFromBenchmark(children.Add(tree.AddNamePostfix(namePostfix)));
         }
         [[nodiscard]] Expected<Tree<T>> ChangeRoot(const String& n) const {
+            StartBenchmark
             TreeElement* doubleTree = ToDoubleTree();
-            if (!doubleTree) return Expected<Tree<T>>();
+            if (!doubleTree) ReturnFromBenchmark(Expected<Tree<T>>());
             const TreeElement* rootInfo = doubleTree->Find(n);
             Tree<T> ret = rootInfo->self;
             Tree<T>* curr = &ret;
             Array<String> names = MakeArrayFromSingle<String>(ret.name);
             while (rootInfo->parent) {
                 Tree<T> tmp = Tree<T>(rootInfo->parent->self.name, rootInfo->parent->self.data, Array<Tree<T>>());
-                if (!names.Add(tmp.name)) return Expected<Tree<T>>();
+                if (!names.Add(tmp.name)) ReturnFromBenchmark(Expected<Tree<T>>());
                 for (const Tree<T>& child : rootInfo->parent->self.children) {
                     if (names.Contains(child.name)) continue;
-                    if (!tmp.Add(child)) return Expected<Tree<T>>();
+                    if (!tmp.Add(child)) ReturnFromBenchmark(Expected<Tree<T>>());
                 }
-                if (!curr->Add(tmp)) return Expected<Tree<T>>();
+                if (!curr->Add(tmp)) ReturnFromBenchmark(Expected<Tree<T>>());
                 curr = &curr->children.At(curr->children.GetSize() - 1);
                 rootInfo = rootInfo->parent;
             }
             delete doubleTree;
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         [[nodiscard]] Tree<T> GetMirror(void) const {
+            StartBenchmark
             Tree<T> ret = *this;
-            if (!ret.children.GetSize()) return ret;
+            if (!ret.children.GetSize()) ReturnFromBenchmark(ret);
             size_t start = 0;
             size_t end = ret.children.GetSize() - 1;
             while (start < end) Swap<Tree<T>>(ret.children.At(start++), ret.children.At(end--));
             for (Tree<T>& child : ret.children) child = child.GetMirror();
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         [[nodiscard]] Pair<Tree<T>, size_t> GetFarthest(void) const {
+            StartBenchmark
             Pair<Tree<T>, size_t> ret = Pair<Tree<T>, size_t>(*this, 0);
             for (const Tree<T>& child : children) {
                 const Pair<Tree<T>, size_t> tmp = child.GetFarthest();
                 if (ret.second < tmp.second) ret = tmp;
             }
             ret.second++;
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         [[nodiscard]] Array<Tree<T>> GetPath(const String& target) const {
-            if (name == target) return MakeArrayFromSingle<Tree<T>>(*this);
+            StartBenchmark
+            if (name == target) ReturnFromBenchmark(MakeArrayFromSingle<Tree<T>>(*this));
             for (const Tree<T>& child : children) {
                 Array<Tree<T>> ret = child.GetPath(target);
                 if (ret.GetSize()) {
                     Array<Tree<T>> tmp = Array<Tree<T>>(ret.GetSize() + 1);
                     tmp.At(0) = *this;
                     for (size_t i = 0; i < ret.GetSize(); i++) tmp.At(i + 1) = ret.At(i);
-                    return tmp;
+                    ReturnFromBenchmark(tmp);
                 }
             }
-            return Array<Tree<T>>();
+            ReturnFromBenchmark(Array<Tree<T>>());
         }
         [[nodiscard]] Array<Tree<T>> GetCenters(void) const {
+            StartBenchmark
             const Expected<Tree<T>> u = ChangeRoot(GetFarthest().first.name);
-            if (!u.HasValue()) return Array<Tree<T>>();
+            if (!u.HasValue()) ReturnFromBenchmark(Array<Tree<T>>());
             const Tree<T> v = u.Get().GetFarthest().first;
             const Array<Tree<T>> path = u.Get().GetPath(v.name);
             if (path.GetSize() % 2) {
                 const Expected<Tree<T>> tmp = ChangeRoot(path.At(path.GetSize() / 2).name);
-                return tmp.HasValue() ? MakeArrayFromSingle<Tree<T>>(tmp.Get()) : Array<Tree<T>>();
+                ReturnFromBenchmark(tmp.HasValue() ? MakeArrayFromSingle<Tree<T>>(tmp.Get()) : Array<Tree<T>>());
             }
             else {
                 Array<Tree<T>> ret = Array<Tree<T>>(2);
                 Expected<Tree<T>> tmp = ChangeRoot(path.At(path.GetSize() / 2).name);
-                if (!tmp.HasValue()) return Array<Tree<T>>();
+                if (!tmp.HasValue()) ReturnFromBenchmark(Array<Tree<T>>());
                 ret.At(0) = tmp.Get();
                 tmp = ChangeRoot(path.At((path.GetSize() - 1) / 2).name);
-                if (!tmp.HasValue()) return Array<Tree<T>>();
+                if (!tmp.HasValue()) ReturnFromBenchmark(Array<Tree<T>>());
                 ret.At(1) = tmp.Get();
-                return ret;
+                ReturnFromBenchmark(ret);
             }
         }
         [[nodiscard]] Expected<bool> StrictEquality(const Tree<T>& other) const {
-            if (data != other.data || children.GetSize() != other.children.GetSize()) return Expected<bool>(false);
+            StartBenchmark
+            if (data != other.data || children.GetSize() != other.children.GetSize()) ReturnFromBenchmark(Expected<bool>(false));
             const size_t size = children.GetSize();
             Bitmap used = Bitmap(size);
             for (size_t i = 0; i < size; i++) {
                 bool foundMatch = false;
                 for (size_t j = 0; j < size; j++) {
                     Expected<bool> tmp = used.Get(j);
-                    if (!tmp.HasValue()) return Expected<bool>();
+                    if (!tmp.HasValue()) ReturnFromBenchmark(Expected<bool>());
                     if (!tmp.Get()) {
                         tmp = children.At(i).StrictEquality(other.children.At(j));
-                        if (!tmp.HasValue()) return Expected<bool>();
+                        if (!tmp.HasValue()) ReturnFromBenchmark(Expected<bool>());
                         if (tmp.Get()) {
-                            if (!used.Set(j, true)) return Expected<bool>();
+                            if (!used.Set(j, true)) ReturnFromBenchmark(Expected<bool>());
                             foundMatch = true;
                             break;
                         }
                     }
                 }
-                if (!foundMatch) return Expected<bool>(false);
+                if (!foundMatch) ReturnFromBenchmark(Expected<bool>(false));
             }
-            return Expected<bool>(true);
+            ReturnFromBenchmark(Expected<bool>(true));
         }
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+            StartBenchmark
             String ret = padding + name + " (" + MathLib::ToString(data) + ')';
             if (children.GetSize()) {
                 ret += ": {\n";
                 for (const Tree<T>& child : children) ret += child.ToString(padding + '\t') + '\n';
-                return ret + padding + '}';
+                ReturnFromBenchmark(ret + padding + '}');
             }
-            else return ret;
+            else ReturnFromBenchmark(ret);
         }
         [[nodiscard]] Expected<bool> operator==(const Tree<T>& other) const {
+            StartBenchmark
             const Array<Tree<T>> centers1 = GetCenters();
             const Array<Tree<T>> centers2 = other.GetCenters();
             for (const Tree<T>& center1 : centers1) {
                 for (const Tree<T>& center2 : centers2) {
                     const Expected<bool> tmp = center1.StrictEquality(center2);
-                    if (!tmp.HasValue()) return Expected<bool>();
-                    if (tmp.Get()) return Expected<bool>(true);
+                    if (!tmp.HasValue()) ReturnFromBenchmark(Expected<bool>());
+                    if (tmp.Get()) ReturnFromBenchmark(Expected<bool>(true));
                 }
             }
-            return Expected<bool>(false);
+            ReturnFromBenchmark(Expected<bool>(false));
         }
         [[nodiscard]] Expected<bool> operator!=(const Tree<T>& other) const {
+            StartBenchmark
             const Expected<bool> tmp = *this == other;
-            return tmp.HasValue() ? Expected<bool>(!tmp.Get()) : Expected<bool>();
+            ReturnFromBenchmark(tmp.HasValue() ? Expected<bool>(!tmp.Get()) : Expected<bool>());
         }
 
         private:
         [[nodiscard]] TreeElement* ToDoubleTree(void) const {
+            StartBenchmark
             TreeElement* ret = new TreeElement(*this, nullptr);
             for (const Tree<T>& child : children) {
                 if (!ret->AddChild(child.ToDoubleTree())) {
                     delete ret;
-                    return nullptr;
+                    ReturnFromBenchmark(nullptr);
                 }
             }
-            return ret;
+            ReturnFromBenchmark(ret);
         }
     };
 }

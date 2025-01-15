@@ -5,7 +5,7 @@
 
 SegmentNotPresent::SegmentNotPresent(void) : Exception(Type::SegmentNotPresent) {}
 MathLib::String SegmentNotPresent::GetPanicMessage(uintptr_t error) const {
-    return MathLib::String("Segment without present attribute used\n") + ((SelectorErrorCode*)&error)->ToString() + '\n';
+    return "Segment without present attribute used\n"_M + ((SelectorErrorCode*)&error)->ToString() + '\n';
 }
 
 #endif

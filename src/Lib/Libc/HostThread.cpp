@@ -1,4 +1,5 @@
 #ifndef Freestanding
+#ifndef __MINGW32__
 #include "HostThread.hpp"
 
 namespace MathLib {
@@ -19,4 +20,5 @@ namespace MathLib {
     }
 }
 
+#endif
 #endif

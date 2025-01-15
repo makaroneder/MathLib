@@ -1,7 +1,7 @@
 #include "Renderer.hpp"
 
 namespace MathLib {
-    Renderer::Renderer(size_t width, size_t height) : SaveableImage(width, height), position(CreateVector<num_t>(0, 0, 0)), pointMultiplier(100), image(nullptr) {
+    Renderer::Renderer(size_t width, size_t height) : SaveableImage(width, height), position(CreateVector<num_t>(0, 0, 0)), pointMultiplier(100), fillGapsInFunctions(true), image(nullptr) {
         EmptyBenchmark
     }
     Renderer::~Renderer(void) {
@@ -15,7 +15,7 @@ namespace MathLib {
         while (ret.type == Event::Type::None) ret = GetEvent();
         ReturnFromBenchmark(ret);
     }
-    bool Renderer::Save(Writeable& file) const {
+    bool Renderer::Save(Writable& file) const {
         StartBenchmark
         if (!image) ReturnFromBenchmark(false);
         image->pixels = pixels;

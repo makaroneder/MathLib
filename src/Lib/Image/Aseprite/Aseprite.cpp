@@ -10,7 +10,7 @@ namespace MathLib {
     Aseprite::Aseprite(size_t width, size_t height) : SaveableImage(width, height) {
         EmptyBenchmark
     }
-    bool Aseprite::Save(Writeable& file) const {
+    bool Aseprite::Save(Writable& file) const {
         // TODO:
         (void)file;
         StartBenchmark

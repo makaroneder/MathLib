@@ -1,4 +1,8 @@
-#include <MathLib.hpp>
+#include <EquationSolver/Preprocesor.hpp>
+#include <EquationSolver/Tokenizer.hpp>
+#include <EquationSolver/Optimizer.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <Host.hpp>
 #include <iostream>
 
 // TODO: logical and, logical or, for loops, structs, pointers
@@ -15,7 +19,7 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 2) MathLib::Panic(MathLib::String("Usage: ") + argv[0] + " <input file>");
+        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
         MathLib::HostFileSystem fs;
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[1]));
         #ifdef Debug

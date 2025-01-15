@@ -1,4 +1,3 @@
-#include <MathLib.hpp>
 #include <Graph/Graph.hpp>
 #include <iostream>
 

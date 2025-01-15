@@ -51,9 +51,9 @@ bool InitAHCI(PCIHeader* header) {
                     type = "PM";
                     break;
                 }
-                default: type = MathLib::String("Unknown (0x") + MathLib::ToString((uint32_t)tmp, 16) + ')';
+                default: type = "Unknown (0x"_M + MathLib::ToString((uint32_t)tmp, 16) + ')';
             }
-            LogString(MathLib::String("Found ") + type + " on AHCI port " + MathLib::ToString(i) + '\n');
+            LogString("Found "_M + type + " on AHCI port " + MathLib::ToString(i) + '\n');
             AHCIPort* port = new AHCIPort(&abar->ports[i]);
             if (!port || !disks.Add(port)) return false;
         }

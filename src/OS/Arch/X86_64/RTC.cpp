@@ -47,14 +47,8 @@ Date RTC::GetDate(void) const {
     Date date;
     uint8_t century = 0;
     while (true) {
-        Date tmp;
         uint8_t tmpCentury = 0;
-        tmp.second = Read(Register::RTCSeconds);
-        tmp.minute = Read(Register::RTCMinutes);
-        tmp.hour = Read(Register::RTCHours);
-        tmp.day = Read(Register::RTCDay);
-        tmp.month = Read(Register::RTCMonth);
-        tmp.year = Read(Register::RTCYear);
+        Date tmp = Date(Read(Register::RTCSeconds), Read(Register::RTCMinutes), Read(Register::RTCHours), Read(Register::RTCDay), Read(Register::RTCMonth), Read(Register::RTCYear));
         if ((uint8_t)centuryRegister) tmpCentury = Read(centuryRegister);
         if (date == tmp && century == tmpCentury) break;
         date = tmp;
@@ -62,19 +56,14 @@ Date RTC::GetDate(void) const {
     }
     const uint8_t regB = Read(Register::StatusRegisterB);
     if (!(regB & 1 << 2)) {
-        date.second = date.second % 16 + date.second / 16 * 10;
-        date.minute = date.minute % 16 + date.minute / 16 * 10;
-        date.hour = date.hour % 16 + date.hour / 16 * 10;
-        date.day = date.day % 16 + date.day / 16 * 10;
-        date.month = date.month % 16 + date.month / 16 * 10;
-        date.year = date.year % 16 + date.year / 16 * 10;
+        date = Date(date.second % 16 + date.second / 16 * 10, date.minute % 16 + date.minute / 16 * 10, date.hour % 16 + date.hour / 16 * 10, date.day % 16 + date.day / 16 * 10, date.month % 16 + date.month / 16 * 10, date.year % 16 + date.year / 16 * 10);
         century = century % 16 + century / 16 * 10;
     }
     if (!(regB & 1 << 1) && date.hour & 1 << 7) date.hour = ((date.hour & ((1 << 7) - 1)) + 12) % 24;
     if ((uint8_t)centuryRegister) date.year += century * 100;
     else {
-        date.year += Date::currentYear / 100 * 100;
-        if (date.year < Date::currentYear) date.year += 100;
+        date.year += creationData.year / 100 * 100;
+        if (date.year < creationData.year) date.year += 100;
     }
     return date;
 }

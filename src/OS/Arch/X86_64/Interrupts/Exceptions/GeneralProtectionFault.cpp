@@ -5,7 +5,7 @@
 
 GeneralProtectionFault::GeneralProtectionFault(void) : Exception(Type::GeneralProtectionFault) {}
 MathLib::String GeneralProtectionFault::GetPanicMessage(uintptr_t error) const {
-    return MathLib::String("General protection fault detected\n") + ((SelectorErrorCode*)&error)->ToString() + '\n';
+    return "General protection fault detected\n"_M + ((SelectorErrorCode*)&error)->ToString() + '\n';
 }
 
 #endif

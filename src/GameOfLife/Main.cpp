@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "LifeAutomaton.hpp"
 #include <DummyRenderer.hpp>
 #include <SDL2.cpp>
@@ -9,7 +10,8 @@
 /// @return Status
 int main(int, char**) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Game of life", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Game of life", 800, 800);
         LifeAutomaton game = LifeAutomaton(10, 10, LifeAutomatonRule(LifeAutomatonRule::life));
         std::cout << game << std::endl;
         game.Set(1, 2, true);

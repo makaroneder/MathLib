@@ -1,6 +1,5 @@
 #include "../Math/Factorial.hpp"
 #include "Optimizer.hpp"
-#include "../Host.hpp"
 
 namespace MathLib {
     Optimizer::Optimizer(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
@@ -13,6 +12,16 @@ namespace MathLib {
     }
     Optimizer::Optimizer(Optimizer* parent) : builtinFunctions(), functions(), variables(), runtime(parent->runtime), parent(parent) {
         EmptyBenchmark
+    }
+    Optimizer Optimizer::Recreate(void) const {
+        StartBenchmark
+        Optimizer ret = *this;
+        for (Variable& variable : ret.variables) variable.value = variable.value->Recreate();
+        for (FunctionNode& function : ret.functions) {
+            function.body = function.body->Recreate();
+            for (Variable& arg : function.arguments) arg.value = arg.value->Recreate();
+        }
+        ReturnFromBenchmark(ret);
     }
     void Optimizer::Destroy(void) {
         StartBenchmark
@@ -50,6 +59,13 @@ namespace MathLib {
         for (const FunctionNode& function : functions)
             if (function.name == name) ReturnFromBenchmark(function);
         ReturnFromBenchmark(parent ? parent->GetFunction(name) : FunctionNode("", Array<Variable>(), nullptr, ""));
+    }
+    bool Optimizer::SetBuiltinFunctionData(const String& name, void* data) {
+        StartBenchmark
+        BuiltinFunction* func = GetBuiltinFunctionInternal(name);
+        if (!func) ReturnFromBenchmark(false);
+        func->function.data = data;
+        ReturnFromBenchmark(true);
     }
     Node* Optimizer::Optimize(const Node* node) {
         StartBenchmark
@@ -245,6 +261,7 @@ namespace MathLib {
                 if (!body) ReturnFromBenchmark(new Node(Node::Type::Constant, "0"))
                 Optimizer scope = Optimizer(this);
                 Node* ret = scope.OptimizeProgram(body);
+                delete body;
                 scope.Destroy();
                 ReturnFromBenchmark(ret)
             }

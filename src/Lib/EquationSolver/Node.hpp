@@ -38,7 +38,7 @@ namespace MathLib {
         /// @param value Value
         /// @param left Left child
         /// @param right Right child
-        Node(Type type, const String& value, Node* left = nullptr, Node* right = nullptr);
+        Node(Type type = Type::None, const String& value = "", Node* left = nullptr, Node* right = nullptr);
         /// @brief Destroys current node and it's children
         virtual ~Node(void) override;
         /// @brief Creates a new node with the same values as the current node

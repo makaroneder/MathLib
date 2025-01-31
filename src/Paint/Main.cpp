@@ -11,7 +11,8 @@ int main(int, char**) {
     try {
         MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
         if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Paint", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Paint", 800, 800);
         renderer.Fill(0);
         const uint32_t colors[] = {
             UINT32_MAX,

@@ -1,16 +1,17 @@
 #include "Color.hpp"
 
 namespace MathLib {
+    Color::RGBA::RGBA(void) : a(0), b(0), g(0), r(0) {
+        EmptyBenchmark
+    }
+    Color::RGBA::RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : a(a), b(b), g(g), r(r) {
+        EmptyBenchmark
+    }
     Color::Color(uint32_t h) : hex(h) {
         EmptyBenchmark
     }
-    Color::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-        StartBenchmark
-        rgba.r = r;
-        rgba.g = g;
-        rgba.b = b;
-        rgba.a = a;
-        EndBenchmark
+    Color::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : rgba(r, g, b, a) {
+        EmptyBenchmark
     }
     uint32_t BlendColor(uint32_t c1, uint32_t c2) {
         StartBenchmark

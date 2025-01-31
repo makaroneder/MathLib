@@ -2,9 +2,8 @@
 #ifndef PS2Keyboard_H
 #define PS2Keyboard_H
 #include "PS2Device.hpp"
-#include "../Interrupts/Interrupts.hpp"
 
-struct PS2Keyboard : PS2Device, InterruptDevice {
+struct PS2Keyboard : PS2Device {
     PS2Keyboard(bool second);
     virtual ~PS2Keyboard(void) override;
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;

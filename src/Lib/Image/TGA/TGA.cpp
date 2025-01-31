@@ -55,7 +55,7 @@ namespace MathLib {
     bool TGA::Load(Readable& file) {
         StartBenchmark
         TGAHeader header;
-        if (!file.Read<TGAHeader>(header) || header.imageType != 2 || header.pixelDepth != 32) ReturnFromBenchmark(false);
+        if (!file.Read<TGAHeader>(header) || header.imageType != 2 || (header.pixelDepth != 32 && header.pixelDepth != 24)) ReturnFromBenchmark(false);
         bool createdByMathLib = false;
         if (header.idLength) {
             char id[header.idLength];
@@ -65,8 +65,8 @@ namespace MathLib {
         pixels = Matrix<uint32_t>(header.width, header.height);
         for (size_t y = 0; y < header.height; y++) {
             for (size_t x = 0; x < header.width; x++) {
-                uint8_t tmp[4] = { 0, 0, 0, 0, };
-                if (!file.ReadBuffer(tmp, SizeOfArray(tmp) * sizeof(uint8_t))) ReturnFromBenchmark(false);
+                uint8_t tmp[4] = { 0, 0, 0, 0xff, };
+                if (!file.ReadBuffer(tmp, header.pixelDepth / 8 * sizeof(uint8_t))) ReturnFromBenchmark(false);
                 pixels.At(x, y) = Color(tmp[2], tmp[1], tmp[0], tmp[3]).hex;
             }
         }

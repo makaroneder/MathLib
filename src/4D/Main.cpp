@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include <EquationSolver/Preprocesor.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
@@ -38,7 +39,8 @@ template <typename T>
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("4D viewer", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("4D viewer", 800, 800);
         MathLib::HostFileSystem fs;
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program").Get("No program specified")));

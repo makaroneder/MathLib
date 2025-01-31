@@ -1,9 +1,19 @@
 #ifndef MathLib_Math_Trigonometry_H
 #define MathLib_Math_Trigonometry_H
 #include "Constants.hpp"
+#include "Host.hpp"
 
 // TODO: Use [[nodiscard]]
 namespace MathLib {
+    /// @brief sinc(x) = sin(x) / x
+    /// @tparam T Type of number
+    /// @param x Radians
+    /// @return Sinc of x
+    template <typename T>
+    T Sinc(const T& x) {
+        StartBenchmark
+        ReturnFromBenchmark(FloatsEqual<T>(x, 0) ? 1 : Sin(x) / x);
+    }
     /// @brief cos(x) = sin(pi / 2 - x)
     /// @tparam T Type of number
     /// @param x Radians

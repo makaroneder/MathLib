@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #ifndef Exception_H
 #define Exception_H
-#include "../Interrupts.hpp"
+#include "../InterruptDevice.hpp"
 
 struct Exception : InterruptDevice {
     enum class Type {

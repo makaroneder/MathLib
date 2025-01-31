@@ -24,6 +24,7 @@
 #include "Exceptions/Breakpoint.hpp"
 #include "Exceptions/PageFault.hpp"
 #include "Exceptions/Overflow.hpp"
+#include "InterruptDevice.hpp"
 #include "SystemCall.hpp"
 #include "Interrupts.hpp"
 #include "PIC8259.hpp"
@@ -83,16 +84,17 @@ void SetInterrupts(bool value) {
 }
 void RegisterInterruptDevice(uintptr_t interrupt, InterruptDevice* device) {
     interruptDevices[interrupt] = device;
-    interrupt -= pic.GetBase();
-    if (interrupt <= 15) {
-        pic.SetIRQMask(interrupt, !device);
-        if (initialized && !pic.UpdateMask()) MathLib::Panic("Failed to update PIC interrupt mask");
-    }
+}
+bool RegisterIRQDevice(IRQ irq, InterruptDevice* device) {
+    const uintptr_t interrupt = pic.GetBase() + (uint8_t)irq;
+    RegisterInterruptDevice(interrupt, device);
+    pic.SetIRQMask(interrupt, !device);
+    return !initialized || pic.UpdateMask();
 }
 bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment) {
     if (initialized || !pic.Init(irqBase)) return false;
     for (uintptr_t i = 0; i < 256; i++)
-        idt.descriptors[i] = InterruptDescriptor(isrFunctionTable[i], codeSegment, 1 << 7 | (uint8_t)InterruptDescriptor::GateType::Interrupt);
+        idt.descriptors[i] = InterruptDescriptor(isrFunctionTable[i], codeSegment, InterruptDescriptor::GateType::Interrupt);
     asm volatile("lidt %0" : : "m"(idtr));
     if (!AlignmentCheck::Enable() || !MachineCheck::Enable()) return false;
     SetInterrupts(true);

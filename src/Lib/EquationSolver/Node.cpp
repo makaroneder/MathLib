@@ -1,6 +1,7 @@
 #include "Node.hpp"
 #include "Host.hpp"
 #include "Tokenizer.hpp"
+#include "../String.hpp"
 
 namespace MathLib {
     Array<const Node*> CommaToArray(const Node* node) {
@@ -162,11 +163,14 @@ namespace MathLib {
                 String ret = padding + '[' + (value == "1" ? "!" : "") + '\n';
                 const Array<const Node*> params = CommaToArray(left);
                 for (size_t i = 0; i < params.GetSize(); i++)
-                    ret += params[i]->ToString(padding + '\t') + (i + 1 == params.GetSize() ? String('\n') + padding + ']' : '\n');
+                    ret += params[i]->ToString(padding + '\t') + (i + 1 == params.GetSize() ? ('\n'_M + padding + ']') : '\n');
                 ReturnFromBenchmark(ret);
             }
-            case Type::Equal: ReturnFromBenchmark(padding + left->ToString() + " = " + right->ToString());
-            case Type::DynamicEqual: ReturnFromBenchmark(padding + left->ToString() + " := " + right->ToString());
+            case Type::Equal:
+            case Type::DynamicEqual: {
+                const String tmp = right->ToString(padding);
+                ReturnFromBenchmark(padding + left->ToString() + (type == Type::Equal ? " = " : " := ") + SubString(tmp, padding.GetSize(), tmp.GetSize() - padding.GetSize()));
+            }
             case Type::Add: ReturnFromBenchmark(padding + '(' + left->ToString() + " + " + right->ToString() + ')');
             case Type::Sub: ReturnFromBenchmark(padding + '(' + left->ToString() + " - " + right->ToString() + ')');
             case Type::Mul: ReturnFromBenchmark(padding + '(' + left->ToString() + " * " + right->ToString() + ')');

@@ -25,8 +25,7 @@ namespace MathLib {
             if (!ret.Add(token)) ReturnFromBenchmark(Array<String>());
             str = Erase(str, 0, pos + delim.GetSize());
         }
-        if (!ret.Add(str)) ReturnFromBenchmark(Array<String>());
-        ReturnFromBenchmark(ret);
+        ReturnFromBenchmark(ret.Add(str) ? ret : Array<String>());
     }
     String BoolToString(bool x) {
         StartBenchmark

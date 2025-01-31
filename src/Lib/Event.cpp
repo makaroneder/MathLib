@@ -4,10 +4,10 @@ namespace MathLib {
     Event::Event(Type type) : type(type) {
         EmptyBenchmark
     }
-    Event::Event(char key, bool pressed) : type(Type::KeyPressed), pressed(pressed), key(key) {
+    Event::Event(char key, bool pressed) : type(Type::KeyPressed), mouseButton(MouseButton::None), pressed(pressed), key(key) {
         EmptyBenchmark
     }
-    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : type(Type::MousePressed), pressed(pressed), mousePosition(position), mouseButton(button) {
+    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : type(Type::MousePressed), mouseButton(button), pressed(pressed), mousePosition(position) {
         EmptyBenchmark
     }
     Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {

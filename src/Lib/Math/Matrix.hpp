@@ -1,6 +1,7 @@
 #ifndef MathLib_Math_Matrix_H
 #define MathLib_Math_Matrix_H
 #include "../Interfaces/Printable.hpp"
+#include "../Interfaces/Function.hpp"
 #include "../Interfaces/Saveable.hpp"
 #include "Exponential.hpp"
 #include "MathObject.hpp"
@@ -20,6 +21,16 @@ namespace MathLib {
         Matrix(size_t width = 0, size_t height = 0) : width(width), height(height), ptr(Array<T>(width * height)) {
             StartBenchmark
             Fill(T());
+            EndBenchmark
+        }
+        /// @brief Creates a new matrix
+        /// @param width Width of matrix
+        /// @param height Height of matrix
+        /// @param func Function representing the matrix
+        Matrix(size_t width, size_t height, const Function<T, size_t, size_t>& func) : width(width), height(height), ptr(Array<T>(width * height)) {
+            StartBenchmark
+            for (size_t y = 0; y < height; y++)
+                for (size_t x = 0; x < width; x++) At(x, y) = func(x, y);
             EndBenchmark
         }
         /// @brief Creates a new matrix
@@ -82,6 +93,13 @@ namespace MathLib {
         [[nodiscard]] T At(size_t x, size_t y) const {
             StartBenchmark
             ReturnFromBenchmark(ptr.At(y * width + x));
+        }
+        [[nodiscard]] Expected<Matrix<T>> HadamardProduct(const Matrix<T>& other) const {
+            if (width != other.GetWidth() || height != other.GetHeight()) return Expected<Matrix<T>>();
+            Matrix<T> ret = *this;
+            for (size_t y = 0; y < height; y++)
+                for (size_t x = 0; x < width; x++) ret.At(x, y) *= other.At(x, y);
+            return ret;
         }
         /// @brief a = (a . b) / (|a| * |b|)
         /// @param other Other matrix
@@ -254,7 +272,7 @@ namespace MathLib {
         [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
             if (height == 1) {
-                String ret = padding + "[";
+                String ret = padding + '[';
                 for (size_t x = 0; x < width; x++) ret += MathLib::ToString(At(x, 0)) + (((x + 1) == width) ? "]" : ", ");
                 ReturnFromBenchmark(ret);
             }

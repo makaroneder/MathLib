@@ -1,12 +1,11 @@
 #ifndef Lens_H
 #define Lens_H
-#include "Intersectable.hpp"
+#include "Refractable.hpp"
+#include <Renderer.hpp>
 
 template <typename T>
-struct Lens : Intersectable<T> {
-    T radius;
-
-    Lens(const MathLib::Matrix<T>& position, const T& refractionIndex, const T& radius) : Intersectable<T>(position, refractionIndex), radius(radius) {}
+struct Lens : Refractable<T> {
+    Lens(const MathLib::Matrix<T>& position, const T& refractionIndex, const T& radius) : Refractable<T>(position, refractionIndex), radius(radius) {}
     virtual MathLib::Expected<T> GetIntersection(const MathLib::Ray<T>& ray) const override {
         const MathLib::Matrix<T> oc = ray.position - this->position;
         const T a = ray.GetDirection().Dot(ray.GetDirection());
@@ -19,6 +18,15 @@ struct Lens : Intersectable<T> {
         else if (t2 < 0) return MathLib::Expected<T>(t1);
         else return MathLib::Expected<T>(MathLib::Min<T>(t1, t2));        
     }
+    virtual MathLib::Matrix<T> GetNormal(const MathLib::Matrix<T>& intersection) const override {
+        return (intersection - this->position).Normalize();
+    }
+    void Draw(MathLib::Renderer& renderer, uint32_t color) const {
+        renderer.DrawCircle2D<T>(this->position, radius, color);
+    }
+
+    private:
+    T radius;
 };
 
 #endif

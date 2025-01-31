@@ -6,17 +6,22 @@
 struct InterruptDescriptor {
     enum class GateType : uint8_t {
         Interrupt = 0b1110,
-        Trap = 0b1110,
+        Trap = 0b1111,
     };
+    InterruptDescriptor(void);
+    InterruptDescriptor(uintptr_t offset, uint16_t codeSegment, InterruptDescriptor::GateType gateType);
+
+    private:
     uint16_t offset1;
     uint16_t codeSegment;
-    uint8_t interruptStackTableOffset;
-    uint8_t attributes;
-    uint16_t offset2;
-    uint32_t offset3;
-    uint32_t reserved;
-
-    InterruptDescriptor(uintptr_t offset = 0, uint16_t codeSegment = 0, uint8_t attributes = 0);
+    uint8_t interruptStackTableOffset : 2;
+    uint8_t reserved1 : 6;
+    uint8_t type : 4;
+    bool reserved3 : 1;
+    uint8_t ring : 2;
+    bool present : 1;
+    uint64_t offset2 : 48;
+    uint32_t reserved2;
 } __attribute__((packed));
 
 #endif

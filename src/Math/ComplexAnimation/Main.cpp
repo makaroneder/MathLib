@@ -15,7 +15,8 @@
 int main(int argc, char** argv) {
     try {
         if (argc < 4) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output image directory> <output file>");
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Complex animation", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Complex animation", 800, 800);
         if (!renderer.SetImage<MathLib::P6>()) MathLib::Panic("Failed to set image interface in renderer");
         MathLib::HostFileSystem fs;
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[1]));
@@ -36,7 +37,7 @@ int main(int argc, char** argv) {
         if (funcNode.dataType == "R") {
             for (MathLib::num_t x = -4; x <= 4; x += 1 / renderer.pointMultiplier)
                 if (!domain.Add(MathLib::complex_t(x, 0))) MathLib::Panic("Failed to add point to domain");
-            func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [funcNode, optimizer](const void*, MathLib::complex_t z) -> MathLib::complex_t {
+            func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([funcNode, optimizer](MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
                 if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(z.GetReal()), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
                 MathLib::Node* n = tmp.Optimize(funcNode.body);
@@ -54,7 +55,7 @@ int main(int argc, char** argv) {
                 else for (MathLib::num_t x = -4; x <= 4; x++)
                     if (!domain.Add(MathLib::complex_t(x, y))) MathLib::Panic("Failed to add point to domain");
             }
-            func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [funcNode, optimizer](const void*, MathLib::complex_t z) -> MathLib::complex_t {
+            func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([funcNode, optimizer](MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
                 if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
                 MathLib::Node* n = tmp.Optimize(funcNode.body);

@@ -6,7 +6,7 @@
 namespace MathLib {
     struct MathFS : PhysicalFileSystem {
         MathFS(ByteDevice& disk);
-        [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] virtual bool IsValid(void) const override;
         [[nodiscard]] virtual bool Create(void) override;
         /// @brief Opens file
         /// @param path Path to file

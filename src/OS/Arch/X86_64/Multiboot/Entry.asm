@@ -76,8 +76,9 @@ Stack:
     .bottom: resb 2 * 4096
     .top:
 
-section .rodata
-GDT:
+section .data
+global gdt
+gdt:
     .nullLimit: dw 0x0000
     .nullBase1: dw 0x0000
     .nullBase2: db 0x00
@@ -96,9 +97,17 @@ GDT:
     .dataAccess: db 0x92
     .dataGranularity: db 0xc0
     .dataBase3: db 0x00
+    .tssLimit: dw 108
+    .tssBase1: dw 0
+    .tssBase2: db 0
+    .tssAccess: db 10001001b
+    .tssGranularity: db 00000000b
+    .tssBase3: db 0
+    .tssBase4: dd 0
+    .tssReserved: dd 0
     .pointer:
-        dw $ - GDT - 1
-        dq GDT
+        dw $ - gdt - 1
+        dq gdt
 
 section .text
 
@@ -177,7 +186,7 @@ Entry:
     mov eax, cr0
     or eax, 1 << 31
     mov cr0, eax
-    lgdt [GDT.pointer]
+    lgdt [gdt.pointer]
     jmp 0x08:Entry64
     .error:
         mov al, 'E'

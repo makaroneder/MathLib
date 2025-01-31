@@ -1,3 +1,4 @@
+#define SDL_MAIN_HANDLED
 #include "Hand.hpp"
 #include <EquationSolver/Preprocesor.hpp>
 #include <EquationSolver/Optimizer.hpp>
@@ -54,7 +55,8 @@ int main(int, char**) {
         #ifndef Debug
         srand(time(nullptr));
         #endif
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Cards", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Cards", 800, 800);
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/Cards/";
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));

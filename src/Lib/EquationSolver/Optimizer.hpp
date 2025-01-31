@@ -12,8 +12,10 @@ namespace MathLib {
 
         Optimizer(const Array<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Array<Variable>& vars = Array<Variable>());
         Optimizer(Optimizer* parent);
+        Optimizer Recreate(void) const;
         void Destroy(void);
         [[nodiscard]] FunctionNode GetFunction(const String& name) const;
+        [[nodiscard]] bool SetBuiltinFunctionData(const String& name, void* data);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node

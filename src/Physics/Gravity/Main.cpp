@@ -10,7 +10,8 @@
 /// @return Status
 int main(int, char**) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Gravity simulation", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Gravity simulation", 800, 800);
         MathLib::Second<MathLib::num_t> prevTime = MathLib::Second<MathLib::num_t>(MathLib::GetTime());
         bool pause = false;
         Body<MathLib::num_t> bodies[] = {

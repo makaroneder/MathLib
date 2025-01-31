@@ -13,8 +13,8 @@ using ssize_t = intptr_t;
 #endif
 #define SizeOfArray(arr) (sizeof(arr) / sizeof(arr[0]))
 #define IsBetween(x, a, b) ((x) >= (a) && (x) <= (b))
-#define StartBenchmark if (!MathLib::BenchmarkStart(__PRETTY_FUNCTION__)) MathLib::Panic("Failed to start benchmark");
-#define EndBenchmark if (!MathLib::BenchmarkEnd()) MathLib::Panic("Failed to end benchmark");
+#define StartBenchmark if (!MathLib::IsCompileTimeEvaluated() && !MathLib::BenchmarkStart(__PRETTY_FUNCTION__)) MathLib::Panic("Failed to start benchmark");
+#define EndBenchmark if (!MathLib::IsCompileTimeEvaluated() && !MathLib::BenchmarkEnd()) MathLib::Panic("Failed to end benchmark");
 #define ReturnFromBenchmark(ret) {  \
     EndBenchmark                    \
     return ret;                     \
@@ -50,6 +50,12 @@ namespace MathLib {
     [[nodiscard]] num_t Sqrt(num_t x);
     [[nodiscard]] num_t RandomFloat(void);
     [[nodiscard]] num_t GetTime(void);
+    [[nodiscard]] constexpr bool IsCompileTimeEvaluated(void) {
+        #ifndef __MINGW32__
+        return __builtin_is_constant_evaluated();
+        #endif
+        return true;
+    }
     void StartBenchmarking(void);
     [[nodiscard]] bool BenchmarkStart(const char* function);
     [[nodiscard]] bool BenchmarkEnd(void);
@@ -84,7 +90,7 @@ namespace MathLib {
     /// @param x Number to return sign of
     /// @return Sign of specified number
     template <typename T>
-    [[nodiscard]] T Sign(const T& x) {
+    [[nodiscard]] constexpr T Sign(const T& x) {
         StartBenchmark
         if (x < 0) ReturnFromBenchmark(-1)
         else if (x > 0) ReturnFromBenchmark(1)
@@ -105,7 +111,7 @@ namespace MathLib {
     /// @param x Value to use
     /// @return Value with reversed bits
     template <typename T>
-    [[nodiscard]] T BitReverse(const T& x, const uint8_t& bits = sizeof(T) * 8) {
+    [[nodiscard]] constexpr T BitReverse(const T& x, const uint8_t& bits = sizeof(T) * 8) {
         StartBenchmark
         T ret = 0;
         for (uint8_t i = 0; i < bits; i++)
@@ -117,13 +123,14 @@ namespace MathLib {
     /// @param array Array to be sorted
     /// @return Sorted array
     template <typename T>
-    [[nodiscard]] Array<T> BubbleSort(const Array<T>& array) {
+    [[nodiscard]] Array<T> BubbleSort(const Array<T>& array, bool largestFirst) {
         StartBenchmark
         Array<T> ret = array;
         while (true) {
             bool any = false;
             for (size_t i = 0; i < ret.GetSize() - 1; i++) {
-                if (ret.At(i) < ret.At(i + 1)) {
+                const bool x = ret.At(i) < ret.At(i + 1);
+                if ((largestFirst && x) || (!largestFirst && !x)) {
                     Swap<T>(ret.At(i), ret.At(i + 1));
                     any = true;
                 }

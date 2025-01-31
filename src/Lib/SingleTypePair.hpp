@@ -11,6 +11,12 @@ namespace MathLib {
         SingleTypePair(const T& first, const T& second) : Pair<T, T>(first, second) {
             EmptyBenchmark
         }
+        T operator[](bool i) const {
+            return i ? this->second : this->first;
+        }
+        T& operator[](bool i) {
+            return i ? this->second : this->first;
+        }
     };
 }
 

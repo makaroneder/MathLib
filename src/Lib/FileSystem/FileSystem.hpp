@@ -3,9 +3,9 @@
 #include "SeekMode.hpp"
 #include "OpenMode.hpp"
 #include "FileInfo.hpp"
+#include "File.hpp"
 
 namespace MathLib {
-    struct File;
     /// @brief File system
     struct FileSystem : Allocatable {
         /// @brief Opens file
@@ -41,7 +41,7 @@ namespace MathLib {
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) = 0;
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const String& path) = 0;
-        [[nodiscard]] String ListFiles(const String& path, const String& padding = "");
+        [[nodiscard]] String ListFiles(const String& path, size_t maxDepth, const String& padding = "");
     };
 }
 

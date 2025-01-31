@@ -12,6 +12,7 @@ namespace MathLib {
             KeyPressed,
             MousePressed,
         } type;
+        /// @brief Pressed or released mouse button
         enum class MouseButton {
             None = 0,
             Left,
@@ -19,14 +20,12 @@ namespace MathLib {
             Right,
             Button4,
             Button5,
-        };
+        } mouseButton;
         bool pressed;
         /// @brief Pressed or released key
         char key;
         /// @brief Mouse position
         Matrix<size_t> mousePosition;
-        /// @brief Pressed or released mouse button
-        MouseButton mouseButton;
 
         /// @brief Creates a new event
         /// @param type Type of event

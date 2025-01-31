@@ -10,7 +10,8 @@
 /// @return Status
 int main(int, char**) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Physics simulation", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Physics simulation", 800, 800);
         MathLib::Array<MathLib::matrix_t> points;
         for (MathLib::num_t i = 0; i <= 5; i += 0.1)
             if (!points.Add(MathLib::CreateVector<MathLib::num_t>(i, 3, 0))) MathLib::Panic("Failed to add point to the rope");

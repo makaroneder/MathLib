@@ -2,7 +2,7 @@
 #ifndef SCI_H
 #define SCI_H
 #include "FADT.hpp"
-#include "../Interrupts/Interrupts.hpp"
+#include "../Interrupts/InterruptDevice.hpp"
 
 struct SCI : InterruptDevice {
     SCI(void);

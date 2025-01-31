@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #ifndef Cascade_H
 #define Cascade_H
-#include "Interrupts.hpp"
+#include "InterruptDevice.hpp"
 
 struct Cascade : InterruptDevice {
     Cascade(void);

@@ -2,7 +2,6 @@
 #ifndef PS2Mouse_H
 #define PS2Mouse_H
 #include "PS2Device.hpp"
-#include "../Interrupts/Interrupts.hpp"
 #include <Math/Matrix.hpp>
 
 struct PS2MousePacket1 {
@@ -21,7 +20,7 @@ struct PS2Mouse5ButtonsPacket {
     bool button5 : 1;
     uint8_t alwaysZero : 2;
 } __attribute__((packed));
-struct PS2Mouse : PS2Device, InterruptDevice {
+struct PS2Mouse : PS2Device {
     static constexpr const uint8_t validSampleRates[] = {
         10, 20, 40, 60, 80, 100, 200,
     };

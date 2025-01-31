@@ -29,7 +29,8 @@ void SetFirstVisibleQuest(size_t& quest, const MathLib::Array<Quest>& quests, bo
 /// @return Status
 int main(void) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("RPG", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("RPG", 800, 800);
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/RPG/";
         MathLib::TGA playerImage = MathLib::TGA(0, 0);

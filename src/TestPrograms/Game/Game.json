@@ -1,0 +1,10 @@
+{
+    "name": "Game",
+    "script": "Main.txt",
+    "objects": [
+        {
+            "name": "Object1",
+            "script": "Object1.txt"
+        }
+    ]
+}

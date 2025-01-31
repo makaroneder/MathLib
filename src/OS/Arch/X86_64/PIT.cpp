@@ -1,4 +1,5 @@
 #ifdef __x86_64__
+#include "Interrupts/Interrupts.hpp"
 #include "PIT.hpp"
 #include "IO.hpp"
 #include <Host.hpp>
@@ -7,11 +8,11 @@ PIT::PIT(void) {
     SetInterrupts(false);
     WritePort<uint8_t>((uint16_t)Ports::CommandRegister, ((uint8_t)OperatingMode::RateGenerator << 1) | ((uint8_t)AccessMode::LowAndHighByte << 4) | ((uint8_t)Channel::Channel0 << 6));
     if (!SetReloadValue(UINT16_MAX + 1)) MathLib::Panic("Failed to set PIT reaload value");
-    RegisterInterruptDevice(GetIRQBase(), this);
+    if (!RegisterIRQDevice(IRQ::PIT, this)) MathLib::Panic("Failed to register IRQ");
     SetInterrupts(true);
 }
 PIT::~PIT(void) {
-    RegisterInterruptDevice(GetIRQBase(), nullptr);
+    if (!RegisterIRQDevice(IRQ::PIT, nullptr)) MathLib::Panic("Failed to unregister IRQ");
 }
 MathLib::num_t PIT::GetFrequency(void) const {
     return baseFrequency / GetReloadValue();
@@ -30,7 +31,7 @@ bool PIT::SetReloadValue(size_t value) {
     if (value == UINT16_MAX + 1) value = 0;
     SetInterrupts(false);
     WritePort<uint8_t>((uint16_t)Ports::Channel0, value);
-	WritePort<uint8_t>((uint16_t)Ports::Channel0, value >> 8);
+    WritePort<uint8_t>((uint16_t)Ports::Channel0, value >> 8);
     SetInterrupts(true);
     return true;
 }

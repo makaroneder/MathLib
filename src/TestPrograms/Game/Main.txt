@@ -1,0 +1,6 @@
+OnEvent(deltaTime : Float) : Bool = [!
+    if (GetEventData("type") == keyPressedEvent, {
+        Log(GetEventData("key")),
+    }),
+    return(true),
+]

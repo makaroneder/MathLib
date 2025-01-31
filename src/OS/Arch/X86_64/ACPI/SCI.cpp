@@ -13,10 +13,10 @@ SCI::SCI(FADT* fadt) : fadt(fadt) {
         }
         else while (!(ReadPort<uint16_t>(fadt->pm1aControlBlock) & 1)) {}
     }
-    RegisterInterruptDevice(GetIRQBase() + fadt->sciInterrupt, this);
+    if (!RegisterIRQDevice((IRQ)fadt->sciInterrupt, this)) MathLib::Panic("Failed to register IRQ");
 }
 SCI::~SCI(void) {
-    if (fadt) RegisterInterruptDevice(GetIRQBase() + fadt->sciInterrupt, nullptr);
+    if (fadt && !RegisterIRQDevice((IRQ)fadt->sciInterrupt, nullptr)) MathLib::Panic("Failed to unregister IRQ");
 }
 bool SCI::Reboot(void) {
     if (fadt->revision >= 0x02) {

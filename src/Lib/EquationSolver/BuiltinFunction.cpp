@@ -1,6 +1,7 @@
 #include "BuiltinFunction.hpp"
 #include "../Math/Sigmoid.hpp"
 #include "../Math/Trigonometry.hpp"
+#include "../Math/Log.hpp"
 
 namespace MathLib {
     BuiltinFunction::BuiltinFunction(void) {
@@ -31,6 +32,7 @@ namespace MathLib {
     CreateBuiltinFunction(Ceil, Ceil, 1, args[0]->ToNumber().At(0).GetReal())
     CreateBuiltinFunction(InversedTan2, InversedTan2, 2, args[0]->ToNumber().At(0).GetReal(), args[1]->ToNumber().At(0).GetReal())
     CreateComplexBuiltinFunction(Sin, Sin, 1, args[0]->ToNumber().At(0))
+    CreateComplexBuiltinFunction(Sinc, Sinc<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(Cos, Cos<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(Tan, Tan<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(Cot, Cot<complex_t>, 1, args[0]->ToNumber().At(0))
@@ -102,6 +104,7 @@ namespace MathLib {
             CreateBuiltinFunction("ceil", Ceil),
             CreateBuiltinFunction("atan2", InversedTan2),
             CreateBuiltinFunction("sin", Sin),
+            CreateBuiltinFunction("sinc", Sinc),
             CreateBuiltinFunction("cos", Cos),
             CreateBuiltinFunction("tan", Tan),
             CreateBuiltinFunction("cot", Cot),

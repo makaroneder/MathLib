@@ -1,10 +1,11 @@
 #ifdef __x86_64__
+#include "Interrupts/Interrupts.hpp"
 #include "RTC.hpp"
 #include <Host.hpp>
 
 RTC::RTC(bool nmi_, Register centuryRegister) : CMOS(false), centuryRegister(centuryRegister) {
     SetInterrupts(false);
-    RegisterInterruptDevice(GetIRQBase() + 8, this);
+    if (!RegisterIRQDevice(IRQ::RTC, this)) MathLib::Panic("Failed to register IRQ");
     Write(Register::StatusRegisterB, Read(Register::StatusRegisterB) | (1 << 6));
     if (!SetRate(3)) MathLib::Panic("Failed to set RTC rate");
     SetNMI(nmi_);
@@ -12,7 +13,7 @@ RTC::RTC(bool nmi_, Register centuryRegister) : CMOS(false), centuryRegister(cen
     (void)Read(Register::StatusRegisterC);
 }
 RTC::~RTC(void) {
-    RegisterInterruptDevice(GetIRQBase() + 8, nullptr);
+    if (!RegisterIRQDevice(IRQ::RTC, nullptr)) MathLib::Panic("Failed to unregister IRQ");
 }
 uint8_t RTC::GetRate(void) const {
     SetInterrupts(false);

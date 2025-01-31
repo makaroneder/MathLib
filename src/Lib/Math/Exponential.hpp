@@ -12,5 +12,4 @@
     ReturnFromBenchmark(MathLib::Expected<self>(ret));              \
 }
 
-
 #endif

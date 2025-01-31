@@ -7,20 +7,20 @@
 namespace MathLib {
     template <typename Ret, typename... Args>
     struct HostFunction : Function<Ret, Args...> {
-        using RawFunction = std::function<Ret(const void*, Args...)>;
+        using RawFunction = std::function<Ret(Args...)>;
         HostFunction(void) {
             EmptyBenchmark
         }
-        HostFunction(void* data, RawFunction function) : Function<Ret, Args...>(data), function(function) {
+        HostFunction(RawFunction function) : Function<Ret, Args...>(nullptr), function(function) {
             EmptyBenchmark
         }
         [[nodiscard]] RawFunction GetFunction(void) const {
             StartBenchmark
             ReturnFromBenchmark(function);
         }
-        [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const override {
+        [[nodiscard]] virtual Ret Invoke(const void*, Args... args) const override {
             StartBenchmark
-            ReturnFromBenchmark(function(data, args...));
+            ReturnFromBenchmark(function(args...));
         }
 
         private:

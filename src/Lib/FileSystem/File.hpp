@@ -1,12 +1,13 @@
 #ifndef MathLib_FileSystem_File_H
 #define MathLib_FileSystem_File_H
-#include "FileSystem.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 
 namespace MathLib {
+    struct FileSystem;
     struct File : ByteDevice {
         File(FileSystem& fileSystem, size_t index);
         virtual ~File(void) override;
+        bool Exists(void) const;
         /// @brief Returns file size
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(void) const override;

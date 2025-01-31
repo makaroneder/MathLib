@@ -6,8 +6,8 @@
 [[nodiscard]] bool InitArch(uintptr_t signature, void* info);
 [[noreturn]] void ArchPanic(void);
 [[noreturn]] void ShutdownArch(void);
-[[nodiscard]] bool ArchCreateTask(const MathLib::FunctionPointer<void, size_t>& task);
-[[nodiscard]] bool ArchDestroyTask(size_t task);
+extern "C" void ArchSwitchTasks(void* prev, void* next);
+void* ArchCreateTask(const MathLib::FunctionPointer<void>& function, void* stack, size_t stackSize);
 [[nodiscard]] MathLib::num_t ArchSqrt(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t GenericSqrt(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t ArchInversedTan2(MathLib::num_t y, MathLib::num_t x);

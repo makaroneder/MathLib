@@ -4,6 +4,9 @@
 #include "PS2.hpp"
 
 PS2Device::PS2Device(bool second) : second(second) {}
+bool PS2Device::RegisterDevice(bool init) {
+    return RegisterIRQDevice(second ? IRQ::SecondPS2 : IRQ::FirstPS2, init ? this : nullptr);
+}
 MathLib::Expected<uint8_t> PS2Device::Read(void) const {
     return Await8042(false) ? MathLib::Expected<uint8_t>(ReadPort<uint8_t>(0x60)) : MathLib::Expected<uint8_t>();
 }
@@ -35,5 +38,6 @@ MathLib::Expected<uint16_t> PS2Device::GetID(void) {
     tmp = SendCommand(0xf4);
     return tmp.HasValue() && tmp.Get() == (uint8_t)Response::Acknowledge ? MathLib::Expected<uint16_t>(type) : MathLib::Expected<uint16_t>();
 }
+void PS2Device::OnInterrupt(uintptr_t, Registers*, uintptr_t) {}
 
 #endif

@@ -16,12 +16,13 @@ PS2Mouse::PS2Mouse(bool second) : PS2Device(second), position(MathLib::CreateVec
     }
     else type = Type::Normal;
     if (!SetSampleRate(200)) MathLib::Panic("Failed to set mouse sample rate");
-    RegisterInterruptDevice(GetIRQBase() + 12, this);
+    if (!RegisterDevice(true)) MathLib::Panic("Failed to register IRQ");
 }
 PS2Mouse::~PS2Mouse(void) {
-    RegisterInterruptDevice(GetIRQBase() + 12, nullptr);
+    if (!RegisterDevice(false)) MathLib::Panic("Failed to unregister IRQ");
 }
-void PS2Mouse::OnInterrupt(uintptr_t, Registers*, uintptr_t) {
+void PS2Mouse::OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) {
+    PS2Device::OnInterrupt(interrupt, regs, error);
     const uint8_t tmp = Read().Get("Failed to read mouse packet");
     packets[packet++] = tmp;
     packet = packet % (type == Type::Normal ? 3 : 4);

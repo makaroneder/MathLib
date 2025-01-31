@@ -36,9 +36,15 @@ DefaultTarget("Cards.out", "Games/Cards", "-l SDL2", "Cards", "", "")
 DefaultTarget("GraphTheory.out", "GraphTheory", "", "GraphTheory", "", "")
 DefaultTarget("GameOfLife.out", "GameOfLife", "-l SDL2", "GOL", "", "")
 DefaultTarget("Ray.out", "Physics/Ray", "-l SDL2", "Ray", "", "")
+DefaultTarget("Quantum.out", "Physics/Quantum", "-l SDL2", "Quantum", "", "")
+DefaultTarget("GameEngine.out", "Games/GameEngine", "-l SDL2", "Engine", "$(GAMEARGS)", "")
+DefaultTarget("Database.out", "Database", "", "DB", "$(DBARGS)", "")
+DefaultTarget("ImageProcessing.out", "ImageProcessing", "-l SDL2", "ImgProc", "$(IMGPROCARGS)", "")
+DefaultTarget("Probability.out", "Math/Probability", "", "Prob", "", "")
 
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)
-DeclareTarget("$(BUILDDIR)/OS.img", "$(BUILDDIR)/Kernel.elf $(OSROOT)/*", "cp $< $(OSROOT)/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT) && rm $(OSROOT)/boot/Kernel.elf", false)
+DeclareTarget("$(BUILDDIR)/FAT.img", "$(OSROOT)/HDD/*", "dd if=/dev/zero of=$@ bs=512 count=93750 && mformat -i $@ :: && mcopy -i $@ -s $< ::", false)
+DeclareTarget("$(BUILDDIR)/OS.img", "$(BUILDDIR)/Kernel.elf $(OSROOT)/CD/*", "cp $< $(OSROOT)/CD/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT)/CD && rm $(OSROOT)/CD/boot/Kernel.elf", false)
 DeclareTarget("$(BUILDDIR)/OS.gdb", "Scripts/MakeGDB.sh", "bash $< $@ $(BUILDDIR)/Kernel.elf Main '$(OSQEMUCMD)'", false)
 
 MakeObjects("OS", "s", "$(AS) $(ASFLAGS) $< -o $@", "$(BUILDDIR)/OS/crti.s $(BUILDDIR)/OS/crtn.s")
@@ -48,5 +54,5 @@ kernelObjs : String =
     MakeObjects("OS", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS", ".asm")) +
     "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "
 LDTarget("Kernel.elf", kernelObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS)", "$(OSLINKER)")
-DeclareTarget("runOS", "$(BUILDDIR)/OS.img", "$(OSQEMUCMD) -debugcon stdio", true)
-DeclareTarget("debugOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/OS.gdb", "gdb -x $(BUILDDIR)/OS.gdb", true)
+DeclareTarget("runOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "$(OSQEMUCMD) -debugcon stdio", true)
+DeclareTarget("debugOS", "$(BUILDDIR)/OS.gdb $(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "gdb -x $<", true)

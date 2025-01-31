@@ -42,7 +42,7 @@ struct Hand : MathLib::Printable {
         return true;
     }
     [[nodiscard]] bool IsStraight(void) const {
-        const MathLib::Array<CardIndex> sorted = MathLib::BubbleSort<CardIndex>(cards);
+        const MathLib::Array<CardIndex> sorted = MathLib::BubbleSort<CardIndex>(cards, true);
         for (size_t i = 1; i < sorted.GetSize(); i++)
             if ((size_t)sorted.At(i - 1).type - (size_t)sorted.At(i).type != 1) return false;
         return true;
@@ -58,7 +58,7 @@ struct Hand : MathLib::Printable {
                 if (!ret.Add(1)) return MathLib::Array<size_t>();
             }
         }
-        return MathLib::BubbleSort<size_t>(ret);
+        return MathLib::BubbleSort<size_t>(ret, true);
     }
     [[nodiscard]] Type GetType(void) const {
         if (IsFlush() && IsStraight()) return Type::StraightFlush;

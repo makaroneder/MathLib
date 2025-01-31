@@ -83,12 +83,18 @@ ELFPROGRAM ?= $(BUILDDIR)/ELFParser.out
 ELFARGS = -program $(ELFPROGRAM)
 4DPROGRAM ?= $(SRCDIR)/TestPrograms/4D/Tesseract.txt
 4DARGS ?= -program $(4DPROGRAM)
+GAME ?= $(SRCDIR)/TestPrograms/Game/Game.json
+GAMEARGS = -program $(GAME)
+DBOUTPUT ?= $(BUILDDIR)/DB.bin
+DBARGS = -program $(DBOUTPUT)
+IMGPROCINPUT ?= $(SRCDIR)/TestPrograms/Cards/Prototype.tga
+IMGPROCARGS = -input $(IMGPROCINPUT)
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
 OSLINKER = $(SRCDIR)/OS/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -T $(OSLINKER) -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map
-OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk -boot d
 
 clean:
 	@mkdir -p $(BUILDDIR)

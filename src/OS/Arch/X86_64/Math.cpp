@@ -1,3 +1,4 @@
+#ifdef __x86_64__
 #include "ControlRegisters.hpp"
 #include "../Arch.hpp"
 #include "CPUID.hpp"
@@ -85,3 +86,5 @@ MathLib::num_t ArchExp(MathLib::num_t x) {
     // TODO:
     return GenericExp(x);
 }
+
+#endif

@@ -6,15 +6,11 @@ namespace MathLib {
         StartBenchmark
         if (!disk.Seek(16 * 2048, SeekMode::Set)) Panic("Failed to set disk position");
         uint8_t buff[2048];
-        while (true) {
+        while (disk.Tell() < disk.GetSize()) {
             ISO9660VolumeDescriptor* descriptor = (ISO9660VolumeDescriptor*)buff;
             if (!disk.ReadBuffer(buff, 2048)) Panic("Failed to read primary volume descriptor");
-            else if (descriptor->type == ISO9660VolumeDescriptor::Type::PrimaryVolumeDescriptor) {
+            else if (!descriptor->IsValid() || descriptor->type == ISO9660VolumeDescriptor::Type::VolumeDescriptorSetTerminator || descriptor->type == ISO9660VolumeDescriptor::Type::PrimaryVolumeDescriptor) {
                 pvd = *(ISO9660PrimaryVolumeDescriptor*)descriptor;
-                break;
-            }
-            else if (descriptor->type == ISO9660VolumeDescriptor::Type::VolumeDescriptorSetTerminator) {
-                pvd.type = ISO9660VolumeDescriptor::Type::VolumeDescriptorSetTerminator;
                 break;
             }
         }
@@ -46,7 +42,7 @@ namespace MathLib {
     }
     bool ISO9660::Close(size_t file) {
         StartBenchmark
-        if (file >= files.GetSize()) ReturnFromBenchmark(false);
+        if (file >= files.GetSize() || files.At(file).free) ReturnFromBenchmark(false);
         files.At(file).free = true;
         ReturnFromBenchmark(true);
     }

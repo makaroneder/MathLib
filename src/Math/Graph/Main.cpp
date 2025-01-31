@@ -74,8 +74,9 @@ template <typename T>
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        MathLib::SDL2 sdl2;
         MathLib::HostFileSystem fs;
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Math graph", 800, 800);
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Math graph", 800, 800);
         MathLib::Array<MathLib::Optimizer> states;
         for (int i = 1; i < argc; i++) {
             MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[i]));
@@ -93,7 +94,7 @@ int main(int argc, char** argv) {
             if (!states.Add(optimizer)) MathLib::Panic("Failed to add optimizer");
         }
         size_t state = 0;
-        const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>(nullptr, [&states, &state](const void*, MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
+        const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>([&states, &state](MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
@@ -106,7 +107,7 @@ int main(int argc, char** argv) {
             for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).ToReal();
             return ret;
         });
-        const MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> complexFunc = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>(nullptr, [&states, &state](const void*, MathLib::complex_t z) -> MathLib::complex_t {
+        const MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> complexFunc = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([&states, &state](MathLib::complex_t z) -> MathLib::complex_t {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
@@ -117,7 +118,7 @@ int main(int argc, char** argv) {
             delete n;
             return ret;
         });
-        if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>(nullptr, [&renderer, func, complexFunc, &states, &state](const void*) -> bool {
+        if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>([&renderer, func, complexFunc, &states, &state](void) -> bool {
             renderer.Fill(0);
             renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");

@@ -20,6 +20,7 @@ struct GDTEntry {
     bool pageGranularity : 1;
     uint8_t base2;
 
+    uint32_t GetBase(void) const;
     void SetBase(uint32_t base);
     [[nodiscard]] bool SetLimit(uint32_t limit);
 } __attribute__((packed));

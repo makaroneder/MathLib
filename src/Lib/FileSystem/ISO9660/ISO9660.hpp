@@ -8,7 +8,7 @@ namespace MathLib {
     // TODO: Add extensions like SUSP, Rock Ridge, El Torito, Joilet, Romeo, etc.
     struct ISO9660 : PhysicalFileSystem {
         ISO9660(ByteDevice& disk);
-        [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] virtual bool IsValid(void) const override;
         [[nodiscard]] virtual bool Create(void) override;
         /// @brief Opens file
         /// @param path Path to file

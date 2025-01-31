@@ -1,8 +1,8 @@
 #include "Time.hpp"
+#include "Task.hpp"
 #include "Disks.hpp"
 #include "Memory.hpp"
 #include "Arch/Arch.hpp"
-#include "Scheduler.hpp"
 #include "DateKeeper.hpp"
 #include "DebugTextUI.hpp"
 #include "KernelRenderer.hpp"
@@ -13,21 +13,8 @@ bool constructorsCalled = false;
 [[gnu::constructor]] void TestConstructors(void) {
     constructorsCalled = true;
 }
-MathLib::Expected<char> WaitForKey(void) {
-    MathLib::Array<MathLib::Event> events;
-    while (true) {
-        const MathLib::Event event = renderer->GetEvent();
-        if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
-            for (const MathLib::Event& event : events)
-                if (!renderer->AddEvent(event)) return MathLib::Expected<char>();
-            return MathLib::Expected<char>(event.key);
-        }
-        else if (event.type != MathLib::Event::Type::None && !events.Add(event)) return MathLib::Expected<char>();
-    }
-}
-void MainTask(const void*, size_t task) {
+void MainTask(const void*) {
     MathLib::String command = "";
-    LogString("Running in task "_M + MathLib::ToString(task) + '\n');
     if (!textUI->Puts("> ")) MathLib::Panic("Failed to print data to text UI");
     // TODO: Split output of commands so we can read it if it's too long
     // TODO: Add option to chain commands
@@ -54,7 +41,7 @@ void MainTask(const void*, size_t task) {
                         if (!textUI->Clear()) MathLib::Panic("Failed to clear text UI");
                     }
                     else if (args.At(0) == "exit") ShutdownArch();
-                    else if (args.At(0) == "ls") output = vfs.ListFiles(args.GetSize() > 1 ? args.At(1) : "");
+                    else if (args.At(0) == "ls") output = vfs.ListFiles(args.GetSize() > 1 ? args.At(1) : "", args.GetSize() > 2 ? MathLib::StringToNumber(args.At(2)) : 0);
                     else if (args.At(0) == "read") output = args.GetSize() < 2 ? "Usage: read <path>\n" : vfs.Open(args.At(1), MathLib::OpenMode::Read).ReadUntil('\0') + '\n';
                     else if (args.At(0) == "date") output = dateKeeper->GetDate().ToString() + '\n';
                     else if (args.At(0) == "memory") output = "Free memory: "_M + MathLib::ToString(allocator.GetFreeMemory()) + '\n';
@@ -92,6 +79,34 @@ void MainTask(const void*, size_t task) {
         }
     }
 }
+MathLib::Pair<MathLib::String, size_t> fsTable[] = {
+    MathLib::Pair<MathLib::String, size_t>("iso9660fs", 0),
+    MathLib::Pair<MathLib::String, size_t>("fatfs", 0),
+};
+template <typename T>
+MathLib::Expected<bool> AddFileSystem(size_t i, const MathLib::String& fsName) {
+    T* fs = new T(*disks.At(i));
+    if (!fs) return MathLib::Expected<bool>();
+    else if (fs->IsValid()) {
+        size_t fsIndex = SIZE_MAX;
+        for (size_t j = 0; j < SizeOfArray(fsTable); j++) {
+            if (fsTable[j].first == fsName) {
+                fsIndex = j;
+                break;
+            }
+        }
+        if (fsIndex == SIZE_MAX) return MathLib::Expected<bool>();
+        const MathLib::String name = fsName + MathLib::ToString(fsTable[fsIndex].second++);
+        LogString("Created "_M + name + " on disk " + MathLib::ToString(i) + '\n');
+        if (!vfs.AddFileSystem(MathLib::VFSEntry(fs, name))) return MathLib::Expected<bool>();
+    }
+    else {
+        delete fs;
+        return MathLib::Expected<bool>(false);
+    }
+    return MathLib::Expected<bool>(true);
+}
+uint8_t  stack[4096] __attribute__((aligned(16)));
 extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
     if (!constructorsCalled) MathLib::Panic("Failed to call global constructors");
     if (!InitArch(signature, info)) MathLib::Panic("Failed to initialize architecture");
@@ -106,20 +121,14 @@ extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
     else if (!textUI->Clear()) MathLib::Panic("Failed to clear text UI");
     if (!mainTimer) MathLib::Panic("Failed to initialize main timer");
     if (!vfs.AddFileSystem(MathLib::VFSEntry(new MathLib::MemoryFS(), "ramfs"))) MathLib::Panic("Failed to allocate memory file system");
-    size_t iso9660fs = 0;
-    for (size_t i = 0; i < disks.GetSize(); i++) {
-        MathLib::ISO9660* iso9660 = new MathLib::ISO9660(*disks.At(i));
-        if (!iso9660) MathLib::Panic("Failed to allocate file system");
-        else if (iso9660->IsValid()) {
-            LogString("Found ISO9660 file system on disk "_M + MathLib::ToString(i) + '\n');
-            if (!vfs.AddFileSystem(MathLib::VFSEntry(iso9660, "iso9660fs"_M + MathLib::ToString(iso9660fs++)))) MathLib::Panic("Failed to add file system to VFS");
-        }
-        else delete iso9660;
-    }
+    for (size_t i = 0; i < disks.GetSize(); i++)
+        if (!AddFileSystem<MathLib::ISO9660>(i, "iso9660fs").Get("Failed to allocate file system"))
+            if (!AddFileSystem<MathLib::FAT>(i, "fatfs").Get("Failed to allocate file system"))
+                LogString("No file system found "_M + " on disk " + MathLib::ToString(i) + '\n');
+    LogString("VFS: {\n"_M + vfs.ListFiles("", SIZE_MAX, "\t") + "}\n");
     LogString("Boot time: "_M + MathLib::Second<MathLib::num_t>(MathLib::GetTime()).ToString() + '\n');
     renderer->Fill(0);
     if (!renderer->Update()) MathLib::Panic("Failed to update renderer");
-    if (!StartScheduler(MathLib::FunctionPointer<void, size_t>(nullptr, &MainTask))) MathLib::Panic("Failed to start scheduler");
-    mainTimer->Sleep(MathLib::eps);
-    MathLib::Panic("Failed to run main task");
+    if (!AddTask(Task(MathLib::FunctionPointer<void>(nullptr, &MainTask), stack, SizeOfArray(stack)))) MathLib::Panic("Failed to create kernel task");
+    while (true) Schedule();
 }

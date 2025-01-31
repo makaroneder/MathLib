@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #ifndef SystemCall_H
 #define SystemCall_H
-#include "Interrupts.hpp"
+#include "InterruptDevice.hpp"
 #include "../../../SystemCallHandler.hpp"
 
 struct SystemCall : InterruptDevice, SystemCallHandler {

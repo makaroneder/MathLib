@@ -1,6 +1,9 @@
 #ifdef __x86_64__
 #include "GDTEntry.hpp"
 
+uint32_t GDTEntry::GetBase(void) const {
+    return (base2 << 24) | base1;
+}
 void GDTEntry::SetBase(uint32_t base) {
     base1 = base;
     base2 = base >> 24;

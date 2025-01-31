@@ -20,7 +20,8 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Image converter", 800, 800);
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Image converter", 800, 800);
         MathLib::DummyRenderer dummyRenderer = MathLib::DummyRenderer(0, 0);
         MathLib::HostFileSystem fs;
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);

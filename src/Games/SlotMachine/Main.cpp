@@ -15,6 +15,7 @@ int main(int, char**) {
         #ifndef Debug
         srand(time(nullptr));
         #endif
+        MathLib::SDL2 sdl2;
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/SlotMachine/";
         const Symbol symbols[] = {
@@ -33,8 +34,9 @@ int main(int, char**) {
             Consumable(fs, path + "TapWater.obj", Consumable::Type::BetIncreaser, -10, 100),
             Consumable(fs, path + "FancyWater.obj", Consumable::Type::RewardRankIncreaser, 1, 4000),
         };
-        MathLib::WavefrontObject<MathLib::num_t> machine = MathLib::WavefrontObject<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, 0, 0), fs, path + "Machine.obj");
-        MathLib::SDL2Renderer renderer = MathLib::SDL2Renderer("Slot machine", 800, 800);
+        MathLib::WavefrontObject<MathLib::num_t> machine = MathLib::WavefrontObject<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
+        if (!machine.LoadFromPath(fs, path + "Machine.obj")) MathLib::Panic("Failed to load wavefront object");
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Slot machine", 800, 800);
         ssize_t score = 100000;
         MathLib::Array<size_t> symbolIndexes = MathLib::Array<size_t>(3);
         MathLib::num_t specialTime = 0;

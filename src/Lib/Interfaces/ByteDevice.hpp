@@ -59,8 +59,7 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool ReadPositioned(T& value, size_t position) {
-            StartBenchmark
-            ReturnFromBenchmark(ReadPositionedBuffer(&value, sizeof(T), position));
+            StartAndReturnFromBenchmark(ReadPositionedBuffer(&value, sizeof(T), position));
         }
         /// @brief Writes one T value
         /// @tparam T Type of value
@@ -69,8 +68,7 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool WritePositioned(const T& value, size_t position) {
-            StartBenchmark
-            ReturnFromBenchmark(WritePositionedBuffer(&value, sizeof(T), position));
+            StartAndReturnFromBenchmark(WritePositionedBuffer(&value, sizeof(T), position));
         }
         /// @brief Reads one T value
         /// @tparam T Type of value

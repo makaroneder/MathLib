@@ -6,12 +6,10 @@ namespace MathLib {
         EmptyBenchmark
     }
     void* Allocatable::operator new(size_t size) {
-        StartBenchmark
-        ReturnFromBenchmark(allocator ? allocator->Alloc(size) : nullptr);
+        StartAndReturnFromBenchmark(allocator ? allocator->Alloc(size) : nullptr);
     }
     void* Allocatable::operator new[](size_t size) {
-        StartBenchmark
-        ReturnFromBenchmark(allocator ? allocator->Alloc(size) : nullptr);
+        StartAndReturnFromBenchmark(allocator ? allocator->Alloc(size) : nullptr);
     }
     void Allocatable::operator delete(void* ptr) {
         StartBenchmark

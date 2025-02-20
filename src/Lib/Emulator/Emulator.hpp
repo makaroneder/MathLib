@@ -1,10 +1,9 @@
 #ifndef MathLib_Emulator_H
 #define MathLib_Emulator_H
-#include "../Interfaces/Printable.hpp"
 #include "../Interfaces/ByteDevice.hpp"
 
 namespace MathLib {
-    struct Emulator : ByteDevice, Printable {
+    struct Emulator : ByteDevice {
         Emulator(const Array<uint8_t>& memory);
         [[nodiscard]] virtual bool Run(void) = 0;
         /// @brief Returns memory size

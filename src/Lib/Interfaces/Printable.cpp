@@ -2,11 +2,9 @@
 
 namespace MathLib {
     String ToString(const Printable& printable) {
-        StartBenchmark
-        ReturnFromBenchmark(printable.ToString());
+        StartAndReturnFromBenchmark(printable.ToString());
     }
     String ToString(const String& string) {
-        StartBenchmark
-        ReturnFromBenchmark(string);
+        StartAndReturnFromBenchmark(string);
     }
 }

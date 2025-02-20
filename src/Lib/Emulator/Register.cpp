@@ -7,20 +7,16 @@ namespace MathLib {
         EmptyBenchmark
     }
     uint32_t Register::Get32(bool upper) const {
-        StartBenchmark
-        ReturnFromBenchmark(value >> (upper ? 32 : 0));
+        StartAndReturnFromBenchmark(value >> (upper ? 32 : 0));
     }
     uint16_t Register::Get16(bool upper) const {
-        StartBenchmark
-        ReturnFromBenchmark(Get32(false) >> (upper ? 16 : 0));
+        StartAndReturnFromBenchmark(Get32(false) >> (upper ? 16 : 0));
     }
     uint8_t Register::Get8(bool upper) const {
-        StartBenchmark
-        ReturnFromBenchmark(Get16(false) >> (upper ? 8 : 0));
+        StartAndReturnFromBenchmark(Get16(false) >> (upper ? 8 : 0));
     }
     uint8_t Register::Get4(bool upper) const {
-        StartBenchmark
-        ReturnFromBenchmark(Get8(false) & (0b1111 << (upper ? 4 : 0)));
+        StartAndReturnFromBenchmark(Get8(false) & (0b1111 << (upper ? 4 : 0)));
     }
     void Register::Set32(uint32_t val, bool upper) {
         StartBenchmark
@@ -46,7 +42,6 @@ namespace MathLib {
         EndBenchmark
     }
     String Register::ToString(const String& padding) const {
-        StartBenchmark
-        ReturnFromBenchmark(padding + "0x" + MathLib::ToString(value, 16));
+        StartAndReturnFromBenchmark(padding + "0x" + MathLib::ToString(value, 16));
     }
 }

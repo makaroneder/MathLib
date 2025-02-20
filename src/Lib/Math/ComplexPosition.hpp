@@ -26,14 +26,12 @@ namespace MathLib {
         /// @brief v = [re(p), im(p), 0]
         /// @return Argument of complex function as position
         [[nodiscard]] Matrix<T> GetPosition(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(CreateVector<T>(position.GetReal(), position.GetImaginary(), 0));
+            StartAndReturnFromBenchmark(CreateVector<T>(position.GetReal(), position.GetImaginary(), 0));
         }
         /// @brief c = R(|[re(v), im(v), 0]|)
         /// @return Value of complex function as color
         [[nodiscard]] uint32_t GetColor(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(GetRainbow<T>(CreateVector<T>(value.GetReal(), value.GetImaginary(), 0).GetLength()));
+            StartAndReturnFromBenchmark(GetRainbow<T>(CreateVector<T>(value.GetReal(), value.GetImaginary(), 0).GetLength()));
         }
     };
 }

@@ -1,10 +1,9 @@
-#include "File.hpp"
+#include "FileSystem.hpp"
 #include "../String.hpp"
 
 namespace MathLib {
     File FileSystem::Open(const String& path, OpenMode mode) {
-        StartBenchmark
-        ReturnFromBenchmark(File(*this, OpenInternal(path, mode)));
+        StartAndReturnFromBenchmark(File(*this, OpenInternal(path, mode)));
     }
     String FileSystem::ListFiles(const String& path_, size_t maxDepth, const String& padding) {
         StartBenchmark

@@ -1,6 +1,6 @@
 #include "NotGate.hpp"
 
-NotGate::NotGate(const CircuitElementConnection& child) : OnePinCircuitElement(MathLib::MakeArrayFromSingle<CircuitElementConnection>(child)) {}
+NotGate::NotGate(const CircuitElementConnection& child) : OnePinCircuitElement(MathLib::MakeArray<CircuitElementConnection>(child)) {}
 MathLib::Expected<bool> NotGate::EvaluateInternal(void) const {
     if (children.GetSize() != 1) return MathLib::Expected<bool>();
     const MathLib::Expected<bool> tmp = children.At(0).Evaluate();

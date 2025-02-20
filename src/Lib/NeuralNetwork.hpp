@@ -22,7 +22,7 @@ namespace MathLib {
         }
         /// @brief Creates a new neural network
         /// @param arch Architecture of the neural network
-        NeuralNetwork<T>(ActivationFunction activation, const Array<size_t>& arch) : activation(activation) {
+        NeuralNetwork<T>(ActivationFunction activation, const Collection<size_t>& arch) : activation(activation) {
             StartBenchmark
             const size_t c = arch.GetSize();
             if (!c) Panic("Invalid architecture size");
@@ -38,32 +38,27 @@ namespace MathLib {
         /// @brief Returns count of weights, biases and count of neurons - 1
         /// @return Count of weights, biases and count of neurons - 1
         [[nodiscard]] size_t GetCount(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(count);
+            StartAndReturnFromBenchmark(count);
         }
         /// @brief Returns input neuron
         /// @return Input neuron
         [[nodiscard]] Matrix<T>& GetInput(void) {
-            StartBenchmark
-            ReturnFromBenchmark(as.At(0));
+            StartAndReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns input neuron
         /// @return Input neuron
         [[nodiscard]] Matrix<T> GetInput(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(as.At(0));
+            StartAndReturnFromBenchmark(as.At(0));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
         [[nodiscard]] Matrix<T>& GetOutput(void) {
-            StartBenchmark
-            ReturnFromBenchmark(as.At(count));
+            StartAndReturnFromBenchmark(as.At(count));
         }
         /// @brief Returns output neuron
         /// @return Output neuron
         [[nodiscard]] Matrix<T> GetOutput(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(as.At(count));
+            StartAndReturnFromBenchmark(as.At(count));
         }
         /// @brief Fills weights, biases and neurons
         /// @param x Value to fill with
@@ -108,11 +103,11 @@ namespace MathLib {
         /// @return Average error
         [[nodiscard]] T Cost(const Matrix<T>& input, const Matrix<T>& output) {
             StartBenchmark
-            if (input.GetHeight() != output.GetHeight() || output.GetWidth() != GetOutput().GetWidth()) ReturnFromBenchmark(MakeNaN());
+            if (input.GetHeight() != output.GetHeight() || output.GetWidth() != GetOutput().GetWidth()) ReturnFromBenchmark(nan);
             T ret = 0;
             for (size_t y = 0; y < input.GetHeight(); y++) {
                 GetInput() = input.GetRow(y);
-                if (!Forward()) ReturnFromBenchmark(MakeNaN());
+                if (!Forward()) ReturnFromBenchmark(nan);
                 for (size_t x = 0; x < output.GetWidth(); x++) ret += Pow(GetOutput().At(x, 0) - output.At(x, y), 2);
             }
             ReturnFromBenchmark(ret / input.GetHeight());
@@ -226,21 +221,23 @@ namespace MathLib {
         [[nodiscard]] T Activation(const T& x) {
             StartBenchmark
             switch (activation) {
+                case ActivationFunction::None: ReturnFromBenchmark(x);
                 case ActivationFunction::Sigmoid: ReturnFromBenchmark(Sigmoid<T>(x));
                 case ActivationFunction::Tanh: ReturnFromBenchmark(HyperbolicTan<T>(x));
                 case ActivationFunction::ReLU: ReturnFromBenchmark(x > 0 ? x : x);
                 case ActivationFunction::LeakyReLU: ReturnFromBenchmark(x > 0 ? x : x * eps);
-                default: ReturnFromBenchmark(MakeNaN());
+                default: ReturnFromBenchmark(nan);
             }
         }
         [[nodiscard]] T ActivationDerivate(T y) {
             StartBenchmark
             switch (activation) {
+                case ActivationFunction::None: ReturnFromBenchmark(1);
                 case ActivationFunction::Sigmoid: ReturnFromBenchmark(y * (1 - y));
                 case ActivationFunction::Tanh: ReturnFromBenchmark(1 - y * y);
                 case ActivationFunction::ReLU: ReturnFromBenchmark(y >= 0 ? 1 : 0);
                 case ActivationFunction::LeakyReLU: ReturnFromBenchmark(y >= 0 ? 1 : eps);
-                default: ReturnFromBenchmark(MakeNaN());
+                default: ReturnFromBenchmark(nan);
             }
         }
 

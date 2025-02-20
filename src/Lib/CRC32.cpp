@@ -1,4 +1,5 @@
 #include "CRC32.hpp"
+#include "Typedefs.hpp"
 
 namespace MathLib {
     CRC32::CRC32(uint32_t magic) {
@@ -16,7 +17,7 @@ namespace MathLib {
         } while(++i);
         EndBenchmark
     }
-    uint32_t CRC32::Calculate(const Array<uint8_t>& data) const {
+    uint32_t CRC32::Calculate(const Collection<uint8_t>& data) const {
         StartBenchmark
         uint32_t crc = UINT32_MAX;
         for (const uint8_t& x : data) crc = table[(uint8_t)crc ^ x] ^ crc >> 8;

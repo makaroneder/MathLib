@@ -87,8 +87,7 @@ namespace MathLib {
         #endif
     }
     FILE* HostFileSystem::GetFile(size_t file) {
-        StartBenchmark
-        ReturnFromBenchmark(file < files.GetSize() ? files[file] : nullptr);
+        StartAndReturnFromBenchmark(file < files.GetSize() ? files[file] : nullptr);
     }
 }
 

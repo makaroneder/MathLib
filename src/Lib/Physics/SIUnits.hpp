@@ -42,12 +42,10 @@ namespace MathLib {
             EndBenchmark
         }
         [[nodiscard]] virtual T GetValue(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(count);
+            StartAndReturnFromBenchmark(count);
         }
         [[nodiscard]] T GetBaseUnit(const size_t& i) const {
-            StartBenchmark
-            ReturnFromBenchmark(baseUnits[i]);
+            StartAndReturnFromBenchmark(baseUnits[i]);
         }
         [[nodiscard]] virtual String ToString(const String& padding = "") const override {
             StartBenchmark
@@ -65,8 +63,7 @@ namespace MathLib {
             ReturnFromBenchmark(padding + ((first && count == 1) ? "1" : str));
         }
         [[nodiscard]] Unit<T> Pow(const T& scalar) const {
-            StartBenchmark
-            ReturnFromBenchmark(Unit<T>(
+            StartAndReturnFromBenchmark(Unit<T>(
                 MathLib::Pow(count, scalar),
                 this->baseUnits[BaseUnit::AmountOfSubstance] * scalar,
                 this->baseUnits[BaseUnit::ElectricCurrent] * scalar,
@@ -78,8 +75,7 @@ namespace MathLib {
             ));
         }
         [[nodiscard]] Unit<T> operator*(const Unit<T>& other) const {
-            StartBenchmark
-            ReturnFromBenchmark(Unit<T>(
+            StartAndReturnFromBenchmark(Unit<T>(
                 count * other.count,
                 this->baseUnits[BaseUnit::AmountOfSubstance] + other.baseUnits[BaseUnit::AmountOfSubstance],
                 this->baseUnits[BaseUnit::ElectricCurrent] + other.baseUnits[BaseUnit::ElectricCurrent],
@@ -91,8 +87,7 @@ namespace MathLib {
             ));
         }
         [[nodiscard]] Unit<T> operator/(const Unit<T>& other) const {
-            StartBenchmark
-            ReturnFromBenchmark(Unit<T>(
+            StartAndReturnFromBenchmark(Unit<T>(
                 count / other.count,
                 this->baseUnits[BaseUnit::AmountOfSubstance] - other.baseUnits[BaseUnit::AmountOfSubstance],
                 this->baseUnits[BaseUnit::ElectricCurrent] - other.baseUnits[BaseUnit::ElectricCurrent],
@@ -155,8 +150,7 @@ namespace MathLib {
             EndBenchmark
         }
         [[nodiscard]] virtual T GetValue(void) const override {
-            StartBenchmark
-            ReturnFromBenchmark(this->count * 1000);
+            StartAndReturnFromBenchmark(this->count * 1000);
         }
     };
 
@@ -186,12 +180,10 @@ namespace MathLib {
             EndBenchmark                                                                                                \
         }                                                                                                               \
         [[nodiscard]] base<T> ToBaseUnit(void) const {                                                                  \
-            StartBenchmark                                                                                              \
-            ReturnFromBenchmark(base<T>(this->count));                                                                  \
+            StartAndReturnFromBenchmark(base<T>(this->count));                                                          \
         }                                                                                                               \
         [[nodiscard]] virtual T GetValue(void) const override {                                                         \
-            StartBenchmark                                                                                              \
-            ReturnFromBenchmark(this->count / (mul));                                                                   \
+            StartAndReturnFromBenchmark(this->count / (mul));                                                           \
         }                                                                                                               \
     }
     #define CreateUnitPrefix(name, base)                                                                                \

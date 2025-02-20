@@ -15,12 +15,10 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] RawFunction GetFunction(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(function);
+            StartAndReturnFromBenchmark(function);
         }
         [[nodiscard]] virtual Ret Invoke(const void*, Args... args) const override {
-            StartBenchmark
-            ReturnFromBenchmark(function(args...));
+            StartAndReturnFromBenchmark(function(args...));
         }
 
         private:

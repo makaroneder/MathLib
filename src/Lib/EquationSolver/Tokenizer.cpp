@@ -243,8 +243,7 @@ namespace MathLib {
     /// @param i Current position in the string
     /// @return Tokenized string
     Node* TokenizeInternal(const String& str, size_t& i) {
-        StartBenchmark
-        ReturnFromBenchmark(TokenizeAssignment(str, i));
+        StartAndReturnFromBenchmark(TokenizeAssignment(str, i));
     }
     Node* Tokenize(const String& str) {
         StartBenchmark

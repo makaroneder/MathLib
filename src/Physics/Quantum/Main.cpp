@@ -25,7 +25,7 @@ int main(int, char**) {
                 renderer.Fill(0);
                 renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
                 renderer.DrawFunction<MathLib::num_t>(renderer.GenerateMultiFunction<MathLib::num_t>(MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>([&wave, &t] (MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
-                    return MathLib::MakeArrayFromSingle<MathLib::num_t>(wave(x, t).GetLengthSquared());
+                    return MathLib::MakeArray<MathLib::num_t>(wave(x, t).GetLengthSquared());
                 })), 0xff0000ff);
                 update = false;
                 std::cout << MathLib::GetTime() - time << std::endl;

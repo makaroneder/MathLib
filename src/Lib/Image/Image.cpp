@@ -5,16 +5,13 @@ namespace MathLib {
         EmptyBenchmark
     }
     size_t Image::GetWidth(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(pixels.GetWidth());
+        StartAndReturnFromBenchmark(pixels.GetWidth());
     }
     size_t Image::GetHeight(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(pixels.GetHeight());
+        StartAndReturnFromBenchmark(pixels.GetHeight());
     }
     size_t Image::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(GetWidth() * GetHeight());
+        StartAndReturnFromBenchmark(GetWidth() * GetHeight());
     }
     void Image::Fill(uint32_t color) {
         StartBenchmark
@@ -22,12 +19,10 @@ namespace MathLib {
         EndBenchmark
     }
     uint32_t& Image::At(size_t x, size_t y) {
-        StartBenchmark
-        ReturnFromBenchmark(pixels.At(x, y));
+        StartAndReturnFromBenchmark(pixels.At(x, y));
     }
     uint32_t Image::At(size_t x, size_t y) const {
-        StartBenchmark
-        ReturnFromBenchmark(pixels.At(x, y));
+        StartAndReturnFromBenchmark(pixels.At(x, y));
     }
     Image Image::Resize(size_t xMultiplier, size_t yMultiplier) const {
         StartBenchmark

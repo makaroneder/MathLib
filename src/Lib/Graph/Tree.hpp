@@ -56,8 +56,7 @@ namespace MathLib {
             ReturnFromBenchmark(ret);
         }
         [[nodiscard]] bool Add(const Tree<T>& tree, const String& namePostfix = "") {
-            StartBenchmark
-            ReturnFromBenchmark(children.Add(tree.AddNamePostfix(namePostfix)));
+            StartAndReturnFromBenchmark(children.Add(tree.AddNamePostfix(namePostfix)));
         }
         [[nodiscard]] Expected<Tree<T>> ChangeRoot(const String& n) const {
             StartBenchmark
@@ -66,7 +65,7 @@ namespace MathLib {
             const TreeElement* rootInfo = doubleTree->Find(n);
             Tree<T> ret = rootInfo->self;
             Tree<T>* curr = &ret;
-            Array<String> names = MakeArrayFromSingle<String>(ret.name);
+            Array<String> names = MakeArray<String>(ret.name);
             while (rootInfo->parent) {
                 Tree<T> tmp = Tree<T>(rootInfo->parent->self.name, rootInfo->parent->self.data, Array<Tree<T>>());
                 if (!names.Add(tmp.name)) ReturnFromBenchmark(Expected<Tree<T>>());
@@ -103,10 +102,10 @@ namespace MathLib {
         }
         [[nodiscard]] Array<Tree<T>> GetPath(const String& target) const {
             StartBenchmark
-            if (name == target) ReturnFromBenchmark(MakeArrayFromSingle<Tree<T>>(*this));
+            if (name == target) ReturnFromBenchmark(MakeArray<Tree<T>>(*this));
             for (const Tree<T>& child : children) {
                 Array<Tree<T>> ret = child.GetPath(target);
-                if (ret.GetSize()) {
+                if (!ret.IsEmpty()) {
                     Array<Tree<T>> tmp = Array<Tree<T>>(ret.GetSize() + 1);
                     tmp.At(0) = *this;
                     for (size_t i = 0; i < ret.GetSize(); i++) tmp.At(i + 1) = ret.At(i);
@@ -123,7 +122,7 @@ namespace MathLib {
             const Array<Tree<T>> path = u.Get().GetPath(v.name);
             if (path.GetSize() % 2) {
                 const Expected<Tree<T>> tmp = ChangeRoot(path.At(path.GetSize() / 2).name);
-                ReturnFromBenchmark(tmp.HasValue() ? MakeArrayFromSingle<Tree<T>>(tmp.Get()) : Array<Tree<T>>());
+                ReturnFromBenchmark(tmp.HasValue() ? MakeArray<Tree<T>>(tmp.Get()) : Array<Tree<T>>());
             }
             else {
                 Array<Tree<T>> ret = Array<Tree<T>>(2);

@@ -49,7 +49,7 @@ MathLib::String MakeUniqueName(void) {
 }
 [[nodiscard]] MathLib::Array<MathLib::Tree<size_t>> CreateComponent(size_t carbons) {
     if (!carbons) return MathLib::Array<MathLib::Tree<size_t>>();
-    MathLib::Array<MathLib::Tree<size_t>> ret = MathLib::MakeArrayFromSingle<MathLib::Tree<size_t>>(MathLib::Tree<size_t>(MakeUniqueName(), 1));
+    MathLib::Array<MathLib::Tree<size_t>> ret = MathLib::MakeArray<MathLib::Tree<size_t>>(MathLib::Tree<size_t>(MakeUniqueName(), 1));
     for (size_t i = 1; i < carbons; i++) {
         MathLib::Array<MathLib::Tree<size_t>> swap = MathLib::Array<MathLib::Tree<size_t>>();
         for (MathLib::Tree<size_t>& root : ret) {

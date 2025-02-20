@@ -26,8 +26,7 @@ namespace MathLib {
     /// @return Converted line
     template <typename T, typename F>
     [[nodiscard]] Line<F> ConvertLine(const Line<T>& line) {
-        StartBenchmark
-        ReturnFromBenchmark(Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end)));
+        StartAndReturnFromBenchmark(Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end)));
     }
 }
 

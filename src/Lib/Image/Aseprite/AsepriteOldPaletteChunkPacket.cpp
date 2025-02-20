@@ -3,7 +3,6 @@
 
 namespace MathLib {
     uint16_t AsepriteOldPaletteChunkPacket::GetColorCount(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(colorCount ? colorCount : 256);
+        StartAndReturnFromBenchmark(colorCount ? colorCount : 256);
     }
 }

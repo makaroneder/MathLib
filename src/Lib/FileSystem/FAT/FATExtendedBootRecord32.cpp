@@ -3,7 +3,6 @@
 
 namespace MathLib {
     bool FATExtendedBootRecord32::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(ebr.IsValid());
+        StartAndReturnFromBenchmark(ebr.IsValid());
     }
 }

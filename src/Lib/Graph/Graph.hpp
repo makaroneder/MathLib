@@ -12,7 +12,7 @@ namespace MathLib {
         T distance;
         size_t prev;
 
-        DijkstrasAlgorithmData(bool visited = false, const T& distance = MakeInf(), size_t prev = SIZE_MAX) : visited(visited), distance(distance), prev(prev) {
+        DijkstrasAlgorithmData(bool visited = false, const T& distance = infinity, size_t prev = SIZE_MAX) : visited(visited), distance(distance), prev(prev) {
             EmptyBenchmark
         }
     };
@@ -30,16 +30,13 @@ namespace MathLib {
             EndBenchmark
         }
         [[nodiscard]] size_t GetPointCount(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(data.GetWidth());
+            StartAndReturnFromBenchmark(data.GetWidth());
         }
         [[nodiscard]] T& At(size_t from, size_t to) {
-            StartBenchmark
-            ReturnFromBenchmark(data.At(to, from));
+            StartAndReturnFromBenchmark(data.At(to, from));
         }
         [[nodiscard]] T At(size_t from, size_t to) const {
-            StartBenchmark
-            ReturnFromBenchmark(data.At(to, from));
+            StartAndReturnFromBenchmark(data.At(to, from));
         }
         void SetWeight(size_t from, size_t to, const T& value, bool twoWay) {
             StartBenchmark
@@ -113,8 +110,7 @@ namespace MathLib {
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const String& padding = "") const override {
-            StartBenchmark
-            ReturnFromBenchmark(data.ToString(padding));
+            StartAndReturnFromBenchmark(data.ToString(padding));
         }
         [[nodiscard]] Expected<bool> operator==(const Graph<T>& other) const {
             StartBenchmark
@@ -134,7 +130,7 @@ namespace MathLib {
         }
 
         private:
-        [[nodiscard]] Expected<Tree<T>> ToTree(const Array<DijkstrasAlgorithmData<T>>& data, size_t start, T prevDist) const {
+        [[nodiscard]] Expected<Tree<T>> ToTree(const Collection<DijkstrasAlgorithmData<T>>& data, size_t start, T prevDist) const {
             StartBenchmark
             Tree<T> ret = Tree<T>(MathLib::ToString(start, 10), data.At(start).distance - prevDist);
             for (size_t i = 0; i < data.GetSize(); i++) {

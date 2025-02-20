@@ -62,8 +62,7 @@ namespace MathLib {
         EndBenchmark
     }
     Node* Node::Recreate(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(new Node(type, value, !left ? nullptr : left->Recreate(), !right ? nullptr : right->Recreate()));
+        StartAndReturnFromBenchmark(new Node(type, value, !left ? nullptr : left->Recreate(), !right ? nullptr : right->Recreate()));
     }
     Array<complex_t> Node::ToNumber(void) const {
         StartBenchmark
@@ -120,8 +119,7 @@ namespace MathLib {
         else ReturnFromBenchmark(Array<complex_t>());
     }
     Array<const Node*> Node::ToArray(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(type == Type::Array ? CommaToArray(left) : Array<const Node*>());
+        StartAndReturnFromBenchmark(type == Type::Array ? CommaToArray(left) : Array<const Node*>());
     }
     String Node::ToString(const String& padding) const {
         StartBenchmark

@@ -14,21 +14,21 @@ namespace MathLib {
         b = StringToNumber(str);
         ReturnFromBenchmark(true);
     }
-    Array<uint8_t> AffineCipher::Encrypt(const Array<uint8_t>& data, const String& key) const {
+    Array<uint8_t> AffineCipher::Encrypt(const Collection<uint8_t>& data, const String& key) const {
         StartBenchmark
         ssize_t a;
         ssize_t b;
         if (!DecodeKey(key, a, b)) ReturnFromBenchmark(Array<uint8_t>());
-        Array<uint8_t> ret = data;
+        Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
         for (uint8_t& chr : ret) chr = chr * a + b;
         ReturnFromBenchmark(ret);
     }
-    Array<uint8_t> AffineCipher::Decrypt(const Array<uint8_t>& data, const String& key) const {
+    Array<uint8_t> AffineCipher::Decrypt(const Collection<uint8_t>& data, const String& key) const {
         StartBenchmark
         ssize_t a;
         ssize_t b;
         if (!DecodeKey(key, a, b)) ReturnFromBenchmark(Array<uint8_t>());
-        Array<uint8_t> ret = data;
+        Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
         for (uint8_t& chr : ret) chr = (chr - b) / a;
         ReturnFromBenchmark(ret);
     }

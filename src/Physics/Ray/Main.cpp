@@ -17,9 +17,9 @@ int main(int, char**) {
         Lens<MathLib::num_t> lens[] = {
             Lens<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 1.5, 1),
         };
-        MathLib::Array<MathLib::matrix_t> points = MathLib::MakeArrayFromSingle<MathLib::matrix_t>(ray.position);
+        MathLib::Array<MathLib::matrix_t> points = MathLib::MakeArray<MathLib::matrix_t>(ray.position);
         while (true) {
-            MathLib::num_t closestIntersection = MathLib::MakeInf();
+            MathLib::num_t closestIntersection = MathLib::infinity;
             size_t len = SIZE_MAX;
             for (size_t i = 0; i < SizeOfArray(lens); i++) {
                 const MathLib::Expected<MathLib::num_t> intersection = lens[i].GetIntersection(ray);

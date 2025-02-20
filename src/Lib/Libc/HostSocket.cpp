@@ -47,8 +47,7 @@ namespace MathLib {
         ReturnFromBenchmark(new HostSocket(accept(handle, (sockaddr*)&addr, &size)));
     }
     int HostSocket::GetHandle(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(handle);
+        StartAndReturnFromBenchmark(handle);
     }
 }
 

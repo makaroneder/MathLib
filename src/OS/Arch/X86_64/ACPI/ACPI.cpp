@@ -47,22 +47,22 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
         LogString("\tExtended checksum: 0x"_M + MathLib::ToString(rsdp2->extendedChecksum, 16) + '\n');
     }
     LogString("}\n");
-    ACPITable* rsdt = (ACPITable*)(uintptr_t)rsdp->rsdt;
+    MathLib::ACPITable* rsdt = (MathLib::ACPITable*)(uintptr_t)rsdp->rsdt;
     size_t pointerSize = sizeof(uint32_t);
     if (rsdp->revision == 2) {
         RSDP2* rsdp2 = (RSDP2*)rsdp;
         if (rsdp2->IsValid()) {
-            rsdt = (ACPITable*)rsdp2->xsdt;
+            rsdt = (MathLib::ACPITable*)rsdp2->xsdt;
             pointerSize = sizeof(uint64_t);
         }
     }
-    const size_t entries = (rsdt->length - sizeof(ACPITable)) / pointerSize;
+    const size_t entries = (rsdt->length - sizeof(MathLib::ACPITable)) / pointerSize;
     FADT* fadt = nullptr;
     const MADT* madt = nullptr;
     const MCFG* mcfg = nullptr;
     for (size_t i = 0; i < entries; i++) {
-        const uintptr_t offset = (uintptr_t)rsdt + sizeof(ACPITable) + (i * pointerSize);
-        const ACPITable* table = (const ACPITable*)(rsdp->revision == 2 ? *(uint64_t*)offset : (uintptr_t)*(uint32_t*)offset);
+        const uintptr_t offset = (uintptr_t)rsdt + sizeof(MathLib::ACPITable) + (i * pointerSize);
+        const MathLib::ACPITable* table = (const MathLib::ACPITable*)(rsdp->revision == 2 ? *(uint64_t*)offset : (uintptr_t)*(uint32_t*)offset);
         if (!table->IsValid()) continue;
         char signature[5];
         for (size_t i = 0; i < SizeOfArray(table->signature); i++) signature[i] = table->signature[i];

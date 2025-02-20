@@ -47,8 +47,8 @@ namespace MathLib {
         [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Matrix<T>& dimensions) {
             StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(2);
-            ret.At(0) = Matrix<T>(1, 1, MakeArrayFromSingle<T>(GetX(dimensions)));
-            ret.At(1) = Matrix<T>(1, 1, MakeArrayFromSingle<T>(-GetX(dimensions)));
+            ret.At(0) = Matrix<T>(1, 1, MakeArray<T>(GetX(dimensions)));
+            ret.At(1) = Matrix<T>(1, 1, MakeArray<T>(-GetX(dimensions)));
             for (size_t i = 1; i < dimensions.GetWidth(); i++) ret = GenerateVertices(ret, dimensions.At(i, 0));
             ReturnFromBenchmark(ret);
         }

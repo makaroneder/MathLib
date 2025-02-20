@@ -1,17 +1,23 @@
 #ifndef Question_H
 #define Question_H
-#include <Typedefs.hpp>
+#include <Interfaces/Printable.hpp>
 
 /// @brief Question for our quiz
-struct Question : MathLib::Allocatable {
+struct Question : MathLib::Printable {
+    /// @brief Creates new question
+    /// @param eq Equation to solve
+    Question(const MathLib::String& equation);
+    [[nodiscard]] bool IsSolution(MathLib::num_t sol, MathLib::num_t eps) const;
+    /// @brief Converts struct to string
+    /// @param padding String to pad with
+    /// @return String representation
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+
+    private:
     /// @brief Equation to solve
     MathLib::String equation;
     /// @brief Solution for equation
     MathLib::num_t solution;
-
-    /// @brief Creates new question
-    /// @param eq Equation to solve
-    Question(const MathLib::String& eq);
 };
 
 #endif

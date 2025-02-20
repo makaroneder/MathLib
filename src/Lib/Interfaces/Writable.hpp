@@ -28,8 +28,7 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool Write(const T& value) {
-            StartBenchmark
-            ReturnFromBenchmark(WriteBuffer(&value, sizeof(T)));
+            StartAndReturnFromBenchmark(WriteBuffer(&value, sizeof(T)));
         }
     };
 }

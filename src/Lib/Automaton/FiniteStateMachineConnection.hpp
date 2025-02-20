@@ -9,8 +9,7 @@ namespace MathLib {
             EmptyBenchmark
         }
         Expected<size_t> GetState(const T& x) const {
-            StartBenchmark
-            ReturnFromBenchmark(input.Contains(x) ? Expected<size_t>(state) : Expected<size_t>());
+            StartAndReturnFromBenchmark(input.Contains(x) ? Expected<size_t>(state) : Expected<size_t>());
         }
 
         private:

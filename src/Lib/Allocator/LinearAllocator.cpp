@@ -18,11 +18,9 @@ namespace MathLib {
         ReturnFromBenchmark(ret);
     }
     bool LinearAllocator::Dealloc(void* ptr) {
-        StartBenchmark
-        ReturnFromBenchmark(IsBetween((uintptr_t)ptr, (uintptr_t)buffer, (uintptr_t)buffer + size));
+        StartAndReturnFromBenchmark(IsBetween((uintptr_t)ptr, (uintptr_t)buffer, (uintptr_t)buffer + size));
     }
     size_t LinearAllocator::GetFreeMemory(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(size - offset);
+        StartAndReturnFromBenchmark(size - offset);
     }
 }

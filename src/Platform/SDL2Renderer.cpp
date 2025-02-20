@@ -24,6 +24,13 @@ namespace MathLib {
         if (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT: return Event(Event::Type::Quit);
+                case SDL_WINDOWEVENT: {
+                    switch (event.window.type) {
+                        case SDL_WINDOWEVENT_CLOSE: return Event(Event::Type::Quit);
+                        default: break;
+                    }
+                    break;
+                }
                 case SDL_KEYDOWN:
                 case SDL_KEYUP: return Event(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 case SDL_MOUSEBUTTONDOWN:

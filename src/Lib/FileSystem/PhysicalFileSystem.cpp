@@ -5,7 +5,6 @@ namespace MathLib {
         EmptyBenchmark
     }
     ByteDevice& PhysicalFileSystem::GetDisk(void) {
-        StartBenchmark
-        ReturnFromBenchmark(disk);
+        StartAndReturnFromBenchmark(disk);
     }
 }

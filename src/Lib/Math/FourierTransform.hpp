@@ -24,7 +24,7 @@ namespace MathLib {
         [[nodiscard]] virtual Complex<T> Invoke(const void*, T k) const override {
             StartBenchmark
             const FourierTransformData<T> data = FourierTransformData<T>(function, k, inverse);
-            ReturnFromBenchmark((Integrate<Complex<T>, T>(FunctionPointer<Complex<T>, T>((void*)&data, &IntegralFourierTransform<T>), -MakeInf(), MakeInf(), n, type)));
+            ReturnFromBenchmark((Integrate<Complex<T>, T>(FunctionPointer<Complex<T>, T>((void*)&data, &IntegralFourierTransform<T>), -infinity, infinity, n, type)));
         }
 
         private:

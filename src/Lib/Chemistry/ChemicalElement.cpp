@@ -11,20 +11,16 @@ namespace MathLib {
         EmptyBenchmark
     }
     String ChemicalElement::GetSymbol(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(symbol);
+        StartAndReturnFromBenchmark(symbol);
     }
     size_t ChemicalElement::GetCount(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(count);
+        StartAndReturnFromBenchmark(count);
     }
     bool ChemicalElement::IsMetal(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(metal);
+        StartAndReturnFromBenchmark(metal);
     }
     String ChemicalElement::ToString(const String& padding) const {
-        StartBenchmark
-        ReturnFromBenchmark(padding + symbol + (count == 1 ? "" : MathLib::ToString(count)));
+        StartAndReturnFromBenchmark(padding + symbol + (count == 1 ? "" : MathLib::ToString(count)));
     }
     ChemicalElement& ChemicalElement::operator*=(size_t num) {
         StartBenchmark

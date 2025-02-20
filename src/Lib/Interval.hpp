@@ -1,33 +1,49 @@
 #ifndef MathLib_Interval_H
 #define MathLib_Interval_H
-#include "Typedefs.hpp"
+#include "Interfaces/Printable.hpp"
 #include "MinMax.hpp"
 
 namespace MathLib {
     template <typename T>
-    struct Interval : Allocatable {
+    struct Interval : Printable {
         constexpr Interval(const T& min_ = 0, const T& max_ = 0) : min(min_), max(max_) {
             EmptyBenchmark
         }
+        [[nodiscard]] constexpr bool IsEmpty(void) const {
+            return FloatsEqual<T>(GetSize(), 0);
+        }
         [[nodiscard]] constexpr T GetMin(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(min);
+            StartAndReturnFromBenchmark(min);
         }
         [[nodiscard]] constexpr T GetMax(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(max);
+            StartAndReturnFromBenchmark(max);
         }
         [[nodiscard]] constexpr T GetSize(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(max - min);
+            StartAndReturnFromBenchmark(max - min);
         }
         [[nodiscard]] constexpr bool Contains(const T& x) const {
-            StartBenchmark
-            ReturnFromBenchmark(IsBetween(x, min, max));
+            StartAndReturnFromBenchmark(IsBetween(x, min, max));
         }
         [[nodiscard]] T constexpr Clamp(const T& x) const {
-            StartBenchmark
-            ReturnFromBenchmark(MathLib::Clamp(x, min, max));
+            StartAndReturnFromBenchmark(MathLib::Clamp(x, min, max));
+        }
+        [[nodiscard]] Interval<T> Expand(const T& stepSize) const {
+            Interval<T> ret;
+            while (ret.GetMin() > GetMin()) ret.min -= stepSize;
+            while (ret.GetMax() < GetMax()) ret.max += stepSize;
+            return ret;
+        }
+        [[nodiscard]] Interval<T> Min(const Interval<T>& other) const {
+            return Interval<T>(MathLib::Max<T>(min, other.min), MathLib::Min<T>(max, other.max));
+        }
+        [[nodiscard]] Interval<T> Max(const Interval<T>& other) const {
+            return Interval<T>(MathLib::Min<T>(min, other.min), MathLib::Max<T>(max, other.max));
+        }
+        /// @brief Converts struct to string
+        /// @param padding String to pad with
+        /// @return String representation
+        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+            return padding + '[' + MathLib::ToString(min) + ", " + MathLib::ToString(max) + ']';
         }
 
         private:

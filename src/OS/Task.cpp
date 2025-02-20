@@ -1,7 +1,7 @@
 #include "Task.hpp"
 #include "Arch/Arch.hpp"
 
-MathLib::Array<Task> tasks = MathLib::MakeArrayFromSingle<Task>(Task(MathLib::FunctionPointer<void>(nullptr, nullptr), nullptr, 0));
+MathLib::Array<Task> tasks = MathLib::MakeArray<Task>(Task(MathLib::FunctionPointer<void>(nullptr, nullptr), nullptr, 0));
 size_t currentTask = 0;
 
 Task::Task(void) : state(nullptr) {}

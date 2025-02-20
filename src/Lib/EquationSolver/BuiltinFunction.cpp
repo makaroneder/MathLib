@@ -11,15 +11,13 @@ namespace MathLib {
         EmptyBenchmark
     }
 
-    #define CreateBuiltinFunction(name, func, argc, ...)                                                                                \
-    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                                             \
-        StartBenchmark                                                                                                                  \
-        ReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, MathLib::ToString(func(__VA_ARGS__))) : nullptr);   \
+    #define CreateBuiltinFunction(name, func, argc, ...)                                                                                        \
+    static Node* EquationSolverBuiltin##name(const void*, const Collection<const Node*>& args) {                                                \
+        StartAndReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, MathLib::ToString(func(__VA_ARGS__))) : nullptr);   \
     }
-    #define CreateComplexBuiltinFunction(name, func, argc, ...)                                                                 \
-    static Node* EquationSolverBuiltin##name(const void*, const Array<const Node*>& args) {                                     \
-        StartBenchmark                                                                                                          \
-        ReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, func(__VA_ARGS__).ToString()) : nullptr);   \
+    #define CreateComplexBuiltinFunction(name, func, argc, ...)                                                                         \
+    static Node* EquationSolverBuiltin##name(const void*, const Collection<const Node*>& args) {                                        \
+        StartAndReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, func(__VA_ARGS__).ToString()) : nullptr);   \
     }
     CreateBuiltinFunction(Argument, InversedTan2, 1, args[0]->ToNumber().At(0).GetImaginary(), args[0]->ToNumber().At(0).GetReal())
     CreateBuiltinFunction(Real, args[0]->ToNumber().At(0).GetReal, 1, )

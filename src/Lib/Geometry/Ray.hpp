@@ -13,12 +13,10 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] Matrix<T> At(const T& t) const {
-            StartBenchmark
-            ReturnFromBenchmark(this->position + direction * t);
+            StartAndReturnFromBenchmark(this->position + direction * t);
         }
         [[nodiscard]] Matrix<T> GetDirection(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(direction);
+            StartAndReturnFromBenchmark(direction);
         }
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
@@ -26,8 +24,7 @@ namespace MathLib {
             ReturnFromBenchmark(false);
         }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
-            StartBenchmark
-            ReturnFromBenchmark(MakeArrayFromSingle<Line<T>>(Line<T>(this->position, RotateVector<T>(At(1), this->position, rotation))));
+            StartAndReturnFromBenchmark(MakeArray<Line<T>>(Line<T>(this->position, RotateVector<T>(At(1), this->position, rotation))));
         }
 
         private:

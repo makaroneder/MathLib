@@ -1,7 +1,7 @@
 #ifdef __x86_64__
 #ifndef MCFG_H
 #define MCFG_H
-#include "ACPITable.hpp"
+#include <ACPI/ACPITable.hpp>
 
 struct MCFGEntry {
     uint64_t address;
@@ -10,7 +10,7 @@ struct MCFGEntry {
     uint8_t endBus;
     uint32_t reserved;
 } __attribute__((packed));
-struct MCFG : ACPITable {
+struct MCFG : MathLib::ACPITable {
     static constexpr const char* expectedSignature = "MCFG";
     uint64_t reserved;
     MCFGEntry entries[];

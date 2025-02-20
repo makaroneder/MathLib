@@ -6,8 +6,7 @@ namespace MathLib {
         EmptyBenchmark
     }
     bool VFS::AddFileSystem(const VFSEntry& entry) {
-        StartBenchmark
-        ReturnFromBenchmark(entry.fs && entries.Add(entry));
+        StartAndReturnFromBenchmark(entry.fs && entries.Add(entry));
     }
     size_t VFS::OpenInternal(const String& path, OpenMode mode) {
         StartBenchmark
@@ -38,16 +37,13 @@ namespace MathLib {
         ReturnFromBenchmark(true);
     }
     size_t VFS::Read(size_t file, void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->Read(files.At(file).index, buffer, size, position) : 0);
+        StartAndReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->Read(files.At(file).index, buffer, size, position) : 0);
     }
     size_t VFS::Write(size_t file, const void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->Write(files.At(file).index, buffer, size, position) : 0);
+        StartAndReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->Write(files.At(file).index, buffer, size, position) : 0);
     }
     size_t VFS::GetSize(size_t file) {
-        StartBenchmark
-        ReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->GetSize(files.At(file).index) : 0);
+        StartAndReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->GetSize(files.At(file).index) : 0);
     }
     Array<FileInfo> VFS::ReadDirectory(const String& path) {
         StartBenchmark
@@ -56,9 +52,9 @@ namespace MathLib {
         String fs;
         for (; off < path.GetSize() && path.At(off) != '/'; off++) fs += path.At(off);
         if (fs.IsEmpty()) {
-            Array<FileInfo> ret = Array<FileInfo>();
-            for (const VFSEntry& entry : entries)
-                if (!ret.Add(FileInfo(FileInfo::Type::Directory, entry.name))) ReturnFromBenchmark(Array<FileInfo>());
+            Array<FileInfo> ret = Array<FileInfo>(entries.GetSize());
+            for (size_t i = 0; i < ret.GetSize(); i++)
+                ret.At(i) = FileInfo(FileInfo::Type::Directory, entries.At(i).name);
             ReturnFromBenchmark(ret);
         }
         for (size_t i = 0; i < entries.GetSize(); i++)
@@ -66,7 +62,6 @@ namespace MathLib {
         ReturnFromBenchmark(Array<FileInfo>());
     }
     bool VFS::IsValid(size_t file) const {
-        StartBenchmark
-        ReturnFromBenchmark(file < files.GetSize() && files.At(file).fs < entries.GetSize());
+        StartAndReturnFromBenchmark(file < files.GetSize() && files.At(file).fs < entries.GetSize());
     }
 }

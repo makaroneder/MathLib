@@ -17,8 +17,7 @@ namespace MathLib {
         EndBenchmark
     }
     bool ISO9660::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(pvd.IsValid());
+        StartAndReturnFromBenchmark(pvd.IsValid());
     }
     bool ISO9660::Create(void) {
         // TODO: Create file system
@@ -63,8 +62,7 @@ namespace MathLib {
         ReturnFromBenchmark(disk.WriteSizedBuffer(buffer, size));
     }
     size_t ISO9660::GetSize(size_t file) {
-        StartBenchmark
-        ReturnFromBenchmark(file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0);
+        StartAndReturnFromBenchmark(file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0);
     }
     Array<FileInfo> ISO9660::ReadDirectory(const String& path) {
         StartBenchmark

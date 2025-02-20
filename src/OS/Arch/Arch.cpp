@@ -3,7 +3,7 @@
 #include <Host.hpp>
 
 MathLib::num_t GenericSqrt(MathLib::num_t x) {
-    if (x < 0) return MathLib::MakeNaN();
+    if (x < 0) return MathLib::nan;
     if (!x) return 0;
     MathLib::num_t guess = x;
     MathLib::num_t prev;
@@ -39,10 +39,10 @@ MathLib::num_t GenericInversedTan2(MathLib::num_t y, MathLib::num_t x) {
     }
     else if (y > 0) return MathLib::pi / 2;
     else if (y < 0) return -MathLib::pi / 2;
-    else return MathLib::MakeNaN();
+    else return MathLib::nan;
 }
 MathLib::num_t GenericLn(MathLib::num_t x) {
-    if (x <= 0) return MathLib::MakeNaN();
+    if (x <= 0) return MathLib::nan;
     MathLib::num_t logx = 0;
     while (x >= 2) {
         x /= 2;

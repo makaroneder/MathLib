@@ -12,8 +12,7 @@ namespace MathLib {
         EndBenchmark
     }
     bool MathFS::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(root);
+        StartAndReturnFromBenchmark(root);
     }
     bool MathFS::Create(void) {
         StartBenchmark

@@ -57,9 +57,11 @@
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        const MathLib::num_t start = MathLib::GetTime();
         const MathLib::Array<MathLib::ChemicalReaction> reactions = ParseReactions(MathLib::HostFileSystem().Open(argv[1], MathLib::OpenMode::Read).ReadUntil('\0'));
         for (size_t i = 0; i < reactions.GetSize(); i++)
             std::cout << reactions.At(i) << '\n' << reactions.At(i).Balance().Get("Failed to balance chemical reaction") << (i + 1 == reactions.GetSize() ? "" : "\n") << std::endl;
+        std::cout << "Time: " << MathLib::GetTime() - start << std::endl; // 0.25    
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

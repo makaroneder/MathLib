@@ -3,19 +3,15 @@
 
 namespace MathLib {
     bool PSF1::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(signature == expectedSignature);
+        StartAndReturnFromBenchmark(signature == expectedSignature);
     }
     size_t PSF1::GetWidth(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(8);
+        StartAndReturnFromBenchmark(8);
     }
     size_t PSF1::GetHeight(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(charSize);
+        StartAndReturnFromBenchmark(charSize);
     }
     const uint8_t* PSF1::GetGlyph(char chr) const {
-        StartBenchmark
-        ReturnFromBenchmark(&buffer[chr * charSize]);
+        StartAndReturnFromBenchmark(&buffer[chr * charSize]);
     }
 }

@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "Hand.hpp"
 #include <EquationSolver/Preprocesor.hpp>
+#include <Allocator/RegionAllocator.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <Libc/HostFileSystem.hpp>
@@ -25,7 +26,7 @@ void SwapCards(Hand<T>& hand, MathLib::Matrix<Card>& cards) {
         }
     }
 }
-[[nodiscard]] size_t FindVariable(const MathLib::Array<MathLib::Variable>& variables, const MathLib::String& name) {
+[[nodiscard]] size_t FindVariable(const MathLib::Collection<MathLib::Variable>& variables, const MathLib::String& name) {
     for (size_t i = 0; i < variables.GetSize(); i++)
         if (name == variables.At(i).name) return i;
     return SIZE_MAX;
@@ -52,6 +53,8 @@ template <typename T>
 /// @return Status
 int main(int, char**) {
     try {
+        MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
+        if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
         #ifndef Debug
         srand(time(nullptr));
         #endif
@@ -213,6 +216,7 @@ int main(int, char**) {
                 }
             }
         }
+        delete MathLib::allocator;
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

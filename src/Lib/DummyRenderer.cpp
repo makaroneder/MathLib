@@ -5,11 +5,9 @@ namespace MathLib {
         EmptyBenchmark
     }
     bool DummyRenderer::Update(void) {
-        StartBenchmark
-        ReturnFromBenchmark(true);
+        StartAndReturnFromBenchmark(true);
     }
     Event DummyRenderer::GetEvent(void) {
-        StartBenchmark
-        ReturnFromBenchmark(Event());
+        StartAndReturnFromBenchmark(Event());
     }
 }

@@ -5,7 +5,6 @@ namespace MathLib {
         EmptyBenchmark
     }
     String FileInfo::ToString(const String& padding) const {
-        StartBenchmark
-        ReturnFromBenchmark(padding + path + " [" + typeStr[(size_t)type] + ']');
+        StartAndReturnFromBenchmark(padding + path + " [" + typeStr[(size_t)type] + ']');
     }
 }

@@ -6,7 +6,7 @@
 template <typename T>
 struct Music : MathLib::Saveable {
     Music(void) {}
-    Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Array<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
+    Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Collection<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
         for (const MusicNote<T>& note : notes) {
             const size_t sampleCount = (note.duration * sampleRate).GetValue();
             const MathLib::Hertz<T> frequency = note.GetFrequency();

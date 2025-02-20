@@ -2,12 +2,10 @@
 #define MathLib_Math_Object_H
 #define CreateOperators(self, T)                            \
 [[nodiscard]] bool operator!=(const self& other) const {    \
-    StartBenchmark                                          \
-    ReturnFromBenchmark(!(*this == other));                 \
+    StartAndReturnFromBenchmark(!(*this == other));         \
 }                                                           \
 [[nodiscard]] self operator-(void) const {                  \
-    StartBenchmark                                          \
-    ReturnFromBenchmark(*this * -1);                        \
+    StartAndReturnFromBenchmark(*this * -1);                \
 }                                                           \
 [[nodiscard]] self operator+(const self& other) const {     \
     StartBenchmark                                          \

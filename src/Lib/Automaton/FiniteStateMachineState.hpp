@@ -9,8 +9,7 @@ namespace MathLib {
             EmptyBenchmark
         }
         bool IsAccepting(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(accepting);
+            StartAndReturnFromBenchmark(accepting);
         }
         Expected<size_t> Run(const T& x) const {
             StartBenchmark

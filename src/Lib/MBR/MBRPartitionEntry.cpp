@@ -8,7 +8,6 @@ namespace MathLib {
         EmptyBenchmark
     }
     bool MBRPartitionEntry::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark((type == Type::Normal || type == Type::Active) && !(id == ID::Empty && type == Type::Active));
+        StartAndReturnFromBenchmark((type == Type::Normal || type == Type::Active) && !(id == ID::Empty && type == Type::Active));
     }
 }

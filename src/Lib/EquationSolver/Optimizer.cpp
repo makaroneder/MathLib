@@ -2,7 +2,7 @@
 #include "Optimizer.hpp"
 
 namespace MathLib {
-    Optimizer::Optimizer(const Array<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Array<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
+    Optimizer::Optimizer(const Collection<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Collection<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
         StartBenchmark
         for (const BuiltinFunction& func : builtinFuncs)
             if (!builtinFunctions.Add(func)) Panic("Failed to add builtin function");
@@ -68,8 +68,7 @@ namespace MathLib {
         ReturnFromBenchmark(true);
     }
     Node* Optimizer::Optimize(const Node* node) {
-        StartBenchmark
-        ReturnFromBenchmark(OptimizeComma(node));
+        StartAndReturnFromBenchmark(OptimizeComma(node));
     }
     Node* Optimizer::OptimizeComma(const Node* node) {
         StartBenchmark
@@ -129,7 +128,7 @@ namespace MathLib {
         }
         ReturnFromBenchmark(node->Recreate());
     }
-    Node* Optimizer::OptimizeComparison(const Node* node, const Array<Node::Type>& validTypes, Node::Type defaultType) {
+    Node* Optimizer::OptimizeComparison(const Node* node, const Collection<Node::Type>& validTypes, Node::Type defaultType) {
         StartBenchmark
         Node* l = OptimizeInternal(node->left);
         Node* r = OptimizeInternal(node->right);
@@ -237,7 +236,7 @@ namespace MathLib {
             else ReturnFromBenchmark(new Node(Node::Type::Factorial, "", n))
         }
         else if (node->type == Node::Type::LogicalEqual || node->type == Node::Type::LogicalNotEqual || node->type == Node::Type::LessThan || node->type == Node::Type::GreaterThan)
-            ReturnFromBenchmark(OptimizeComparison(node, MakeArrayFromSingle<Node::Type>(node->type), node->type))
+            ReturnFromBenchmark(OptimizeComparison(node, MakeArray<Node::Type>(node->type), node->type))
         else if (node->type == Node::Type::LessThanEqual) {
             Array<Node::Type> validTypes = Array<Node::Type>(2);
             validTypes.At(0) = Node::Type::LessThan;

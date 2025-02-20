@@ -6,7 +6,7 @@
 #include <Cryptography/ROT13.hpp>
 #include <iostream>
 
-[[nodiscard]] MathLib::Node* Encrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Encrypt(const void*, const MathLib::Collection<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args)
         if (arg->type != MathLib::Node::Type::String) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().EncryptString(args.At(1)->value, args.At(2)->value));
@@ -15,7 +15,7 @@
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().EncryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
-[[nodiscard]] MathLib::Node* Decrypt(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Decrypt(const void*, const MathLib::Collection<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args)
         if (arg->type != MathLib::Node::Type::String) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().DecryptString(args.At(1)->value, args.At(2)->value));
@@ -24,7 +24,7 @@
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().DecryptString(args.At(1)->value, args.At(2)->value));
     else return nullptr;
 }
-[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Collection<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args) {
         if (arg->type != MathLib::Node::Type::String) return nullptr;
         std::cout << arg->value;
@@ -44,11 +44,11 @@ int main(int argc, char** argv) {
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
-        MathLib::Optimizer optimizer = MathLib::Optimizer(std::vector<MathLib::BuiltinFunction> {
+        MathLib::Optimizer optimizer = MathLib::Optimizer(MathLib::MakeArray<MathLib::BuiltinFunction>(
             MathLib::BuiltinFunction("Encrypt", MathLib::BuiltinFunctionPointer(nullptr, &Encrypt)),
             MathLib::BuiltinFunction("Decrypt", MathLib::BuiltinFunctionPointer(nullptr, &Decrypt)),
-            MathLib::BuiltinFunction("Print", MathLib::BuiltinFunctionPointer(nullptr, &Print)),
-        });
+            MathLib::BuiltinFunction("Print", MathLib::BuiltinFunctionPointer(nullptr, &Print))
+        ));
         MathLib::Node* optimizedRoot = optimizer.Optimize(root);
         delete root;
         optimizer.Destroy();

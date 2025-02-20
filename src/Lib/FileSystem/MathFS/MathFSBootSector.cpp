@@ -9,7 +9,6 @@ namespace MathLib {
         EmptyBenchmark
     }
     bool MathFSBootSector::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(signature1 == expectedSignature1 && signature2 == expectedSignature2);
+        StartAndReturnFromBenchmark(signature1 == expectedSignature1 && signature2 == expectedSignature2);
     }
 }

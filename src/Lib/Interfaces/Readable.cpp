@@ -2,8 +2,7 @@
 
 namespace MathLib {
     bool Readable::ReadBuffer(void* buffer, size_t size) {
-        StartBenchmark
-        ReturnFromBenchmark(ReadSizedBuffer(buffer, size) == size);
+        StartAndReturnFromBenchmark(ReadSizedBuffer(buffer, size) == size);
     }
     Expected<char> Readable::Getc(void) {
         StartBenchmark

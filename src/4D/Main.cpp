@@ -18,7 +18,7 @@ template <typename T>
     delete tmp;
     return ret;
 }
-[[nodiscard]] size_t FindVariable(const MathLib::Array<MathLib::Variable>& variables, const MathLib::String& name) {
+[[nodiscard]] size_t FindVariable(const MathLib::Collection<MathLib::Variable>& variables, const MathLib::String& name) {
     for (size_t i = 0; i < variables.GetSize(); i++)
         if (name == variables.At(i).name) return i;
     return SIZE_MAX;

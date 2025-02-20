@@ -3,9 +3,9 @@
 #include <Libc/HostSocket.hpp>
 #include <iostream>
 
-MathLib::Array<HTTPHeader> resources = std::vector<HTTPHeader> {
-    HTTPHeader("/", "<h1>Amongus</h1>"),
-};
+MathLib::Array<HTTPHeader> resources = MathLib::MakeArray<HTTPHeader>(
+    HTTPHeader("/", "<h1>Amongus</h1>")
+);
 [[nodiscard]] HTTPHeader* GetResource(MathLib::String name) {
     for (HTTPHeader& resource : resources)
         if (resource.name == name) return &resource;

@@ -126,7 +126,7 @@ namespace MathLib {
             default: ReturnFromBenchmark(false)                                         \
         })                                                                              \
     }
-    X86::X86(const Array<uint8_t>& mem, const X86State& state) : Emulator(mem), state(state) {
+    X86::X86(const Array<uint8_t>& memory, const X86State& state) : StepEmulator(memory), state(state) {
         EmptyBenchmark
     }
     void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
@@ -156,23 +156,18 @@ namespace MathLib {
         }
     }
     String X86::ToString(const String& padding) const {
-        StartBenchmark
-        ReturnFromBenchmark(state.ToString(padding));
-    }
-    bool X86::Run(void) {
-        StartBenchmark
-        while (state.ip.value < GetSize())
-            if (!Step()) ReturnFromBenchmark(false);
-        ReturnFromBenchmark(true);
+        StartAndReturnFromBenchmark(state.ToString(padding));
     }
     uint64_t X86::ToLinear(uint64_t segment, uint64_t offset) {
-        StartBenchmark
-        ReturnFromBenchmark(segment * 16 + offset);
+        StartAndReturnFromBenchmark(segment * 16 + offset);
     }
     void X86::Interrupt(uint8_t index) {
         (void)index;
         // TODO:
         EmptyBenchmark
+    }
+    Register X86::GetPC(void) const {
+        StartAndReturnFromBenchmark(state.ip);
     }
     bool X86::Step(void) {
         StartBenchmark

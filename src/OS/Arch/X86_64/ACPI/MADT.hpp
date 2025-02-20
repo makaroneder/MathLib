@@ -1,9 +1,9 @@
 #ifdef __x86_64__
 #ifndef MADT_H
 #define MADT_H
-#include "ACPITable.hpp"
+#include <ACPI/ACPITable.hpp>
 
-struct MADT : ACPITable {
+struct MADT : MathLib::ACPITable {
     static constexpr const char* expectedSignature = "APIC";
     uint32_t localAPIC;
     bool dual8259 : 1;

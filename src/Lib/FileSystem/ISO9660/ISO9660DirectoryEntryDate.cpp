@@ -3,8 +3,7 @@
 
 namespace MathLib {
     bool ISO9660DirectoryEntryDate::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(!(
+        StartAndReturnFromBenchmark(!(
             month > 12 || !month ||
             day > 31 || !day ||
             hour > 23 ||

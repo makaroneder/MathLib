@@ -21,6 +21,7 @@ struct MusicNote : MathLib::Allocatable {
     } type;
     MathLib::Second<T> duration;
 
+    MusicNote(void) {}
     MusicNote(Type type, const MathLib::Second<T>& duration) : type(type), duration(duration) {}
     [[nodiscard]] MathLib::Hertz<T> GetFrequency(void) const {
         return type == Type::None ? MathLib::Hertz<T>(0) : MathLib::Hertz<T>(440) * MathLib::Pow(2, ((ssize_t)type - 49) / 12);

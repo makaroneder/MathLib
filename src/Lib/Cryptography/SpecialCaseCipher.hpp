@@ -6,12 +6,12 @@
 namespace MathLib {
     template <typename T>
     struct SpecialCaseCipher : Cipher {
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Array<uint8_t>& data, const String& key) const override {
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Collection<uint8_t>& data, const String& key) const override {
             StartBenchmark
             const Expected<String> k = GetKey(key);
             ReturnFromBenchmark(k.HasValue() ? base.Encrypt(data, k.Get()) : Array<uint8_t>());
         }
-        [[nodiscard]] virtual Array<uint8_t> Decrypt(const Array<uint8_t>& data, const String& key) const override {
+        [[nodiscard]] virtual Array<uint8_t> Decrypt(const Collection<uint8_t>& data, const String& key) const override {
             StartBenchmark
             const Expected<String> k = GetKey(key);
             ReturnFromBenchmark(k.HasValue() ? base.Decrypt(data, k.Get()) : Array<uint8_t>());

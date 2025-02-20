@@ -28,8 +28,7 @@ namespace MathLib {
         ReturnFromBenchmark(ret.Add(str) ? ret : Array<String>());
     }
     String BoolToString(bool x) {
-        StartBenchmark
-        ReturnFromBenchmark(x ? "true" : "false");
+        StartAndReturnFromBenchmark(x ? "true" : "false");
     }
     String ToString(size_t x, size_t base, size_t size) {
         StartBenchmark

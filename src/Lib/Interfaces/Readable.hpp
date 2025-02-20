@@ -27,8 +27,7 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool Read(T& value) {
-            StartBenchmark
-            ReturnFromBenchmark(ReadBuffer(&value, sizeof(T)));
+            StartAndReturnFromBenchmark(ReadBuffer(&value, sizeof(T)));
         }
         /// @brief Reads one T value
         /// @tparam T Type of value

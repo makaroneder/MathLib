@@ -15,6 +15,13 @@ namespace MathLib {
     /// @return String representation
     [[nodiscard]] String ToString(const Printable& printable);
     [[nodiscard]] String ToString(const String& string);
+    template <typename T>
+    String ToString(const Collection<T>& data) {
+        String ret = '{';
+        const size_t size = data.GetSize();
+        for (size_t i = 0; i < size; i++) ret += MathLib::ToString(data.At(i)) + (((i + 1) == size) ? "" : ", ");
+        return ret + '}';
+    }
 }
 
 #endif

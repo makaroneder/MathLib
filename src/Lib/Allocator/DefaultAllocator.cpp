@@ -3,8 +3,7 @@
 
 namespace MathLib {
     void* DefaultAllocator::Alloc(size_t size) {
-        StartBenchmark
-        ReturnFromBenchmark(::operator new(size));
+        StartAndReturnFromBenchmark(::operator new(size));
     }
     bool DefaultAllocator::Dealloc(void* ptr) {
         StartBenchmark

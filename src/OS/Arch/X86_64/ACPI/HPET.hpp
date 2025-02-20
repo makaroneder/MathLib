@@ -1,10 +1,10 @@
 #ifdef __x86_64__
 #ifndef HPET_H
 #define HPET_H
-#include "ACPITable.hpp"
 #include "GenericAddressStructure.hpp"
+#include <ACPI/ACPITable.hpp>
 
-struct HPET : ACPITable {
+struct HPET : MathLib::ACPITable {
     static constexpr const char* expectedSignature = "HPET";
     uint8_t hardwareRevision;
     uint8_t comparatorCount : 5;

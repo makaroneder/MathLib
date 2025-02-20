@@ -14,8 +14,7 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] Ret operator()(Args... args) const {
-            StartBenchmark
-            ReturnFromBenchmark(Invoke(data, args...));
+            StartAndReturnFromBenchmark(Invoke(data, args...));
         }
         [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const = 0;
     };

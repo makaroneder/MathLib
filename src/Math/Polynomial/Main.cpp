@@ -25,14 +25,14 @@ template <typename T>
     else return MathLib::Abs(a * b) / GreatestCommonDivisor<T>(a, b);
 }
 template <typename T>
-[[nodiscard]] T LeastCommonMultiple(const MathLib::Array<T>& array) {
+[[nodiscard]] T LeastCommonMultiple(const MathLib::Collection<T>& array) {
     if (array.IsEmpty()) return 0;
     T ret = array.At(0);
     for (size_t i = 1; i < array.GetSize(); i++) ret = LeastCommonMultiple<T>(ret, array.At(i));
     return ret;
 }
 [[nodiscard]] MathLib::Array<ssize_t> GetDivisors(size_t p) {
-    if (!p) return MathLib::MakeArrayFromSingle<ssize_t>(0);
+    if (!p) return MathLib::MakeArray<ssize_t>(0);
     MathLib::Array<ssize_t> ret;
     for (size_t i = 1; i <= p; i++)
         if (!(p % i) && (!ret.Add(i) || !ret.Add(-i))) return MathLib::Array<ssize_t>();
@@ -42,7 +42,7 @@ template <typename T>
 template <typename T>
 struct Polynomial : MathLib::Printable {
     CreateOperators(Polynomial<T>, T)
-    CreateExponential(Polynomial<T>, true, Polynomial<T>(MathLib::MakeArrayFromSingle<T>(1)))
+    CreateExponential(Polynomial<T>, true, Polynomial<T>(MathLib::MakeArray<T>(1)))
     Polynomial(void) {}
     Polynomial(MathLib::Array<T> coefficients) : coefficients(coefficients) {}
     [[nodiscard]] size_t GetDegree(void) const {
@@ -199,7 +199,7 @@ struct Polynomial : MathLib::Printable {
         for (size_t i = 0; i < coefficients.GetSize(); i++) coefficients.At(i) = tmp.At(i);
     }
     void Multiply(const T& scalar) {
-        if (MathLib::FloatsEqual<T>(scalar, 0)) coefficients = MathLib::MakeArrayFromSingle<T>(0);
+        if (MathLib::FloatsEqual<T>(scalar, 0)) coefficients = MathLib::MakeArray<T>(0);
         else for (T& x : coefficients) x *= scalar;
     }
 };
@@ -213,7 +213,7 @@ template <typename T>
         case MathLib::Node::Type::Mul: return left.HasValue() && right.HasValue() ? MathLib::Expected<Polynomial<T>>(left.Get() * right.Get()) : MathLib::Expected<Polynomial<T>>();
         case MathLib::Node::Type::Div: return left.HasValue() && right.HasValue() ? MathLib::Expected<Polynomial<T>>(left.Get() / right.Get()) : MathLib::Expected<Polynomial<T>>();
         case MathLib::Node::Type::Pow: return left.HasValue() && right.HasValue() && !right.Get().GetDegree() ? left.Get().UnsignedPow((size_t)right.Get().At(0)) : MathLib::Expected<Polynomial<T>>();
-        case MathLib::Node::Type::Constant: return MathLib::Expected<Polynomial<T>>(Polynomial<T>(MathLib::MakeArrayFromSingle<T>((T)node->ToNumber().At(0))));
+        case MathLib::Node::Type::Constant: return MathLib::Expected<Polynomial<T>>(Polynomial<T>(MathLib::MakeArray<T>((T)node->ToNumber().At(0))));
         case MathLib::Node::Type::Variable: {
             MathLib::Array<T> tmp = MathLib::Array<T>(2);
             tmp.At(1) = 1;

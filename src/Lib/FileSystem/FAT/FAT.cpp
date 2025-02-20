@@ -38,12 +38,10 @@ namespace MathLib {
         EndBenchmark
     }
     bool FAT::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(type != Type::None);
+        StartAndReturnFromBenchmark(type != Type::None);
     }
     size_t FAT::ClusterToSector(size_t cluster) const {
-        StartBenchmark
-        ReturnFromBenchmark((cluster - 2) * bootSector.sectorsPerCluster + dataSection);
+        StartAndReturnFromBenchmark((cluster - 2) * bootSector.sectorsPerCluster + dataSection);
     }
     uint32_t FAT::GetNextCluster(size_t cluster, size_t fat) const {
         StartBenchmark
@@ -151,17 +149,14 @@ namespace MathLib {
         ReturnFromBenchmark(true);
     }
     size_t FAT::Read(size_t file, void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.ReadPositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
+        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.ReadPositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
     }
     size_t FAT::Write(size_t file, const void* buffer, size_t size, size_t position) {
         // TODO: Resize file
-        StartBenchmark
-        ReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.WritePositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
+        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.WritePositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
     }
     size_t FAT::GetSize(size_t file) {
-        StartBenchmark
-        ReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? files.At(file).size : 0);
+        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? files.At(file).size : 0);
     }
     Array<FileInfo> FAT::ReadDirectory(const String& path) {
         StartBenchmark

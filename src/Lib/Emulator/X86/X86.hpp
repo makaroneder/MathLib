@@ -1,13 +1,14 @@
 #ifndef MathLib_Emulator_X86_H
 #define MathLib_Emulator_X86_H
-#include "../Emulator.hpp"
+#include "../StepEmulator.hpp"
 #include "X86Opcode.hpp"
 #include "X86State.hpp"
 
 namespace MathLib {
-    struct X86 : Emulator {
-        X86(const Array<uint8_t>& mem, const X86State& state);
-        [[nodiscard]] virtual bool Run(void) override;
+    struct X86 : StepEmulator, Printable {
+        X86(const Array<uint8_t>& memory, const X86State& state);
+        [[nodiscard]] virtual bool Step(void) override;
+        [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
@@ -16,7 +17,6 @@ namespace MathLib {
         private:
         X86State state;
 
-        [[nodiscard]] bool Step(void);
         void Interrupt(uint8_t index);
         void UpdateFlags(uint64_t val, uint64_t a, uint64_t b);
         [[nodiscard]] uint64_t ToLinear(uint64_t segment, uint64_t offset);

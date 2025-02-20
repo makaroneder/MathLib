@@ -3,7 +3,6 @@
 
 namespace MathLib {
     bool FATLongFileName::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(signature == expectedSignature);
+        StartAndReturnFromBenchmark(signature == expectedSignature);
     }
 }

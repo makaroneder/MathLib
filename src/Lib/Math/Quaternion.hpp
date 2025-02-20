@@ -27,14 +27,12 @@ namespace MathLib {
         /// @brief Returns scalar part of quaternion
         /// @return Scalar part of quaternion
         [[nodiscard]] T GetScalar(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(a);
+            StartAndReturnFromBenchmark(a);
         }
         /// @brief Returns vector part of quaternion
         /// @return Vector part of quaternion
         [[nodiscard]] Matrix<T> GetVector(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(CreateVector<T>(b, c, d));
+            StartAndReturnFromBenchmark(CreateVector<T>(b, c, d));
         }
         /// @brief Converts quaternion to string
         /// @param padding String to pad with
@@ -54,8 +52,7 @@ namespace MathLib {
         /// @param other Other quaternion
         /// @return New quaternion
         [[nodiscard]] Quaternion<T> operator*(const Quaternion<T>& other) const {
-            StartBenchmark
-            ReturnFromBenchmark(Quaternion<T>(
+            StartAndReturnFromBenchmark(Quaternion<T>(
                 a * other.a - b * other.b - c * other.c - d * other.d,
                 a * other.b + b * other.a + c * other.d - d * other.c,
                 a * other.c - b * other.d + c * other.a + d * other.b,
@@ -65,14 +62,12 @@ namespace MathLib {
         /// @brief |q|^2 = a^2 + b^2 + c^2 + d^2
         /// @return Squared norm of quaternion
         [[nodiscard]] T GetNormSquared(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(a * a + b * b + c * c + d * d);
+            StartAndReturnFromBenchmark(a * a + b * b + c * c + d * d);
         }
         /// @brief |q| = sqrt(a^2 + b^2 + c^2 + d^2)
         /// @return Norm of quaternion
         [[nodiscard]] T GetNorm(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(Sqrt(GetNormSquared()));
+            StartAndReturnFromBenchmark(Sqrt(GetNormSquared()));
         }
         /// @brief ln(q) = ln(|q|) + v / |v| * arccos(a / |q|)
         /// @return Logarithm of quaternion
@@ -171,8 +166,7 @@ namespace MathLib {
     /// @return Cross product of vector A and B
     template <typename T>
     [[nodiscard]] Matrix<T> CrossProduct(const Matrix<T>& a, const Matrix<T>& b) {
-        StartBenchmark
-        ReturnFromBenchmark((Quaternion<T>(0, a) * Quaternion<T>(0, b)).GetVector());
+        StartAndReturnFromBenchmark((Quaternion<T>(0, a) * Quaternion<T>(0, b)).GetVector());
     }
 }
 

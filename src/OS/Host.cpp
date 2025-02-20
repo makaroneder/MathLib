@@ -6,6 +6,9 @@
 #include <Math/Trigonometry.hpp>
 
 namespace MathLib {
+    const num_t nan = __builtin_nanl("");
+    const num_t infinity = __builtin_infl();
+
     complex_t ComplexExp(complex_t x) {
         complex_t term = complex_t(1, 0);
         complex_t sum = term;
@@ -24,11 +27,15 @@ namespace MathLib {
     num_t StringToNumber(String str) {
         size_t i = 0;
         num_t ret = 0;
-        while (i < str.GetSize() && str.At(i) != '.') ret = ret * 10 + (str.At(i++) - '0');
+        while (i < str.GetSize() && str.At(i) != '.') {
+            if (!IsDigit(str.At(i))) return nan;
+            ret = ret * 10 + (str.At(i++) - '0');
+        }
         if (i < str.GetSize() && str.At(i) == '.') {
             i++;
             size_t mult = 10;
             while (i < str.GetSize()) {
+                if (!IsDigit(str.At(i))) return nan;
                 ret += num_t(str.At(i++) - '0') / mult;
                 mult *= 10;
             }
@@ -64,19 +71,13 @@ namespace MathLib {
     void DeallocThread(Thread* thread) {
         (void)thread;
     }
-    num_t MakeNaN(void) {
-        return __builtin_nanl("");
-    }
-    num_t MakeInf(void) {
-        return __builtin_infl();
-    }
     uint32_t rand = 1;
     num_t RandomFloat(void) {
         rand = rand * 1103515245 + 12345;
         return (num_t)((rand / (UINT16_MAX + 1)) % ((UINT16_MAX + 1) / 2)) / ((UINT16_MAX + 1) / 2);
     }
     num_t Abs(complex_t x) {
-        return ArchSqrt(x.GetReal() * x.GetReal() + x.GetImaginary() * x.GetImaginary());
+        return ArchSqrt(x.GetLengthSquared());
     }
     complex_t Pow(complex_t x, complex_t y) {
         return FloatsEqual<num_t>(x.ToReal(), 0) ? complex_t(FloatsEqual<num_t>(y.ToReal(), 0), 0) : ComplexExp(y * NaturalLog(x));
@@ -88,7 +89,6 @@ namespace MathLib {
         return x != x;
     }
     bool IsInf(num_t x) {
-        const num_t infinity = MakeInf();
         return x == infinity || x == -infinity;
     }
     num_t Exp(num_t x) {

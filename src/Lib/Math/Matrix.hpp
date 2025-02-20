@@ -6,6 +6,7 @@
 #include "Exponential.hpp"
 #include "MathObject.hpp"
 #include "Factorial.hpp"
+#include "Interval.hpp"
 #include "../Host.hpp"
 
 namespace MathLib {
@@ -47,16 +48,13 @@ namespace MathLib {
             ReturnFromBenchmark(ret);
         }
         [[nodiscard]] size_t GetWidth(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(width);
+            StartAndReturnFromBenchmark(width);
         }
         [[nodiscard]] size_t GetHeight(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(height);
+            StartAndReturnFromBenchmark(height);
         }
         [[nodiscard]] Array<T> GetValue(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(ptr);
+            StartAndReturnFromBenchmark(ptr);
         }
         [[nodiscard]] Matrix<T> GetRow(size_t y) const {
             StartBenchmark
@@ -67,6 +65,83 @@ namespace MathLib {
         [[nodiscard]] bool IsSquare(void) const {
             StartBenchmark
             ReturnFromBenchmark(width == height);
+        }
+        [[nodiscard]] bool IsInside(const Matrix<Interval<T>>& interval) const {
+            StartBenchmark
+            if (GetWidth() != interval.GetWidth() || GetHeight() != interval.GetHeight()) ReturnFromBenchmark(false);
+            for (size_t y = 0; y < GetHeight(); y++)
+                for (size_t x = 0; x < GetHeight(); x++)
+                    if (!interval.At(x, y).Contains(At(x, y))) ReturnFromBenchmark(false);
+            ReturnFromBenchmark(true);
+        }
+        [[nodiscard]] bool Swap(const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) {
+            StartBenchmark
+            if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) ReturnFromBenchmark(false);
+            for (size_t y = 0; y < yInterval1.GetSize(); y++)
+                for (size_t x = 0; x < xInterval1.GetSize(); x++) MathLib::Swap<T>(At(x + xInterval1.GetMin(), y + yInterval1.GetMin()), At(x + xInterval2.GetMin(), y + yInterval2.GetMin()));
+            ReturnFromBenchmark(true);
+        }
+        [[nodiscard]] bool Add(const T& multiple, const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) {
+            StartBenchmark
+            if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) ReturnFromBenchmark(false);
+            for (size_t y = 0; y < yInterval1.GetSize(); y++)
+                for (size_t x = 0; x < xInterval1.GetSize(); x++) At(x + xInterval1.GetMin(), y + yInterval1.GetMin()) += At(x + xInterval2.GetMin(), y + yInterval2.GetMin()) * multiple;
+            ReturnFromBenchmark(true);
+        }
+        void Multiply(const T& multiple, const Interval<size_t>& xInterval, const Interval<size_t>& yInterval) {
+            StartBenchmark
+            for (size_t y = yInterval.GetMin(); y < yInterval.GetMax(); y++)
+                for (size_t x = xInterval.GetMin(); x < xInterval.GetMax(); x++) At(x, y) *= multiple;
+            EndBenchmark;
+        }
+        [[nodiscard]] bool Insert(const Matrix<T>& other, const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) {
+            StartBenchmark
+            if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) ReturnFromBenchmark(false);
+            for (size_t y = 0; y < yInterval1.GetSize(); y++)
+                for (size_t x = 0; x < xInterval1.GetSize(); x++) At(x + xInterval1.GetMin(), y + yInterval1.GetMin()) = other.At(x + xInterval2.GetMin(), y + yInterval2.GetMin());
+            ReturnFromBenchmark(true);
+        }
+        [[nodiscard]] bool IsFilledWith(const T& value, const Interval<size_t>& xInterval, const Interval<size_t>& yInterval) const {
+            StartBenchmark
+            for (size_t y = yInterval.GetMin(); y < yInterval.GetMax(); y++)
+                for (size_t x = xInterval.GetMin(); x < xInterval.GetMax(); x++)
+                    if (!MathLib::FloatsEqual<T>(At(x, y), value)) ReturnFromBenchmark(false);
+            ReturnFromBenchmark(true);
+        }
+        /// @brief Checks whether the matrix is multiple of another matrix
+        /// @param other Another matrix
+        /// @return Check status
+        [[nodiscard]] bool IsMultipleOf(const Matrix<T>& other, const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) const {
+            StartBenchmark
+            if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) ReturnFromBenchmark(false);
+            T prev = 0;
+            for (size_t y = 0; y < yInterval1.GetSize(); y++) {
+                for (size_t x = 0; x < xInterval1.GetSize(); x++) {
+                    const T v1 = At(x + xInterval1.GetMin(), y + yInterval1.GetMin());
+                    const T v2 = other.At(x + xInterval2.GetMin(), y + yInterval2.GetMin());
+                    if (FloatsEqual<T>(v1, 0) && FloatsEqual<T>(v2, 0)) continue;
+                    const T div = v1 / v2;
+                    if (FloatsEqual<T>(prev, 0)) prev = div;
+                    if (!FloatsEqual<T>(prev, div)) ReturnFromBenchmark(false);
+                }
+            }
+            ReturnFromBenchmark(true);
+        }
+        [[nodiscard]] bool IsMultipleOf(const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) const {
+            StartBenchmark
+            if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) ReturnFromBenchmark(false);
+            T prev = 0;
+            for (size_t y = 0; y < yInterval1.GetSize(); y++) {
+                for (size_t x = 0; x < xInterval1.GetSize(); x++) {
+                    const T v1 = At(xInterval1.GetMin() + x, yInterval1.GetMin() + y);
+                    const T v2 = At(xInterval2.GetMin() + x, yInterval2.GetMin() + y);
+                    if (FloatsEqual<T>(v1, 0) && FloatsEqual<T>(v2, 0)) continue;
+                    const T div = v1 / v2;
+                    if (FloatsEqual<T>(prev, 0)) prev = div;
+                    if (!FloatsEqual<T>(prev, div)) ReturnFromBenchmark(false);
+                }
+            }
+            ReturnFromBenchmark(true);
         }
         void Fill(const T& v) {
             StartBenchmark
@@ -83,42 +158,43 @@ namespace MathLib {
         /// @param y Y position
         /// @return Data at specified position
         [[nodiscard]] T& At(size_t x, size_t y) {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.At(y * width + x));
+            StartAndReturnFromBenchmark(ptr.At(y * width + x));
         }
         /// @brief Returns data at specified position
         /// @param x X position
         /// @param y Y position
         /// @return Data at specified position
         [[nodiscard]] T At(size_t x, size_t y) const {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.At(y * width + x));
+            StartAndReturnFromBenchmark(ptr.At(y * width + x));
+        }
+        [[nodiscard]] T GetSum(void) const {
+            T ret = 0;
+            for (const T& val : ptr) ret += val;
+            return ret;
         }
         [[nodiscard]] Expected<Matrix<T>> HadamardProduct(const Matrix<T>& other) const {
-            if (width != other.GetWidth() || height != other.GetHeight()) return Expected<Matrix<T>>();
+            StartBenchmark
+            if (width != other.GetWidth() || height != other.GetHeight()) ReturnFromBenchmark(Expected<Matrix<T>>());
             Matrix<T> ret = *this;
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) ret.At(x, y) *= other.At(x, y);
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         /// @brief a = (a . b) / (|a| * |b|)
         /// @param other Other matrix
         /// @return Angle between 2 matrices
         [[nodiscard]] T GetAngle(const Matrix<T>& other) const {
-            StartBenchmark
-            ReturnFromBenchmark(Dot(other) / (GetLength() * other.GetLength()));
+            StartAndReturnFromBenchmark(Dot(other) / (GetLength() * other.GetLength()));
         }
         /// @brief |a|^2 = a . a
         /// @return Squared length of the vector
         [[nodiscard]] T GetLengthSquared(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(Dot(*this));
+            StartAndReturnFromBenchmark(Dot(*this));
         }
         /// @brief |a| = sqrt(a . a)
         /// @return Length of the vector
         [[nodiscard]] T GetLength(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(Sqrt(GetLengthSquared()));
+            StartAndReturnFromBenchmark(Sqrt(GetLengthSquared()));
         }
         /// @brief ^a = a / |a|
         /// @return Normalized matrix
@@ -132,7 +208,7 @@ namespace MathLib {
         /// @return Dot product of 2 vectors
         [[nodiscard]] T Dot(const Matrix<T>& other) const {
             StartBenchmark
-            if (other.width != width || other.height != height) ReturnFromBenchmark(MakeNaN());
+            if (other.width != width || other.height != height) ReturnFromBenchmark(nan);
             T ret = 0;
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) ret += At(x, y) * other.At(x, y);
@@ -185,28 +261,11 @@ namespace MathLib {
             const Expected<Matrix<T>> tmp = Log();
             ReturnFromBenchmark(tmp.HasValue() ? (tmp.Get() * n).Exponential() : Expected<Matrix<T>>());
         }
-        /// @brief Checks whether the matrix is multiple of another matrix
-        /// @param other Another matrix
-        /// @return Check status
-        [[nodiscard]] bool IsMultipleOf(const Matrix<T>& other) const {
-            StartBenchmark
-            if (other.width != width || other.height != height) ReturnFromBenchmark(false);
-            T prev = 0;
-            for (size_t y = 0; y < height; y++) {
-                for (size_t x = 0; x < width; x++) {
-                    if (FloatsEqual<T>(At(x, y), 0) && FloatsEqual<T>(other.At(x, y), 0)) continue;
-                    const T div = At(x, y) / other.At(x, y);
-                    if (FloatsEqual<T>(prev, 0)) prev = div;
-                    if (!FloatsEqual<T>(prev, div)) ReturnFromBenchmark(false);
-                }
-            }
-            ReturnFromBenchmark(true);
-        }
         /// @brief Returns determinant of the matrix
         /// @return Determinant of the matrix
         [[nodiscard]] T GetDeterminant(void) const {
             StartBenchmark
-            if (!IsSquare()) ReturnFromBenchmark(MakeNaN())
+            if (!IsSquare()) ReturnFromBenchmark(nan)
             else if (!width) ReturnFromBenchmark(1)
             else if (width == 1) ReturnFromBenchmark(At(0, 0))
             else if (width == 2) ReturnFromBenchmark(At(0, 0) * At(1, 1) - At(0, 1) * At(1, 0))
@@ -340,20 +399,16 @@ namespace MathLib {
             ReturnFromBenchmark(true);
         }
         [[nodiscard]] virtual Iterator<const T> begin(void) const override {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.begin());
+            StartAndReturnFromBenchmark(ptr.begin());
         }
         [[nodiscard]] virtual Iterator<const T> end(void) const override {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.end());
+            StartAndReturnFromBenchmark(ptr.end());
         }
         [[nodiscard]] virtual Iterator<T> begin(void) override {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.begin());
+            StartAndReturnFromBenchmark(ptr.begin());
         }
         [[nodiscard]] virtual Iterator<T> end(void) override {
-            StartBenchmark
-            ReturnFromBenchmark(ptr.end());
+            StartAndReturnFromBenchmark(ptr.end());
         }
 
         private:

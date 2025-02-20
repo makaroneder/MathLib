@@ -11,8 +11,7 @@ namespace MathLib {
         EmptyBenchmark
     }
     size_t Bitmap::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(array.GetSize() * 8);
+        StartAndReturnFromBenchmark(array.GetSize() * 8);
     }
     Expected<bool> Bitmap::Get(size_t i) const {
         StartBenchmark

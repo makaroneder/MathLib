@@ -9,8 +9,7 @@
 
 namespace MathLib {
     bool Test::ReportRecord(const Record& record) {
-        StartBenchmark
-        ReturnFromBenchmark(records.Add(record));
+        StartAndReturnFromBenchmark(records.Add(record));
     }
     bool Test::Passed(void) const {
         StartBenchmark
@@ -31,14 +30,17 @@ namespace MathLib {
     Test TestSelf(void) {
         StartBenchmark
         Test test;
-        TestOperation(test, IsNaN(MakeNaN()));
-        TestOperation(test, IsInf(MakeInf()));
-        TestOperation(test, IsNaN(complex_t(MakeNaN(), 0)));
-        TestOperation(test, IsInf(complex_t(MakeInf(), 0)));
-        TestOperation(test, IsNaN(complex_t(0, MakeNaN())));
-        TestOperation(test, IsInf(complex_t(0, MakeInf())));
-        TestOperation(test, IsNaN(complex_t(MakeNaN(), MakeNaN())));
-        TestOperation(test, IsInf(complex_t(MakeInf(), MakeInf())));
+        TestOperation(test, IsNaN(nan));
+        TestOperation(test, IsInf(infinity));
+        TestOperation(test, IsInf(-infinity));
+        TestOperation(test, IsNaN(complex_t(nan, 0)));
+        TestOperation(test, IsInf(complex_t(infinity, 0)));
+        TestOperation(test, IsInf(complex_t(-infinity, 0)));
+        TestOperation(test, IsNaN(complex_t(0, nan)));
+        TestOperation(test, IsInf(complex_t(0, infinity)));
+        TestOperation(test, IsInf(complex_t(0, -infinity)));
+        TestOperation(test, IsNaN(complex_t(nan, nan)));
+        TestOperation(test, IsInf(complex_t(infinity, infinity)));
         TestOperation(test, FloatsEqual<num_t>(1, 1));
         TestOperation(test, FloatsEqual<num_t>(StringToNumber("2.71"), 2.71));
         TestOperation(test, ToString(2.71).Contains(String("2.71")));
@@ -174,7 +176,7 @@ namespace MathLib {
         TestOperation(test, FloatsEqual<num_t>(Sign<num_t>(1), 1));
         TestOperation(test, FloatsEqual<num_t>(Sign<num_t>(-1), -1));
         TestOperation(test, FloatsEqual<num_t>(Sign<num_t>(0), 0));
-        TestOperation(test, MakeArrayFromSingle<size_t>(SIZE_MAX).At(0) == SIZE_MAX);
+        TestOperation(test, MakeArray<size_t>(SIZE_MAX).At(0) == SIZE_MAX);
         TestOperation(test, BitReverse<uint8_t>(0b11111100) == 0b00111111);
         TestOperation(test, IsBetween(1, 0, 2));
         TestOperation(test, !IsBetween(3, 0, 2));
@@ -189,10 +191,10 @@ namespace MathLib {
         TestOperation(test, Interval<size_t>(1, 3).Clamp(4) == 3);
         TestOperation(test, Kilometre<num_t>(1) == Metre<num_t>(1000));
         TestOperation(test, (Second<num_t>(1) * Second<num_t>(1)) == Second<num_t>(1).Pow(2));
-        TestOperation(test, FloatsEqual<num_t>(matrix_t(1, 1, MakeArrayFromSingle<num_t>(2)).Normalize().GetLength(), 1));
-        TestOperation(test, !matrix_t(1, 1, MakeArrayFromSingle<num_t>(0)).Normalize().GetLength());
-        TestOperation(test, !matrix_t(1, 1, MakeArrayFromSingle<num_t>(0)).GetInverse().HasValue());
-        TestOperation(test, matrix_t(1, 1, MakeArrayFromSingle<num_t>(1)).GetInverse().HasValue());
+        TestOperation(test, FloatsEqual<num_t>(matrix_t(1, 1, MakeArray<num_t>(2)).Normalize().GetLength(), 1));
+        TestOperation(test, !matrix_t(1, 1, MakeArray<num_t>(0)).Normalize().GetLength());
+        TestOperation(test, !matrix_t(1, 1, MakeArray<num_t>(0)).GetInverse().HasValue());
+        TestOperation(test, matrix_t(1, 1, MakeArray<num_t>(1)).GetInverse().HasValue());
         ReturnFromBenchmark(test);
     }
 }

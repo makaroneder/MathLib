@@ -66,11 +66,9 @@ namespace MathLib {
         ReturnFromBenchmark(ret);
     }
     String Cipher::EncryptString(const String& str, const String& key) const {
-        StartBenchmark
-        ReturnFromBenchmark(GetString(str, key, true));
+        StartAndReturnFromBenchmark(GetString(str, key, true));
     }
     String Cipher::DecryptString(const String& str, const String& key) const {
-        StartBenchmark
-        ReturnFromBenchmark(GetString(str, key, false));
+        StartAndReturnFromBenchmark(GetString(str, key, false));
     }
 }

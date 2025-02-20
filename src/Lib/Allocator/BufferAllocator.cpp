@@ -21,11 +21,9 @@ namespace MathLib {
         EndBenchmark
     }
     void* BufferAllocator::GetBuffer(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(buffer);
+        StartAndReturnFromBenchmark(buffer);
     }
     size_t BufferAllocator::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(size);
+        StartAndReturnFromBenchmark(size);
     }
 }

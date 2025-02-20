@@ -40,7 +40,7 @@ namespace MathLib {
     template <typename T>
     [[nodiscard]] Matrix<T> ProjectVector(const Matrix<T>& point, const T& fov = -10) {
         StartBenchmark
-        if (point.At(point.GetWidth() - 1, 0) <= (1 + fov)) ReturnFromBenchmark(CreateVector<T>(MakeNaN(), MakeNaN(), MakeNaN()));
+        if (point.At(point.GetWidth() - 1, 0) <= (1 + fov)) ReturnFromBenchmark(CreateVector<T>(nan, nan, nan));
         Array<T> arr = Array<T>(point.GetWidth() - 1);
         for (size_t i = 0; i < arr.GetSize(); i++) arr.At(i) = point.At(i, 0);
         ReturnFromBenchmark(Matrix<T>(point.GetWidth() - 1, 1, arr) / (1 - point.At(point.GetWidth() - 1, 0) / fov));
@@ -53,15 +53,14 @@ namespace MathLib {
     template <typename T>
     [[nodiscard]] Matrix<T> ConvertVectorDimension(const Matrix<T>& point, size_t dimension, const T& fov = -10) {
         StartBenchmark
-        if (point.GetWidth() < dimension) ReturnFromBenchmark(CreateVector<T>(MakeNaN(), MakeNaN(), MakeNaN()));
+        if (point.GetWidth() < dimension) ReturnFromBenchmark(CreateVector<T>(nan, nan, nan));
         Matrix<T> pos = point;
         while (pos.GetWidth() != dimension) pos = ProjectVector<T>(pos, fov);
         ReturnFromBenchmark(pos);
     }
     template <typename T>
     [[nodiscard]] Matrix<T> Reflect(const Matrix<T>& v, const Matrix<T>& n) {
-        StartBenchmark
-        ReturnFromBenchmark(v - n * v.Dot(n) * 2);
+        StartAndReturnFromBenchmark(v - n * v.Dot(n) * 2);
     }
     template <typename T>
     [[nodiscard]] Matrix<T> Refract(const Matrix<T>& uv, const Matrix<T>& n, const T& t) {

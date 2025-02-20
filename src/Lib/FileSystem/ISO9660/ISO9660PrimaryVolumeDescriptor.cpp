@@ -2,8 +2,7 @@
 
 namespace MathLib {
     bool ISO9660PrimaryVolumeDescriptor::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark (
+        StartAndReturnFromBenchmark (
             ISO9660VolumeDescriptor::IsValid() &&
             type == Type::PrimaryVolumeDescriptor &&
             bytesPerSector.little == 2048 &&

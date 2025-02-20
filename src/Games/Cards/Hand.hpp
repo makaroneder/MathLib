@@ -27,7 +27,7 @@ struct Hand : MathLib::Printable {
         for (const CardIndex& card : cards) ret += card.ToString(padding + '\t') + '\n';
         return ret + padding + '}';
     }
-    [[nodiscard]] bool ShouldSwap(size_t i) {
+    [[nodiscard]] bool ShouldSwap(size_t i) const {
         return cards.At(i).selected;
     }
     [[nodiscard]] CardIndex Swap(const CardIndex& card, size_t i) {

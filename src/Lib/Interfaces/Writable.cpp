@@ -2,12 +2,10 @@
 
 namespace MathLib {
     bool Writable::WriteBuffer(const void* buffer, size_t size) {
-        StartBenchmark
-        ReturnFromBenchmark(WriteSizedBuffer(buffer, size) == size);
+        StartAndReturnFromBenchmark(WriteSizedBuffer(buffer, size) == size);
     }
     bool Writable::Puts(const String& str) {
-        StartBenchmark
-        ReturnFromBenchmark(WriteBuffer(str.GetValue(), str.GetSize()));
+        StartAndReturnFromBenchmark(WriteBuffer(str.GetValue(), str.GetSize()));
     }
     bool Writable::Puts(const char* str) {
         StartBenchmark

@@ -39,11 +39,11 @@ int main(int argc, char** argv) {
                 if (!domain.Add(MathLib::complex_t(x, 0))) MathLib::Panic("Failed to add point to domain");
             func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([funcNode, optimizer](MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
-                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(z.GetReal()), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
+                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(z.GetReal()), true))) return MathLib::complex_t(MathLib::nan, MathLib::nan);
                 MathLib::Node* n = tmp.Optimize(funcNode.body);
                 const MathLib::Array<MathLib::complex_t> complexRet = n->ToNumber();
                 delete n;
-                return MathLib::complex_t(z.GetReal(), (complexRet.GetSize() != 1 || complexRet.At(0).GetImaginary() != 0) ? MathLib::MakeNaN() : complexRet.At(0).GetReal());
+                return MathLib::complex_t(z.GetReal(), (complexRet.GetSize() != 1 || complexRet.At(0).GetImaginary() != 0) ? MathLib::nan : complexRet.At(0).GetReal());
             });
         }
         else if (funcNode.dataType == "C") {
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
             }
             func = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([funcNode, optimizer](MathLib::complex_t z) -> MathLib::complex_t {
                 MathLib::Optimizer tmp = optimizer;
-                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true))) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
+                if (!tmp.variables.Add(MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true))) return MathLib::complex_t(MathLib::nan, MathLib::nan);
                 MathLib::Node* n = tmp.Optimize(funcNode.body);
                 const MathLib::complex_t ret = n->ToNumber().At(0);
                 delete n;

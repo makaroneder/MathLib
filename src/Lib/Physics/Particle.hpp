@@ -10,12 +10,10 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] Matrix<T> GetPreviousPosition(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(prevPosition);
+            StartAndReturnFromBenchmark(prevPosition);
         }
         [[nodiscard]] bool IsFixed(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(fixed);
+            StartAndReturnFromBenchmark(fixed);
         }
         virtual void Update(const Second<T>& dt) {
             StartBenchmark
@@ -33,12 +31,10 @@ namespace MathLib {
             EndBenchmark
         }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>&) const override {
-            StartBenchmark
-            ReturnFromBenchmark(MakeArrayFromSingle<Line<T>>(Line<T>(prevPosition, this->position)));
+            StartAndReturnFromBenchmark(MakeArray<Line<T>>(Line<T>(prevPosition, this->position)));
         }
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const override {
-            StartBenchmark
-            ReturnFromBenchmark(this->position == ((const Particle<T>&)other).position);
+            StartAndReturnFromBenchmark(this->position == ((const Particle<T>&)other).position);
         }
         Matrix<T> prevPosition;
 

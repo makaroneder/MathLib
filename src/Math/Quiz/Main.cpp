@@ -17,13 +17,13 @@ int main(int argc, char** argv) {
         bool running = true;
         for (int i = 1; i < argc && running; i++) {
             const Question question = Question(MathLib::Preproces(fs, argv[i]));
-            std::cout << question.equation;
+            std::cout << question;
             for (size_t j = 0; j < retryCount && running; j++) {
                 std::cout << "> ";
                 std::string tmp;
                 std::cin >> tmp;
                 if (tmp == "exit") running = false;
-                else if (MathLib::FloatsEqual<MathLib::num_t>(MathLib::StringToNumber(tmp), question.solution, 0.01)) {
+                else if (question.IsSolution(MathLib::StringToNumber(tmp), 0.01)) {
                     solved++;
                     break;
                 }

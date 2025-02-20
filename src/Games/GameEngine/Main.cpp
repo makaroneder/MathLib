@@ -15,12 +15,12 @@
 #include <iostream>
 
 MathLib::String path;
-MathLib::Node* Log(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+MathLib::Node* Log(const void*, const MathLib::Collection<const MathLib::Node*>& args) {
     for (const MathLib::Node* const& arg : args) std::cout << arg->value << std::endl;
     return nullptr;
 }
 MathLib::Event event;
-MathLib::Node* GetEventData(const void*, const MathLib::Array<const MathLib::Node*>& args) {
+MathLib::Node* GetEventData(const void*, const MathLib::Collection<const MathLib::Node*>& args) {
     if (args.GetSize() != 1 || args.At(0)->type != MathLib::Node::Type::String) return nullptr;
     const MathLib::String name = args.At(0)->value;
     if (name == "type") return new MathLib::Node(MathLib::Node::Type::Constant, MathLib::ToString((size_t)event.type, 10));
@@ -32,7 +32,7 @@ MathLib::Node* GetEventData(const void*, const MathLib::Array<const MathLib::Nod
     else return nullptr;
 }
 MathLib::Array<MathLib::Image> images;
-MathLib::Node* LoadImage(const void* data, const MathLib::Array<const MathLib::Node*>& args) {
+MathLib::Node* LoadImage(const void* data, const MathLib::Collection<const MathLib::Node*>& args) {
     if (args.GetSize() != 2 || args.At(0)->type != MathLib::Node::Type::String || args.At(1)->type != MathLib::Node::Type::String) return nullptr;
     const MathLib::String type = args.At(0)->value;
     const MathLib::String name = path + args.At(1)->value;
@@ -51,7 +51,7 @@ MathLib::Node* LoadImage(const void* data, const MathLib::Array<const MathLib::N
     }
     else return nullptr;
 }
-MathLib::Node* DrawImage(const void* data, const MathLib::Array<const MathLib::Node*>& args) {
+MathLib::Node* DrawImage(const void* data, const MathLib::Collection<const MathLib::Node*>& args) {
     if (args.GetSize() != 4) return nullptr;
     MathLib::num_t arg[4];
     for (size_t i = 0; i < 4; i++) {
@@ -62,12 +62,12 @@ MathLib::Node* DrawImage(const void* data, const MathLib::Array<const MathLib::N
     renderer.DrawImage<MathLib::num_t>(images.At(arg[0]), MathLib::CreateVector<MathLib::num_t>(arg[1], arg[2], arg[3]));
     return nullptr;
 }
-MathLib::Optimizer baseOptimizer = MathLib::Optimizer(std::vector<MathLib::BuiltinFunction> {
-    MathLib::BuiltinFunction("Log", MathLib::FunctionPointer<MathLib::Node*, const MathLib::Array<const MathLib::Node*>&>(nullptr, &Log)),
-    MathLib::BuiltinFunction("GetEventData", MathLib::FunctionPointer<MathLib::Node*, const MathLib::Array<const MathLib::Node*>&>(nullptr, &GetEventData)),
-    MathLib::BuiltinFunction("LoadImage", MathLib::FunctionPointer<MathLib::Node*, const MathLib::Array<const MathLib::Node*>&>(nullptr, &LoadImage)),
-    MathLib::BuiltinFunction("DrawImage", MathLib::FunctionPointer<MathLib::Node*, const MathLib::Array<const MathLib::Node*>&>(nullptr, &DrawImage)),
-}, std::vector<MathLib::FunctionNode> {}, std::vector<MathLib::Variable> {
+MathLib::Optimizer baseOptimizer = MathLib::Optimizer(MathLib::MakeArray<MathLib::BuiltinFunction>(
+    MathLib::BuiltinFunction("Log", MathLib::BuiltinFunctionPointer(nullptr, &Log)),
+    MathLib::BuiltinFunction("GetEventData", MathLib::BuiltinFunctionPointer(nullptr, &GetEventData)),
+    MathLib::BuiltinFunction("LoadImage", MathLib::BuiltinFunctionPointer(nullptr, &LoadImage)),
+    MathLib::BuiltinFunction("DrawImage", MathLib::BuiltinFunctionPointer(nullptr, &DrawImage))
+), MathLib::Array<MathLib::FunctionNode>(), MathLib::MakeArray<MathLib::Variable>(
     MathLib::Variable("noneEvent", "EventType", MathLib::ToString((size_t)MathLib::Event::Type::None, 10), true),
     MathLib::Variable("quitEvent", "EventType", MathLib::ToString((size_t)MathLib::Event::Type::Quit, 10), true),
     MathLib::Variable("keyPressedEvent", "EventType", MathLib::ToString((size_t)MathLib::Event::Type::KeyPressed, 10), true),
@@ -77,8 +77,8 @@ MathLib::Optimizer baseOptimizer = MathLib::Optimizer(std::vector<MathLib::Built
     MathLib::Variable("middleButton", "MouseButton", MathLib::ToString((size_t)MathLib::Event::MouseButton::Middle, 10), true),
     MathLib::Variable("rightButton", "MouseButton", MathLib::ToString((size_t)MathLib::Event::MouseButton::Right, 10), true),
     MathLib::Variable("button4", "MouseButton", MathLib::ToString((size_t)MathLib::Event::MouseButton::Button4, 10), true),
-    MathLib::Variable("button5", "MouseButton", MathLib::ToString((size_t)MathLib::Event::MouseButton::Button5, 10), true),
-});
+    MathLib::Variable("button5", "MouseButton", MathLib::ToString((size_t)MathLib::Event::MouseButton::Button5, 10), true)
+));
 void OnStatus(MathLib::Node* status) {
     if (status->type != MathLib::Node::Type::Constant) MathLib::Panic("Invalid status type");
     if (!status->ToNumber().At(0).ToReal()) MathLib::Panic("Error detected");

@@ -1,32 +1,36 @@
 #ifndef MathLib_Math_Set_H
 #define MathLib_Math_Set_H
 #include "../Expected.hpp"
+#include "Orderable.hpp"
 
 namespace MathLib {
     template <typename T>
-    struct Set : Printable {
+    struct Set : Orderable, Iteratable<T>, Printable {
+        template <typename F>
+        friend struct Set;
+
         Set(void) {}
         Set(const Array<T>& data) : data(data) {}
-        size_t GetSize(void) const {
+        [[nodiscard]] size_t GetSize(void) const {
             return data.GetSize();
         }
-        bool Contains(const T& x) const {
+        [[nodiscard]] bool Contains(const T& x) const {
             return data.Contains(x);
         }
-        Array<T> GetData(void) const {
+        [[nodiscard]] Array<T> GetData(void) const {
             return data;
         }
-        Expected<Set<T>> Negate(const Set<T>& universalSet) const {
+        [[nodiscard]] Expected<Set<T>> Negate(const Set<T>& universalSet) const {
             return universalSet - *this;
         }
-        Expected<Set<Set<T>>> PowerSet(void) const {
-            if (!data.GetSize()) return Expected<Set<Set<T>>>(Set<Set<T>>(MakeArrayFromSingle<Set<T>>(Set<T>())));
+        [[nodiscard]] Expected<Set<Set<T>>> PowerSet(void) const {
+            if (!data.GetSize()) return Expected<Set<Set<T>>>(Set<Set<T>>(MakeArray<Set<T>>(Set<T>())));
             else {
                 Array<T> tmp = Array<T>(data.GetSize() - 1);
                 for (size_t i = 0; i < tmp.GetSize(); i++) tmp.At(i) = data.At(i);
                 const Expected<Set<Set<T>>> pow = Set<T>(tmp).PowerSet();
                 if (!pow.HasValue()) return Expected<Set<Set<T>>>();
-                const Set<T> rest = Set<T>(MakeArrayFromSingle<T>(data.At(data.GetSize() - 1)));
+                const Set<T> rest = Set<T>(MakeArray<T>(data.At(data.GetSize() - 1)));
                 Array<Set<T>> ret = pow.Get().GetData();
                 const Array<Set<T>> powArr = pow.Get().GetData();
                 for (size_t i = 0; i < powArr.GetSize(); i++) {
@@ -36,13 +40,13 @@ namespace MathLib {
                 return Set<Set<T>>(ret);
             }
         }
-        Expected<Set<T>> SymetricDifference(const Set<T>& other) const {
+        [[nodiscard]] Expected<Set<T>> SymetricDifference(const Set<T>& other) const {
             const Expected<Set<T>> tmp1 = *this + other;
             if (!tmp1.HasValue()) return Expected<Set<T>>();
             const Expected<Set<T>> tmp2 = *this * other;
             return tmp2.HasValue() ? tmp1.Get() - tmp2.Get() : Expected<Set<T>>();
         }
-        Expected<Set<Array<T>>> CartesianProduct(const Set<T>& other) const {
+        [[nodiscard]] Expected<Set<Array<T>>> CartesianProduct(const Set<T>& other) const {
             Set<Array<T>> ret;
             for (const T& x : data) {
                 Array<T> tmp = Array<T>(2);
@@ -54,25 +58,33 @@ namespace MathLib {
             }
             return ret;
         }
-        bool operator==(const Set<T>& other) const {
-            if (data.GetSize() != other.GetSize()) return false;
-            for (size_t i = 0; i < data.GetSize(); i++)
-                if (!other.Contains(data.At(i))) return false;
-            return true;
+        [[nodiscard]] Expected<Set<Array<T>>> CartesianProduct(const Array<Set<T>>& others) const {
+            if (others.IsEmpty()) return Expected<Set<Array<T>>>(Set<Array<T>>());
+            Set<Array<T>> ret;
+            const Expected<Set<Array<T>>> tmp = CartesianProduct(others.At(0));
+            if (!tmp.HasValue()) return Expected<Set<Array<T>>>();
+            ret = tmp.Get();
+            for (size_t i = 1; i < others.GetSize(); i++) {
+                Array<Array<T>> data = ret.GetData();
+                for (Array<T>& x : data)
+                    if (!x.Add(others.At(i))) return Expected<Set<Array<T>>>();
+                ret = Set<Array<T>>(data);        
+            }
+            return ret;
         }
-        Expected<Set<T>> operator+(const Set<T>& other) const {
+        [[nodiscard]] Expected<Set<T>> operator+(const Set<T>& other) const {
             Set<T> ret = *this;
             for (const T& x : other.data)
                 if (!ret.data.Contains(x) && !ret.data.Add(x)) return Expected<Set<T>>();
             return Expected<Set<T>>(ret);
         }
-        Expected<Set<T>> operator-(const Set<T>& other) const {
+        [[nodiscard]] Expected<Set<T>> operator-(const Set<T>& other) const {
             Set<T> ret;
             for (const T& x : data)
                 if (!other.data.Contains(x) && !ret.data.Add(x)) return Expected<Set<T>>();
             return Expected<Set<T>>(ret);
         }
-        Expected<Set<T>> operator*(const Set<T>& other) const {
+        [[nodiscard]] Expected<Set<T>> operator*(const Set<T>& other) const {
             Set<T> ret;
             for (const T& x : data)
                 if (other.data.Contains(x) && !ret.data.Add(x)) return Expected<Set<T>>();
@@ -82,10 +94,27 @@ namespace MathLib {
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const String& padding = "") const override {
-            String ret = padding + '{';
-            const size_t size = data.GetSize();
-            for (size_t i = 0; i < size; i++) ret += ToString(data.At(i)) + (((i + 1) == size) ? "" : ", ");
-            return ret + '}';
+            return padding + MathLib::ToString<T>(data);
+        }
+        [[nodiscard]] virtual Iterator<const T> begin(void) const override {
+            return data.begin();
+        }
+        [[nodiscard]] virtual Iterator<const T> end(void) const override {
+            return data.end();
+        }
+        [[nodiscard]] virtual Iterator<T> begin(void) override {
+            return data.begin();
+        }
+        [[nodiscard]] virtual Iterator<T> end(void) override {
+            return data.end();
+        }
+
+        protected:
+        [[nodiscard]] virtual bool LessThanEqual(const Orderable& other_) const override {
+            const Set<T>& other = (const Set<T>&)other_;
+            for (const T& x : data)
+                if (!other.Contains(x)) return false;
+            return true;
         }
 
         private:

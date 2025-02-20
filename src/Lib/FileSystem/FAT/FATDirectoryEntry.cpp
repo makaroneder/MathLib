@@ -4,8 +4,7 @@
 
 namespace MathLib {
     bool FATDirectoryEntry::IsLongFileName(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(readOnly && hidden && system && volumeID && directory && archive);
+        StartAndReturnFromBenchmark(readOnly && hidden && system && volumeID && directory && archive);
     }
     String FATDirectoryEntry::GetName(void) const {
         StartBenchmark

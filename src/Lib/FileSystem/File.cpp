@@ -15,15 +15,12 @@ namespace MathLib {
         return index != SIZE_MAX;
     }
     size_t File::ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.Read(index, buffer, size, position));
+        StartAndReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.Read(index, buffer, size, position));
     }
     size_t File::WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.Write(index, buffer, size, position));
+        StartAndReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.Write(index, buffer, size, position));
     }
     size_t File::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.GetSize(index));
+        StartAndReturnFromBenchmark(index == SIZE_MAX ? 0 : fileSystem.GetSize(index));
     }
 }

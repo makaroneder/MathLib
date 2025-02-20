@@ -17,8 +17,11 @@ namespace MathLib {
             else ReturnFromBenchmark(value);
         }
         [[nodiscard]] bool HasValue(void) const {
-            StartBenchmark
-            ReturnFromBenchmark(!error);
+            StartAndReturnFromBenchmark(!error);
+        }
+        template <typename F>
+        [[nodiscard]] Expected<F> Convert(void) const {
+            return HasValue() ? Expected<F>((F)value) : Expected<F>();
         }
 
         private:
@@ -27,8 +30,7 @@ namespace MathLib {
     };
     template <typename T>
     [[nodiscard]] String ToString(const Expected<T>& expected) {
-        StartBenchmark
-        ReturnFromBenchmark(expected.HasValue() ? MathLib::ToString(expected.Get()) : "No value");
+        StartAndReturnFromBenchmark(expected.HasValue() ? MathLib::ToString(expected.Get()) : "No value");
     }
 }
 

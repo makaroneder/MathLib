@@ -1,11 +1,12 @@
 #ifdef __x86_64__
 #ifndef FADT_H
 #define FADT_H
+#include "FACS.hpp"
 #include "../CMOS.hpp"
-#include "ACPITable.hpp"
 #include "GenericAddressStructure.hpp"
+#include <ACPI/DSDT.hpp>
 
-struct FADT : ACPITable {
+struct FADT : MathLib::ACPITable {
     static constexpr const char* expectedSignature = "FACP";
     enum class PreferredPowerManagementProfile : uint8_t {
         Unspecified = 0,
@@ -54,6 +55,9 @@ struct FADT : ACPITable {
     uint8_t monthAlarm;
     CMOS::Register rtcCenturyRegister;
     uint16_t bootArchitectureFlags;
+
+    FACS* GetFACS(void);
+    MathLib::DSDT* GetDSDT(void);
 } __attribute__((packed));
 struct FADT2 : FADT {
     uint8_t reserved1;
@@ -71,6 +75,9 @@ struct FADT2 : FADT {
     GenericAddressStructure pmTimerBlock2;
     GenericAddressStructure gpe0Block2;
     GenericAddressStructure gpe1Block2;
+
+    FACS* GetFACS(void);
+    MathLib::DSDT* GetDSDT(void);
 } __attribute__((packed));
 
 #endif

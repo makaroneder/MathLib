@@ -10,8 +10,7 @@ namespace MathLib {
     /// @return Logarithm of specified base and number
     template <typename T>
     [[nodiscard]] T Log(const T& b, const T& x) {
-        StartBenchmark
-        ReturnFromBenchmark(NaturalLog(x) / NaturalLog(b));
+        StartAndReturnFromBenchmark(NaturalLog(x) / NaturalLog(b));
     }
 }
 

@@ -1,7 +1,7 @@
 #include "MathArch.hpp"
 
 namespace MathLib {
-    MathArch::MathArch(const Array<uint8_t>& mem) : Emulator(mem), pc(0), sp(0), a(0) {
+    MathArch::MathArch(const Array<uint8_t>& memory) : StepEmulator(memory), pc(0), sp(0), a(0) {
         EmptyBenchmark
     }
     size_t MathArch::EncodeOneByteInstruction(size_t i, MathArchOpcode opcode) {
@@ -18,11 +18,8 @@ namespace MathLib {
         for (uint8_t x = 0; x < sizeof(uint64_t); x++) memory.At(i + x + 1) = tmp[x];
         ReturnFromBenchmark(sizeof(uint64_t) + 1);
     }
-    bool MathArch::Run(void) {
-        StartBenchmark
-        while (pc.value < GetSize())
-            if (!Step()) ReturnFromBenchmark(false);
-        ReturnFromBenchmark(true);
+    Register MathArch::GetPC(void) const {
+        StartAndReturnFromBenchmark(pc);
     }
     bool MathArch::Step(void) {
         StartBenchmark

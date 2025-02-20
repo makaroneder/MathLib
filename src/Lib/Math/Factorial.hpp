@@ -23,8 +23,7 @@ namespace MathLib {
     /// @return Factorial of the complex number
     template <typename T>
     [[nodiscard]] T Factorial(const T& z, const T& a) {
-        StartBenchmark
-        ReturnFromBenchmark(Pow(a, (z - 1) / a) * Gamma<T>(z / a + 1) / Gamma<T>((T)1 / a + 1));
+        StartAndReturnFromBenchmark(Pow(a, (z - 1) / a) * Gamma<T>(z / a + 1) / Gamma<T>((T)1 / a + 1));
     }
 }
 

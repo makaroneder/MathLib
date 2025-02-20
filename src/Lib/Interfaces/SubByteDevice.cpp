@@ -5,15 +5,12 @@ namespace MathLib {
         EmptyBenchmark
     }
     size_t SubByteDevice::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(range.GetSize());
+        StartAndReturnFromBenchmark(range.GetSize());
     }
     size_t SubByteDevice::ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(base.ReadPositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
+        StartAndReturnFromBenchmark(base.ReadPositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
     }
     size_t SubByteDevice::WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(base.WritePositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
+        StartAndReturnFromBenchmark(base.WritePositionedSizedBuffer(buffer, position + size >= GetSize() ? GetSize() - position : size, position + range.GetMin()));
     }
 }

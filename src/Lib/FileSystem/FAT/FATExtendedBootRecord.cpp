@@ -3,7 +3,6 @@
 
 namespace MathLib {
     bool FATExtendedBootRecord::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(type == Type::NoID || type == Type::Normal);
+        StartAndReturnFromBenchmark(type == Type::NoID || type == Type::Normal);
     }
 }

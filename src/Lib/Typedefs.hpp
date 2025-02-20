@@ -19,6 +19,9 @@ using ssize_t = intptr_t;
     EndBenchmark                    \
     return ret;                     \
 }
+#define StartAndReturnFromBenchmark(ret)    \
+    StartBenchmark                          \
+    ReturnFromBenchmark(ret)
 #define EmptyBenchmark  \
     StartBenchmark      \
     EndBenchmark
@@ -63,15 +66,27 @@ namespace MathLib {
     struct Tree;
     [[nodiscard]] Tree<num_t> StopBenchmarking(void);
 
-    /// @brief Makes array with specified single element
-    /// @tparam T Type of element
-    /// @param a Single element of created array
-    /// @return Single element array
     template <typename T>
-    [[nodiscard]] Array<T> MakeArrayFromSingle(const T& a) {
+    Array<T> CollectionToArray(const Collection<T>& collection) {
+        // Array<T> ret = Array<T>(collection.GetSize());
+        // for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = collection.At(i);
+        // return ret;
+        return Array<T>(collection.GetValue(), collection.GetSize());
+    }
+    template <typename T>
+    Array<T> MakeArray(T arg) {
         StartBenchmark
         Array<T> ret = Array<T>(1);
-        ret.At(0) = a;
+        ret.At(0) = arg;
+        ReturnFromBenchmark(ret);
+    }
+    template <typename T, typename ...Args>
+    Array<T> MakeArray(T arg, Args... args) {
+        StartBenchmark
+        Array<T> ret = MakeArray<T>(arg);
+        Array<T> tmp = MakeArray<T>(args...);
+        for (const T& x : tmp)
+            if (!ret.Add(x)) ReturnFromBenchmark(Array<T>());
         ReturnFromBenchmark(ret);
     }
     /// @brief |a - b| < eps
@@ -82,8 +97,7 @@ namespace MathLib {
     /// @return Equality
     template <typename T>
     [[nodiscard]] bool FloatsEqual(const T& a, const T& b, const T& eps_ = eps) {
-        StartBenchmark
-        ReturnFromBenchmark(Abs(a - b) < eps_);
+        StartAndReturnFromBenchmark(Abs(a - b) < eps_);
     }
     /// @brief Returns sign of specified number
     /// @tparam T Type of number
@@ -103,8 +117,11 @@ namespace MathLib {
     /// @return Random number
     template <typename T>
     [[nodiscard]] T RandomNumber(const T& min, const T& max) {
-        StartBenchmark
-        ReturnFromBenchmark(RandomFloat() * (max - min) + min);
+        StartAndReturnFromBenchmark(RandomFloat() * (max - min) + min);
+    }
+    template <typename T>
+    [[nodiscard]] T RelativeError(const T& x, const T& expected) {
+        return FloatsEqual<T>(expected, 0) ? !FloatsEqual<T>(x, 0) : Abs(1 - x / expected);
     }
     /// @brief Reverses bits of x
     /// @tparam T Type of number

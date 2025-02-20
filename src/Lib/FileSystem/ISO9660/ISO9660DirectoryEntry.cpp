@@ -2,8 +2,7 @@
 
 namespace MathLib {
     bool ISO9660DirectoryEntry::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(length && date.IsValid());
+        StartAndReturnFromBenchmark(length && date.IsValid());
     }
     String ISO9660DirectoryEntry::GetName(void) const {
         StartBenchmark

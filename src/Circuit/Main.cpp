@@ -12,15 +12,15 @@
     const size_t name = elements.GetSize() - 1
 
 [[nodiscard]] size_t Create1BitAdder(CircuitElementConnection a, CircuitElementConnection b, CircuitElementConnection carryIn) {
-    MakeElement(xor1, new XorGate(std::vector<CircuitElementConnection> { a, b, }));
-    MakeElement(and1, new AndGate(std::vector<CircuitElementConnection> { a, b, }));
-    MakeElement(sum, new XorGate(std::vector<CircuitElementConnection> { CircuitElementConnection(xor1, 0), carryIn, }));
-    MakeElement(and2, new AndGate(std::vector<CircuitElementConnection> { CircuitElementConnection(xor1, 0), carryIn, }));
-    MakeElement(carryOut, new OrGate(std::vector<CircuitElementConnection> { CircuitElementConnection(and1, 0), CircuitElementConnection(and2, 0), }));
-    MakeElement(ret, new Circuit(std::vector<CircuitElementConnection> {
+    MakeElement(xor1, new XorGate(MathLib::MakeArray<CircuitElementConnection>(a, b)));
+    MakeElement(and1, new AndGate(MathLib::MakeArray<CircuitElementConnection>(a, b)));
+    MakeElement(sum, new XorGate(MathLib::MakeArray<CircuitElementConnection>(CircuitElementConnection(xor1, 0), carryIn)));
+    MakeElement(and2, new AndGate(MathLib::MakeArray<CircuitElementConnection>(CircuitElementConnection(xor1, 0), carryIn)));
+    MakeElement(carryOut, new OrGate(MathLib::MakeArray<CircuitElementConnection>(CircuitElementConnection(and1, 0), CircuitElementConnection(and2, 0))));
+    MakeElement(ret, new Circuit(MathLib::MakeArray<CircuitElementConnection>(
         CircuitElementConnection(sum, 0),
-        CircuitElementConnection(carryOut, 0),
-    }));
+        CircuitElementConnection(carryOut, 0)
+    )));
     return ret;
 }
 [[nodiscard]] MathLib::Expected<Circuit> CreateAdder(uint8_t bits, size_t a, size_t b, const CircuitElementConnection& carryIn, const CircuitElementConnection& low, const CircuitElementConnection& high) {

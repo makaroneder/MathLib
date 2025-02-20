@@ -1,13 +1,13 @@
 #ifndef MathLib_Emulator_MathArch_H
 #define MathLib_Emulator_MathArch_H
 #include "MathArchOpcode.hpp"
-#include "../Emulator.hpp"
-#include "../Register.hpp"
+#include "../StepEmulator.hpp"
 
 namespace MathLib {
-    struct MathArch : Emulator {
-        MathArch(const Array<uint8_t>& mem);
-        [[nodiscard]] virtual bool Run(void) override;
+    struct MathArch : StepEmulator, Printable {
+        MathArch(const Array<uint8_t>& memory);
+        [[nodiscard]] virtual bool Step(void) override;
+        [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
@@ -16,7 +16,6 @@ namespace MathLib {
         [[nodiscard]] size_t EncodeConstInstruction(size_t i, MathArchOpcode opcode, uint64_t value);
 
         private:
-        [[nodiscard]] bool Step(void);
         template <typename T>
         [[nodiscard]] Expected<T> Fetch(void) {
             StartBenchmark

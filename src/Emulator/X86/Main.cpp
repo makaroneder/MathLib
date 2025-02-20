@@ -1,6 +1,5 @@
 #include <Emulator/X86/X86.hpp>
 #include <Libc/HostFileSystem.hpp>
-#include <FileSystem/File.hpp>
 #include <iostream>
 
 /// @brief Entry point for this program

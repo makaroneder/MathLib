@@ -10,7 +10,7 @@ namespace MathLib {
         Array<Variable> variables;
         bool runtime;
 
-        Optimizer(const Array<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Array<Variable>& vars = Array<Variable>());
+        Optimizer(const Collection<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Collection<Variable>& vars = Array<Variable>());
         Optimizer(Optimizer* parent);
         Optimizer Recreate(void) const;
         void Destroy(void);
@@ -27,7 +27,7 @@ namespace MathLib {
         [[nodiscard]] BuiltinFunction* GetBuiltinFunctionInternal(const String& name);
         [[nodiscard]] FunctionNode* GetFunctionInternal(const String& name);
         [[nodiscard]] Variable* GetVariableInternal(const String& name);
-        [[nodiscard]] Node* OptimizeComparison(const Node* node, const Array<Node::Type>& validTypes, Node::Type defaultType);
+        [[nodiscard]] Node* OptimizeComparison(const Node* node, const Collection<Node::Type>& validTypes, Node::Type defaultType);
         [[nodiscard]] Node* OptimizeProgram(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize

@@ -12,11 +12,9 @@ namespace MathLib {
         EndBenchmark
     }
     size_t MBR::GetSectorSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(512);
+        StartAndReturnFromBenchmark(512);
     }
     Array<Interval<size_t>> MBR::GetPartitionRanges(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(partitionRanges);
+        StartAndReturnFromBenchmark(partitionRanges);
     }
 }

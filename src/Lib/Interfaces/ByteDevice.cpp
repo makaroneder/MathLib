@@ -17,12 +17,10 @@ namespace MathLib {
         ReturnFromBenchmark(s);
     }
     bool ByteDevice::ReadPositionedBuffer(void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(ReadPositionedSizedBuffer(buffer, size, position) == size);
+        StartAndReturnFromBenchmark(ReadPositionedSizedBuffer(buffer, size, position) == size);
     }
     bool ByteDevice::WritePositionedBuffer(const void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        ReturnFromBenchmark(WritePositionedSizedBuffer(buffer, size, position) == size);
+        StartAndReturnFromBenchmark(WritePositionedSizedBuffer(buffer, size, position) == size);
     }
     bool ByteDevice::Seek(ssize_t offset, SeekMode mode) {
         StartBenchmark
@@ -46,7 +44,6 @@ namespace MathLib {
         ReturnFromBenchmark(true);
     }
     size_t ByteDevice::Tell(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(position);
+        StartAndReturnFromBenchmark(position);
     }
 }

@@ -15,6 +15,7 @@ ASFLAGS = -Werror -f elf64 -I $(SRCDIR) -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
 OBJCPYFLAGS = -O elf64-x86-64 -B i386 -I binary
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
+ASLFLAGS = -oa
 
 ifeq ($(BUILDTYPE), Debug)
 ASFLAGS += -g -O0 -DDebug
@@ -40,7 +41,7 @@ $(BUILDDIR)/libMath.a: $(BUILDDIR)/Lib/LibStub.o
 	@mkdir -p $(@D)
 	@$(AR) $(ARFLAGS) $@ $<
 	@echo "==> Created: $@"
-$(BUILDDIR)/Lib/LibStub.o: $(SRCDIR)/LibStub/Main.cpp $(SRCDIR)/Lib/MathLib.hpp
+$(BUILDDIR)/Lib/LibStub.o: $(SRCDIR)/LibStub/Main.cpp $(HEADERS)
 	@mkdir -p $(@D)
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 	@echo "==> Created: $@"

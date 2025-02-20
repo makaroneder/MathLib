@@ -1,4 +1,5 @@
 #include "ChemicalReaction.hpp"
+#include "../Math/SystemOfLinearEquations.hpp"
 
 namespace MathLib {
     ChemicalReaction::ChemicalReaction(void) {
@@ -64,37 +65,22 @@ namespace MathLib {
         StartBenchmark
         const Array<ChemicalReactionElement> l = GetReactionElements(true);
         const Array<ChemicalReactionElement> r = GetReactionElements(false);
-        const size_t size = left.GetSize() + right.GetSize() - 1;
-        matrix_t a = matrix_t(size, size);
-        matrix_t b = matrix_t(1, size);
-        size_t sub = 0;
+        SystemOfLinearEquations<num_t> equations = SystemOfLinearEquations<num_t>(left.GetSize() + right.GetSize() - 1);
         for (size_t y = 0; y < l.GetSize(); y++) {
-            if ((y - sub) == size) break;
-            Matrix<ssize_t> v = l.At(y).coefficients;
-            const size_t w = v.GetWidth();
-            for (size_t x = 0; x < w; x++) a.At(x, y - sub) = v.At(x, 0);
             for (const ChemicalReactionElement& elment : r) {
                 if (elment.GetSymbol() == l.At(y).GetSymbol()) {
-                    v = elment.coefficients;
-                    break;
-                }
-            }
-            for (size_t x = 0; x < v.GetWidth() - 1; x++) a.At(x + w, y - sub) = -v.At(x, 0);
-            b.At(0, y - sub) = v.At(v.GetWidth() - 1, 0);
-            matrix_t tmp = matrix_t(size, 1);
-            for (size_t j = 0; j < size; j++) tmp.At(j, 0) = a.At(j, y - sub);
-            for (size_t i = 0; i < (y - sub); i++) {
-                matrix_t a1 = matrix_t(size, 1);
-                for (size_t j = 0; j < size; j++) a1.At(j, 0) = a.At(j, i);
-                if (a1.IsMultipleOf(tmp)) {
-                    sub++;
+                    const size_t width1 = l.At(y).coefficients.GetWidth();
+                    const size_t width2 = elment.coefficients.GetWidth() - 1;
+                    matrix_t tmp = matrix_t(width1 + width2 + 1, 1);
+                    for (size_t i = 0; i < width1; i++) tmp.At(i, 0) = l.At(y).coefficients.At(i, 0);
+                    for (size_t i = 0; i < width2; i++) tmp.At(i + width1, 0) = -elment.coefficients.At(i, 0);
+                    tmp.At(width1 + width2, 0) = elment.coefficients.At(width2, 0);
+                    if (!equations.AddEquation(AugmentedMatrix<num_t>(tmp, tmp.GetWidth() - 1))) ReturnFromBenchmark(Expected<ChemicalReaction>());
                     break;
                 }
             }
         }
-        Expected<matrix_t> tmp = a.GetInverse();
-        if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
-        tmp = tmp.Get() * b;
+        Expected<matrix_t> tmp = equations.GetMatrixSolution();
         if (!tmp.HasValue()) ReturnFromBenchmark(Expected<ChemicalReaction>());
         const matrix_t x = tmp.Get();
         for (size_t i = 1; true; i++) {

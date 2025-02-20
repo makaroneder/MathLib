@@ -24,7 +24,7 @@ namespace MathLib {
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
             StartBenchmark
             Array<Line<T>> ret;
-            for (const Array<size_t>& face : faces) {
+            for (const Collection<size_t>& face : faces) {
                 Array<Matrix<T>> verts = Array<Matrix<T>>(face.GetSize());
                 for (size_t i = 0; i < verts.GetSize(); i++)
                     verts.At(i) = RotateVector<T>(verticies.At(face.At(i)) + this->position, this->position, rotation);
@@ -49,7 +49,7 @@ namespace MathLib {
                     if (!file.Puts(' '_M + ToString(GetVectorAxis(v, axis)))) ReturnFromBenchmark(false);
                 if (!file.Write<char>('\n')) ReturnFromBenchmark(false);
             }
-            for (const Array<size_t>& face : faces) {
+            for (const Collection<size_t>& face : faces) {
                 if (!file.Write<char>('f')) ReturnFromBenchmark(false);
                 for (const size_t& f : face)
                     if (!file.Puts(' '_M + ToString(f))) ReturnFromBenchmark(false);

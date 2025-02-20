@@ -35,9 +35,7 @@ namespace MathLib {
         Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
         template <typename T>
         [[nodiscard]] static Color FromVector(const Matrix<T>& v) {
-            StartBenchmark
-            const Color ret = Color(GetX(v) * UINT8_MAX, GetY(v) * UINT8_MAX, GetZ(v) * UINT8_MAX, v.At(3, 0) * UINT8_MAX);
-            ReturnFromBenchmark(ret);
+            StartAndReturnFromBenchmark(Color(GetX(v) * UINT8_MAX, GetY(v) * UINT8_MAX, GetZ(v) * UINT8_MAX, v.At(3, 0) * UINT8_MAX));
         }
     };
     /// @brief R(t) = [255 * sin^2(t), 255 * sin^2(t + 0.66 * pi), 255 * sin^2(t + 1.32 * pi), 255]

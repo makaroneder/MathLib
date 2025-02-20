@@ -1,9 +1,9 @@
 #ifdef __x86_64__
 #ifndef WAET_H
 #define WAET_H
-#include "ACPITable.hpp"
+#include <ACPI/ACPITable.hpp>
 
-struct WAET : ACPITable {
+struct WAET : MathLib::ACPITable {
     static constexpr const char* expectedSignature = "WAET";
     bool enhancedRTC : 1;
     bool enhancedACPIPMTimer : 1;

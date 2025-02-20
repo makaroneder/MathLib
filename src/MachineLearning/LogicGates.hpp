@@ -1,26 +1,24 @@
 #ifndef LogicGates_H
 #define LogicGates_H
-#include "State.hpp"
+#include "NeuralNetworkState.hpp"
 
 /// @brief Creates default state for this neural network
 /// @tparam T Type of number
 /// @return State
-template <typename T>
-[[nodiscard]] NeuralNetworkState<T> GetDefaultState(void) {
-    return NeuralNetworkState<T>(1e-1, MathLib::Matrix<T>(2, 4, std::vector<T> {
+[[nodiscard]] NeuralNetworkState<MathLib::num_t> GetDefaultState(void) {
+    return NeuralNetworkState<MathLib::num_t>(1e-1, MathLib::matrix_t(2, 4, MathLib::MakeArray<MathLib::num_t>(
         0, 0,
         0, 1,
         1, 0,
-        1, 1,
-    }), MathLib::Matrix<T>(1, 4, std::vector<T> {
+        1, 1
+    )), MathLib::matrix_t(1, 4, MathLib::MakeArray<MathLib::num_t>(
         0,
         1,
         1,
-        0,
-    }), MathLib::NeuralNetwork<T>(MathLib::NeuralNetwork<T>::ActivationFunction::Tanh, std::vector<size_t> { 2, 2, 1, }));
+        0
+    )), MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::Tanh, MathLib::MakeArray<size_t>(2, 2, 1)));
 }
-template <typename T>
-[[nodiscard]] MathLib::String StateToString(NeuralNetworkState<T>& state) {
+[[nodiscard]] MathLib::String StateToString(NeuralNetworkState<MathLib::num_t>& state) {
     MathLib::String ret;
     for (size_t y = 0; y < 2; y++) {
         for (size_t x = 0; x < 2; x++) {

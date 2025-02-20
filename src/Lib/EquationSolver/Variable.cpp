@@ -12,7 +12,6 @@ namespace MathLib {
         EmptyBenchmark
     }
     Array<Variable> CreateDefaultVariables(void) {
-        StartBenchmark
         const Variable defaultVariables[] = {
             Variable("true", "Bool", "1", true),
             Variable("false", "Bool", "0", true),
@@ -100,6 +99,6 @@ namespace MathLib {
             Variable("foiasConstant", "R", ToString(foiasConstant), true),
             Variable("taniguchiConstant", "R", ToString(taniguchiConstant), true),
         };
-        ReturnFromBenchmark(Array<Variable>(defaultVariables, SizeOfArray(defaultVariables)));
+        StartAndReturnFromBenchmark(Array<Variable>(defaultVariables, SizeOfArray(defaultVariables)));
     }
 }

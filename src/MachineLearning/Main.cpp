@@ -1,7 +1,10 @@
-#if 0
+#define DefaultML 2
+#if DefaultML == 0
 #include "Adder.hpp"
-#else
+#elif DefaultML == 1
 #include "LogicGates.hpp"
+#elif DefaultML == 2
+#include "Multiplier.hpp"
 #endif
 #include <Libc/HostFileSystem.hpp>
 #include <iostream>
@@ -24,7 +27,7 @@ int main(int argc, char** argv) {
         const size_t limit = (size_t)MathLib::StringToNumber(argv[2]);
         NeuralNetworkState<MathLib::num_t> state;
         if (access(argv[1], F_OK) == -1) {
-            state = GetDefaultState<MathLib::num_t>();
+            state = GetDefaultState();
             state.neuralNetwork.Random(0, 1);
         }
         else if (!state.LoadFromPath(fs, argv[1])) MathLib::Panic("Failed to load neural network");
@@ -54,7 +57,7 @@ int main(int argc, char** argv) {
         std::cout << "Cost = " << state.Cost() << std::endl;
         std::cout << "Neural network:\n" << state.neuralNetwork << std::endl;
         #endif
-        std::cout << StateToString<MathLib::num_t>(state) << std::endl;
+        std::cout << StateToString(state) << std::endl;
         if (!state.SaveFromPath(fs, argv[1])) MathLib::Panic("Failed to save neural network");
         #ifdef Debug
         std::cout << "Time: " << MathLib::GetTime() - start << " second(s)" << std::endl;

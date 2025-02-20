@@ -1,16 +1,15 @@
 #ifndef Adder_H
 #define Adder_H
-#include "State.hpp"
+#include "NeuralNetworkState.hpp"
 
 /// @brief Creates default state for this neural network
 /// @tparam T Type of number
 /// @return State
-template <typename T>
-[[nodiscard]] NeuralNetworkState<T> GetDefaultState(void) {
+[[nodiscard]] NeuralNetworkState<MathLib::num_t> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);
     const size_t rows = n * n;
-    NeuralNetworkState<T> state = NeuralNetworkState<T>(1, MathLib::Matrix<T>(bits * 2, rows), MathLib::Matrix<T>(bits, rows), MathLib::NeuralNetwork<T>(MathLib::NeuralNetwork<T>::ActivationFunction::Sigmoid, std::vector<size_t> { bits * 2, bits * 4, bits, }));
+    NeuralNetworkState<MathLib::num_t> state = NeuralNetworkState<MathLib::num_t>(1, MathLib::matrix_t(bits * 2, rows), MathLib::matrix_t(bits, rows), MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::Sigmoid, MathLib::MakeArray<size_t>(bits * 2, bits * 4, bits)));
     for (size_t i = 0; i < rows; i++) {
         const size_t x = i / n;
         const size_t y = i % n;
@@ -23,8 +22,7 @@ template <typename T>
     }
     return state;
 }
-template <typename T>
-[[nodiscard]] MathLib::String StateToString(NeuralNetworkState<T>& state) {
+[[nodiscard]] MathLib::String StateToString(NeuralNetworkState<MathLib::num_t>& state) {
     const size_t bits = state.trainingDataInput.GetWidth() / 2;
     const size_t n = 1 << bits;
     MathLib::String ret;

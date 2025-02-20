@@ -13,7 +13,7 @@ struct FreeParticleWaveFunction : MathLib::Function<MathLib::Complex<T>, T, T> {
     [[nodiscard]] virtual MathLib::Complex<T> Invoke(const void*, T x, T t) const override {
         return MathLib::Integrate<MathLib::Complex<T>, T>(MathLib::HostFunction<MathLib::Complex<T>, T>([this, &x, &t] (T k) -> MathLib::Complex<T> {
             return (*transform)(k) * MathLib::Exp(MathLib::Complex<T>(0, k * x - (t * MathLib::reducedPlanckConstant.GetValue() * k * k / (2 * m))));
-        }), -MathLib::MakeInf(), MathLib::MakeInf(), n, type) / MathLib::Sqrt(2 * MathLib::pi);
+        }), -MathLib::infinity, MathLib::infinity, n, type) / MathLib::Sqrt(2 * MathLib::pi);
     }
 
     private:

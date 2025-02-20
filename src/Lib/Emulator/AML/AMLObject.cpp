@@ -1,0 +1,161 @@
+#include "AMLObject.hpp"
+#include "../../Host.hpp"
+#include "../../String.hpp"
+#include "AMLFieldFlags.hpp"
+
+namespace MathLib {
+    AMLObject::AMLObject(void) {
+        EmptyBenchmark
+    }
+    AMLObject::AMLObject(const String& name) : type(Type::Normal), name(name) {
+        EmptyBenchmark
+    }
+    AMLObject::AMLObject(const String& name, const Array<uint64_t>& data) : type(Type::Normal), name(name), data(data) {
+        EmptyBenchmark
+    }
+    AMLObject::AMLObject(const String& name, const Array<uint64_t>& data, Type type) : type(type), name(name), data(data) {
+        EmptyBenchmark
+    }
+    Array<uint64_t> AMLObject::GetData(void) const {
+        return data;
+    }
+    bool AMLObject::AddChild(const AMLObject& child) {
+        return children.Add(child);
+    }
+    String AMLObject::ToString(const String& padding) const {
+        if (name == "_HID" || false) {
+            String str;
+            if (data.GetSize() == 1) {
+                const uint16_t vendor = data.At(0) & UINT16_MAX;
+                const uint16_t device = data.At(0) >> 16;
+                const uint16_t vendorRev = ((vendor & UINT8_MAX) << 8) | vendor >> 8;
+                str += ((vendorRev >> 10) & 0x1f) + 'A' - 1;
+                str += ((vendorRev >> 5) & 0x1f) + 'A' - 1;
+                str += ((vendorRev >> 0) & 0x1f) + 'A' - 1;
+                const String tmp = MathLib::ToString(device & UINT8_MAX, 16, 2) + MathLib::ToString(device >> 8, 16, 2);
+                for (const char& chr : tmp) str += ToUpper(chr);
+            }
+            else for (size_t i = 0; i < data.GetSize() - 1; i++) str += (char)data.At(i);
+            return padding + name + ": " + str;
+        }
+        String ret = padding + name + ": {\n";
+        switch (type) {
+            case Type::Normal: {
+                if (children.IsEmpty()) {
+                    if (data.IsEmpty()) return padding + name;
+                    if (data.GetSize() == 1) return padding + name + ": 0x" + MathLib::ToString(data.At(0), 16, 8);
+                    for (const uint64_t& x : data) ret += padding + "\t0x" + MathLib::ToString(x, 16, 8) + '\n';
+                    break;
+                }
+                for (const AMLObject& child : children) ret += child.ToString(padding + '\t') + '\n';
+                break;
+            }
+            case Type::OperationRegion: {
+                ret += padding + "\tSpace: ";
+                switch (data.At(0)) {
+                    case 0x01: {
+                        ret += "System IO";
+                        break;
+                    }
+                    case 0x02: {
+                        ret += "PCI config";
+                        break;
+                    }
+                    case 0x03: {
+                        ret += "Embedded control";
+                        break;
+                    }
+                    case 0x04: {
+                        ret += "SMBus";
+                        break;
+                    }
+                    case 0x05: {
+                        ret += "System CMOS";
+                        break;
+                    }
+                    case 0x06: {
+                        ret += "PCI bar target";
+                        break;
+                    }
+                    case 0x07: {
+                        ret += "IPMI";
+                        break;
+                    }
+                    case 0x08: {
+                        ret += "General purpose IO";
+                        break;
+                    }
+                    case 0x09: {
+                        ret += "Generic serial bus";
+                        break;
+                    }
+                    case 0x0a: {
+                        ret += "PCC";
+                        break;
+                    }
+                    case 0x80 ... 0xff: {
+                        ret += "OEM defined";
+                        break;
+                    }
+                    default: ret += "Unknown";
+                }
+                ret += " (0x"_M + MathLib::ToString(data.At(0), 16, 2) + ")\n";
+                ret += padding + "\tOffset: 0x" + MathLib::ToString(data.At(1), 16, 8) + '\n';
+                ret += padding + "\tLength: 0x" + MathLib::ToString(data.At(2), 16, 8) + '\n';
+                break;
+            }
+            case Type::Field: {
+                const AMLFieldFlags flags = AMLFieldFlags(data.At(0));
+                ret += padding + "\tLock: " + BoolToString(flags.lock) + '\n';
+                ret += padding + "\tAccess type: ";
+                switch ((AMLFieldFlags::AccessType)flags.accessType) {
+                    case AMLFieldFlags::AccessType::Any: {
+                        ret += "Any";
+                        break;
+                    }
+                    case AMLFieldFlags::AccessType::Byte: {
+                        ret += "Byte";
+                        break;
+                    }
+                    case AMLFieldFlags::AccessType::Word: {
+                        ret += "Word";
+                        break;
+                    }
+                    case AMLFieldFlags::AccessType::DWord: {
+                        ret += "DWord";
+                        break;
+                    }
+                    case AMLFieldFlags::AccessType::QWord: {
+                        ret += "QWord";
+                        break;
+                    }
+                    case AMLFieldFlags::AccessType::Buffer: {
+                        ret += "Buffer";
+                        break;
+                    }
+                    default: ret += "Unknown";
+                }
+                ret += '\n'_M + padding + "\tAccess type: ";
+                switch ((AMLFieldFlags::UpdateRule)flags.updateRule) {
+                    case AMLFieldFlags::UpdateRule::Preserve: {
+                        ret += "Preserve";
+                        break;
+                    }
+                    case AMLFieldFlags::UpdateRule::FillWith1: {
+                        ret += "Fill with 1";
+                        break;
+                    }
+                    case AMLFieldFlags::UpdateRule::FillWith0: {
+                        ret += "Fill with 0";
+                        break;
+                    }
+                    default: ret += "Unknown";
+                }
+                ret += '\n';
+                for (const AMLObject& child : children) ret += child.ToString(padding + '\t') + '\n';
+                break;
+            }
+        }
+        return ret + padding + '}';
+    }
+}

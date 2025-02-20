@@ -6,8 +6,8 @@ namespace MathLib {
     struct Cipher : Allocatable {
         Cipher(void);
         Cipher(const String& letters, const String& upperLetters, const String& digits);
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Array<uint8_t>& data, const String& key) const = 0;
-        [[nodiscard]] virtual Array<uint8_t> Decrypt(const Array<uint8_t>& data, const String& key) const = 0;
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Collection<uint8_t>& data, const String& key) const = 0;
+        [[nodiscard]] virtual Array<uint8_t> Decrypt(const Collection<uint8_t>& data, const String& key) const = 0;
         [[nodiscard]] String EncryptString(const String& str, const String& key) const;
         [[nodiscard]] String DecryptString(const String& str, const String& key) const;
 

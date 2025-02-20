@@ -4,7 +4,7 @@
 #include "../FunctionPointer.hpp"
 
 namespace MathLib {
-    using BuiltinFunctionPointer = FunctionPointer<Node*, const Array<const Node*>&>;
+    using BuiltinFunctionPointer = FunctionPointer<Node*, const Collection<const Node*>&>;
     /// @brief Builtin function
     struct BuiltinFunction : Allocatable {
         /// @brief Name of the builtin function

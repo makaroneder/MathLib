@@ -3,11 +3,9 @@
 
 namespace MathLib {
     bool FATBootSector::IsValid(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(signature == expectedSignature);
+        StartAndReturnFromBenchmark(signature == expectedSignature);
     }
     uint32_t FATBootSector::GetSectorCount(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(sectorCount16 ? sectorCount16 : sectorCount32);
+        StartAndReturnFromBenchmark(sectorCount16 ? sectorCount16 : sectorCount32);
     }
 }

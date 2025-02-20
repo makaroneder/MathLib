@@ -5,8 +5,7 @@ namespace MathLib {
         EmptyBenchmark
     }
     size_t Emulator::GetSize(void) const {
-        StartBenchmark
-        ReturnFromBenchmark(memory.GetSize());
+        StartAndReturnFromBenchmark(memory.GetSize());
     }
     size_t Emulator::ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) {
         StartBenchmark

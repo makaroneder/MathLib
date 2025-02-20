@@ -1,4 +1,5 @@
 #include "MBRPartitionEntryCHS.hpp"
+#include "../Typedefs.hpp"
 
 namespace MathLib {
     MBRPartitionEntryCHS::MBRPartitionEntryCHS(uint32_t lba, uint8_t heads, uint8_t sectors) {

@@ -4,7 +4,7 @@
 
 namespace MathLib {
     template <typename T>
-    [[nodiscard]] Expected<bool> NextPermutation(Array<T>& array) {
+    [[nodiscard]] Expected<bool> NextPermutation(Collection<T>& array) {
         StartBenchmark
         if (array.GetSize() < 2) ReturnFromBenchmark(Expected<bool>(false));
         size_t i = array.GetSize() - 2;

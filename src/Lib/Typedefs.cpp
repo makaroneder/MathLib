@@ -10,7 +10,7 @@ namespace MathLib {
 
     void StartBenchmarking(void) {
         traceData = Tree<num_t>("Root", GetTime());
-        traces = MakeArrayFromSingle<Tree<num_t>*>(&traceData);
+        traces = MakeArray<Tree<num_t>*>(&traceData);
         currentTrace = 0;
         benchmark = true;
     }

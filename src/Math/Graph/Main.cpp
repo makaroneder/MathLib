@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
-            if (!tmp.variables.Add(var)) return MathLib::MakeNaN();
+            if (!tmp.variables.Add(var)) return MathLib::nan;
             MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const MathLib::Array<MathLib::complex_t> complexRet = n->ToNumber();
@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
-            if (!tmp.variables.Add(var)) return MathLib::complex_t(MathLib::MakeNaN(), MathLib::MakeNaN());
+            if (!tmp.variables.Add(var)) return MathLib::complex_t(MathLib::nan, MathLib::nan);
             MathLib::Node* n = tmp.Optimize(funcNode.body);
             delete var.value;
             const MathLib::complex_t ret = n->ToNumber().At(0);

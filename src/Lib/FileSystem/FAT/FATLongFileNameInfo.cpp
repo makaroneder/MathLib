@@ -13,7 +13,6 @@ namespace MathLib {
         EndBenchmark
     }
     bool FATLongFileNameInfo::operator<(const FATLongFileNameInfo& other) const {
-        StartBenchmark
-        ReturnFromBenchmark(order < other.order);
+        StartAndReturnFromBenchmark(order < other.order);
     }
 }

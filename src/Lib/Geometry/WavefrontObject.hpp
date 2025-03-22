@@ -24,7 +24,7 @@ namespace MathLib {
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
             StartBenchmark
             Array<Line<T>> ret;
-            for (const Collection<size_t>& face : faces) {
+            for (const Sequence<size_t>& face : faces) {
                 Array<Matrix<T>> verts = Array<Matrix<T>>(face.GetSize());
                 for (size_t i = 0; i < verts.GetSize(); i++)
                     verts.At(i) = RotateVector<T>(verticies.At(face.At(i)) + this->position, this->position, rotation);
@@ -49,10 +49,11 @@ namespace MathLib {
                     if (!file.Puts(' '_M + ToString(GetVectorAxis(v, axis)))) ReturnFromBenchmark(false);
                 if (!file.Write<char>('\n')) ReturnFromBenchmark(false);
             }
-            for (const Collection<size_t>& face : faces) {
+            for (const Sequence<size_t>& face : faces) {
                 if (!file.Write<char>('f')) ReturnFromBenchmark(false);
-                for (const size_t& f : face)
-                    if (!file.Puts(' '_M + ToString(f))) ReturnFromBenchmark(false);
+                if (!face.Foreach<bool>(MakeFunctionT<bool, bool, size_t>(nullptr, [&file] (const void*, bool prev, size_t f) -> bool {
+                    return prev && file.Puts(' '_M + ToString(f));
+                }), true)) ReturnFromBenchmark(false);
                 if (!file.Write<char>('\n')) ReturnFromBenchmark(false);
             }
             for (size_t i = 0; i < lines.GetSize(); i += 2)
@@ -64,8 +65,8 @@ namespace MathLib {
         /// @return Status
         [[nodiscard]] virtual bool Load(Readable& file) override {
             StartBenchmark
-            const Array<String> split = Split(file.ReadUntil('\0'), "\n", true);
-            for (const String& line : split) {
+            const Array<String> split = Split(file.ReadUntil('\0'), "\n"_M, true);
+            for (const Sequence<char>& line : split) {
                 if (line[0] == 'v' && line[1] == ' ') {
                     size_t i = 2;
                     Matrix<T> v = CreateVector<T>(0, 0, 0);

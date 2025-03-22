@@ -4,7 +4,7 @@ namespace MathLib {
     ChemicalElement::ChemicalElement(void) : symbol(""), count(0), metal(false) {
         EmptyBenchmark
     }
-    ChemicalElement::ChemicalElement(const String& symbol, size_t count, bool metal) : symbol(symbol), count(count), metal(metal) {
+    ChemicalElement::ChemicalElement(const Sequence<char>& symbol, size_t count, bool metal) : symbol(CollectionToString(symbol)), count(count), metal(metal) {
         EmptyBenchmark
     }
     ChemicalElement::ChemicalElement(const ChemicalElement& self, size_t count) : ChemicalElement(self.symbol, count, self.metal) {
@@ -19,8 +19,8 @@ namespace MathLib {
     bool ChemicalElement::IsMetal(void) const {
         StartAndReturnFromBenchmark(metal);
     }
-    String ChemicalElement::ToString(const String& padding) const {
-        StartAndReturnFromBenchmark(padding + symbol + (count == 1 ? "" : MathLib::ToString(count)));
+    String ChemicalElement::ToString(const Sequence<char>& padding) const {
+        StartAndReturnFromBenchmark(CollectionToString(padding) + symbol + (count == 1 ? "" : MathLib::ToString(count)));
     }
     ChemicalElement& ChemicalElement::operator*=(size_t num) {
         StartBenchmark

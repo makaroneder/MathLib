@@ -23,13 +23,14 @@
     )));
     return ret;
 }
-[[nodiscard]] MathLib::Expected<Circuit> CreateAdder(uint8_t bits, size_t a, size_t b, const CircuitElementConnection& carryIn, const CircuitElementConnection& low, const CircuitElementConnection& high) {
-    MathLib::Array<CircuitElementConnection> adders;
+[[nodiscard]] Circuit CreateAdder(uint8_t bits, size_t a, size_t b, const CircuitElementConnection& carryIn, const CircuitElementConnection& low, const CircuitElementConnection& high) {
+    MathLib::Array<CircuitElementConnection> adders = MathLib::Array<CircuitElementConnection>(bits + 1);
     for (uint8_t i = 0; i < bits; i++) {
         const size_t element = Create1BitAdder(a & (1 << i) ? high : low, b & (1 << i) ? high : low, i ? CircuitElementConnection(adders.At(i - 1).index, 1) : carryIn);
-        if (!adders.Add(CircuitElementConnection(element, 0)) || !(i + 1 == bits && !adders.Add(CircuitElementConnection(element, 1)))) return MathLib::Expected<Circuit>();
+        adders.At(i) = CircuitElementConnection(element, 0);
+        if (i + 1 == bits) adders.At(i + 1) = CircuitElementConnection(element, 1);
     }
-    return MathLib::Expected<Circuit>(Circuit(adders));
+    return Circuit(adders);
 }
 
 /// @brief Entry point for this program
@@ -44,10 +45,10 @@ int main(int, char**) {
         const size_t a = 0b1111;
         const size_t b = 0b0001;
         const CircuitElementConnection carryIn = CircuitElementConnection(low, 0);
-        const Circuit circuit = CreateAdder(bits, a, b, carryIn, CircuitElementConnection(low, 0), CircuitElementConnection(high, 0)).Get("Failed to create adder");
+        const Circuit circuit = CreateAdder(bits, a, b, carryIn, CircuitElementConnection(low, 0), CircuitElementConnection(high, 0));
         std::cout << circuit << std::endl;
         const MathLib::Bitmap bitmap = circuit.Evaluate().Get("Failed to run circuit");
-        for (size_t i = 0; i < bitmap.GetSize(); i++) std::cout << ConstGate(bitmap.Get(i).Get("Failed to run circuit")) << std::endl;
+        for (size_t i = 0; i < bitmap.GetSize(); i++) std::cout << ConstGate(bitmap.Get(i).Get("Failed to print circuit state")) << std::endl;
         for (CircuitElement*& element : elements) delete element;
         return EXIT_SUCCESS;
     }

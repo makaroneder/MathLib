@@ -54,7 +54,7 @@ namespace MathLib {
         }
 
         private:
-        [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Array<Matrix<T>>& prev, const T& dimension) {
+        [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Sequence<Matrix<T>>& prev, const T& dimension) {
             StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(prev.GetSize() * 2);
             for (size_t i = 0; i < prev.GetSize(); i++) {

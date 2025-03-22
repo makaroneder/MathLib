@@ -39,11 +39,14 @@ namespace MathLib {
         [[nodiscard]] Interval<T> Max(const Interval<T>& other) const {
             return Interval<T>(MathLib::Min<T>(min, other.min), MathLib::Max<T>(max, other.max));
         }
+        [[nodiscard]] T Random(void) const {
+            return RandomNumber<T>(min, max);
+        }
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
-            return padding + '[' + MathLib::ToString(min) + ", " + MathLib::ToString(max) + ']';
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
+            return CollectionToString(padding) + '[' + MathLib::ToString(min) + ", " + MathLib::ToString(max) + ']';
         }
 
         private:

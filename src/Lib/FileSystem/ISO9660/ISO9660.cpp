@@ -2,7 +2,7 @@
 #include "../../String.hpp"
 
 namespace MathLib {
-    ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), pvd(ISO9660PrimaryVolumeDescriptor()), files(Array<ISO9660File>()) {
+    ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), pvd(ISO9660PrimaryVolumeDescriptor()), files() {
         StartBenchmark
         if (!disk.Seek(16 * 2048, SeekMode::Set)) Panic("Failed to set disk position");
         uint8_t buff[2048];
@@ -24,7 +24,7 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(false);
     }
-    size_t ISO9660::OpenInternal(const String& path, OpenMode mode) {
+    size_t ISO9660::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         // TODO: Create file and overwrite its data
         StartBenchmark
         if (mode == OpenMode::Write) ReturnFromBenchmark(SIZE_MAX);
@@ -64,7 +64,7 @@ namespace MathLib {
     size_t ISO9660::GetSize(size_t file) {
         StartAndReturnFromBenchmark(file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0);
     }
-    Array<FileInfo> ISO9660::ReadDirectory(const String& path) {
+    Array<FileInfo> ISO9660::ReadDirectory(const Sequence<char>& path) {
         StartBenchmark
         Expected<ISO9660DirectoryEntry> entry = GetDirectoryEntry(path);
         if (!entry.HasValue() || !entry.Get().directory) ReturnFromBenchmark(Array<FileInfo>());
@@ -104,11 +104,11 @@ namespace MathLib {
         }
         ReturnFromBenchmark(ret);
     }
-    Expected<ISO9660DirectoryEntry> ISO9660::GetDirectoryEntry(const String& path) {
+    Expected<ISO9660DirectoryEntry> ISO9660::GetDirectoryEntry(const Sequence<char>& path) {
         StartBenchmark
         ISO9660DirectoryEntry prev = pvd.root;
-        const Array<String> split = Split(path, "/", false);
-        for (const String& name : split) {
+        const Array<String> split = Split(path, '/'_M, false);
+        for (const Sequence<char>& name : split) {
             if (name.IsEmpty()) continue;
             Array<ISO9660DirectoryEntry*> subData = ReadDirectoryEntry(prev);
             bool found = false;

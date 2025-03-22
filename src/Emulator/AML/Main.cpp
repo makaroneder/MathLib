@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
         MathLib::HostFileSystem fs;
-        MathLib::File file = fs.Open(argv[1], MathLib::OpenMode::Read);
+        MathLib::File file = fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read);
         const size_t size = file.GetSize();
         uint8_t memory[size];
         if (!file.ReadBuffer(memory, size)) MathLib::Panic("Failed to read input file");

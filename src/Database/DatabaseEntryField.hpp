@@ -5,7 +5,7 @@
 
 struct DatabaseEntryField : MathLib::Saveable, MathLib::Printable {
     DatabaseEntryField(void);
-    DatabaseEntryField(const MathLib::String& name, const MathLib::String& value);
+    DatabaseEntryField(const MathLib::Sequence<char>& name, const MathLib::Sequence<char>& value);
     MathLib::String GetName(void) const;
     /// @brief Saves data
     /// @param file File to save data into
@@ -18,7 +18,7 @@ struct DatabaseEntryField : MathLib::Saveable, MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
 
     private:
     MathLib::String name;

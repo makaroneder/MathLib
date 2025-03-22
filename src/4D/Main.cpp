@@ -9,8 +9,8 @@
 #include <iostream>
 
 template <typename T>
-[[nodiscard]] MathLib::Array<T> GetArray(MathLib::Optimizer& optimizer, const MathLib::FunctionNode& func, size_t variable, const MathLib::String& value) {
-    optimizer.variables.At(variable).value->value = value;
+[[nodiscard]] MathLib::Array<T> GetArray(MathLib::Optimizer& optimizer, const MathLib::FunctionNode& func, size_t variable, const MathLib::Sequence<char>& value) {
+    optimizer.variables.At(variable).value->value = MathLib::CollectionToString(value);
     MathLib::Node* tmp = optimizer.Optimize(func.body);
     const MathLib::Array<MathLib::complex_t> tmpArr = tmp->ToNumber();
     MathLib::Array<T> ret = MathLib::Array<T>(tmpArr.GetSize());
@@ -18,7 +18,7 @@ template <typename T>
     delete tmp;
     return ret;
 }
-[[nodiscard]] size_t FindVariable(const MathLib::Collection<MathLib::Variable>& variables, const MathLib::String& name) {
+[[nodiscard]] size_t FindVariable(const MathLib::Sequence<MathLib::Variable>& variables, const MathLib::Sequence<char>& name) {
     for (size_t i = 0; i < variables.GetSize(); i++)
         if (name == variables.At(i).name) return i;
     return SIZE_MAX;
@@ -28,7 +28,7 @@ template <typename T>
     MathLib::FunctionNode vname = optimizer.GetFunction(identifier);                                                                                                        \
     size_t vname##Variable = FindVariable(optimizer.variables, vname.arguments.At(0).name);                                                                                 \
     if (vname##Variable == SIZE_MAX) {                                                                                                                                      \
-        if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, "0", true))) MathLib::Panic("Failed to add variable");   \
+        if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, '0'_M, true))) MathLib::Panic("Failed to add variable"); \
         vname##Variable = optimizer.variables.GetSize() - 1;                                                                                                                \
     }
 #define FunctionToArray(name) const MathLib::Array<MathLib::num_t> name##Arr = GetArray<MathLib::num_t>(optimizer, name, name##Variable, time)
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
         MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("4D viewer", 800, 800);
         MathLib::HostFileSystem fs;
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program").Get("No program specified")));
+        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program"_M).Get("No program specified")));
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
@@ -55,10 +55,10 @@ int main(int argc, char** argv) {
         #endif
         delete optimizedRoot;
         optimizer.runtime = true;
-        AddFunction(position, "p")
-        AddFunction(size, "s")
-        AddFunction(rotation, "r")
-        AddFunction(color, "c")
+        AddFunction(position, "p"_M)
+        AddFunction(size, "s"_M)
+        AddFunction(rotation, "r"_M)
+        AddFunction(color, "c"_M)
         const MathLib::num_t startTime = MathLib::GetTime();
         bool pause = false;
         while (true) {

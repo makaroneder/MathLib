@@ -66,7 +66,7 @@ struct ELFHeader {
     uint8_t headerVersion;
     ABI abi;
     uint8_t abiVersion;
-    uint8_t reserved[7];
+    uint64_t reserved : 56;
     Type type;
     Arch arch;
     uint32_t version;
@@ -85,7 +85,7 @@ struct ELFHeader {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] MathLib::String ToString(const MathLib::String& padding = "") const;
+    [[nodiscard]] MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const;
 } __attribute__((packed));
 
 #endif

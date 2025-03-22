@@ -16,14 +16,14 @@ int main(int argc, char** argv) {
         MathLib::num_t solved = 0;
         bool running = true;
         for (int i = 1; i < argc && running; i++) {
-            const Question question = Question(MathLib::Preproces(fs, argv[i]));
+            const Question question = Question(MathLib::Preproces(fs, MathLib::String(argv[i])));
             std::cout << question;
             for (size_t j = 0; j < retryCount && running; j++) {
                 std::cout << "> ";
                 std::string tmp;
                 std::cin >> tmp;
                 if (tmp == "exit") running = false;
-                else if (question.IsSolution(MathLib::StringToNumber(tmp), 0.01)) {
+                else if (question.IsSolution(MathLib::StringToNumber(MathLib::String(tmp)), 0.01)) {
                     solved++;
                     break;
                 }

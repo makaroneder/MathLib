@@ -1,13 +1,16 @@
 #include "../Math/Factorial.hpp"
+#include "../FunctionT.hpp"
 #include "Optimizer.hpp"
 
 namespace MathLib {
-    Optimizer::Optimizer(const Collection<BuiltinFunction>& builtinFuncs, const Array<FunctionNode>& funcs, const Collection<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(funcs), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
+    Optimizer::Optimizer(const Sequence<BuiltinFunction>& builtinFuncs, const Sequence<FunctionNode>& funcs, const Sequence<Variable>& vars) : builtinFunctions(CreateDefaultBuiltinFunctions()), functions(CollectionToArray<FunctionNode>(funcs)), variables(CreateDefaultVariables()), runtime(false), parent(nullptr) {
         StartBenchmark
-        for (const BuiltinFunction& func : builtinFuncs)
-            if (!builtinFunctions.Add(func)) Panic("Failed to add builtin function");
-        for (const Variable& var : vars)
-            if (!variables.Add(var)) Panic("Failed to add variable");
+        if (!builtinFuncs.Foreach<bool>(MakeFunctionT<bool, bool, BuiltinFunction>(nullptr, [this] (const void*, bool prev, BuiltinFunction func) -> bool {
+            return prev && builtinFunctions.Add(func);
+        }), true)) Panic("Failed to add builtin function");
+        if (!vars.Foreach<bool>(MakeFunctionT<bool, bool, Variable>(nullptr, [this] (const void*, bool prev, Variable var) -> bool {
+            return prev && variables.Add(var);
+        }), true)) Panic("Failed to add variable");
         EndBenchmark
     }
     Optimizer::Optimizer(Optimizer* parent) : builtinFunctions(), functions(), variables(), runtime(parent->runtime), parent(parent) {
@@ -36,31 +39,31 @@ namespace MathLib {
         runtime = false;
         EndBenchmark
     }
-    BuiltinFunction* Optimizer::GetBuiltinFunctionInternal(const String& name) {
+    BuiltinFunction* Optimizer::GetBuiltinFunctionInternal(const Sequence<char>& name) {
         StartBenchmark
         for (BuiltinFunction& function : builtinFunctions)
             if (function.name == name) ReturnFromBenchmark(&function);
         ReturnFromBenchmark(parent ? parent->GetBuiltinFunctionInternal(name) : nullptr);
     }
-    FunctionNode* Optimizer::GetFunctionInternal(const String& name) {
+    FunctionNode* Optimizer::GetFunctionInternal(const Sequence<char>& name) {
         StartBenchmark
         for (FunctionNode& function : functions)
             if (function.name == name) ReturnFromBenchmark(&function);
         ReturnFromBenchmark(parent ? parent->GetFunctionInternal(name) : nullptr);
     }
-    Variable* Optimizer::GetVariableInternal(const String& name) {
+    Variable* Optimizer::GetVariableInternal(const Sequence<char>& name) {
         StartBenchmark
         for (Variable& var : variables)
             if (var.name == name) ReturnFromBenchmark(&var);
         ReturnFromBenchmark(parent ? parent->GetVariableInternal(name) : nullptr);
     }
-    FunctionNode Optimizer::GetFunction(const String& name) const {
+    FunctionNode Optimizer::GetFunction(const Sequence<char>& name) const {
         StartBenchmark
         for (const FunctionNode& function : functions)
             if (function.name == name) ReturnFromBenchmark(function);
-        ReturnFromBenchmark(parent ? parent->GetFunction(name) : FunctionNode("", Array<Variable>(), nullptr, ""));
+        ReturnFromBenchmark(parent ? parent->GetFunction(name) : FunctionNode(""_M, Array<Variable>(), nullptr, ""_M));
     }
-    bool Optimizer::SetBuiltinFunctionData(const String& name, void* data) {
+    bool Optimizer::SetBuiltinFunctionData(const Sequence<char>& name, void* data) {
         StartBenchmark
         BuiltinFunction* func = GetBuiltinFunctionInternal(name);
         if (!func) ReturnFromBenchmark(false);
@@ -73,7 +76,7 @@ namespace MathLib {
     Node* Optimizer::OptimizeComma(const Node* node) {
         StartBenchmark
         if (node->type != Node::Type::Comma) ReturnFromBenchmark(OptimizeInternal(node));
-        Node* ret = new Node(Node::Type::Comma, "");
+        Node* ret = new Node(Node::Type::Comma, ""_M);
         if (node->left) ret->left = OptimizeComma(node->left);
         if (node->right) ret->right = OptimizeComma(node->right);
         ReturnFromBenchmark(ret);
@@ -128,7 +131,7 @@ namespace MathLib {
         }
         ReturnFromBenchmark(node->Recreate());
     }
-    Node* Optimizer::OptimizeComparison(const Node* node, const Collection<Node::Type>& validTypes, Node::Type defaultType) {
+    Node* Optimizer::OptimizeComparison(const Node* node, const Sequence<Node::Type>& validTypes, Node::Type defaultType) {
         StartBenchmark
         Node* l = OptimizeInternal(node->left);
         Node* r = OptimizeInternal(node->right);
@@ -138,19 +141,19 @@ namespace MathLib {
             else if (l->type == r->type && l->type == Node::Type::Constant) type = l->ToNumber().At(0).ToReal() < r->ToNumber().At(0).ToReal() ? Node::Type::LessThan : Node::Type::GreaterThan;
             else type = Node::Type::LogicalNotEqual;
         }
-        else ReturnFromBenchmark(new Node(defaultType, "", l, r));
+        else ReturnFromBenchmark(new Node(defaultType, ""_M, l, r));
         delete l;
         delete r;
-        for (const Node::Type& validType : validTypes)
-            if (validType == type) ReturnFromBenchmark(new Node(Node::Type::Constant, "1"));
-        ReturnFromBenchmark(new Node(Node::Type::Constant, "0"));
+        ReturnFromBenchmark(new Node(Node::Type::Constant, validTypes.Foreach<bool>(MakeFunctionT<bool, bool, Node::Type>(nullptr, [type] (const void*, bool prev, Node::Type validType) -> bool {
+            return prev || validType == type;
+        }), true) ? '1'_M : '0'_M));
     }
     Node* Optimizer::OptimizeInternal(const Node* node) {
         StartBenchmark
         if (node->type == Node::Type::Constant || node->type == Node::Type::String || node->type == Node::Type::Struct) ReturnFromBenchmark(node->Recreate())
         else if (node->type == Node::Type::Variable) ReturnFromBenchmark(OptimizeVariable(node))
         else if (node->type == Node::Type::Function) ReturnFromBenchmark(OptimizeFunction(node))
-        else if (node->type == Node::Type::Array) ReturnFromBenchmark(new Node(Node::Type::Array, "", OptimizeComma(node->left)))
+        else if (node->type == Node::Type::Array) ReturnFromBenchmark(new Node(Node::Type::Array, ""_M, OptimizeComma(node->left)))
         else if (node->type == Node::Type::Program) {
             if (node->value == "1" && !runtime) ReturnFromBenchmark(node->Recreate())
             Optimizer scope = Optimizer(this);
@@ -166,9 +169,9 @@ namespace MathLib {
         else if (node->type == Node::Type::Index) {
             Node* l = OptimizeInternal(node->left);
             Node* r = OptimizeInternal(node->right);
-            if (r->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Index, "", l, r))
+            if (r->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Index, ""_M, l, r))
             const complex_t index = r->ToNumber().At(0).GetReal() - 1;
-            if (index.GetImaginary() != 0) ReturnFromBenchmark(new Node(Node::Type::Index, "", l, r))
+            if (index.GetImaginary() != 0) ReturnFromBenchmark(new Node(Node::Type::Index, ""_M, l, r))
             if (l->type == Node::Type::Array) {
                 Node* tmp = l->ToArray().At(index.GetReal())->Recreate();
                 delete l;
@@ -181,9 +184,9 @@ namespace MathLib {
                 const char tmp = l->value.At(index.GetReal());
                 delete l;
                 delete r;
-                ReturnFromBenchmark(new Node(Node::Type::String, tmp))
+                ReturnFromBenchmark(new Node(Node::Type::String, String(tmp)))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Index, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Index, ""_M, l, r))
         }
         else if (node->type == Node::Type::Equal) {
             Node* l = OptimizeInternal(node->left);
@@ -200,18 +203,18 @@ namespace MathLib {
                 Array<Variable> args;
                 Array<const Node*> nodeArgs = CommaToArray(l->left);
                 for (const Node*& arg : nodeArgs)
-                    if (!args.Add(Variable(arg->value, arg->left->value, "0", true))) ReturnFromBenchmark(nullptr);
+                    if (!args.Add(Variable(arg->value, arg->left->value, '0'_M, true))) ReturnFromBenchmark(nullptr);
                 if (!functions.Add(FunctionNode(l->value, args, r->Recreate(), l->right->value))) ReturnFromBenchmark(nullptr);
             }
-            ReturnFromBenchmark(new Node(Node::Type::Equal, "", l, r))
+            ReturnFromBenchmark(new Node(Node::Type::Equal, ""_M, l, r))
         }
         else if (node->type == Node::Type::DynamicEqual) {
             Node* value = OptimizeInternal(node->right);
-            if (node->left->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, "", node->left, value))
-            if (value->type != Node::Type::Constant && value->type != Node::Type::Array && value->type != Node::Type::String && value->type != Node::Type::Struct) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, "", node->left, value))
+            if (node->left->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, ""_M, node->left, value))
+            if (value->type != Node::Type::Constant && value->type != Node::Type::Array && value->type != Node::Type::String && value->type != Node::Type::Struct) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, ""_M, node->left, value))
             Variable* var = GetVariableInternal(node->left->value);
             if (var) {
-                if (var->constant || !runtime) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, "", node->left, value))
+                if (var->constant || !runtime) ReturnFromBenchmark(new Node(Node::Type::DynamicEqual, ""_M, node->left, value))
                 var->value = value->Recreate();
                 ReturnFromBenchmark(value)
             }
@@ -224,7 +227,7 @@ namespace MathLib {
                 delete n;
                 ReturnFromBenchmark(new Node(Node::Type::Constant, ToString(Abs(val))))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Absolute, "", n))
+            else ReturnFromBenchmark(new Node(Node::Type::Absolute, ""_M, n))
         }
         else if (node->type == Node::Type::Factorial) {
             Node* n = OptimizeInternal(node->left);
@@ -233,7 +236,7 @@ namespace MathLib {
                 delete n;
                 ReturnFromBenchmark(new Node(Node::Type::Constant, ret.ToString()))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Factorial, "", n))
+            else ReturnFromBenchmark(new Node(Node::Type::Factorial, ""_M, n))
         }
         else if (node->type == Node::Type::LogicalEqual || node->type == Node::Type::LogicalNotEqual || node->type == Node::Type::LessThan || node->type == Node::Type::GreaterThan)
             ReturnFromBenchmark(OptimizeComparison(node, MakeArray<Node::Type>(node->type), node->type))
@@ -257,7 +260,7 @@ namespace MathLib {
                 if (tmp->type == Node::Type::Constant && tmp->ToNumber().At(0).ToReal()) body = arr.At(1)->Recreate();
                 else if (arr.GetSize() == 3) body = arr.At(2)->Recreate();
                 delete tmp;
-                if (!body) ReturnFromBenchmark(new Node(Node::Type::Constant, "0"))
+                if (!body) ReturnFromBenchmark(new Node(Node::Type::Constant, '0'_M))
                 Optimizer scope = Optimizer(this);
                 Node* ret = scope.OptimizeProgram(body);
                 delete body;
@@ -281,17 +284,17 @@ namespace MathLib {
                 delete req;
             }
             else if (node->value == "integral") {
-                String pow = "1";
+                String pow = '1';
                 Node* del = OptimizeComma(node->left);
                 Array<const Node*> arr = CommaToArray(del);
                 const Node*& a0 = arr.At(0);
                 const Node*& a1 = arr.At(1);
-                if (a0->type == Node::Type::Variable) pow = "2";
+                if (a0->type == Node::Type::Variable) pow = '2';
                 else if (a0->type == Node::Type::Constant) {
                     Node* l = a0->Recreate();
                     Node* r = a1->Recreate();
                     delete del;
-                    ReturnFromBenchmark(new Node(Node::Type::Mul, "", l, r))
+                    ReturnFromBenchmark(new Node(Node::Type::Mul, ""_M, l, r))
                 }
                 else if (a0->type == Node::Type::Pow) {
                     if (a0->left->type == Node::Type::Variable && a0->left->value == a1->value && a0->right->type == Node::Type::Constant)
@@ -303,23 +306,23 @@ namespace MathLib {
                 }
                 else if (a0->type == Node::Type::Mul) {
                     if (a0->left->type == Node::Type::Variable && a0->left->value == a1->value) {
-                        Node* tmp = new Node(Node::Type::Keyword, "integral", new Node(Node::Type::Comma, "", a0->left->Recreate(), a1->Recreate()));
+                        Node* tmp = new Node(Node::Type::Keyword, "integral"_M, new Node(Node::Type::Comma, ""_M, a0->left->Recreate(), a1->Recreate()));
                         Node* integral = OptimizeInternal(tmp);
                         delete tmp;
                         tmp = a0->right->Recreate();
                         delete del;
-                        tmp = new Node(Node::Type::Mul, "", tmp, integral);
+                        tmp = new Node(Node::Type::Mul, ""_M, tmp, integral);
                         Node* ret = OptimizeInternal(tmp);
                         delete tmp;
                         ReturnFromBenchmark(ret)
                     }
                     else if (a0->right->type == Node::Type::Variable && a0->right->value == a1->value) {
-                        Node* tmp = new Node(Node::Type::Keyword, "integral", new Node(Node::Type::Comma, "", a0->right->Recreate(), a1->Recreate()));
+                        Node* tmp = new Node(Node::Type::Keyword, "integral"_M, new Node(Node::Type::Comma, ""_M, a0->right->Recreate(), a1->Recreate()));
                         Node* integral = OptimizeInternal(tmp);
                         delete tmp;
                         tmp = a0->left->Recreate();
                         delete del;
-                        tmp = new Node(Node::Type::Mul, "", tmp, integral);
+                        tmp = new Node(Node::Type::Mul, ""_M, tmp, integral);
                         Node* ret = OptimizeInternal(tmp);
                         delete tmp;
                         ReturnFromBenchmark(ret)
@@ -331,10 +334,10 @@ namespace MathLib {
                 }
                 else if (a0->type == Node::Type::Div) {
                     if (a0->left->type == Node::Type::Variable && a0->left->value == a1->value) {
-                        Node* tmp = new Node(Node::Type::Keyword, "integral", new Node(Node::Type::Comma, "", a0->left->Recreate(), a1->Recreate()));
+                        Node* tmp = new Node(Node::Type::Keyword, "integral"_M, new Node(Node::Type::Comma, ""_M, a0->left->Recreate(), a1->Recreate()));
                         Node* integral = OptimizeInternal(tmp);
                         delete tmp;
-                        tmp = new Node(Node::Type::Div, "", integral, a0->right->Recreate());
+                        tmp = new Node(Node::Type::Div, ""_M, integral, a0->right->Recreate());
                         delete del;
                         Node* ret = OptimizeInternal(tmp);
                         delete tmp;
@@ -349,7 +352,7 @@ namespace MathLib {
                     delete del;
                     ReturnFromBenchmark(node->Recreate())
                 }
-                Node* tmp = pow == "0" ? new Node(Node::Type::Function, "ln", new Node(Node::Type::Absolute, "", a1->Recreate())) : new Node(Node::Type::Div, "", new Node(Node::Type::Pow, "", a1->Recreate(), new Node(Node::Type::Constant, pow)), new Node(Node::Type::Constant, pow));
+                Node* tmp = pow == '0'_M ? new Node(Node::Type::Function, "ln"_M, new Node(Node::Type::Absolute, ""_M, a1->Recreate())) : new Node(Node::Type::Div, ""_M, new Node(Node::Type::Pow, ""_M, a1->Recreate(), new Node(Node::Type::Constant, pow)), new Node(Node::Type::Constant, pow));
                 delete del;
                 Node* ret = OptimizeInternal(tmp);
                 delete tmp;
@@ -362,15 +365,15 @@ namespace MathLib {
                 const Node*& a1 = args.At(1);
                 const Node*& a2 = args.At(2);
                 const Node*& a3 = args.At(3);
-                if (a0->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::Keyword, "summation", del))
+                if (a0->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::Keyword, "summation"_M, del))
                 if (ContainsVariable(a3, a0->value)) {
                     Node* ret;
                     Node** curr = &ret;
-                    if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Keyword, "summation", del))
-                    if (a2->ToNumber().At(0).GetReal() < a1->ToNumber().At(0).GetReal()) ReturnFromBenchmark(new Node(Node::Type::Constant, "0"))
+                    if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Keyword, "summation"_M, del))
+                    if (a2->ToNumber().At(0).GetReal() < a1->ToNumber().At(0).GetReal()) ReturnFromBenchmark(new Node(Node::Type::Constant, '0'_M))
                     for (num_t i = a1->ToNumber().At(0).GetReal(); i <= a2->ToNumber().At(0).GetReal(); i++) {
                         Node* tmp = new Node(Node::Type::Constant, ToString(i));
-                        *curr = new Node(Node::Type::Add, "", ReplaceVariable(a3, a0->value, tmp), new Node(Node::Type::Constant, "0"));
+                        *curr = new Node(Node::Type::Add, ""_M, ReplaceVariable(a3, a0->value, tmp), new Node(Node::Type::Constant, '0'_M));
                         delete tmp;
                         curr = &(*curr)->right;
                     }
@@ -385,7 +388,7 @@ namespace MathLib {
                     Node* start = a1->Recreate();
                     Node* end = a2->Recreate();
                     delete del;
-                    del = new Node(Node::Type::Mul, "", tmp, new Node(Node::Type::Add, "", new Node(Node::Type::Sub, "", end, start), new Node(Node::Type::Constant, "1")));
+                    del = new Node(Node::Type::Mul, ""_M, tmp, new Node(Node::Type::Add, ""_M, new Node(Node::Type::Sub, ""_M, end, start), new Node(Node::Type::Constant, '1'_M)));
                     tmp = OptimizeInternal(del);
                     delete del;
                     ReturnFromBenchmark(tmp)
@@ -398,15 +401,15 @@ namespace MathLib {
                 const Node*& a1 = args.At(1);
                 const Node*& a2 = args.At(2);
                 const Node*& a3 = args.At(3);
-                if (a0->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::Keyword, "product", del))
+                if (a0->type != Node::Type::Variable) ReturnFromBenchmark(new Node(Node::Type::Keyword, "product"_M, del))
                 if (ContainsVariable(a3, a0->value)) {
                     Node* ret;
                     Node** curr = &ret;
-                    if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Keyword, "product", del))
-                    if (a2->ToNumber().At(0).GetReal() < a1->ToNumber().At(0).GetReal()) ReturnFromBenchmark(new Node(Node::Type::Constant, "1"))
+                    if (a1->type != Node::Type::Constant || a2->type != Node::Type::Constant) ReturnFromBenchmark(new Node(Node::Type::Keyword, "product"_M, del))
+                    if (a2->ToNumber().At(0).GetReal() < a1->ToNumber().At(0).GetReal()) ReturnFromBenchmark(new Node(Node::Type::Constant, '1'_M))
                     for (num_t i = a1->ToNumber().At(0).GetReal(); i <= a2->ToNumber().At(0).GetReal(); i++) {
                         Node* tmp = new Node(Node::Type::Constant, ToString(i));
-                        *curr = new Node(Node::Type::Mul, "", ReplaceVariable(a3, a0->value, tmp), new Node(Node::Type::Constant, "1"));
+                        *curr = new Node(Node::Type::Mul, ""_M, ReplaceVariable(a3, a0->value, tmp), new Node(Node::Type::Constant, '1'_M));
                         delete tmp;
                         curr = &(*curr)->right;
                     }
@@ -421,7 +424,7 @@ namespace MathLib {
                     Node* start = a1->Recreate();
                     Node* end = a2->Recreate();
                     delete del;
-                    del = new Node(Node::Type::Pow, "", tmp, new Node(Node::Type::Add, "", new Node(Node::Type::Sub, "", end, start), new Node(Node::Type::Constant, "1")));
+                    del = new Node(Node::Type::Pow, ""_M, tmp, new Node(Node::Type::Add, ""_M, new Node(Node::Type::Sub, ""_M, end, start), new Node(Node::Type::Constant, '1'_M)));
                     tmp = OptimizeInternal(del);
                     delete del;
                     ReturnFromBenchmark(tmp)
@@ -433,10 +436,10 @@ namespace MathLib {
                 Array<Node*> fields = Array<Node*>(args.GetSize() * 2);
                 for (size_t i = 0; i < args.GetSize(); i++) {
                     fields.At(i * 2) = args.At(i)->Recreate();
-                    fields.At(i * 2 + 1) = new Node(Node::Type::Constant, "0");
+                    fields.At(i * 2 + 1) = new Node(Node::Type::Constant, '0'_M);
                 }
                 delete del;
-                ReturnFromBenchmark(new Node(Node::Type::Struct, "", ArrayToComma(fields)))
+                ReturnFromBenchmark(new Node(Node::Type::Struct, ""_M, ArrayToComma(fields)))
             }
             else if (node->value == "GetField") {
                 Node* del = OptimizeComma(node->left);
@@ -466,7 +469,7 @@ namespace MathLib {
                 }
                 if (found) {
                     delete del;
-                    ReturnFromBenchmark(new Node(Node::Type::Struct, "", ArrayToComma(ret)))
+                    ReturnFromBenchmark(new Node(Node::Type::Struct, ""_M, ArrayToComma(ret)))
                 }
             }
             ReturnFromBenchmark(new Node(Node::Type::Keyword, node->value, node->left ? OptimizeInternal(node->left) : nullptr, node->right ? OptimizeInternal(node->right) : nullptr))
@@ -498,7 +501,7 @@ namespace MathLib {
                 delete r;
                 ReturnFromBenchmark(ret)
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Add, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Add, ""_M, l, r))
         }
         else if (node->type == Node::Type::Sub) {
             Node* l = OptimizeInternal(node->left);
@@ -510,19 +513,19 @@ namespace MathLib {
                 delete r;
                 ReturnFromBenchmark(new Node(Node::Type::Constant, (lv - rv).ToString()))
             }
-            else if (l->type == Node::Type::Constant && l->value == "0") {
-                Node* ret = new Node(Node::Type::Mul, "", new Node(Node::Type::Constant, "-1"), r->Recreate());
+            else if (l->type == Node::Type::Constant && l->value == '0'_M) {
+                Node* ret = new Node(Node::Type::Mul, ""_M, new Node(Node::Type::Constant, "-1"_M), r->Recreate());
                 delete l;
                 delete r;
                 ReturnFromBenchmark(ret)
             }
-            else if (r->type == Node::Type::Constant && r->value == "0") {
+            else if (r->type == Node::Type::Constant && r->value == '0'_M) {
                 Node* ret = l->Recreate();
                 delete l;
                 delete r;
                 ReturnFromBenchmark(ret)
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Sub, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Sub, ""_M, l, r))
         }
         else if (node->type == Node::Type::Mul) {
             Node* l = OptimizeInternal(node->left);
@@ -549,9 +552,9 @@ namespace MathLib {
             else if ((l->type == Node::Type::Constant && l->value == "0") || (r->type == Node::Type::Constant && r->value == "0")) {
                 delete l;
                 delete r;
-                ReturnFromBenchmark(new Node(Node::Type::Constant, "0"))
+                ReturnFromBenchmark(new Node(Node::Type::Constant, '0'_M))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Mul, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Mul, ""_M, l, r))
         }
         else if (node->type == Node::Type::Div) {
             Node* l = OptimizeInternal(node->left);
@@ -567,7 +570,7 @@ namespace MathLib {
                 delete r;
                 ReturnFromBenchmark(l)
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Div, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Div, ""_M, l, r))
         }
         else if (node->type == Node::Type::Pow) {
             Node* l = OptimizeInternal(node->left);
@@ -586,14 +589,14 @@ namespace MathLib {
             else if (r->type == Node::Type::Constant && r->value == "0") {
                 delete l;
                 delete r;
-                ReturnFromBenchmark(new Node(Node::Type::Constant, "1"))
+                ReturnFromBenchmark(new Node(Node::Type::Constant, '1'_M))
             }
             else if (l->type == Node::Type::Constant && l->value == "1") {
                 delete l;
                 delete r;
-                ReturnFromBenchmark(new Node(Node::Type::Constant, "1"))
+                ReturnFromBenchmark(new Node(Node::Type::Constant, '1'_M))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Pow, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Pow, ""_M, l, r))
         }
         else if (node->type == Node::Type::Root) {
             Node* l = OptimizeInternal(node->left);
@@ -604,7 +607,7 @@ namespace MathLib {
                 delete r;
                 ReturnFromBenchmark(new Node(Node::Type::Constant, ret.ToString()))
             }
-            else ReturnFromBenchmark(new Node(Node::Type::Root, "", l, r))
+            else ReturnFromBenchmark(new Node(Node::Type::Root, ""_M, l, r))
         }
         else ReturnFromBenchmark(nullptr)
     }

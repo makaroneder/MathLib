@@ -2,7 +2,7 @@
 #include "String.hpp"
 
 namespace MathLib {
-    Expected<JSON> LoadJSON(const String& str, size_t& i) {
+    Expected<JSON> LoadJSON(const Sequence<char>& str, size_t& i) {
         String name = "";
         SkipWhiteSpace(str, i);
         if (str.At(i) == '"') {
@@ -33,7 +33,7 @@ namespace MathLib {
         }
         else if (str.At(i) == '{' || str.At(i) == '[') {
             const char end = str.At(i) == '{' ? '}' : ']';
-            JSON ret = JSON(end == '}' ? JSON::Type::Object : JSON::Type::Array, name, "");
+            JSON ret = JSON(end == '}' ? JSON::Type::Object : JSON::Type::Array, name, ""_M);
             i++;
             while (true) {
                 const Expected<JSON> tmp = LoadJSON(str, i);
@@ -51,7 +51,7 @@ namespace MathLib {
         else return Expected<JSON>();
     }
     JSON::JSON(void) {}
-    JSON::JSON(Type type, const String& name, const String& value) : type(type), name(name), value(value) {}
+    JSON::JSON(Type type, const Sequence<char>& name, const Sequence<char>& value) : type(type), name(CollectionToString(name)), value(CollectionToString(value)) {}
     JSON::Type JSON::GetType(void) const {
         return type;
     }
@@ -64,10 +64,10 @@ namespace MathLib {
     bool JSON::AddChild(const JSON& child) {
         return children.Add(child);
     }
-    Expected<JSON> JSON::Find(const String& path) const {
-        const Array<String> split = Split(path, "/", false);
+    Expected<JSON> JSON::Find(const Sequence<char>& path) const {
+        const Array<String> split = Split(path, "/"_M, false);
         JSON prev = *this;
-        for (const String& name : split) {
+        for (const Sequence<char>& name : split) {
             bool found = false;
             for (const JSON& child : prev.children) {
                 if (child.name == name) {
@@ -93,7 +93,7 @@ namespace MathLib {
         return children.end();
     }
     bool JSON::Save(Writable& file) const {
-        return file.Puts(ToString(""));
+        return file.Puts(ToString());
     }
     bool JSON::Load(Readable& file) {
         size_t i = 0;
@@ -102,14 +102,14 @@ namespace MathLib {
         *this = tmp.Get();
         return true;
     }
-    String JSON::ToString(const String& padding) const {
-        String ret = padding + (name.IsEmpty() ? "" : '"'_M + name + "\": ");
+    String JSON::ToString(const Sequence<char>& padding) const {
+        String ret = CollectionToString(padding) + (name.IsEmpty() ? "" : '"'_M + name + "\": ");
         if (type == Type::String) return ret + '"'_M + value + '"';
         else if (type == Type::Number || type == Type::Keyword) return ret + value;
         else if (type == Type::Object || type == Type::Array) {
             ret += type == Type::Object ? "{\n" : "[\n";
             for (size_t i = 0; i < children.GetSize(); i++)
-                ret += children.At(i).ToString(padding + '\t') + (i + 1 != children.GetSize() ? ",\n" : "\n");
+                ret += children.At(i).ToString(CollectionToString(padding) + '\t') + (i + 1 != children.GetSize() ? ",\n" : "\n");
             return ret + padding + (type == Type::Object ? '}' : ']');
         }
         else return ret;

@@ -1,6 +1,6 @@
 #include "TriggerStrategy.hpp"
 
-TriggerStrategy::TriggerStrategy(const MathLib::Array<TriggerAction*>& actions) : actions(actions), action(0) {}
+TriggerStrategy::TriggerStrategy(const MathLib::Sequence<TriggerAction*>& actions) : actions(MathLib::CollectionToArray<TriggerAction*>(actions)), action(0) {}
 TriggerStrategy::~TriggerStrategy(void) {
     for (TriggerAction*& action : actions) delete action;
 }

@@ -5,17 +5,13 @@
 namespace MathLib {
     template <typename T, typename Ret, typename... Args>
     struct FunctionT : Function<Ret, Args...> {
-        FunctionT(void) {
-            EmptyBenchmark
-        }
-        FunctionT(void* data, T function) : Function<Ret, Args...>(data), function(function) {
-            EmptyBenchmark
-        }
+        FunctionT(void) {}
+        FunctionT(void* data, T function) : Function<Ret, Args...>(data), function(function) {}
         [[nodiscard]] T GetFunction(void) const {
-            StartAndReturnFromBenchmark(function);
+            return function;
         }
         [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const override {
-            StartAndReturnFromBenchmark(function(data, args...));
+            return function(data, args...);
         }
 
         private:
@@ -24,6 +20,10 @@ namespace MathLib {
     template <typename Ret, typename... Args, typename T>
     FunctionT<T, Ret, Args...> MakeFunctionT(void* data, T function) {
         return FunctionT<T, Ret, Args...>(data, function);
+    }
+    template <typename Ret, typename... Args, typename T>
+    FunctionT<T, Ret, Args...>* AllocFunctionT(void* data, T function) {
+        return new FunctionT<T, Ret, Args...>(data, function);
     }
 }
 

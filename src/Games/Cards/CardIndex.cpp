@@ -4,8 +4,8 @@ CardIndex::CardIndex(Card::Type type, Card::Color color) : type(type), color(col
 bool CardIndex::operator<(const CardIndex& other) const {
     return type < other.type;
 }
-MathLib::String CardIndex::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding;
+MathLib::String CardIndex::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding);
     switch (type) {
         case Card::Type::C2: {
             ret += "2";

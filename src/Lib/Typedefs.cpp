@@ -8,8 +8,13 @@ namespace MathLib {
     Array<Tree<num_t>*> traces;
     size_t currentTrace;
 
+    String CollectionToString(const Sequence<char>& sequence) {
+        String ret = "";
+        for (size_t i = 0; i < sequence.GetSize(); i++) ret += sequence.At(i);
+        return ret;
+    }
     void StartBenchmarking(void) {
-        traceData = Tree<num_t>("Root", GetTime());
+        traceData = Tree<num_t>("Root"_M, GetTime());
         traces = MakeArray<Tree<num_t>*>(&traceData);
         currentTrace = 0;
         benchmark = true;
@@ -17,7 +22,7 @@ namespace MathLib {
     bool BenchmarkStart(const char* function) {
         if (!benchmark) return true;
         benchmark = false;
-        if (!traces.At(currentTrace)->Add(Tree<num_t>(function, GetTime())) || !traces.Add(&traces.At(currentTrace)->children.At(traces.At(currentTrace)->children.GetSize() - 1))) {
+        if (!traces.At(currentTrace)->Add(Tree<num_t>(String(function), GetTime())) || !traces.Add(&traces.At(currentTrace)->children.At(traces.At(currentTrace)->children.GetSize() - 1))) {
             benchmark = true;
             return false;
         }

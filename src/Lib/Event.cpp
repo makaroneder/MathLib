@@ -13,14 +13,14 @@ namespace MathLib {
     Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {
         EmptyBenchmark
     }
-    String Event::ToString(const String& padding) const {
+    String Event::ToString(const Sequence<char>& padding) const {
         StartBenchmark
         switch (type) {
-            case Event::Type::None: ReturnFromBenchmark(padding + "None");
-            case Event::Type::Quit: ReturnFromBenchmark(padding + "Quit");
-            case Event::Type::KeyPressed: ReturnFromBenchmark(padding + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'');
+            case Event::Type::None: ReturnFromBenchmark(CollectionToString(padding) + "None");
+            case Event::Type::Quit: ReturnFromBenchmark(CollectionToString(padding) + "Quit");
+            case Event::Type::KeyPressed: ReturnFromBenchmark(CollectionToString(padding) + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'');
             case Event::Type::MousePressed: {
-                String ret = padding + (pressed ? "Pressed" : "Released") + ' ';
+                String ret = CollectionToString(padding) + (pressed ? "Pressed" : "Released") + ' ';
                 switch (mouseButton) {
                     case MouseButton::None: {
                         ret += "no";
@@ -50,7 +50,7 @@ namespace MathLib {
                 }
                 ReturnFromBenchmark(ret + " button at " + mousePosition.ToString());
             }
-            default: ReturnFromBenchmark(padding + "Unknown");
+            default: ReturnFromBenchmark(CollectionToString(padding) + "Unknown");
         }
     }
 }

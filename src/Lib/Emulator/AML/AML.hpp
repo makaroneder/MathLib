@@ -7,7 +7,7 @@
 
 namespace MathLib {
     struct AML : Emulator {
-        AML(const Array<uint8_t>& memory);
+        AML(const Sequence<uint8_t>& memory);
         AML(const DSDT* dsdt);
         [[nodiscard]] virtual bool Run(void) override;
         [[nodiscard]] AMLObject GetRoot(void) const;

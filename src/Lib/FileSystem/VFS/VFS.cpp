@@ -2,19 +2,20 @@
 #include "../../String.hpp"
 
 namespace MathLib {
-    VFS::VFS(void) : entries(Array<VFSEntry>()), files(Array<VFSFile>()) {
+    VFS::VFS(void) : entries(), files() {
         EmptyBenchmark
     }
     bool VFS::AddFileSystem(const VFSEntry& entry) {
         StartAndReturnFromBenchmark(entry.fs && entries.Add(entry));
     }
-    size_t VFS::OpenInternal(const String& path, OpenMode mode) {
+    size_t VFS::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         StartBenchmark
         size_t off = 0;
-        if (path.At(0) == '/') off++;
+        if (path.At(off) == '/') off++;
         String fs;
-        for (; path.At(off) != '/'; off++) fs += path.At(off);
+        for (; off < path.GetSize() && path.At(off) != '/'; off++) fs += path.At(off);
         off++;
+        if (off >= path.GetSize()) return SIZE_MAX;
         String fsPath = SubString(path, off, path.GetSize() - off);
         size_t fsIndex = SIZE_MAX;
         for (size_t i = 0; i < entries.GetSize() && fsIndex == SIZE_MAX; i++)
@@ -45,7 +46,7 @@ namespace MathLib {
     size_t VFS::GetSize(size_t file) {
         StartAndReturnFromBenchmark(IsValid(file) ? entries.At(files.At(file).fs).fs->GetSize(files.At(file).index) : 0);
     }
-    Array<FileInfo> VFS::ReadDirectory(const String& path) {
+    Array<FileInfo> VFS::ReadDirectory(const Sequence<char>& path) {
         StartBenchmark
         size_t off = 0;
         if (!path.IsEmpty() && path.At(0) == '/') off++;

@@ -6,13 +6,13 @@
 
 namespace MathLib {
     struct MOS6502 : StepEmulator, Printable {
-        MOS6502(const Array<uint8_t>& memory);
+        MOS6502(const Sequence<uint8_t>& memory);
         [[nodiscard]] virtual bool Step(void) override;
         [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
         [[nodiscard]] bool OrA(uint16_t addr);

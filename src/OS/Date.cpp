@@ -6,8 +6,8 @@ Date creationData = Date::FromTimestampMacro(__TIMESTAMP__);
 Date::Date(void) {}
 Date::Date(uint8_t second, uint8_t minute, uint8_t hour, uint8_t day, uint8_t month, size_t year) : second(second), minute(minute), hour(hour), day(day), month(month), year(year) {}
 Date Date::FromTimestampMacro(const char* timeStamp) {
-    const MathLib::Array<MathLib::String> split1 = MathLib::Split(timeStamp, " ", false);
-    const MathLib::Array<MathLib::String> split2 = MathLib::Split(split1.At(3), ":", false);
+    const MathLib::Array<MathLib::String> split1 = MathLib::Split(MathLib::String(timeStamp), " "_M, false);
+    const MathLib::Array<MathLib::String> split2 = MathLib::Split(split1.At(3), ":"_M, false);
     uint8_t month = 0;
     if (split1.At(1) == "Jan") month = 1;
     else if (split1.At(1) == "Feb") month = 2;
@@ -32,6 +32,6 @@ bool Date::operator==(const Date& other) const {
 bool Date::operator!=(const Date& other) const {
     return !(*this == other);
 }
-MathLib::String Date::ToString(const MathLib::String& padding) const {
-    return padding + MathLib::ToString(hour, 10, 2) + ':' + MathLib::ToString(minute, 10, 2) + ':' + MathLib::ToString(second, 10, 2) + ' ' + MathLib::ToString(day, 10, 2) + '.' + MathLib::ToString(month, 10, 2) + '.' + MathLib::ToString(year, 10);
+MathLib::String Date::ToString(const MathLib::Sequence<char>& padding) const {
+    return MathLib::CollectionToString(padding) + MathLib::ToString(hour, 10, 2) + ':' + MathLib::ToString(minute, 10, 2) + ':' + MathLib::ToString(second, 10, 2) + ' ' + MathLib::ToString(day, 10, 2) + '.' + MathLib::ToString(month, 10, 2) + '.' + MathLib::ToString(year, 10);
 }

@@ -1,5 +1,4 @@
-#include <SingleTypePair.hpp>
-#include <Math/Matrix.hpp>
+#include <Math/SystemOfLinearEquations.hpp>
 #include <iostream>
 
 /// @brief Entry point for this program
@@ -12,14 +11,13 @@ int main(int, char**) {
             MathLib::SingleTypePair<MathLib::num_t>(0, 0),
             MathLib::SingleTypePair<MathLib::num_t>(1, 1),
         };
-        MathLib::matrix_t a = MathLib::matrix_t(SizeOfArray(data), SizeOfArray(data));
-        MathLib::matrix_t b = MathLib::matrix_t(1, SizeOfArray(data));
+        MathLib::SystemOfLinearEquations<MathLib::num_t> equations = MathLib::SystemOfLinearEquations<MathLib::num_t>(SizeOfArray(data));
         for (size_t y = 0; y < SizeOfArray(data); y++) {
             for (size_t x = 0; x < SizeOfArray(data); x++)
-                a.At(x, y) = MathLib::Pow(data[y].first, x);
-            b.At(0, y) = data[y].second;
+                equations.EquationAt(x, y) = MathLib::Pow(data[y].first, x);
+            equations.ValueAt(y) = data[y].second;
         }
-        std::cout << (a.GetInverse().Get("Failed to get inverse of matrix") * b).Get("Failed to multiply to matrices").GetTranspose() << std::endl;
+        std::cout << equations.GetMatrixSolution().Get("Failed to solve").GetTranspose() << std::endl;
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

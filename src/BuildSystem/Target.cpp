@@ -1,6 +1,6 @@
 #include "Target.hpp"
 
-Target::Target(const MathLib::String& name, const MathLib::String& deps, const MathLib::String& command, bool phony) : name(name), deps(deps), command(command), phony(phony) {}
-MathLib::String Target::ToString(const MathLib::String& padding) const {
-    return padding + name + ": " + deps + " => " + command;
+Target::Target(const MathLib::Sequence<char>& name, const MathLib::Sequence<char>& deps, const MathLib::Sequence<char>& command, bool phony) : name(MathLib::CollectionToString(name)), deps(MathLib::CollectionToString(deps)), command(MathLib::CollectionToString(command)), phony(phony) {}
+MathLib::String Target::ToString(const MathLib::Sequence<char>& padding) const {
+    return MathLib::CollectionToString(padding) + name + ": " + deps + " => " + command;
 }

@@ -8,7 +8,7 @@
 /// @brief Converts string to number with size postfixes
 /// @param size String to convert
 /// @return Number
-[[nodiscard]] size_t ParseSize(const MathLib::String& size) {
+[[nodiscard]] size_t ParseSize(const MathLib::Sequence<char>& size) {
     switch (size.At(size.GetSize() - 1)) {
         case 'B': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1));
         case 'K': return MathLib::StringToNumber(MathLib::SubString(size, 0, size.GetSize() - 1)) * 1024;
@@ -25,13 +25,13 @@ int main(int argc, char** argv) {
     try {
         const size_t sectorSize = 512;
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
-        size_t diskSize = ParseSize(cmdLine.GetEntry("diskSize").Get("Disk size not specified"));
+        size_t diskSize = ParseSize(cmdLine.GetEntry("diskSize"_M).Get("Disk size not specified"));
         if (diskSize % sectorSize != 0) diskSize += sectorSize - diskSize % sectorSize;
         diskSize /= sectorSize;
         MathLib::HostFileSystem fs;
-        MathLib::File file = fs.Open(cmdLine.GetEntry("output").Get("Output file not specified"), MathLib::OpenMode::Write);
+        MathLib::File file = fs.Open(cmdLine.GetEntry("output"_M).Get("Output file not specified"), MathLib::OpenMode::Write);
         uint8_t emptySector[sectorSize] = { 0, };
-        const MathLib::String diskType = cmdLine.GetEntry("diskType").Get("Disk type not specified");
+        const MathLib::String diskType = cmdLine.GetEntry("diskType"_M).Get("Disk type not specified");
         if (diskType == "MBR") {
             MathLib::MBRHeader mbr;
             mbr.entries[0] = MathLib::MBRPartitionEntry(MathLib::Interval<uint32_t>(1, diskSize--), MathLib::MBRPartitionEntry::ID::NonFileSystemData);

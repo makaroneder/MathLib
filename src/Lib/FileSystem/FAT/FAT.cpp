@@ -86,7 +86,7 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(false);
     }
-    Expected<FATDirectoryEntry> FAT::GetDirectoryEntry(const String& path) {
+    Expected<FATDirectoryEntry> FAT::GetDirectoryEntry(const Sequence<char>& path) {
         StartBenchmark
         size_t sector = root;
         FATDirectoryEntry prev = FATDirectoryEntry();
@@ -95,10 +95,10 @@ namespace MathLib {
             prev.SetCluster(bootSector.ebr32.rootCluster);
             prev.name[0] = '/';
         }
-        const Array<String> split = Split(path, "/", false);
+        const Array<String> split = Split(path, '/'_M, false);
         uint32_t cluster;
         if (split.IsEmpty()) ReturnFromBenchmark(prev);
-        for (const String& name : split) {
+        for (const Sequence<char>& name : split) {
             while (true) {
                 size_t size = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
                 if (prev.name[0]) {
@@ -129,7 +129,7 @@ namespace MathLib {
         }
         ReturnFromBenchmark(Expected<FATDirectoryEntry>(prev));
     }
-    size_t FAT::OpenInternal(const String& path, OpenMode mode) {
+    size_t FAT::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         StartBenchmark
         const Expected<FATDirectoryEntry> entry = GetDirectoryEntry(path);
         if (!entry.HasValue()) ReturnFromBenchmark(SIZE_MAX);
@@ -158,7 +158,7 @@ namespace MathLib {
     size_t FAT::GetSize(size_t file) {
         StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? files.At(file).size : 0);
     }
-    Array<FileInfo> FAT::ReadDirectory(const String& path) {
+    Array<FileInfo> FAT::ReadDirectory(const Sequence<char>& path) {
         StartBenchmark
         Array<FileInfo> ret;
         if (path.IsEmpty() && type != Type::FAT32) {

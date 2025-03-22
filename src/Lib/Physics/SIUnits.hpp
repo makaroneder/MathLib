@@ -47,20 +47,20 @@ namespace MathLib {
         [[nodiscard]] T GetBaseUnit(const size_t& i) const {
             StartAndReturnFromBenchmark(baseUnits[i]);
         }
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
-            if (FloatsEqual<T>(count, 0)) ReturnFromBenchmark(padding + '0');
-            String str = CoefficientToString(count, "");
+            if (FloatsEqual<T>(count, 0)) ReturnFromBenchmark(CollectionToString(padding) + '0');
+            String str = CoefficientToString(count, ""_M);
             bool first = true;
             for (size_t i = 0; i < BaseUnit::End; i++) {
                 if (baseUnits[i] != 0) {
                     if (!first) str += " * ";
                     str += baseUnitsStr[i];
-                    if (baseUnits[i] != 1) str += String('^') + MathLib::ToString(baseUnits[i]);
+                    if (baseUnits[i] != 1) str += '^'_M + MathLib::ToString(baseUnits[i]);
                     first = false;
                 }
             }
-            ReturnFromBenchmark(padding + ((first && count == 1) ? "1" : str));
+            ReturnFromBenchmark(CollectionToString(padding) + ((first && count == 1) ? '1'_M : str));
         }
         [[nodiscard]] Unit<T> Pow(const T& scalar) const {
             StartAndReturnFromBenchmark(Unit<T>(

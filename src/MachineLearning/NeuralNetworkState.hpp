@@ -23,7 +23,7 @@ struct NeuralNetworkState : MathLib::Saveable {
     /// @param in Input data for learning
     /// @param out Output data for learning
     /// @param nn Neural network
-    constexpr NeuralNetworkState(const T& rate, const MathLib::Matrix<T>& trainingDataInput, const MathLib::Matrix<T>& trainingDataOutput, const MathLib::NeuralNetwork<T>& neuralNetwork, const MathLib::Array<T>& data = MathLib::Array<T>()) : rate(rate), trainingDataInput(trainingDataInput), trainingDataOutput(trainingDataOutput), neuralNetwork(neuralNetwork), data(data) {}
+    constexpr NeuralNetworkState(const T& rate, const MathLib::Matrix<T>& trainingDataInput, const MathLib::Matrix<T>& trainingDataOutput, const MathLib::NeuralNetwork<T>& neuralNetwork, const MathLib::Sequence<T>& data = MathLib::Array<T>()) : rate(rate), trainingDataInput(trainingDataInput), trainingDataOutput(trainingDataOutput), neuralNetwork(neuralNetwork), data(MathLib::CollectionToArray<T>(data)) {}
     [[nodiscard]] constexpr bool Forward(void) {
         return neuralNetwork.Forward();
     }

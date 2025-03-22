@@ -14,7 +14,7 @@ namespace MathLib {
         char name[495];
 
         MathFSFileHeader(void);
-        MathFSFileHeader(Type type, uint64_t lba, uint64_t size, const String& path);
+        MathFSFileHeader(Type type, uint64_t lba, uint64_t size, const Sequence<char>& path);
     } __attribute__((packed));
 }
 

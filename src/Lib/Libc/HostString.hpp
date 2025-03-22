@@ -6,6 +6,9 @@
 
 namespace MathLib {
     struct HostString : Collection<char> {
+        using Sequence<char>::operator==;
+        using Sequence<char>::operator!=;
+        using Collection<char>::operator+=;
         HostString(void) {}
         HostString(const char* str) : string(str) {}
         HostString(const char* str, size_t size) : string(str, size) {}
@@ -30,19 +33,11 @@ namespace MathLib {
         [[nodiscard]] std::string ToStdString(void) const {
             return string;
         }
-        HostString& operator+=(const HostString& other) {
-            string += other.string;
-            return *this;
-        }
         HostString& operator+=(const char* other) {
             string += other;
             return *this;
         }
-        HostString& operator+=(const char& chr) {
-            string += chr;
-            return *this;
-        }
-        [[nodiscard]] HostString operator+(const HostString& other) const {
+        [[nodiscard]] HostString operator+(const Sequence<char>& other) const {
             HostString tmp = *this;
             tmp += other;
             return tmp;
@@ -57,14 +52,8 @@ namespace MathLib {
             tmp += chr;
             return tmp;
         }
-        [[nodiscard]] bool operator==(const HostString& other) const {
-            return string == other.string;
-        }
         [[nodiscard]] bool operator==(const char* other) const {
             return string == other;
-        }
-        [[nodiscard]] bool operator!=(const HostString& other) const {
-            return string != other.string;
         }
         [[nodiscard]] bool operator!=(const char* other) const {
             return string != other;

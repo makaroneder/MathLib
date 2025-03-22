@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
         MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Complex animation", 800, 800);
         if (!renderer.SetImage<MathLib::P6>()) MathLib::Panic("Failed to set image interface in renderer");
         MathLib::HostFileSystem fs;
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[1]));
+        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
         #endif
         delete optimizedRoot;
         optimizer.runtime = true;
-        const MathLib::FunctionNode funcNode = optimizer.GetFunction("f");
+        const MathLib::FunctionNode funcNode = optimizer.GetFunction('f'_M);
         MathLib::Array<MathLib::complex_t> domain;
         MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> func;
         if (funcNode.dataType == "R") {

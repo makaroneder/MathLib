@@ -5,10 +5,10 @@
 bool ELFHeader::IsValid(void) const {
     return *(const uint32_t*)signature == *(const uint32_t*)expectedSignature && version == expectedVersion && bitMode != BitMode::Invalid && endianness != Endianness::Invalid;
 }
-MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + "{\n";
-    ret += padding + "\tSignature: 0x" + MathLib::ToString(signature[0], 16) + ' ' + signature[1] + signature[2] + signature[3] + '\n';
-    ret += padding + "\tBit mode: ";
+MathLib::String ELFHeader::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
+    ret += MathLib::CollectionToString(padding) + "\tSignature: 0x" + MathLib::ToString(signature[0], 16) + ' ' + signature[1] + signature[2] + signature[3] + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tBit mode: ";
     switch (bitMode) {
         case BitMode::Invalid: {
             ret += "Invalid";
@@ -25,7 +25,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         default: ret += "Unknown";
     }
     ret += " (0x"_M + MathLib::ToString((uint8_t)bitMode, 16) + ")\n";
-    ret += padding + "\tEndianness: ";
+    ret += MathLib::CollectionToString(padding) + "\tEndianness: ";
     switch (endianness) {
         case Endianness::Invalid: {
             ret += "Invalid";
@@ -42,8 +42,8 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         default: ret += "Unknown";
     }
     ret += " (0x"_M + MathLib::ToString((uint8_t)endianness, 16) + ")\n";
-    ret += padding + "\tHeader version: " + MathLib::ToString(headerVersion, 10) + '\n';
-    ret += padding + "\tABI: ";
+    ret += MathLib::CollectionToString(padding) + "\tHeader version: " + MathLib::ToString(headerVersion, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tABI: ";
     switch (abi) {
         case ABI::SystemV: {
             ret += "SystemV";
@@ -104,11 +104,9 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         default: ret += "Unknown";
     }
     ret += " (0x"_M + MathLib::ToString((uint8_t)abi, 16) + ")\n";
-    ret += padding + "\tABI version: " + MathLib::ToString(abiVersion, 10) + '\n';
-    uint64_t tmp = 0;
-    MathLib::MemoryCopy(reserved, &tmp, SizeOfArray(reserved));
-    ret += padding + "\tReserved: 0x" + MathLib::ToString(tmp, 16) + '\n';
-    ret += padding + "\tType: ";
+    ret += MathLib::CollectionToString(padding) + "\tABI version: " + MathLib::ToString(abiVersion, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tReserved: 0x" + MathLib::ToString(reserved, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tType: ";
     switch (type) {
         case Type::None: {
             ret += "None";
@@ -141,7 +139,7 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         default: ret += "Unknown";
     }
     ret += " (0x"_M + MathLib::ToString((uint16_t)type, 16) + ")\n";
-    ret += padding + "\tArch: ";
+    ret += MathLib::CollectionToString(padding) + "\tArch: ";
     switch (arch) {
         case Arch::None: {
             ret += "None";
@@ -194,16 +192,16 @@ MathLib::String ELFHeader::ToString(const MathLib::String& padding) const {
         default: ret += "Unknown";
     }
     ret += " (0x"_M + MathLib::ToString((uint16_t)arch, 16) + ")\n";
-    ret += padding + "\tVersion: " + MathLib::ToString(version, 10) + '\n';
-    ret += padding + "\tEntry: 0x" + MathLib::ToString(entry, 16) + '\n';
-    ret += padding + "\tProgram header: 0x" + MathLib::ToString(programHeader, 16) + '\n';
-    ret += padding + "\tSection header: 0x" + MathLib::ToString(sectionHeader, 16) + '\n';
-    ret += padding + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n';
-    ret += padding + "\tHeader size: " + MathLib::ToString(headerSize, 10) + '\n';
-    ret += padding + "\tProgram header entry size: " + MathLib::ToString(programHeaderEntrySize, 10) + '\n';
-    ret += padding + "\tProgram header entries: " + MathLib::ToString(programHeaderEntries, 10) + '\n';
-    ret += padding + "\tSection header entry size: " + MathLib::ToString(sectionHeaderEntrySize, 10) + '\n';
-    ret += padding + "\tSection header entries: " + MathLib::ToString(sectionHeaderEntries, 10) + '\n';
-    ret += padding + "\tString table: 0x" + MathLib::ToString(stringTable, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tVersion: " + MathLib::ToString(version, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tEntry: 0x" + MathLib::ToString(entry, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tProgram header: 0x" + MathLib::ToString(programHeader, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tSection header: 0x" + MathLib::ToString(sectionHeader, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tHeader size: " + MathLib::ToString(headerSize, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tProgram header entry size: " + MathLib::ToString(programHeaderEntrySize, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tProgram header entries: " + MathLib::ToString(programHeaderEntries, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tSection header entry size: " + MathLib::ToString(sectionHeaderEntrySize, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tSection header entries: " + MathLib::ToString(sectionHeaderEntries, 10) + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tString table: 0x" + MathLib::ToString(stringTable, 16) + '\n';
     return ret + padding + '}';
 }

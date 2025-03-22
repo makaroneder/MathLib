@@ -25,7 +25,7 @@ template <typename T>
     else return MathLib::Abs(a * b) / GreatestCommonDivisor<T>(a, b);
 }
 template <typename T>
-[[nodiscard]] T LeastCommonMultiple(const MathLib::Collection<T>& array) {
+[[nodiscard]] T LeastCommonMultiple(const MathLib::Sequence<T>& array) {
     if (array.IsEmpty()) return 0;
     T ret = array.At(0);
     for (size_t i = 1; i < array.GetSize(); i++) ret = LeastCommonMultiple<T>(ret, array.At(i));
@@ -44,7 +44,8 @@ struct Polynomial : MathLib::Printable {
     CreateOperators(Polynomial<T>, T)
     CreateExponential(Polynomial<T>, true, Polynomial<T>(MathLib::MakeArray<T>(1)))
     Polynomial(void) {}
-    Polynomial(MathLib::Array<T> coefficients) : coefficients(coefficients) {}
+    Polynomial(size_t degree) : coefficients(degree) {}
+    Polynomial(const MathLib::Sequence<T>& coefficients) : coefficients(MathLib::CollectionToArray<T>(coefficients)) {}
     [[nodiscard]] size_t GetDegree(void) const {
         return coefficients.GetSize() - 1;
     }
@@ -169,11 +170,11 @@ struct Polynomial : MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         MathLib::String ret;
         for (size_t i = GetDegree(); i; i--) {
-            const MathLib::String tmp = MathLib::CoefficientToString(coefficients.At(i), "x");
-            if (!tmp.IsEmpty()) ret += padding + tmp + (i == 1 ? "" : ('^'_M + MathLib::ToString(i, 10))) + " + ";
+            const MathLib::String tmp = MathLib::CoefficientToString(coefficients.At(i), 'x'_M);
+            if (!tmp.IsEmpty()) ret += MathLib::CollectionToString(padding) + tmp + (i == 1 ? "" : ('^'_M + MathLib::ToString(i, 10))) + " + ";
         }
         return !ret.IsEmpty() && MathLib::FloatsEqual<T>(coefficients.At(0), 0) ? MathLib::SubString(ret, 0, ret.GetSize() - 3) : ret + padding + MathLib::ToString(coefficients.At(0));
     }
@@ -230,7 +231,7 @@ int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
         MathLib::HostFileSystem fs;
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[1]));
+        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
@@ -242,8 +243,8 @@ int main(int argc, char** argv) {
         #endif
         delete optimizedRoot;
         optimizer.runtime = true;
-        const Polynomial<MathLib::num_t> w = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction("w").body).Get("Failed to read polynomials from file");
-        const Polynomial<MathLib::num_t> q = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction("q").body).Get("Failed to read polynomials from file");
+        const Polynomial<MathLib::num_t> w = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('w'_M).body).Get("Failed to read polynomials from file");
+        const Polynomial<MathLib::num_t> q = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('q'_M).body).Get("Failed to read polynomials from file");
         optimizer.Destroy();
         std::cout << "W(x) = " << w << '\n';
         std::cout << "Q(x) = " << q << '\n';

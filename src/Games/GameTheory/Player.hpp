@@ -31,10 +31,10 @@ struct Player : GameStrategy, MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         MathLib::String ret = "{\n";
-        ret += padding + "\tScore: " + MathLib::ToString(score) + '\n';
-        ret += padding + "\tPrevious move: " + (prevMove == SIZE_MAX ? "None" : MathLib::ToString(prevMove, 10)) + '\n';
+        ret += MathLib::CollectionToString(padding) + "\tScore: " + MathLib::ToString(score) + '\n';
+        ret += MathLib::CollectionToString(padding) + "\tPrevious move: " + (prevMove == SIZE_MAX ? "None" : MathLib::ToString(prevMove, 10)) + '\n';
         return ret + padding + '}';
     }
 

@@ -2,8 +2,12 @@
 #include "Math/Trigonometry.hpp"
 
 namespace MathLib {
-    void Panic(String str) {
-        Panic(str.GetValue());
+    void Panic(const Sequence<char>& str) {
+        const size_t size = str.GetSize();
+        char buff[size + 1];
+        for (size_t i = 0; i < size; i++) buff[i] = str.At(i);
+        buff[size] = '\0';
+        Panic(buff);
     }
     char ToUpper(char chr) {
         StartAndReturnFromBenchmark(IsLower(chr) ? (chr + 'A' - 'a') : chr);
@@ -23,7 +27,7 @@ namespace MathLib {
     bool IsWhiteSpace(char chr) {
         StartAndReturnFromBenchmark(chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r');
     }
-    void SkipWhiteSpace(const String& str, size_t& i) {
+    void SkipWhiteSpace(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         while (i < str.GetSize() && IsWhiteSpace(str.At(i))) i++;
         EndBenchmark
@@ -54,6 +58,18 @@ namespace MathLib {
     }
     size_t BitwiseXnor(size_t x, size_t y) {
         StartAndReturnFromBenchmark(~(x ^ y));
+    }
+    uint16_t SwapEndian16(uint16_t x) {
+        Swap<uint8_t>(((uint8_t*)&x)[0], ((uint8_t*)&x)[1]);
+        return x;
+    }
+    uint32_t SwapEndian32(uint32_t x) {
+        StartAndReturnFromBenchmark(
+            ((x >> 24) & UINT8_MAX <<  0) |
+            ((x >>  8) & UINT8_MAX <<  8) |
+            ((x <<  8) & UINT8_MAX << 16) |
+            ((x << 24) & UINT8_MAX << 24)
+        );
     }
     num_t Abs(num_t x) {
         StartAndReturnFromBenchmark(x < 0 ? -x : x);

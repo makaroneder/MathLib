@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
     try {
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
         MathLib::HostFileSystem fs;
-        const MathLib::String path = cmdLine.GetEntry("program").Get("No database specified");
+        const MathLib::String path = cmdLine.GetEntry("program"_M).Get("No database specified");
         Database database;
         if (!database.LoadFromPath(fs, path) || !database.IsValid()) database = Database();
         while (true) {
-            const MathLib::Array<MathLib::String> split = MathLib::Split(ReadLine(), " ", false);
+            const MathLib::Array<MathLib::String> split = MathLib::Split(ReadLine(), " "_M, false);
             if (split.At(0) == "exit") break;
             else if (split.At(0) == "help") {
                 std::cout << "exit: closes the program" << std::endl;

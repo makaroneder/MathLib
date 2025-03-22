@@ -24,13 +24,13 @@ int main(int argc, char** argv) {
         if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <file> <iteration count>");
         MathLib::HostFileSystem fs;
         const size_t printStatements = 10;
-        const size_t limit = (size_t)MathLib::StringToNumber(argv[2]);
+        const size_t limit = (size_t)MathLib::StringToNumber(MathLib::String(argv[2]));
         NeuralNetworkState<MathLib::num_t> state;
         if (access(argv[1], F_OK) == -1) {
             state = GetDefaultState();
             state.neuralNetwork.Random(0, 1);
         }
-        else if (!state.LoadFromPath(fs, argv[1])) MathLib::Panic("Failed to load neural network");
+        else if (!state.LoadFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to load neural network");
         #ifdef Debug
         std::cout << "Start data:\n";
         std::cout << "Cost = " << state.Cost() << std::endl;
@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
         std::cout << "Neural network:\n" << state.neuralNetwork << std::endl;
         #endif
         std::cout << StateToString(state) << std::endl;
-        if (!state.SaveFromPath(fs, argv[1])) MathLib::Panic("Failed to save neural network");
+        if (!state.SaveFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to save neural network");
         #ifdef Debug
         std::cout << "Time: " << MathLib::GetTime() - start << " second(s)" << std::endl;
         #endif

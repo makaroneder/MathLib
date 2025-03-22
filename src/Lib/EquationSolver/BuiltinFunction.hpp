@@ -4,7 +4,7 @@
 #include "../FunctionPointer.hpp"
 
 namespace MathLib {
-    using BuiltinFunctionPointer = FunctionPointer<Node*, const Collection<const Node*>&>;
+    using BuiltinFunctionPointer = FunctionPointer<Node*, const Sequence<const Node*>&>;
     /// @brief Builtin function
     struct BuiltinFunction : Allocatable {
         /// @brief Name of the builtin function
@@ -17,7 +17,7 @@ namespace MathLib {
         /// @brief Creates new builtin function
         /// @param n Name of the builtin function
         /// @param func Code of the builtin function
-        BuiltinFunction(const String& n, const BuiltinFunctionPointer& func);
+        BuiltinFunction(const Sequence<char>& n, const BuiltinFunctionPointer& func);
     };
     /// @brief Creates default builtin functions for equation solver
     /// @return Default builtin functions

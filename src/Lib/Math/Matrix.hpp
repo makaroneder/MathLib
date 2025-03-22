@@ -19,7 +19,7 @@ namespace MathLib {
         /// @brief Creates a new matrix
         /// @param width Width of matrix
         /// @param height Height of matrix
-        Matrix(size_t width = 0, size_t height = 0) : width(width), height(height), ptr(Array<T>(width * height)) {
+        Matrix(size_t width = 0, size_t height = 0) : width(width), height(height), ptr(width * height) {
             StartBenchmark
             Fill(T());
             EndBenchmark
@@ -28,7 +28,7 @@ namespace MathLib {
         /// @param width Width of matrix
         /// @param height Height of matrix
         /// @param func Function representing the matrix
-        Matrix(size_t width, size_t height, const Function<T, size_t, size_t>& func) : width(width), height(height), ptr(Array<T>(width * height)) {
+        Matrix(size_t width, size_t height, const Function<T, size_t, size_t>& func) : width(width), height(height), ptr(width * height) {
             StartBenchmark
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) At(x, y) = func(x, y);
@@ -38,7 +38,7 @@ namespace MathLib {
         /// @param width Width of matrix
         /// @param height Height of matrix
         /// @param arr Values for the matrix
-        Matrix(size_t width, size_t height, const Array<T>& arr) : width(width), height(height), ptr(arr) {
+        Matrix(size_t width, size_t height, const Sequence<T>& arr) : width(width), height(height), ptr(CollectionToArray<T>(arr)) {
             EmptyBenchmark
         }
         [[nodiscard]] static Matrix<T> Identity(size_t n) {
@@ -328,17 +328,17 @@ namespace MathLib {
         /// @brief Converts matrix to string
         /// @param padding String to pad with
         /// @return String representation of matrix
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
             if (height == 1) {
-                String ret = padding + '[';
+                String ret = CollectionToString(padding) + '[';
                 for (size_t x = 0; x < width; x++) ret += MathLib::ToString(At(x, 0)) + (((x + 1) == width) ? "]" : ", ");
                 ReturnFromBenchmark(ret);
             }
             else {
-                String ret = padding + "[\n";
+                String ret = CollectionToString(padding) + "[\n";
                 for (size_t y = 0; y < height; y++) {
-                    ret += padding + '\t';
+                    ret += CollectionToString(padding) + '\t';
                     for (size_t x = 0; x < width; x++) ret += MathLib::ToString(At(x, y)) + (((x + 1) == width && (y + 1) == height) ? "\n" : ", ");
                     if ((y + 1) != height) ret += '\n';
                 }

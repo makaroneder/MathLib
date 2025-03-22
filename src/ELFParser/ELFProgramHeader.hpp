@@ -39,7 +39,7 @@ struct ELFProgramHeader {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] MathLib::String ToString(const MathLib::String& padding = "") const;
+    [[nodiscard]] MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const;
 } __attribute__((packed));
 
 #endif

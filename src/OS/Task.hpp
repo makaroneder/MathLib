@@ -10,6 +10,7 @@ struct Task {
     private:
     void* state;
 };
+void InitTasks(void);
 [[nodiscard]] bool AddTask(const Task& task);
 void Schedule(void);
 

@@ -5,7 +5,7 @@
 namespace MathLib {
     struct ChemicalMolecule : Printable {
         ChemicalMolecule(void);
-        ChemicalMolecule(const Array<ChemicalElement>& elements, size_t count);
+        ChemicalMolecule(const Sequence<ChemicalElement>& elements, size_t count);
         [[nodiscard]] Array<ChemicalElement> GetElements(void) const;
         [[nodiscard]] bool IsCompound(void) const;
         [[nodiscard]] bool IsWater(void) const;
@@ -14,7 +14,7 @@ namespace MathLib {
         [[nodiscard]] bool IsAcid(void) const;
         [[nodiscard]] bool IsHydroxide(void) const;
         [[nodiscard]] bool IsOxide(void) const;
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         size_t count;
         private:

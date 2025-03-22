@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
         MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Image processing", 800, 800);
         MathLib::HostFileSystem fs;
         MathLib::TGA tga = MathLib::TGA(0, 0);
-        if (!tga.LoadFromPath(fs, cmdLine.GetEntry("input").Get("No input specified"))) MathLib::Panic("Failed to load input image");
+        if (!tga.LoadFromPath(fs, cmdLine.GetEntry("input"_M).Get("No input specified"))) MathLib::Panic("Failed to load input image");
         MathLib::matrix_t kernel = MathLib::matrix_t(3, 3);
         kernel.At(1, 1) = 5;
         kernel.At(0, 1) = -1;

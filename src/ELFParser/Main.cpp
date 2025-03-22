@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
     try {
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
         MathLib::HostFileSystem fs;
-        MathLib::File file = fs.Open(cmdLine.GetEntry("program").Get("No program provided"), MathLib::OpenMode::Read);
+        MathLib::File file = fs.Open(cmdLine.GetEntry("program"_M).Get("No program provided"), MathLib::OpenMode::Read);
         ELFHeader header = file.Read<ELFHeader>().Get("Failed to read ELF header");
         if (!header.IsValid()) MathLib::Panic("ELF header is not valid");
         std::cout << "ELF header: " << header.ToString() << std::endl;

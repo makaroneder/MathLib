@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
         MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Math graph", 800, 800);
         MathLib::Array<MathLib::Optimizer> states;
         for (int i = 1; i < argc; i++) {
-            MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, argv[i]));
+            MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[i])));
             #ifdef Debug
             std::cout << "Generated nodes:\n" << *root << std::endl;
             #endif
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
         }
         size_t state = 0;
         const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>([&states, &state](MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
-            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
             if (!tmp.variables.Add(var)) return MathLib::nan;
@@ -108,7 +108,7 @@ int main(int argc, char** argv) {
             return ret;
         });
         const MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> complexFunc = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([&states, &state](MathLib::complex_t z) -> MathLib::complex_t {
-            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
             if (!tmp.variables.Add(var)) return MathLib::complex_t(MathLib::nan, MathLib::nan);
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
         if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>([&renderer, func, complexFunc, &states, &state](void) -> bool {
             renderer.Fill(0);
             renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
-            const MathLib::FunctionNode funcNode = states.At(state).GetFunction("f");
+            const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);
             if (funcNode.dataType == "C")
                 renderer.DrawComplexFunction<MathLib::num_t>(renderer.GenerateComplexFunction<MathLib::num_t>(complexFunc));
             else if (funcNode.dataType == "R")

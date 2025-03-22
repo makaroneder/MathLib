@@ -27,7 +27,7 @@ int main(int, char**) {
             std::string tmp;
             std::cin >> tmp;
             if (tmp == "exit") break;
-            game.Update(MathLib::StringToNumber(tmp));
+            game.Update(MathLib::StringToNumber(MathLib::String(tmp)));
         }
         return EXIT_SUCCESS;
     }

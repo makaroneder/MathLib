@@ -2,73 +2,41 @@
 #include "../Host.hpp"
 
 namespace MathLib {
-    Cipher::Cipher(void) {
-        StartBenchmark
-        for (char chr = '0'; chr <= '9'; chr++) digits += chr;
-        for (char chr = 'a'; chr <= 'z'; chr++) {
-            letters += chr;
-            upperLetters += ToUpper(chr);
-        }
-        EndBenchmark
+    Array<uint8_t> Cipher::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+        return Encrypt(data, key, true);
     }
-    Cipher::Cipher(const String& letters, const String& upperLetters, const String& digits) : letters(letters), upperLetters(upperLetters), digits(digits) {
-        EmptyBenchmark
-    }
-    uint8_t Cipher::GetIndex(char chr) const {
-        StartBenchmark
-        if (IsDigit(chr)) {
-            for (uint8_t i = 0; i < digits.GetSize(); i++)
-                if (chr == digits.At(i)) ReturnFromBenchmark(i);
-            ReturnFromBenchmark(UINT8_MAX);
-        }
-        else if (IsAlpha(chr)) {
-            if (IsUpper(chr)) {
-                for (uint8_t i = 0; i < upperLetters.GetSize(); i++)
-                    if (chr == upperLetters.At(i)) ReturnFromBenchmark(i);
-                ReturnFromBenchmark(UINT8_MAX);
-            }
-            else {
-                for (uint8_t i = 0; i < letters.GetSize(); i++)
-                    if (chr == letters.At(i)) ReturnFromBenchmark(i);
-                ReturnFromBenchmark(UINT8_MAX);
-            }
-        }
-        else ReturnFromBenchmark(UINT8_MAX);
-    }
-    String Cipher::GetString(const String& str, const String& key, bool encrypt) const {
+    String Cipher::EncryptString(const Sequence<char>& str, const Sequence<uint64_t>& key, bool encrypt) const {
         StartBenchmark
         Array<uint8_t> tmp = Array<uint8_t>(str.GetSize());
-        for (size_t i = 0; i < tmp.GetSize(); i++) tmp.At(i) = GetIndex(str.At(i));
-        tmp = encrypt ? Encrypt(tmp, key) : Decrypt(tmp, key);
+        for (size_t i = 0; i < tmp.GetSize(); i++) {
+            if (IsDigit(str.At(i))) tmp.At(i) = str.At(i) - '0';
+            else if (IsAlpha(str.At(i))) tmp.At(i) = ToUpper(str.At(i)) - 'A';
+            else tmp.At(i) = UINT8_MAX;
+        }
+        tmp = Encrypt(tmp, key, encrypt);
         String ret;
         for (size_t i = 0; i < str.GetSize(); i++) {
-            String base;
+            char base;
             uint8_t bounds;
             if (IsDigit(str.At(i))) {
-                base = digits;
+                base = '0';
                 bounds = '9' - '0' + 1;
             }
             else if (IsAlpha(str.At(i))) {
                 if (IsUpper(str.At(i))) {
-                    base = upperLetters;
+                    base = 'A';
                     bounds = 'Z' - 'A' + 1;
                 }
                 else {
-                    base = letters;
+                    base = 'a';
                     bounds = 'z' - 'a' + 1;
                 }
             }
             else bounds = 0;
             char chr = tmp.At(i);
             if (chr < '\0') chr += bounds;
-            ret += bounds ? base.At(chr % bounds) : str.At(i);
+            ret += bounds ? base + chr % bounds : str.At(i);
         }
         ReturnFromBenchmark(ret);
-    }
-    String Cipher::EncryptString(const String& str, const String& key) const {
-        StartAndReturnFromBenchmark(GetString(str, key, true));
-    }
-    String Cipher::DecryptString(const String& str, const String& key) const {
-        StartAndReturnFromBenchmark(GetString(str, key, false));
     }
 }

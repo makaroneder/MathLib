@@ -7,16 +7,16 @@ namespace MathLib {
     BuiltinFunction::BuiltinFunction(void) {
         EmptyBenchmark
     }
-    BuiltinFunction::BuiltinFunction(const String& n, const BuiltinFunctionPointer& func) : name(n), function(func) {
+    BuiltinFunction::BuiltinFunction(const Sequence<char>& n, const BuiltinFunctionPointer& func) : name(CollectionToString(n)), function(func) {
         EmptyBenchmark
     }
 
     #define CreateBuiltinFunction(name, func, argc, ...)                                                                                        \
-    static Node* EquationSolverBuiltin##name(const void*, const Collection<const Node*>& args) {                                                \
+    static Node* EquationSolverBuiltin##name(const void*, const Sequence<const Node*>& args) {                                           \
         StartAndReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, MathLib::ToString(func(__VA_ARGS__))) : nullptr);   \
     }
     #define CreateComplexBuiltinFunction(name, func, argc, ...)                                                                         \
-    static Node* EquationSolverBuiltin##name(const void*, const Collection<const Node*>& args) {                                        \
+    static Node* EquationSolverBuiltin##name(const void*, const Sequence<const Node*>& args) {                                   \
         StartAndReturnFromBenchmark(args.GetSize() == argc ? new Node(Node::Type::Constant, func(__VA_ARGS__).ToString()) : nullptr);   \
     }
     CreateBuiltinFunction(Argument, InversedTan2, 1, args[0]->ToNumber().At(0).GetImaginary(), args[0]->ToNumber().At(0).GetReal())
@@ -86,7 +86,7 @@ namespace MathLib {
 
     #undef CreateComplexBuiltinFunction
     #undef CreateBuiltinFunction
-    #define CreateBuiltinFunction(name, func) BuiltinFunction(name, BuiltinFunctionPointer(nullptr, EquationSolverBuiltin##func))
+    #define CreateBuiltinFunction(name, func) BuiltinFunction(String(name), BuiltinFunctionPointer(nullptr, EquationSolverBuiltin##func))
 
     Array<BuiltinFunction> CreateDefaultBuiltinFunctions(void) {
         StartBenchmark

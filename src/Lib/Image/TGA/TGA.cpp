@@ -11,13 +11,7 @@ namespace MathLib {
     }
     bool TGA::Save(Writable& file) const {
         StartBenchmark
-        TGAHeader header = {};
-        header.idLength = identifier.GetSize();
-        header.imageType = 2;
-        header.width = GetWidth();
-        header.height = header.yOrigin = GetHeight();
-        header.pixelDepth = 32;
-        header.imageDescriptor = 1 << 5;
+        TGAHeader header = TGAHeader(identifier.GetSize(), TGAHeader::ImageType::UncompressedTrueColor, GetWidth(), GetHeight(), 32);
         if (!file.Write<TGAHeader>(header) || !file.Puts(identifier)) ReturnFromBenchmark(false);
         for (size_t y = 0; y < header.height; y++) {
             for (size_t x = 0; x < header.width; x++) {
@@ -55,7 +49,7 @@ namespace MathLib {
     bool TGA::Load(Readable& file) {
         StartBenchmark
         TGAHeader header;
-        if (!file.Read<TGAHeader>(header) || header.imageType != 2 || (header.pixelDepth != 32 && header.pixelDepth != 24)) ReturnFromBenchmark(false);
+        if (!file.Read<TGAHeader>(header) || header.imageType != TGAHeader::ImageType::UncompressedTrueColor || (header.pixelDepth != 32 && header.pixelDepth != 24)) ReturnFromBenchmark(false);
         bool createdByMathLib = false;
         if (header.idLength) {
             char id[header.idLength];

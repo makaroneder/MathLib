@@ -1,0 +1,104 @@
+#ifndef MathLib_Interfaces_Sequence_H
+#define MathLib_Interfaces_Sequence_H
+#include "../MinMax.hpp"
+#include "Function.hpp"
+#include <stddef.h>
+#include <stdint.h>
+
+namespace MathLib {
+    template <typename T>
+    struct Sequence : Function<T, size_t> {
+        [[nodiscard]] virtual size_t GetSize(void) const = 0;
+        [[nodiscard]] virtual T At(size_t index) const = 0;
+        [[nodiscard]] bool IsEmpty(void) const {
+            return !GetSize();
+        }
+        [[nodiscard]] virtual T Invoke(const void*, size_t index) const override {
+            return At(index);
+        }
+        [[nodiscard]] T operator[](size_t index) const {
+            return At(index);
+        }
+        [[nodiscard]] bool Contains(const T& value) const {
+            for (size_t i = 0; i < GetSize(); i++)
+                if (At(i) == value) return true;
+            return false;
+        }
+        [[nodiscard]] bool Contains(const Sequence<T>& other) const {
+            return Find(other, 0) != SIZE_MAX;
+        }
+        [[nodiscard]] size_t Find(const T& value, size_t start = 0) const {
+            for (size_t i = start; i < GetSize(); i++)
+                if (At(i) == value) return i;
+            return SIZE_MAX;
+        }
+        [[nodiscard]] size_t Find(const Sequence<T>& other, size_t start = 0) const {
+            if (GetSize() < other.GetSize()) return SIZE_MAX;
+            for (size_t i = start; i < GetSize() - other.GetSize(); i++) {
+                bool found = true;
+                for (size_t j = 0; j < other.GetSize() && found; j++)
+                    if (At(i + j) != other.At(j)) found = false;
+                if (found) return i;
+            }
+            return SIZE_MAX;
+        }
+        [[nodiscard]] size_t Find(const Function<bool, T>& function, size_t start = 0) const {
+            for (size_t i = start; i < GetSize(); i++)
+                if (function(At(i))) return i;
+            return SIZE_MAX;
+        }
+        [[nodiscard]] size_t GetCountOf(const T& x) const {
+            const size_t size = GetSize();
+            size_t ret = 0;
+            for (size_t i = 0; i < size; i++) ret += At(i) == x;
+            return ret;
+        }
+        [[nodiscard]] size_t GetHammingDistance(const Sequence<T>& other) const {
+            const size_t size = GetSize();
+            if (size != other.GetSize()) return SIZE_MAX;
+            size_t ret = 0;
+            for (size_t i = 0; i < size; i++) ret += At(i) != other.At(i);
+            return ret;
+        }
+        [[nodiscard]] T Sum(const T& t0) const {
+            T ret = t0;
+            const size_t size = GetSize();
+            for (size_t i = 0; i < size; i++) ret += At(i);
+            return ret;
+        }
+        [[nodiscard]] T Product(const T& t0) const {
+            T ret = t0;
+            const size_t size = GetSize();
+            for (size_t i = 0; i < size; i++) ret *= At(i);
+            return ret;
+        }
+        void Foreach(const Function<void, T>& function) const {
+            const size_t size = GetSize();
+            for (size_t i = 0; i < size; i++) function(At(i));
+        }
+        template <typename Ret>
+        [[nodiscard]] Ret Foreach(const Function<Ret, Ret, T>& function, const Ret& startRet) const {
+            Ret ret = startRet;
+            const size_t size = GetSize();
+            for (size_t i = 0; i < size; i++) ret = function(ret, At(i));
+            return ret;
+        }
+        [[nodiscard]] bool operator==(const Sequence<T>& other) const {
+            if (GetSize() != other.GetSize()) return false;
+            for (size_t i = 0; i < GetSize(); i++)
+                if (At(i) != other.At(i)) return false;
+            return true;
+        }
+        [[nodiscard]] bool operator!=(const Sequence<T>& other) const {
+            return !(*this == other);
+        }
+        [[nodiscard]] bool operator<(const Sequence<T>& other) const {
+            size_t size = Min<size_t>(GetSize(), other.GetSize());
+            for (size_t i = 0; i < size; i++)
+                if (At(i) != other.At(i)) return At(i) < other.At(i);
+            return GetSize() < other.GetSize();
+        }
+    };
+}
+
+#endif

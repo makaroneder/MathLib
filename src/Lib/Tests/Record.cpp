@@ -1,10 +1,10 @@
 #include "Record.hpp"
 
 namespace MathLib {
-    Record::Record(const String& expression, bool passed) : expression(expression), passed(passed) {
+    Record::Record(const Sequence<char>& expression, bool passed) : expression(CollectionToString(expression)), passed(passed) {
         EmptyBenchmark
     }
-    String Record::ToString(const String& padding) const {
-        StartAndReturnFromBenchmark(padding + expression + " [" + (passed ? "passed" : "failed") + ']');
+    String Record::ToString(const Sequence<char>& padding) const {
+        StartAndReturnFromBenchmark(CollectionToString(padding) + expression + " [" + (passed ? "passed" : "failed") + ']');
     }
 }

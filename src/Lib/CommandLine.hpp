@@ -7,11 +7,11 @@ namespace MathLib {
         String name;
         String value;
 
-        CommandLineEntry(const String& name = "", const String& value = "");
+        CommandLineEntry(const Sequence<char>& name = ""_M, const Sequence<char>& value = ""_M);
     };
     struct CommandLine {
         CommandLine(size_t argc, const char** argv);
-        [[nodiscard]] Expected<String> GetEntry(const String& name) const;
+        [[nodiscard]] Expected<String> GetEntry(const Sequence<char>& name) const;
 
         private:
         Array<CommandLineEntry> entries;

@@ -4,7 +4,7 @@
 
 struct OnePinCircuitElement : CircuitElement {
     OnePinCircuitElement(void);
-    OnePinCircuitElement(const MathLib::Array<CircuitElementConnection>& children);
+    OnePinCircuitElement(const MathLib::Sequence<CircuitElementConnection>& children);
     [[nodiscard]] virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const override;
 
     protected:

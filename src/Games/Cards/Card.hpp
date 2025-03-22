@@ -37,7 +37,7 @@ struct Card : MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
     template <typename T>
     [[nodiscard]] static MathLib::Cuboid<T> ToCuboid(const MathLib::Matrix<T>& position) {
         return MathLib::Cuboid<T>(position, MathLib::CreateVector<T>(width, height, 0.01));

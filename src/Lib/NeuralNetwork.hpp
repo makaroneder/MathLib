@@ -22,7 +22,7 @@ namespace MathLib {
         }
         /// @brief Creates a new neural network
         /// @param arch Architecture of the neural network
-        NeuralNetwork<T>(ActivationFunction activation, const Collection<size_t>& arch) : activation(activation) {
+        NeuralNetwork<T>(ActivationFunction activation, const Sequence<size_t>& arch) : activation(activation) {
             StartBenchmark
             const size_t c = arch.GetSize();
             if (!c) Panic("Invalid architecture size");
@@ -189,11 +189,11 @@ namespace MathLib {
         /// @brief Converts neural network to string
         /// @param padding String to pad with
         /// @return String representation of neural network
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
-            String ret = padding + "a[0] = " + GetInput().ToString() + '\n';
+            String ret = CollectionToString(padding) + "a[0] = " + GetInput().ToString() + '\n';
             for (size_t i = 0; i < count; i++)
-                ret += padding + "a[" + MathLib::ToString(i + 1) + "] = " + as.At(i + 1).ToString() + '\n' + padding + "b[" + MathLib::ToString(i) + "] = " + bs.At(i).ToString() + '\n' + padding + "w[" + MathLib::ToString(i) + "] = " + ws.At(i).ToString() + '\n';
+                ret += CollectionToString(padding) + "a[" + MathLib::ToString(i + 1) + "] = " + as.At(i + 1).ToString() + '\n' + padding + "b[" + MathLib::ToString(i) + "] = " + bs.At(i).ToString() + '\n' + padding + "w[" + MathLib::ToString(i) + "] = " + ws.At(i).ToString() + '\n';
             ReturnFromBenchmark(ret);
         }
         /// @brief Saves neural network data

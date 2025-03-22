@@ -3,10 +3,10 @@
 #include "AMLFieldFlags.hpp"
 
 namespace MathLib {
-    AML::AML(const Array<uint8_t>& memory) : Emulator(memory), root("Root") {
+    AML::AML(const Sequence<uint8_t>& memory) : Emulator(memory), root("Root"_M) {
         EmptyBenchmark
     }
-    AML::AML(const DSDT* dsdt) : Emulator(Array<uint8_t>(dsdt->aml, dsdt->length - sizeof(ACPITable))), root("Root") {
+    AML::AML(const DSDT* dsdt) : Emulator(Array<uint8_t>(dsdt->aml, dsdt->length - sizeof(ACPITable))), root("Root"_M) {
         StartBenchmark
         if (!dsdt->IsValid()) Panic("Invalid DSDT provided");
         EndBenchmark

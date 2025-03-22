@@ -5,10 +5,10 @@ namespace MathLib {
     ChemicalReaction::ChemicalReaction(void) {
         EmptyBenchmark
     }
-    ChemicalReaction::ChemicalReaction(const Array<ChemicalMolecule>& left, const Array<ChemicalMolecule>& right) : left(left), right(right) {
+    ChemicalReaction::ChemicalReaction(const Sequence<ChemicalMolecule>& left, const Sequence<ChemicalMolecule>& right) : left(CollectionToArray<ChemicalMolecule>(left)), right(CollectionToArray<ChemicalMolecule>(right)) {
         EmptyBenchmark
     }
-    Expected<ChemicalReaction> ChemicalReaction::Create(const Array<ChemicalMolecule>& input) {
+    Expected<ChemicalReaction> ChemicalReaction::Create(const Sequence<ChemicalMolecule>& input) {
         StartBenchmark
         Array<ChemicalMolecule> ret;
         if (input.GetSize() == 2) {
@@ -100,9 +100,9 @@ namespace MathLib {
         }
         ReturnFromBenchmark(Expected<ChemicalReaction>());
     }
-    String ChemicalReaction::ToString(const String& padding) const {
+    String ChemicalReaction::ToString(const Sequence<char>& padding) const {
         StartBenchmark
-        String ret = padding;
+        String ret = CollectionToString(padding);
         for (size_t i = 0; i < left.GetSize(); i++)
             ret += left.At(i).ToString() + ((i + 1) == left.GetSize() ? "" : " + ");
         ret += " => ";

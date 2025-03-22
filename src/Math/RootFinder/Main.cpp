@@ -29,7 +29,7 @@ struct Function {
 };
 template <typename T>
 struct Polynomial : Function<T> {
-    Polynomial(const MathLib::Array<T>& coefficients) : coefficients(coefficients) {}
+    Polynomial(const MathLib::Sequence<T>& coefficients) : coefficients(MathLib::CollectionToArray<T>(coefficients)) {}
     [[nodiscard]] virtual T Get(const T& x) const override {
         T ret = 0;
         for (size_t i = 0; i < coefficients.GetSize(); i++) ret += coefficients.At(i) * MathLib::Pow(x, i);

@@ -22,9 +22,9 @@ struct Hand : MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
-        MathLib::String ret = padding + "{\n";
-        for (const CardIndex& card : cards) ret += card.ToString(padding + '\t') + '\n';
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
+        MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
+        for (const CardIndex& card : cards) ret += card.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
         return ret + padding + '}';
     }
     [[nodiscard]] bool ShouldSwap(size_t i) const {

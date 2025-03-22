@@ -1,20 +1,19 @@
 #ifndef MathLib_ExternArray_H
 #define MathLib_ExternArray_H
-#include "Interfaces/Collection.hpp"
+#include "Typedefs.hpp"
 
 namespace MathLib {
-    [[noreturn]] void Panic(const char*);
     template <typename T>
     struct ExternArray : Collection<T> {
-        ExternArray(T* buffer, size_t size) : buffer(buffer), size(size) {}
+        ExternArray(T* buffer, size_t size) : buffer(buffer), size(size) {
+            if (!buffer) Panic("Invalid buffer provided");
+        }
         [[nodiscard]] virtual T At(size_t index) const override {
             if (index >= size) Panic("Index out of bounds");
-            if (!buffer) Panic("Buffer allocation failed");
             return buffer[index];
         }
         [[nodiscard]] virtual T& At(size_t index) override {
             if (index >= size) Panic("Index out of bounds");
-            if (!buffer) Panic("Buffer allocation failed");
             return buffer[index];
         }
         [[nodiscard]] virtual bool Add(const T&) override {
@@ -27,7 +26,7 @@ namespace MathLib {
             return buffer;
         }
 
-        protected:
+        private:
         T* buffer;
         size_t size;
     };

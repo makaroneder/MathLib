@@ -3,7 +3,7 @@
 #include "Math/Complex.hpp"
 
 namespace MathLib {
-    [[noreturn]] void Panic(String str);
+    [[noreturn]] void Panic(const Sequence<char>& str);
     [[nodiscard]] char ToUpper(char chr);
     [[nodiscard]] bool IsUpper(char chr);
     [[nodiscard]] bool IsLower(char chr);
@@ -16,7 +16,7 @@ namespace MathLib {
     /// @brief Skips whitespace characters
     /// @param str String to skip
     /// @param i Current position in the string
-    void SkipWhiteSpace(const String& str, size_t& i);
+    void SkipWhiteSpace(const Sequence<char>& str, size_t& i);
     [[nodiscard]] bool IsHexDigit(char chr);
     [[nodiscard]] bool IsAlphaDigit(char chr);
     [[nodiscard]] size_t BitwiseAnd(size_t x, size_t y);
@@ -26,6 +26,8 @@ namespace MathLib {
     [[nodiscard]] size_t BitwiseNand(size_t x, size_t y);
     [[nodiscard]] size_t BitwiseNor(size_t x, size_t y);
     [[nodiscard]] size_t BitwiseXnor(size_t x, size_t y);
+    [[nodiscard]] uint16_t SwapEndian16(uint16_t x);
+    [[nodiscard]] uint32_t SwapEndian32(uint32_t x);
     [[nodiscard]] num_t Abs(num_t x);
     [[nodiscard]] num_t Pow(num_t x, num_t y);
     [[nodiscard]] complex_t Sqrt(complex_t x);

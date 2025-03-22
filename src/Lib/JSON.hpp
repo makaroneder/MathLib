@@ -13,12 +13,12 @@ namespace MathLib {
             Array,
         };
         JSON(void);
-        JSON(Type type, const String& name, const String& value);
+        JSON(Type type, const Sequence<char>& name, const Sequence<char>& value);
         [[nodiscard]] Type GetType(void) const;
         [[nodiscard]] String GetValue(void) const;
         [[nodiscard]] size_t GetChildrenCount(void) const;
         [[nodiscard]] bool AddChild(const JSON& child);
-        [[nodiscard]] Expected<JSON> Find(const String& path) const;
+        [[nodiscard]] Expected<JSON> Find(const Sequence<char>& path) const;
         [[nodiscard]] virtual Iterator<const JSON> begin(void) const override;
         [[nodiscard]] virtual Iterator<const JSON> end(void) const override;
         [[nodiscard]] virtual Iterator<JSON> begin(void) override;
@@ -34,7 +34,7 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
         Type type;

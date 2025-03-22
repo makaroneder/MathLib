@@ -1,0 +1,72 @@
+#ifndef MathLib_Cryptography_OneWayCipher_CRC_H
+#define MathLib_Cryptography_OneWayCipher_CRC_H
+#include "../OneWayCipher.hpp"
+
+namespace MathLib {
+    struct CRC : OneWayCipher {
+        enum class Polynomial : uint64_t {
+            CRC1 = 0x1,
+            CRC3GSM = 0x3,
+            CRC4ITU = CRC3GSM,
+            CRC6ITU = CRC4ITU,
+            CRC7 = CRC4ITU,
+            CRC5USB = 0x5,
+            CRC6CDMA2000B = 0x7,
+            CRC8CCIT = CRC6CDMA2000B,
+            CRC5EPC = 0x9,
+            CRC5ITU = 0x15,
+            CRC6DARC = 0x19,
+            CRC64ISO = 0x1b,
+            CRC8SAEJ1850 = 0x1d,
+            CRC6CDMA2000A = 0x27,
+            CRC6GSM = 0x2f,
+            CRC8AUTOSAR = CRC6GSM,
+            CRC8DallasMaxim = 0x31,
+            CRC8DARC = 0x39,
+            CRC8GSMB = 0x49,
+            CRC7MVB = 0x65,
+            CRC8WCDMA = 0x9b,
+            CRC8Bluetooth = 0xa7,
+            CRC8 = 0xd5,
+            CRC10GSM = 0x175,
+            CRC10 = 0x233,
+            CRC11 = 0x385,
+            CRC10CDMA2000 = 0x3d9,
+            CRC16DECT = 0x589,
+            CRC14DARC = 0x805,
+            CRC12 = 0x80f,
+            CRC12GSM = 0xd31,
+            CRC12CDMA2000 = 0xf13,
+            CRC16CCITT = 0x1021,
+            CRC13BBC = 0x1cf5,
+            CRC16Profibus = 0x1dcf,
+            CRC14GSM = 0x202d,
+            CRC16Chakravarty = 0x2f15,
+            CRC16DNP = 0x3d65,
+            CRC15CAN = 0x4cd1,
+            CRC16OpenSafetyA = 0x5935,
+            CRC15MPT1327 = 0x6815,
+            CRC16OpenSafetyB = 0x755b,
+            CRC16IBM = 0x8005,
+            CRC16T10DIF = 0x8bb7,
+            CRC16ARINC = 0xa02b,
+            CRC16CDMA2000 = 0xc867,
+            CRC17CAN = 0x1685b,
+            CRC24 = 0x5d6dcb,
+            CRC21CAN = 0x102899,
+            CRC24WCDMA = 0x800063,
+            CRC24Radix64 = 0x864cfb,
+            CRC40GSM = 0x4820009,
+            CRC32 = 0x4c11db7,
+            CRC32C = 0x1edc6f41,
+            CRC30 = 0x2030b9c7,
+            CRC32K2 = 0x32583499,
+            CRC32K = 0x741b8cd7,
+            CRC32Q = 0x814141ab,
+            CRC64ECMA = 0x42f0e1eba9ea3693,
+        };
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
+    };
+}
+
+#endif

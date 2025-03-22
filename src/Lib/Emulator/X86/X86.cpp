@@ -68,7 +68,7 @@ namespace MathLib {
         const Expected<uint8_t> tmp = Fetch<uint8_t>();                                     \
         if (!tmp.HasValue()) ReturnFromBenchmark(false)                                     \
         const X86ModRM modrm = tmp.Get();                                                   \
-        uint##size##_t result;                                                              \
+        uint64_t result;                                                                    \
         uint##size##_t a;                                                                   \
         uint##size##_t b;                                                                   \
         ModRMOperation({                                                                    \
@@ -126,7 +126,7 @@ namespace MathLib {
             default: ReturnFromBenchmark(false)                                         \
         })                                                                              \
     }
-    X86::X86(const Array<uint8_t>& memory, const X86State& state) : StepEmulator(memory), state(state) {
+    X86::X86(const Sequence<uint8_t>& memory, const X86State& state) : StepEmulator(memory), state(state) {
         EmptyBenchmark
     }
     void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
@@ -155,7 +155,7 @@ namespace MathLib {
             default: ReturnFromBenchmark(nullptr);
         }
     }
-    String X86::ToString(const String& padding) const {
+    String X86::ToString(const Sequence<char>& padding) const {
         StartAndReturnFromBenchmark(state.ToString(padding));
     }
     uint64_t X86::ToLinear(uint64_t segment, uint64_t offset) {

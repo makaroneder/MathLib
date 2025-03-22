@@ -21,13 +21,13 @@ namespace MathLib {
         /// @param dataType Data type of the variable
         /// @param value Value of the variable
         /// @brief Is variable constant?
-        Variable(const String& name, const String& dataType, Node* value, bool constant);
+        Variable(const Sequence<char>& name, const Sequence<char>& dataType, Node* value, bool constant);
         /// @brief Creates a new variable
         /// @param name Name of the variable
         /// @param dataType Data type of the variable
         /// @param value Value of the variable
         /// @brief Is variable constant?
-        Variable(const String& name, const String& dataType, const String& value, bool constant);
+        Variable(const Sequence<char>& name, const Sequence<char>& dataType, const Sequence<char>& value, bool constant);
     };
     /// @brief Creates default variables for equation solver
     /// @return Default variables

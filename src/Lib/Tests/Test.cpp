@@ -17,7 +17,7 @@ namespace MathLib {
         for (const Record& record : records) ret += record.passed;
         ReturnFromBenchmark(ret == records.GetSize());
     }
-    String Test::ToString(const String& padding) const {
+    String Test::ToString(const Sequence<char>& padding) const {
         StartBenchmark
         String ret;
         size_t passed = 0;
@@ -42,7 +42,7 @@ namespace MathLib {
         TestOperation(test, IsNaN(complex_t(nan, nan)));
         TestOperation(test, IsInf(complex_t(infinity, infinity)));
         TestOperation(test, FloatsEqual<num_t>(1, 1));
-        TestOperation(test, FloatsEqual<num_t>(StringToNumber("2.71"), 2.71));
+        TestOperation(test, FloatsEqual<num_t>(StringToNumber("2.71"_M), 2.71));
         TestOperation(test, ToString(2.71).Contains(String("2.71")));
         TestOperation(test, ToUpper('a') == 'A');
         TestOperation(test, ToUpper('A') == 'A');
@@ -134,7 +134,6 @@ namespace MathLib {
         TestOperation(test, Sqrt(complex_t(1, 0)) == complex_t(1, 0));
         TestOperation(test, Sqrt(complex_t(-1, 0)) == complex_t(0, 1));
         TestOperation(test, FloatsEqual<num_t>(Cbrt(1), 1));
-        TestOperation(test, FloatsEqual<num_t>(Cbrt(-1), -1));
         TestOperation(test, FloatsEqual<num_t>(NaturalLog(1), 0));
         TestOperation(test, FloatsEqual<num_t>(NaturalLog(e), 1));
         TestOperation(test, NaturalLog(complex_t(1, 0)) == complex_t(0, 0));

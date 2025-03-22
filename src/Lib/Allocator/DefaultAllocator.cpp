@@ -1,5 +1,5 @@
 #include "DefaultAllocator.hpp"
-#include "Typedefs.hpp"
+#include "../Typedefs.hpp"
 
 namespace MathLib {
     void* DefaultAllocator::Alloc(size_t size) {

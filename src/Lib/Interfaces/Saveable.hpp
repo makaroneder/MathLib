@@ -18,12 +18,12 @@ namespace MathLib {
         /// @param fileSystem File system to save data into
         /// @param path Path to the file
         /// @return Status
-        [[nodiscard]] bool SaveFromPath(FileSystem& fileSystem, const String& path) const;
+        [[nodiscard]] bool SaveFromPath(FileSystem& fileSystem, const Sequence<char>& path) const;
         /// @brief Loads data
         /// @param fileSystem File system to load data from
         /// @param path Path to the file
         /// @return Status
-        [[nodiscard]] bool LoadFromPath(FileSystem& fileSystem, const String& path);
+        [[nodiscard]] bool LoadFromPath(FileSystem& fileSystem, const Sequence<char>& path);
     };
 }
 

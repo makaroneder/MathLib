@@ -9,10 +9,6 @@
 #include <MathLib.hpp>
 
 MathLib::VFS vfs;
-bool constructorsCalled = false;
-[[gnu::constructor]] void TestConstructors(void) {
-    constructorsCalled = true;
-}
 void MainTask(const void*) {
     MathLib::String command = "";
     if (!textUI->Puts("> ")) MathLib::Panic("Failed to print data to text UI");
@@ -29,8 +25,8 @@ void MainTask(const void*) {
             }
             else if (event.key == '\n') {
                 if (!textUI->Write<char>('\n')) MathLib::Panic("Failed to print data to text UI");
-                const MathLib::Array<MathLib::String> args = Split(command, " ", false);
-                if (args.GetSize() && !command.IsEmpty()) {
+                const MathLib::Array<MathLib::String> args = Split(command, " "_M, false);
+                if (!args.IsEmpty() && !command.IsEmpty()) {
                     MathLib::String output;
                     if (args.At(0) == "echo") {
                         for (size_t i = 1; i < args.GetSize(); i++)
@@ -84,8 +80,8 @@ MathLib::Pair<MathLib::String, size_t> fsTable[] = {
     MathLib::Pair<MathLib::String, size_t>("fatfs", 0),
 };
 template <typename T>
-MathLib::Expected<bool> AddFileSystem(size_t i, const MathLib::String& fsName) {
-    T* fs = new T(*disks.At(i));
+MathLib::Expected<bool> AddFileSystem(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName, const MathLib::String& fsName) {
+    T* fs = new T(*disk);
     if (!fs) return MathLib::Expected<bool>();
     else if (fs->IsValid()) {
         size_t fsIndex = SIZE_MAX;
@@ -97,7 +93,7 @@ MathLib::Expected<bool> AddFileSystem(size_t i, const MathLib::String& fsName) {
         }
         if (fsIndex == SIZE_MAX) return MathLib::Expected<bool>();
         const MathLib::String name = fsName + MathLib::ToString(fsTable[fsIndex].second++);
-        LogString("Created "_M + name + " on disk " + MathLib::ToString(i) + '\n');
+        LogString("Created "_M + name + " on disk " + diskName + '\n');
         if (!vfs.AddFileSystem(MathLib::VFSEntry(fs, name))) return MathLib::Expected<bool>();
     }
     else {
@@ -105,6 +101,36 @@ MathLib::Expected<bool> AddFileSystem(size_t i, const MathLib::String& fsName) {
         return MathLib::Expected<bool>(false);
     }
     return MathLib::Expected<bool>(true);
+}
+bool InitDisk(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName);
+template <typename T>
+MathLib::Expected<bool> AddPartitions(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName) {
+    T partitionManager = T(*disk);
+    const MathLib::Array<MathLib::SubByteDevice*> partitions = partitionManager.GetPartitions();
+    if (partitions.IsEmpty()) return false;
+    const size_t size = partitions.GetSize();
+    LogString("Found "_M + MathLib::ToString(size) + " partitions on disk " + diskName + '\n');
+    for (size_t i = 0; i < size; i++)
+        if (!InitDisk(partitions.At(i), MathLib::CollectionToString(diskName) + '.' + MathLib::ToString(i))) return MathLib::Expected<bool>();
+    return true;
+}
+bool InitDisk(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName) {
+    MathLib::Expected<bool> tmp = AddFileSystem<MathLib::ISO9660>(disk, diskName, "iso9660fs");
+    if (!tmp.HasValue()) return false;
+    if (!tmp.Get()) {
+        tmp = AddFileSystem<MathLib::FAT>(disk, diskName, "fatfs");
+        if (!tmp.HasValue()) return false;
+        if (!tmp.Get()) {
+            tmp = AddPartitions<MathLib::MBR>(disk, diskName);
+            if (!tmp.HasValue()) return false;
+            if (!tmp.Get()) LogString("No file system found "_M + " on disk " + diskName + '\n');
+        }
+    }
+    return true;
+}
+bool constructorsCalled = false;
+[[gnu::constructor]] void TestConstructors(void) {
+    constructorsCalled = true;
 }
 uint8_t  stack[4096] __attribute__((aligned(16)));
 extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
@@ -120,15 +146,14 @@ extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
     }
     else if (!textUI->Clear()) MathLib::Panic("Failed to clear text UI");
     if (!mainTimer) MathLib::Panic("Failed to initialize main timer");
-    if (!vfs.AddFileSystem(MathLib::VFSEntry(new MathLib::MemoryFS(), "ramfs"))) MathLib::Panic("Failed to allocate memory file system");
+    if (!vfs.AddFileSystem(MathLib::VFSEntry(new MathLib::MemoryFS(), "ramfs"_M))) MathLib::Panic("Failed to allocate memory file system");
     for (size_t i = 0; i < disks.GetSize(); i++)
-        if (!AddFileSystem<MathLib::ISO9660>(i, "iso9660fs").Get("Failed to allocate file system"))
-            if (!AddFileSystem<MathLib::FAT>(i, "fatfs").Get("Failed to allocate file system"))
-                LogString("No file system found "_M + " on disk " + MathLib::ToString(i) + '\n');
-    LogString("VFS: {\n"_M + vfs.ListFiles("", SIZE_MAX, "\t") + "}\n");
+        if (!InitDisk(disks.At(i), MathLib::ToString(i))) MathLib::Panic("Failed to allocate file system");
+    LogString("VFS: {\n"_M + vfs.ListFiles(""_M, SIZE_MAX, "\t"_M) + "}\n");
     LogString("Boot time: "_M + MathLib::Second<MathLib::num_t>(MathLib::GetTime()).ToString() + '\n');
     renderer->Fill(0);
     if (!renderer->Update()) MathLib::Panic("Failed to update renderer");
+    InitTasks();
     if (!AddTask(Task(MathLib::FunctionPointer<void>(nullptr, &MainTask), stack, SizeOfArray(stack)))) MathLib::Panic("Failed to create kernel task");
     while (true) Schedule();
 }

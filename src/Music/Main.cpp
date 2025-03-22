@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
             MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::D2, 0.4), MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::None, 0.5),
             MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::C1, 0.4), MusicNote<MathLib::num_t>(MusicNote<MathLib::num_t>::Type::None, 0.5)
         ));
-        if (!music.SaveFromPath(fs, argv[1])) MathLib::Panic("Failed to save music to output file");
+        if (!music.SaveFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to save music to output file");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

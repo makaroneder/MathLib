@@ -2,24 +2,25 @@
 #include "Host.hpp"
 
 namespace MathLib {
-    String Erase(String str, size_t pos, size_t len) {
+    String Erase(const Sequence<char>& str, size_t pos, size_t len) {
         StartBenchmark
         String ret = "";
         for (size_t i = 0; i < pos; i++) ret += str.At(i);
         for (size_t i = pos + len; i < str.GetSize(); i++) ret += str.At(i);
         ReturnFromBenchmark(ret);
     }
-    String SubString(String str, size_t pos, size_t len) {
+    String SubString(const Sequence<char>& str, size_t pos, size_t len) {
         StartBenchmark
         String ret;
         for (size_t i = 0; i < len; i++) ret += str.At(pos + i);
         ReturnFromBenchmark(ret);
     }
-    Array<String> Split(String str, String delim, bool preserveDelim) {
+    Array<String> Split(const Sequence<char>& str_, const Sequence<char>& delim, bool preserveDelim) {
         StartBenchmark
         Array<String> ret;
         size_t pos = 0;
         String token;
+        String str = CollectionToString(str_);
         while ((pos = str.Find(delim)) != SIZE_MAX) {
             token = SubString(str, 0, pos + delim.GetSize() * preserveDelim);
             if (!ret.Add(token)) ReturnFromBenchmark(Array<String>());
@@ -61,5 +62,129 @@ namespace MathLib {
             ret.At(ret.GetSize() - 1) = '\n';
         }
         ReturnFromBenchmark(ret);
+    }
+    [[nodiscard]] bool MatchRepeatable(const Sequence<char>& pattern, size_t& i, size_t& j, const Function<bool, size_t&>& function) {
+        Interval<size_t> repeat = Interval<size_t>(1, 1);
+        if (j < pattern.GetSize()) {
+            switch (pattern.At(j)) {
+                case '*': {
+                    repeat = Interval<size_t>(0, SIZE_MAX);
+                    j++;
+                    break;
+                }
+                case '?': {
+                    repeat = Interval<size_t>(0, 1);
+                    j++;
+                    break;
+                }
+                case '+': {
+                    repeat = Interval<size_t>(1, SIZE_MAX);
+                    j++;
+                    break;
+                }
+                case '{': {
+                    j++;
+                    const size_t start = j;
+                    const size_t end1 = pattern.Find(',', j);
+                    if (end1 == SIZE_MAX) {
+                        const size_t end = pattern.Find('}', j);
+                        if (end == SIZE_MAX) return false;
+                        const size_t tmp = StringToNumber(SubString(pattern, start, end - start));
+                        repeat = Interval<size_t>(tmp, tmp);
+                        j = end + 1;
+                    }
+                    else {
+                        j = end1 + 1;
+                        const size_t end2 = pattern.Find('}', j);
+                        const String min = SubString(pattern, start, end1 - start);
+                        if (end2 == SIZE_MAX) return false;
+                        const String max = SubString(pattern, end1 + 1, end2 - end1 - 1);
+                        repeat = Interval<size_t>(min.IsEmpty() ? 0 : StringToNumber(min), max.IsEmpty() ? SIZE_MAX : StringToNumber(max));
+                        j = end2 + 1;
+                    }
+                    break;
+                }
+                default: break;
+            }
+        }
+        size_t found = 0;
+        while (true) {
+            const size_t save = i;
+            if (function(i)) {
+                i = save;
+                break;
+            }
+            found++;
+        }
+        return repeat.Contains(found);
+    }
+    [[nodiscard]] bool MatchInternal(const Sequence<char>& str, const Sequence<char>& pattern, size_t& i, const Interval<size_t>& patternInterval) {
+        size_t j = patternInterval.GetMin();
+        const size_t size1 = str.GetSize();
+        const size_t size2 = patternInterval.GetMax();
+        while (j < size2) {
+            const char chr = pattern.At(j++);
+            switch (chr) {
+                case '^': {
+                    if (i) return false;
+                    break;
+                }
+                case '$': {
+                    if (i != size1) return false;
+                    break;
+                }
+                case '[': {
+                    bool negate = false;
+                    if (pattern.At(j) == '^') {
+                        negate = true;
+                        j++;
+                    }
+                    const size_t end = pattern.Find(']', j + 1);
+                    if (end == SIZE_MAX) return false;
+                    String tmp = SubString(pattern, j, end - j);
+                    j = end + 1;
+                    String patt;
+                    for (size_t i = 0; i < tmp.GetSize(); i++) {
+                        if (!i || i + 1 == tmp.GetSize() || tmp.At(i) != '-') patt += tmp.At(i);
+                        else for (char chr = tmp.At(i - 1) + 1; chr < tmp.At(i + 1); chr++) patt += chr;
+                    }
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1, negate, patt, &str] (const void*, size_t& i) -> bool {
+                        return i >= size1 || negate == patt.Contains(str.At(i++));
+                    }))) return false;
+                    break;
+                }
+                case '(': {
+                    const size_t end = pattern.Find(')', j);
+                    if (end == SIZE_MAX) return false;
+                    const size_t start = j;
+                    j = end + 1;
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [&str, &pattern, start, end] (const void*, size_t& i) -> bool {
+                        return !MatchInternal(str, pattern, i, Interval<size_t>(start, end));
+                    }))) return false;
+                    break;
+                }
+                case '.': {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1] (const void*, size_t& i) -> bool {
+                        return i++ >= size1;
+                    }))) return false;
+                    break;
+                }
+                case '\\': {
+                    if (i >= size1 || str.At(i++) != pattern.At(j++)) return false;
+                    break;
+                }
+                default: {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1, &str, chr] (const void*, size_t& i) -> bool {
+                        return i >= size1 || str.At(i++) != chr;
+                    }))) return false;
+                    break;
+                }
+            }
+        }
+        return j >= size2;
+    }
+    bool Match(const Sequence<char>& str, const Sequence<char>& pattern) {
+        size_t i = 0;
+        return MatchInternal(str, pattern, i, Interval<size_t>(0, pattern.GetSize())) && i >= str.GetSize();
     }
 }

@@ -2,7 +2,7 @@
 #include "FileSystem/File.hpp"
 
 namespace MathLib {
-    String Preproces(FileSystem& fileSystem, const String& path) {
+    String Preproces(FileSystem& fileSystem, const Sequence<char>& path) {
         StartBenchmark
         File file = fileSystem.Open(path, OpenMode::Read);
         String ret = "";

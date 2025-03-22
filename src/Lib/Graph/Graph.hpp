@@ -109,7 +109,7 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartAndReturnFromBenchmark(data.ToString(padding));
         }
         [[nodiscard]] Expected<bool> operator==(const Graph<T>& other) const {
@@ -130,7 +130,7 @@ namespace MathLib {
         }
 
         private:
-        [[nodiscard]] Expected<Tree<T>> ToTree(const Collection<DijkstrasAlgorithmData<T>>& data, size_t start, T prevDist) const {
+        [[nodiscard]] Expected<Tree<T>> ToTree(const Sequence<DijkstrasAlgorithmData<T>>& data, size_t start, T prevDist) const {
             StartBenchmark
             Tree<T> ret = Tree<T>(MathLib::ToString(start, 10), data.At(start).distance - prevDist);
             for (size_t i = 0; i < data.GetSize(); i++) {

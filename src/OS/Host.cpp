@@ -24,7 +24,7 @@ namespace MathLib {
         if (LogString(str)) LogChar('\n');
         ArchPanic();
     }
-    num_t StringToNumber(String str) {
+    num_t StringToNumber(const Sequence<char>& str) {
         size_t i = 0;
         num_t ret = 0;
         while (i < str.GetSize() && str.At(i) != '.') {

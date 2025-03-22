@@ -6,8 +6,8 @@ MathLib::Expected<bool> NotGate::EvaluateInternal(void) const {
     const MathLib::Expected<bool> tmp = children.At(0).Evaluate();
     return tmp.HasValue() ? MathLib::Expected<bool>(!tmp.Get()) : MathLib::Expected<bool>();
 }
-MathLib::String NotGate::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + "Not: {\n";
-    for (const CircuitElementConnection& child : children) ret += child.ToString(padding + '\t') + '\n';
+MathLib::String NotGate::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + "Not: {\n";
+    for (const CircuitElementConnection& child : children) ret += child.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
     return ret + padding + '}';
 }

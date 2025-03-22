@@ -1,7 +1,7 @@
 #include "MathArch.hpp"
 
 namespace MathLib {
-    MathArch::MathArch(const Array<uint8_t>& memory) : StepEmulator(memory), pc(0), sp(0), a(0) {
+    MathArch::MathArch(const Sequence<uint8_t>& memory) : StepEmulator(memory), pc(0), sp(0), a(0) {
         EmptyBenchmark
     }
     size_t MathArch::EncodeOneByteInstruction(size_t i, MathArchOpcode opcode) {
@@ -53,12 +53,12 @@ namespace MathLib {
             default: ReturnFromBenchmark(false);
         }
     }
-    String MathArch::ToString(const String& padding) const {
+    String MathArch::ToString(const Sequence<char>& padding) const {
         StartBenchmark
-        String ret = padding + "{\n";
-        ret += padding + "\tPC = " + pc.ToString() + '\n';
-        ret += padding + "\tSP = " + sp.ToString() + '\n';
-        ret += padding + "\tA = " + a.ToString() + '\n';
+        String ret = "{\n";
+        ret += CollectionToString(padding) + "\tPC = " + pc.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tSP = " + sp.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tA = " + a.ToString() + '\n';
         ReturnFromBenchmark(ret + padding + '}');
     }
 }

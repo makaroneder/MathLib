@@ -7,7 +7,7 @@ struct FileTranslation {
     MathLib::String outputFormat;
     MathLib::String sources;
 
-    FileTranslation(const MathLib::String& inputFormat, const MathLib::String& outputFormat, const MathLib::String& sources);
+    FileTranslation(const MathLib::Sequence<char>& inputFormat, const MathLib::Sequence<char>& outputFormat, const MathLib::Sequence<char>& sources);
 };
 
 

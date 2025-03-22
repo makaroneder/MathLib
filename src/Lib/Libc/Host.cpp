@@ -41,8 +41,8 @@ namespace MathLib {
         EndBenchmark
     }
     #endif
-    std::ostream& operator<<(std::ostream& stream, const String& string) {
-        StartAndReturnFromBenchmark(stream << string.GetValue());
+    std::ostream& operator<<(std::ostream& stream, const Sequence<char>& string) {
+        StartAndReturnFromBenchmark(stream << CollectionToString(string).GetValue());
     }
     std::ostream& operator<<(std::ostream& stream, const Printable& printable) {
         StartAndReturnFromBenchmark(stream << printable.ToString());
@@ -50,8 +50,8 @@ namespace MathLib {
     [[noreturn]] void Panic(const char* str) {
         throw std::runtime_error(str);
     }
-    num_t StringToNumber(String str) {
-        StartAndReturnFromBenchmark(std::stold(str.GetValue()));
+    num_t StringToNumber(const Sequence<char>& str) {
+        StartAndReturnFromBenchmark(std::stold(CollectionToString(str).GetValue()));
     }
     String ToString(num_t x) {
         StartBenchmark

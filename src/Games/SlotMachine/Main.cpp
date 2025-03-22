@@ -19,14 +19,14 @@ int main(int, char**) {
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/SlotMachine/";
         const Symbol symbols[] = {
-            Symbol(fs, path + "Nothing.obj", "Nothing", MathLib::MakeArray<size_t>(0, 0, 0)),
-            Symbol(fs, path + "Money.obj", "Money", MathLib::MakeArray<size_t>(2, 5, 10)),
-            Symbol(fs, path + "Bell.obj", "Bell", MathLib::MakeArray<size_t>(0, 0, 10)),
-            Symbol(fs, path + "Bar.obj", "Bar", MathLib::MakeArray<size_t>(0, 0, 20)),
-            Symbol(fs, path + "7.obj", "7", MathLib::MakeArray<size_t>(0, 0, 30)),
-            Symbol(fs, path + "Lemon.obj", "Lemon", MathLib::MakeArray<size_t>(0, 0, 40)),
-            Symbol(fs, path + "Banana.obj", "Banana", MathLib::MakeArray<size_t>(0, 0, 60)),
-            Symbol(fs, path + "Orange.obj", "Orange", MathLib::MakeArray<size_t>(0, 0, 100)),
+            Symbol(fs, path + "Nothing.obj", "Nothing"_M, MathLib::MakeArray<size_t>(0, 0, 0)),
+            Symbol(fs, path + "Money.obj", "Money"_M, MathLib::MakeArray<size_t>(2, 5, 10)),
+            Symbol(fs, path + "Bell.obj", "Bell"_M, MathLib::MakeArray<size_t>(0, 0, 10)),
+            Symbol(fs, path + "Bar.obj", "Bar"_M, MathLib::MakeArray<size_t>(0, 0, 20)),
+            Symbol(fs, path + "7.obj", "7"_M, MathLib::MakeArray<size_t>(0, 0, 30)),
+            Symbol(fs, path + "Lemon.obj", "Lemon"_M, MathLib::MakeArray<size_t>(0, 0, 40)),
+            Symbol(fs, path + "Banana.obj", "Banana"_M, MathLib::MakeArray<size_t>(0, 0, 60)),
+            Symbol(fs, path + "Orange.obj", "Orange"_M, MathLib::MakeArray<size_t>(0, 0, 100)),
         };
         const Consumable consumables[] = {
             Consumable(fs, path + "NormalWater.obj", Consumable::Type::RewardMultiplier, 2, 6000),

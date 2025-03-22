@@ -5,7 +5,7 @@
 
 template <typename T>
 struct Rope : MathLib::LineShape<T> {
-    Rope(const MathLib::Matrix<T>& gravity, const MathLib::Collection<MathLib::Matrix<T>>& segments) : MathLib::LineShape<T>(MathLib::CreateVector<T>(0, 0, 0)), gravity(gravity), particles(MathLib::Array<MathLib::Particle<T>>(segments.GetSize())), lengths(MathLib::Array<T>(segments.GetSize() - 1)) {
+    Rope(const MathLib::Matrix<T>& gravity, const MathLib::Sequence<MathLib::Matrix<T>>& segments) : MathLib::LineShape<T>(MathLib::CreateVector<T>(0, 0, 0)), gravity(gravity), particles(segments.GetSize()), lengths(segments.GetSize() - 1) {
         particles.At(0) = MathLib::Particle<T>(segments.At(0), true);
         for (size_t i = 1; i < particles.GetSize(); i++) {
             particles.At(i) = MathLib::Particle<T>(segments.At(i), false);

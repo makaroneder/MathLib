@@ -10,15 +10,15 @@ namespace MathLib {
             Field,
         };
         AMLObject(void);
-        AMLObject(const String& name);
-        AMLObject(const String& name, const Array<uint64_t>& data);
-        AMLObject(const String& name, const Array<uint64_t>& data, Type type);
+        AMLObject(const Sequence<char>& name);
+        AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data);
+        AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type);
         [[nodiscard]] Array<uint64_t> GetData(void) const;
         [[nodiscard]] bool AddChild(const AMLObject& child);
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
         Type type;

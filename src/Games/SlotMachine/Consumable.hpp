@@ -11,7 +11,7 @@ struct Consumable : MathLib::WavefrontObject<MathLib::num_t> {
     ssize_t value;
     ssize_t cost;
 
-    Consumable(MathLib::FileSystem& fileSystem, const MathLib::String& path, Type type, ssize_t value, ssize_t cost);
+    Consumable(MathLib::FileSystem& fileSystem, const MathLib::Sequence<char>& path, Type type, ssize_t value, ssize_t cost);
 };
 
 #endif

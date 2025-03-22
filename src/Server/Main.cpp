@@ -4,9 +4,9 @@
 #include <iostream>
 
 MathLib::Array<HTTPHeader> resources = MathLib::MakeArray<HTTPHeader>(
-    HTTPHeader("/", "<h1>Amongus</h1>")
+    HTTPHeader("/"_M, "<h1>Amongus</h1>"_M)
 );
-[[nodiscard]] HTTPHeader* GetResource(MathLib::String name) {
+[[nodiscard]] HTTPHeader* GetResource(const MathLib::Sequence<char>& name) {
     for (HTTPHeader& resource : resources)
         if (resource.name == name) return &resource;
     return nullptr;
@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
                 else response = HTTPResponse::FromStatus(HTTPStatus::NotFound, request.target + " does not exist");
             }
             else if (request.method == "OPTIONS") {
-                response = HTTPResponse::FromStatus(HTTPStatus::NoContent, "OK");
-                if (!response.headers.Add(HTTPHeader("Allow", "OPTIONS, GET, HEAD"))) MathLib::Panic("Failed to add resonse header");
+                response = HTTPResponse::FromStatus(HTTPStatus::NoContent, "OK"_M);
+                if (!response.headers.Add(HTTPHeader("Allow"_M, "OPTIONS, GET, HEAD"_M))) MathLib::Panic("Failed to add resonse header");
             }
             else response = HTTPResponse::FromStatus(HTTPStatus::NotImplemented, "Unknown request: "_M + request.method);
             std::cout << response << std::flush;

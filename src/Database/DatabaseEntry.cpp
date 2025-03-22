@@ -1,10 +1,10 @@
 #include "DatabaseEntry.hpp"
 
-DatabaseEntry::DatabaseEntry(const MathLib::String& name) : name(name) {}
+DatabaseEntry::DatabaseEntry(const MathLib::Sequence<char>& name) : name(MathLib::CollectionToString(name)) {}
 MathLib::String DatabaseEntry::GetName(void) const {
     return name;
 }
-MathLib::Expected<DatabaseEntryField> DatabaseEntry::GetField(const MathLib::String& name) const {
+MathLib::Expected<DatabaseEntryField> DatabaseEntry::GetField(const MathLib::Sequence<char>& name) const {
     for (const DatabaseEntryField& field : fields)
         if (field.GetName() == name) return MathLib::Expected<DatabaseEntryField>(field);
     return MathLib::Expected<DatabaseEntryField>();
@@ -33,8 +33,8 @@ bool DatabaseEntry::Load(MathLib::Readable& file) {
         if (!field.Load(file)) return false;
     return true;
 }
-MathLib::String DatabaseEntry::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + name + ": {\n";
-    for (const DatabaseEntryField& field : fields) ret += field.ToString(padding + '\t') + '\n';
+MathLib::String DatabaseEntry::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + name + ": {\n";
+    for (const DatabaseEntryField& field : fields) ret += field.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
     return ret + padding + '}';
 }

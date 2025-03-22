@@ -7,11 +7,11 @@ namespace MathLib {
         String expression;
         bool passed;
 
-        Record(const String& expression = "", bool passed = false);
+        Record(const Sequence<char>& expression = ""_M, bool passed = false);
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
     };
 }
 

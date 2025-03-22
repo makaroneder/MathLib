@@ -4,7 +4,7 @@ Database::Database(void) : signature(expectedSignature) {}
 bool Database::IsValid(void) const {
     return signature == expectedSignature;
 }
-MathLib::Expected<DatabaseEntry> Database::GetEntry(const MathLib::String& name) const {
+MathLib::Expected<DatabaseEntry> Database::GetEntry(const MathLib::Sequence<char>& name) const {
     for (const DatabaseEntry& entry : entries)
         if (entry.GetName() == name) return MathLib::Expected<DatabaseEntry>(entry);
     return MathLib::Expected<DatabaseEntry>();
@@ -32,8 +32,8 @@ bool Database::Load(MathLib::Readable& file) {
         if (!entry.Load(file)) return false;
     return true;
 }
-MathLib::String Database::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + "{\n";
-    for (const DatabaseEntry& entry : entries) ret += entry.ToString(padding + '\t') + '\n';
+MathLib::String Database::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
+    for (const DatabaseEntry& entry : entries) ret += entry.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
     return ret + padding + '}';
 }

@@ -19,7 +19,7 @@ namespace MathLib {
                 for (TreeElement*& child : children) delete child;
                 EndBenchmark
             }
-            [[nodiscard]] const TreeElement* Find(const String& name) const {
+            [[nodiscard]] const TreeElement* Find(const Sequence<char>& name) const {
                 StartBenchmark
                 if (self.name == name) ReturnFromBenchmark(this);
                 for (const TreeElement* const& child : children) {
@@ -42,23 +42,33 @@ namespace MathLib {
         Tree(void) {
             EmptyBenchmark
         }
-        Tree(const String& name, const T& data) : name(name), data(data) {
+        Tree(const Sequence<char>& name, const T& data) : name(CollectionToString(name)), data(data) {
             EmptyBenchmark
         }
-        Tree(const String& name, const T& data, const Array<Tree<T>>& children) : name(name), data(data), children(children) {
+        Tree(const Sequence<char>& name, const T& data, const Array<Tree<T>>& children) : name(CollectionToString(name)), data(data), children(children) {
             EmptyBenchmark
         }
-        [[nodiscard]] Tree<T> AddNamePostfix(const String& namePostfix) const {
+        [[nodiscard]] Tree<T> AddNamePostfix(const Sequence<char>& namePostfix) const {
             StartBenchmark
             Tree<T> ret = *this;
             ret.name += namePostfix;
             for (Tree<T>& child : ret.children) child = child.AddNamePostfix(namePostfix);
             ReturnFromBenchmark(ret);
         }
-        [[nodiscard]] bool Add(const Tree<T>& tree, const String& namePostfix = "") {
+        [[nodiscard]] bool Add(const Tree<T>& tree, const Sequence<char>& namePostfix = ""_M) {
             StartAndReturnFromBenchmark(children.Add(tree.AddNamePostfix(namePostfix)));
         }
-        [[nodiscard]] Expected<Tree<T>> ChangeRoot(const String& n) const {
+        [[nodiscard]] Array<Tree<T>> GetContaining(const Sequence<char>& name) const {
+            StartBenchmark
+            Array<Tree<T>> ret;
+            for (const Tree<T>& child : children) {
+                if (child.name == name && !ret.Add(*this)) ReturnFromBenchmark(Array<Tree<T>>());
+                const Array<Tree<T>> tmp = child.GetContaining(name);
+                ret += tmp;
+            }
+            ReturnFromBenchmark(ret);
+        }
+        [[nodiscard]] Expected<Tree<T>> ChangeRoot(const Sequence<char>& n) const {
             StartBenchmark
             TreeElement* doubleTree = ToDoubleTree();
             if (!doubleTree) ReturnFromBenchmark(Expected<Tree<T>>());
@@ -100,7 +110,7 @@ namespace MathLib {
             ret.second++;
             ReturnFromBenchmark(ret);
         }
-        [[nodiscard]] Array<Tree<T>> GetPath(const String& target) const {
+        [[nodiscard]] Array<Tree<T>> GetPath(const Sequence<char>& target) const {
             StartBenchmark
             if (name == target) ReturnFromBenchmark(MakeArray<Tree<T>>(*this));
             for (const Tree<T>& child : children) {
@@ -162,12 +172,12 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
-            String ret = padding + name + " (" + MathLib::ToString(data) + ')';
+            String ret = CollectionToString(padding) + name + " (" + MathLib::ToString(data) + ')';
             if (children.GetSize()) {
                 ret += ": {\n";
-                for (const Tree<T>& child : children) ret += child.ToString(padding + '\t') + '\n';
+                for (const Tree<T>& child : children) ret += child.ToString(CollectionToString(padding) + '\t') + '\n';
                 ReturnFromBenchmark(ret + padding + '}');
             }
             else ReturnFromBenchmark(ret);

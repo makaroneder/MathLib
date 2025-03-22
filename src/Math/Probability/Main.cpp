@@ -1,4 +1,8 @@
-#include "UniformDiscreteMeasure.hpp"
+#include "FlipChannel.hpp"
+#include <Cryptography/Code/RepetitionCode.hpp>
+#include <Cryptography/Cipher/NestedCipher.hpp>
+#include <Math/UniformDiscreteMeasure.hpp>
+#include <Cryptography/Cipher/ROT13.hpp>
 #include <iostream>
 
 /// @brief Entry point for this program
@@ -7,15 +11,21 @@
 /// @return Status
 int main(int, char**) {
     try {
-        const MathLib::Set<MathLib::num_t> heads = MathLib::Set<MathLib::num_t>(MathLib::MakeArray<MathLib::num_t>(0));
-        const MathLib::Set<MathLib::num_t> tails = MathLib::Set<MathLib::num_t>(MathLib::MakeArray<MathLib::num_t>(1));
-        const UniformDiscreteMeasure<MathLib::num_t, MathLib::num_t> space = UniformDiscreteMeasure<MathLib::num_t, MathLib::num_t>((heads + tails).Get("Failed to combine sets"));
-        std::cout << "P(null) = " << space.GetMeasure(MathLib::Set<MathLib::num_t>()) << std::endl;
-        std::cout << "P(heads) = " << space.GetMeasure(heads) << std::endl;
-        std::cout << "P(tails) = " << space.GetMeasure(tails) << std::endl;
-        std::cout << "E(X) = " << space.GetExpectedValue() << std::endl;
-        std::cout << "Var(X) = " << space.GetVariance() << std::endl;
-        std::cout << "H(X) = " << space.GetTotalEntropy(2) << std::endl;
+        #ifndef Debug
+        srand(time(nullptr));
+        #endif
+        FlipChannel<MathLib::num_t, MathLib::UniformDiscreteMeasure<MathLib::num_t>> channel;
+        const MathLib::NestedCipher cipher = MathLib::NestedCipher(MathLib::MakeArray<MathLib::NestedCipherData*>(
+            new MathLib::NestedCipherData(new MathLib::RepetitionCode(), 1),
+            new MathLib::NestedCipherData(new MathLib::ROT13(), 0)
+        ));
+        const MathLib::String message = "Hello";
+        const ssize_t n = 3;
+        const MathLib::String tmp = channel.SendString(message, cipher, MathLib::MakeArray<uint64_t>(n));
+        std::cout << "Sent: " << message << std::endl;
+        std::cout << "Recieved: " << tmp << std::endl;
+        std::cout << "Lost data: " << message.GetSize() - tmp.GetSize() << std::endl;
+        std::cout << "Hamming distance: " << message.GetHammingDistance(tmp) << std::endl;
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

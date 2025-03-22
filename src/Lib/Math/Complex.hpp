@@ -10,11 +10,11 @@ namespace MathLib {
     num_t Pow(num_t x, num_t y);
     num_t InversedTan2(num_t y, num_t x);
     template <typename T>
-    [[nodiscard]] String CoefficientToString(const T& x, const String& symbol) {
+    [[nodiscard]] String CoefficientToString(const T& x, const Sequence<char>& symbol) {
         StartBenchmark
         if (FloatsEqual<T>(x, 0)) ReturnFromBenchmark("")
-        else if (FloatsEqual<T>(x, 1)) ReturnFromBenchmark(symbol)
-        else if (FloatsEqual<T>(x, -1)) ReturnFromBenchmark(String('-') + symbol)
+        else if (FloatsEqual<T>(x, 1)) ReturnFromBenchmark(CollectionToString(symbol))
+        else if (FloatsEqual<T>(x, -1)) ReturnFromBenchmark('-'_M + symbol)
         else ReturnFromBenchmark(MathLib::ToString(x) + symbol)
     }
     template <typename T>
@@ -49,11 +49,11 @@ namespace MathLib {
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
-            if (FloatsEqual<T>(real, 0)) ReturnFromBenchmark(padding + (FloatsEqual<T>(imaginary, 0) ? "0" : CoefficientToString(imaginary, "i")))
-            else if (FloatsEqual<T>(imaginary, 0)) ReturnFromBenchmark(padding + MathLib::ToString(real))
-            else ReturnFromBenchmark(padding + MathLib::ToString(real) + " + " + MathLib::ToString(imaginary) + 'i')
+            if (FloatsEqual<T>(real, 0)) ReturnFromBenchmark(CollectionToString(padding) + (FloatsEqual<T>(imaginary, 0) ? "0" : CoefficientToString(imaginary, 'i'_M)))
+            else if (FloatsEqual<T>(imaginary, 0)) ReturnFromBenchmark(CollectionToString(padding) + MathLib::ToString(real))
+            else ReturnFromBenchmark(CollectionToString(padding) + MathLib::ToString(real) + " + " + MathLib::ToString(imaginary) + 'i')
         }
         [[nodiscard]] Complex<T> operator/(const Complex<T>& other) const {
             StartAndReturnFromBenchmark(*this * other.GetInverse());

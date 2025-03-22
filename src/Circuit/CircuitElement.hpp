@@ -5,7 +5,7 @@
 
 struct CircuitElement : MathLib::Printable {
     CircuitElement(void);
-    CircuitElement(const MathLib::Array<CircuitElementConnection>& children);
+    CircuitElement(const MathLib::Sequence<CircuitElementConnection>& children);
     [[nodiscard]] virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const = 0;
 
     protected:

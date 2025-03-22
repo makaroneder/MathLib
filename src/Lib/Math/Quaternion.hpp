@@ -37,7 +37,7 @@ namespace MathLib {
         /// @brief Converts quaternion to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             StartBenchmark
             String ret = FloatsEqual<T>(a, 0) ? "" : MathLib::ToString(a);
             if (FloatsEqual<T>(b, 1)) ret += ret.IsEmpty() ? "i" : " + i";
@@ -46,7 +46,7 @@ namespace MathLib {
             else if (!FloatsEqual<T>(c, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + MathLib::ToString(c) + 'j';
             if (FloatsEqual<T>(d, 1)) ret += ret.IsEmpty() ? "k" : " + k";
             else if (!FloatsEqual<T>(d, 0)) ret += String(ret.IsEmpty() ? "" : " + ") + MathLib::ToString(d) + 'k';
-            ReturnFromBenchmark(padding + (ret.IsEmpty() ? "0" : ret));
+            ReturnFromBenchmark(CollectionToString(padding) + (ret.IsEmpty() ? "0" : ret));
         }
         /// @brief (a + bi + cj + dk) * (e + fi + gj + hk) = (ae - bf - cg - dh) + (af + be + ch - dg)i + (ag - bh + ce + df)j + (ah + bg - cf + de)k
         /// @param other Other quaternion

@@ -6,7 +6,7 @@ namespace MathLib {
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Node type
-    Node::Type GetType(const String& str, size_t& i) {
+    Node::Type GetType(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         SkipWhiteSpace(str, i);
         if (str.GetSize() <= i) ReturnFromBenchmark(Node::Type::None);
@@ -55,24 +55,24 @@ namespace MathLib {
             default: ReturnFromBenchmark(Node::Type::None);
         }
     }
-    Node* TokenizeInternal(const String& str, size_t& i);
+    Node* TokenizeInternal(const Sequence<char>& str, size_t& i);
     /// @brief Tokenizes string into nodes
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Tokenized string
-    Node* TokenizeComma(const String& str, size_t& i) {
+    Node* TokenizeComma(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         Node* ret = TokenizeInternal(str, i);
         SkipWhiteSpace(str, i);
         while (i < str.GetSize() && str.At(i) == ',')
-            ret = new Node(GetType(str, i), "", ret, TokenizeInternal(str, i));
+            ret = new Node(GetType(str, i), ""_M, ret, TokenizeInternal(str, i));
         ReturnFromBenchmark(ret);
     }
     /// @brief Tokenizes string into nodes
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Tokenized string
-    Node* TokenizeData(const String& str, size_t& i) {
+    Node* TokenizeData(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         SkipWhiteSpace(str, i);
         if (IsDigit(str.At(i))) {
@@ -80,7 +80,7 @@ namespace MathLib {
             while (i < str.GetSize() && (IsDigit(str.At(i)) || str.At(i) == '.' || str.At(i) == 'e')) ret += str.At(i++);
             if (str.At(i) == 'i') {
                 i++;
-                ReturnFromBenchmark(new Node(Node::Type::Constant, String("0 + ") + ret + 'i'));
+                ReturnFromBenchmark(new Node(Node::Type::Constant, "0 + "_M + ret + 'i'));
             }
             ReturnFromBenchmark(new Node(Node::Type::Constant, ret));
         }
@@ -111,7 +111,7 @@ namespace MathLib {
                 }
                 else ReturnFromBenchmark(new Node(Node::Type::Function, name, ret));
             }
-            else if (name == "i") ReturnFromBenchmark(new Node(Node::Type::Constant, "0 + 1i"))
+            else if (name == "i") ReturnFromBenchmark(new Node(Node::Type::Constant, "0 + 1i"_M))
             else ReturnFromBenchmark(new Node(Node::Type::Variable, name));
         }
         else if (str.At(i) == '"') {
@@ -131,7 +131,7 @@ namespace MathLib {
                 ReturnFromBenchmark(nullptr);
             }
             i++;
-            ReturnFromBenchmark(new Node(Node::Type::Array, "", ret));
+            ReturnFromBenchmark(new Node(Node::Type::Array, ""_M, ret));
         }
         else if (str.At(i) == '[') {
             i++;
@@ -172,18 +172,18 @@ namespace MathLib {
                 ReturnFromBenchmark(nullptr);
             }
             i++;
-            ReturnFromBenchmark(new Node(Node::Type::Absolute, "", ret));
+            ReturnFromBenchmark(new Node(Node::Type::Absolute, ""_M, ret));
         }
         else if (str.At(i) == '-') {
             i++;
             Node* ret = TokenizeInternal(str, i);
-            ReturnFromBenchmark(ret ? new Node(Node::Type::Mul, "", new Node(Node::Type::Constant, "-1"), ret) : nullptr);
+            ReturnFromBenchmark(ret ? new Node(Node::Type::Mul, ""_M, new Node(Node::Type::Constant, "-1"_M), ret) : nullptr);
         }
         else ReturnFromBenchmark(nullptr);
     }
 
     #define TokenizeLayer(func, req, next)                                      \
-    Node* Tokenize##func(const String& str, size_t& i) {                        \
+    Node* Tokenize##func(const Sequence<char>& str, size_t& i) {         \
         StartBenchmark                                                          \
         Node* ret = Tokenize##next(str, i);                                     \
         SkipWhiteSpace(str, i);                                                 \
@@ -191,7 +191,7 @@ namespace MathLib {
         Node::Type type = GetType(str, i);                                      \
         i = tmp;                                                                \
         while (i < str.GetSize() && (req)) {                                    \
-            ret = new Node(GetType(str, i), "", ret, Tokenize##next(str, i));   \
+            ret = new Node(GetType(str, i), ""_M, ret, Tokenize##next(str, i)); \
             if (!ret) ReturnFromBenchmark(nullptr);                             \
             tmp = i;                                                            \
             type = GetType(str, i);                                             \
@@ -203,13 +203,13 @@ namespace MathLib {
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Tokenized string
-    Node* TokenizeIndex(const String& str, size_t& i) {
+    Node* TokenizeIndex(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         Node* ret = TokenizeData(str, i);
         SkipWhiteSpace(str, i);
         if (i < str.GetSize() && str.At(i) == '[') {
             i++;
-            ret = new Node(Node::Type::Index, "", ret, TokenizeInternal(str, i));
+            ret = new Node(Node::Type::Index, ""_M, ret, TokenizeInternal(str, i));
             SkipWhiteSpace(str, i);
             if (str.At(i) != ']') {
                 delete ret;
@@ -223,12 +223,12 @@ namespace MathLib {
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Tokenized string
-    Node* TokenizeFactorial(const String& str, size_t& i) {
+    Node* TokenizeFactorial(const Sequence<char>& str, size_t& i) {
         StartBenchmark
         Node* ret = TokenizeIndex(str, i);
         size_t tmp = i;
         const Node::Type type = GetType(str, i);
-        if (type == Node::Type::Factorial) ret = new Node(type, "", ret);
+        if (type == Node::Type::Factorial) ret = new Node(type, ""_M, ret);
         else i = tmp;
         ReturnFromBenchmark(ret);
     }
@@ -242,15 +242,15 @@ namespace MathLib {
     /// @param str String to tokenize
     /// @param i Current position in the string
     /// @return Tokenized string
-    Node* TokenizeInternal(const String& str, size_t& i) {
+    Node* TokenizeInternal(const Sequence<char>& str, size_t& i) {
         StartAndReturnFromBenchmark(TokenizeAssignment(str, i));
     }
-    Node* Tokenize(const String& str) {
+    Node* Tokenize(const Sequence<char>& str) {
         StartBenchmark
         size_t i = 0;
         Node* ret = TokenizeInternal(str, i);
         while (i < str.GetSize() && ret)
-            ret = new Node(Node::Type::Comma, "", ret, TokenizeInternal(str, i));
+            ret = new Node(Node::Type::Comma, ""_M, ret, TokenizeInternal(str, i));
         ReturnFromBenchmark(ret);
     }
 }

@@ -7,6 +7,6 @@ MathLib::Expected<bool> ConstGate::EvaluateInternal(void) const {
 void ConstGate::Flip(void) {
     value = !value;
 }
-MathLib::String ConstGate::ToString(const MathLib::String& padding) const {
-    return padding + (value ? "High" : "Low");
+MathLib::String ConstGate::ToString(const MathLib::Sequence<char>& padding) const {
+    return MathLib::CollectionToString(padding) + (value ? "High" : "Low");
 }

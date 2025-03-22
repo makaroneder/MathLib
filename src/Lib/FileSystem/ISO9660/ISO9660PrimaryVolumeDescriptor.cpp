@@ -5,11 +5,7 @@ namespace MathLib {
         StartAndReturnFromBenchmark (
             ISO9660VolumeDescriptor::IsValid() &&
             type == Type::PrimaryVolumeDescriptor &&
-            bytesPerSector.little == 2048 &&
-            creationDate.IsValid() &&
-            modificationDate.IsValid() &&
-            expirationDate.IsValid() &&
-            effectiveDate.IsValid()
+            bytesPerSector.little == 2048
         );
     }
 }

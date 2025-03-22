@@ -13,11 +13,11 @@ bool NucleicAcid::operator==(const NucleicAcid& other) const {
 bool NucleicAcid::operator!=(const NucleicAcid& other) const {
     return !(*this == other);
 }
-MathLib::String NucleicAcid::ToString(const MathLib::String& padding) const {
+MathLib::String NucleicAcid::ToString(const MathLib::Sequence<char>& padding) const {
     MathLib::String ret;
     if (adenine) ret += 'A';
     if (cytosine) ret += ret.IsEmpty() ? "C" : "/C";
     if (guanine) ret += ret.IsEmpty() ? "G" : "/G";
     if (thymine) ret += ret.IsEmpty() ? "T" : "/T";
-    return padding + (ret.IsEmpty() ? "0" : ret);
+    return MathLib::CollectionToString(padding) + (ret.IsEmpty() ? "0" : ret);
 }

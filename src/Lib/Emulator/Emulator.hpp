@@ -4,7 +4,7 @@
 
 namespace MathLib {
     struct Emulator : ByteDevice {
-        Emulator(const Array<uint8_t>& memory);
+        Emulator(const Sequence<uint8_t>& memory);
         [[nodiscard]] virtual bool Run(void) = 0;
         /// @brief Returns memory size
         /// @return Memory size

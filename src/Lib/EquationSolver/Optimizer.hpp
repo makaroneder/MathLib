@@ -10,12 +10,12 @@ namespace MathLib {
         Array<Variable> variables;
         bool runtime;
 
-        Optimizer(const Collection<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Array<FunctionNode>& funcs = Array<FunctionNode>(), const Collection<Variable>& vars = Array<Variable>());
+        Optimizer(const Sequence<BuiltinFunction>& builtinFuncs = Array<BuiltinFunction>(), const Sequence<FunctionNode>& funcs = Array<FunctionNode>(), const Sequence<Variable>& vars = Array<Variable>());
         Optimizer(Optimizer* parent);
         Optimizer Recreate(void) const;
         void Destroy(void);
-        [[nodiscard]] FunctionNode GetFunction(const String& name) const;
-        [[nodiscard]] bool SetBuiltinFunctionData(const String& name, void* data);
+        [[nodiscard]] FunctionNode GetFunction(const Sequence<char>& name) const;
+        [[nodiscard]] bool SetBuiltinFunctionData(const Sequence<char>& name, void* data);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node
@@ -24,10 +24,10 @@ namespace MathLib {
         private:
         Optimizer* parent;
 
-        [[nodiscard]] BuiltinFunction* GetBuiltinFunctionInternal(const String& name);
-        [[nodiscard]] FunctionNode* GetFunctionInternal(const String& name);
-        [[nodiscard]] Variable* GetVariableInternal(const String& name);
-        [[nodiscard]] Node* OptimizeComparison(const Node* node, const Collection<Node::Type>& validTypes, Node::Type defaultType);
+        [[nodiscard]] BuiltinFunction* GetBuiltinFunctionInternal(const Sequence<char>& name);
+        [[nodiscard]] FunctionNode* GetFunctionInternal(const Sequence<char>& name);
+        [[nodiscard]] Variable* GetVariableInternal(const Sequence<char>& name);
+        [[nodiscard]] Node* OptimizeComparison(const Node* node, const Sequence<Node::Type>& validTypes, Node::Type defaultType);
         [[nodiscard]] Node* OptimizeProgram(const Node* node);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize

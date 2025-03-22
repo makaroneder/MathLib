@@ -30,6 +30,9 @@ namespace MathLib {
             if (!fixed) acceleration += acc;
             EndBenchmark
         }
+        [[nodiscard]] Matrix<T> GetAcceleration(void) const {
+            return acceleration;
+        }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>&) const override {
             StartAndReturnFromBenchmark(MakeArray<Line<T>>(Line<T>(prevPosition, this->position)));
         }

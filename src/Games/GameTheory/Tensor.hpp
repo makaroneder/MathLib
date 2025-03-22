@@ -6,19 +6,19 @@
 template <typename T>
 struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
     CreateOperators(Tensor<T>, T)
-    Tensor(const MathLib::Array<size_t>& dimensions) : dimensions(dimensions) {
+    Tensor(const MathLib::Sequence<size_t>& dims) : dimensions(MathLib::CollectionToArray<size_t>(dims)) {
         size_t size = 1;
         for (const size_t& dim : dimensions) size *= dim;
         data = MathLib::Array<T>(size);
     }
-    Tensor(const MathLib::Array<size_t>& dimensions, const MathLib::Array<T>& data) : dimensions(dimensions), data(data) {}
+    Tensor(const MathLib::Sequence<size_t>& dimensions, const MathLib::Sequence<T>& data) : dimensions(MathLib::CollectionToArray<size_t>(dimensions)), data(MathLib::CollectionToArray<T>(data)) {}
     void Fill(const T& x) {
         for (T& val : data) val = x;
     }
-    [[nodiscard]] T& At(const MathLib::Collection<size_t>& position) {
+    [[nodiscard]] T& At(const MathLib::Sequence<size_t>& position) {
         return data.At(ToIndex(position));
     }
-    [[nodiscard]] T At(const MathLib::Collection<size_t>& position) const {
+    [[nodiscard]] T At(const MathLib::Sequence<size_t>& position) const {
         return data.At(ToIndex(position));
     }
     [[nodiscard]] T GetSum(void) const {
@@ -35,8 +35,8 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
-        return padding + ToStringInternal(MathLib::Array<size_t>(), dimensions.GetSize());
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
+        return MathLib::CollectionToString(padding) + ToStringInternal(MathLib::Array<size_t>(), dimensions.GetSize());
     }
     [[nodiscard]] virtual MathLib::Iterator<const T> begin(void) const override {
         return data.begin();
@@ -69,7 +69,7 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
         for (T& val : data) val *= scalar;
         EndBenchmark
     }
-    [[nodiscard]] size_t ToIndex(const MathLib::Collection<size_t>& position) const {
+    [[nodiscard]] size_t ToIndex(const MathLib::Sequence<size_t>& position) const {
         size_t ret = 0;
         for (size_t i = 0; i < position.GetSize(); i++) {
             size_t tmp = position.At(i);
@@ -78,7 +78,7 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
         }
         return ret;
     }
-    [[nodiscard]] MathLib::String ToStringInternal(const MathLib::Array<size_t>& position, size_t level) const {
+    [[nodiscard]] MathLib::String ToStringInternal(const MathLib::Sequence<size_t>& position, size_t level) const {
         if (!level) {
             MathLib::String pos = "e(";
             for (size_t i = 0; i < position.GetSize(); i++)
@@ -88,7 +88,7 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
         else {
             const size_t dim = dimensions.At(level - 1);
             MathLib::String ret = "";
-            MathLib::Array<size_t> pos = position;
+            MathLib::Array<size_t> pos = MathLib::CollectionToArray<size_t>(position);
             if (!pos.Add(0)) return "";
             for (size_t i = 0; i < dim; i++) {
                 pos.At(position.GetSize()) = i;

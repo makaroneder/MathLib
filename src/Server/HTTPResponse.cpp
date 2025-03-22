@@ -2,10 +2,10 @@
 #include <String.hpp>
 #include <Host.hpp>
 
-HTTPResponse::HTTPResponse(MathLib::String str) {
+HTTPResponse::HTTPResponse(const MathLib::Sequence<char>& str) {
     if (!str.IsEmpty()) {
-        MathLib::Array<MathLib::String> lines = MathLib::Split(str, "\r\n", true);
-        MathLib::Array<MathLib::String> statusLine = MathLib::Split(lines.At(0), " ", true);
+        MathLib::Array<MathLib::String> lines = MathLib::Split(str, "\r\n"_M, true);
+        MathLib::Array<MathLib::String> statusLine = MathLib::Split(lines.At(0), " "_M, true);
         version = MathLib::SubString(statusLine.At(0), 0, statusLine.At(0).GetSize() - 1);
         status = MathLib::SubString(statusLine.At(1), 0, statusLine.At(1).GetSize() - 1);
         description = MathLib::SubString(statusLine.At(2), 0, statusLine.At(2).GetSize() - 1);
@@ -22,7 +22,7 @@ HTTPResponse::HTTPResponse(MathLib::String str) {
                 }
                 break;
             }
-            MathLib::Array<MathLib::String> tmp = MathLib::Split(line, ":", true);
+            MathLib::Array<MathLib::String> tmp = MathLib::Split(line, ":"_M, true);
             size_t off = 0;
             while (tmp.At(1).At(off) == ' ') off++;
             if (!headers.Add(HTTPHeader(MathLib::SubString(tmp.At(0), 0, tmp.At(0).GetSize() - 1), MathLib::SubString(tmp.At(1), off, tmp.At(1).GetSize() - off)))) MathLib::Panic("Failed to add HTTP header");
@@ -30,18 +30,18 @@ HTTPResponse::HTTPResponse(MathLib::String str) {
         for (size_t i = bodyIndex; i < size; i++) body += lines.At(i) + "\n";
     }
 }
-HTTPResponse HTTPResponse::FromStatus(HTTPStatus status, MathLib::String desc) {
+HTTPResponse HTTPResponse::FromStatus(HTTPStatus status, const MathLib::Sequence<char>& desc) {
     HTTPResponse ret = HTTPResponse();
     ret.version = "HTTP/1.1";
     ret.status = MathLib::ToString((size_t)status, 10);
-    ret.description = desc;
+    ret.description = MathLib::CollectionToString(desc);
     return ret;
 }
-HTTPResponse HTTPResponse::FromHTML(MathLib::String str) {
-    HTTPResponse ret = FromStatus(HTTPStatus::Success, "OK");
-    if (!ret.headers.Add(HTTPHeader("Content-Type", "text/html; charset=utf-8"))) return HTTPResponse();
-    if (!ret.headers.Add(HTTPHeader("Content-Length", MathLib::ToString(str.GetSize())))) return HTTPResponse();
-    ret.body = str;
+HTTPResponse HTTPResponse::FromHTML(const MathLib::Sequence<char>& str) {
+    HTTPResponse ret = FromStatus(HTTPStatus::Success, "OK"_M);
+    if (!ret.headers.Add(HTTPHeader("Content-Type"_M, "text/html; charset=utf-8"_M))) return HTTPResponse();
+    if (!ret.headers.Add(HTTPHeader("Content-Length"_M, MathLib::ToString(str.GetSize())))) return HTTPResponse();
+    ret.body = MathLib::CollectionToString(str);
     return ret;
 }
 MathLib::String HTTPResponse::GetRaw(void) const {
@@ -49,15 +49,15 @@ MathLib::String HTTPResponse::GetRaw(void) const {
     for (const HTTPHeader& header : headers) ret += header.name + ": " + header.value + "\r\n";
     return ret + "\r\n" + body;
 }
-MathLib::String HTTPResponse::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + "Status line:\n";
-    ret += padding + "\tHTTP version: " + version + '\n';
-    ret += padding + "\tStatus: " + status + '\n';
-    ret += padding + "\tDescription: " + description + '\n';
+MathLib::String HTTPResponse::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + "Status line:\n";
+    ret += MathLib::CollectionToString(padding) + "\tHTTP version: " + version + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tStatus: " + status + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tDescription: " + description + '\n';
     if (!headers.IsEmpty()) {
-        ret += padding + "HTTP headers:\n";
-        for (const HTTPHeader& header : headers) ret += header.ToString(padding + '\t') + '\n';
+        ret += MathLib::CollectionToString(padding) + "HTTP headers:\n";
+        for (const HTTPHeader& header : headers) ret += header.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
     }
-    if (!body.IsEmpty()) ret += padding + "Body:\n" + body + '\n';
+    if (!body.IsEmpty()) ret += MathLib::CollectionToString(padding) + "Body:\n" + body + '\n';
     return ret;
 }

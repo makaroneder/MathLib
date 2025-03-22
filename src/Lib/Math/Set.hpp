@@ -5,13 +5,27 @@
 
 namespace MathLib {
     template <typename T>
-    struct Set : Orderable, Iteratable<T>, Printable {
+    struct Set : Collection<T>, Orderable {
         template <typename F>
         friend struct Set;
 
         Set(void) {}
-        Set(const Array<T>& data) : data(data) {}
-        [[nodiscard]] size_t GetSize(void) const {
+        Set(size_t size) : data(size) {}
+        Set(const T& data) : data(MakeArray<T>(data)) {}
+        Set(const Sequence<T>& data) : data(CollectionToArray<T>(data)) {}
+        [[nodiscard]] virtual T At(size_t index) const override {
+            return data.At(index);
+        }
+        [[nodiscard]] virtual T& At(size_t index) override {
+            return data.At(index);
+        }
+        [[nodiscard]] virtual bool Add(const T& val) override {
+            return data.Contains(val) ? true : data.Add(val);
+        }
+        [[nodiscard]] virtual const T* GetValue(void) const override {
+            return data.GetValue();
+        }
+        [[nodiscard]] virtual size_t GetSize(void) const override {
             return data.GetSize();
         }
         [[nodiscard]] bool Contains(const T& x) const {
@@ -58,7 +72,7 @@ namespace MathLib {
             }
             return ret;
         }
-        [[nodiscard]] Expected<Set<Array<T>>> CartesianProduct(const Array<Set<T>>& others) const {
+        [[nodiscard]] Expected<Set<Array<T>>> CartesianProduct(const Sequence<Set<T>>& others) const {
             if (others.IsEmpty()) return Expected<Set<Array<T>>>(Set<Array<T>>());
             Set<Array<T>> ret;
             const Expected<Set<Array<T>>> tmp = CartesianProduct(others.At(0));
@@ -90,24 +104,6 @@ namespace MathLib {
                 if (other.data.Contains(x) && !ret.data.Add(x)) return Expected<Set<T>>();
             return Expected<Set<T>>(ret);
         }
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override {
-            return padding + MathLib::ToString<T>(data);
-        }
-        [[nodiscard]] virtual Iterator<const T> begin(void) const override {
-            return data.begin();
-        }
-        [[nodiscard]] virtual Iterator<const T> end(void) const override {
-            return data.end();
-        }
-        [[nodiscard]] virtual Iterator<T> begin(void) override {
-            return data.begin();
-        }
-        [[nodiscard]] virtual Iterator<T> end(void) override {
-            return data.end();
-        }
 
         protected:
         [[nodiscard]] virtual bool LessThanEqual(const Orderable& other_) const override {
@@ -120,6 +116,10 @@ namespace MathLib {
         private:
         Array<T> data;
     };
+    template <typename T>
+    [[nodiscard]] String ToString(const Set<T>& set) {
+        return MathLib::ToString<T>(set.GetData());
+    }
 }
 
 #endif

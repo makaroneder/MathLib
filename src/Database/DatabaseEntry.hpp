@@ -3,9 +3,9 @@
 #include "DatabaseEntryField.hpp"
 
 struct DatabaseEntry : MathLib::Saveable, MathLib::Printable {
-    DatabaseEntry(const MathLib::String& name = "");
+    DatabaseEntry(const MathLib::Sequence<char>& name = ""_M);
     MathLib::String GetName(void) const;
-    MathLib::Expected<DatabaseEntryField> GetField(const MathLib::String& name) const;
+    MathLib::Expected<DatabaseEntryField> GetField(const MathLib::Sequence<char>& name) const;
     bool UpdateField(const DatabaseEntryField& field);
     /// @brief Saves data
     /// @param file File to save data into
@@ -18,7 +18,7 @@ struct DatabaseEntry : MathLib::Saveable, MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override;
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
 
     private:
     MathLib::String name;

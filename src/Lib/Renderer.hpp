@@ -5,6 +5,7 @@
 #include "Color.hpp"
 #include "String.hpp"
 #include "Threads.hpp"
+#include "FunctionT.hpp"
 #include "Math/Quaternion.hpp"
 #include "Geometry/LineShape.hpp"
 #include "Image/SaveableImage.hpp"
@@ -163,12 +164,16 @@ namespace MathLib {
         template <typename T>
         void FillCircle2D(const Matrix<T>& position, const T& radius, uint32_t color) {
             StartBenchmark
-            const T div = 1 / pointMultiplier;
-            const T radiusSquared = radius * radius;
-            for (T y = -radius; y <= radius; y += div) {
-                for (T x = -radius; x <= radius; x += div) {
-                    const Matrix<T> offset = CreateVector<T>(x, y, 0);
-                    if (offset.GetLengthSquared() <= radiusSquared) SetPixel<T>(position + offset, color);
+            const Matrix<ssize_t> pos = ConvertMatrix<T, ssize_t>(ProjectVector<T>(position - ConvertMatrix<num_t, T>(this->position)) * pointMultiplier);
+            const ssize_t r = radius * pointMultiplier;
+            const size_t radiusSquared = r * r;
+            Matrix<ssize_t> offset = Matrix<ssize_t>(2, 1);
+            for (ssize_t y = -r; y <= r; y++) {
+                const ssize_t absX = Sqrt(radiusSquared - y * y);
+                for (ssize_t x = -absX; x <= absX; x++) {
+                    GetX(offset) = x;
+                    GetY(offset) = y;
+                    SetPixelInternal<ssize_t>(pos + offset, color);
                 }
             }
             EndBenchmark
@@ -182,20 +187,20 @@ namespace MathLib {
         /// @param bgColor Background color to render strings with
         /// @return Status
         template <typename T>
-        [[nodiscard]] bool Puts(const String& str, const PSF1* font, Matrix<T> pos, uint32_t fgColor, uint32_t bgColor) {
+        [[nodiscard]] bool Puts(const Sequence<char>& str, const PSF1* font, Matrix<T> pos, uint32_t fgColor, uint32_t bgColor) {
             StartBenchmark
             if (!font || !font->IsValid()) ReturnFromBenchmark(false);
-            const Array<String> strs = Split(str, "\n", false);
+            const Array<String> strs = Split(str, "\n"_M, false);
             const T w = font->GetWidth() / 2;
             const T h = font->GetHeight() / 2;
             const size_t bytesPerGlyph = (size_t)(w * 2) / 8 + !!((size_t)(w * 2) % 8);
             const T div = 1 / pointMultiplier;
             GetY(pos) -= strs.GetSize() * h * div;
             Matrix<T> tmp = pos;
-            for (const String& s : strs) {
+            for (const Sequence<char>& s : strs) {
                 pos = tmp;
                 GetX(pos) -= s.GetSize() * w * div;
-                for (const char& chr : s) {
+                s.Foreach(MakeFunctionT<void, char>(nullptr, [this, font, &pos, fgColor, bgColor, div, w, h, bytesPerGlyph] (const void*, char chr) -> void {
                     const uint8_t* fontPtr = font->GetGlyph(chr);
                     for (T y = -h; y < h; y++) {
                         for (T x = -w; x < w; x++)
@@ -203,7 +208,7 @@ namespace MathLib {
                         fontPtr += bytesPerGlyph;
                     }
                     GetX(pos) += w * 2 * div;
-                }
+                }));
                 GetY(tmp) -= h * 2 * div;
             }
             ReturnFromBenchmark(true);
@@ -222,7 +227,7 @@ namespace MathLib {
         [[nodiscard]] bool Puts(const String& str, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, uint32_t fgColor, uint32_t bgColor) {
             StartBenchmark
             if (!font || !font->IsValid()) ReturnFromBenchmark(false);
-            const Array<String> strs = Split(str, "\n", false);
+            const Array<String> strs = Split(str, "\n"_M, false);
             const T w = font->GetWidth() / 2;
             const T h = font->GetHeight() / 2;
             const size_t bytesPerGlyph = (size_t)(w * 2) / 8 + !!((size_t)(w * 2) % 8);
@@ -232,11 +237,11 @@ namespace MathLib {
             const T div = 1 / pointMultiplier;
             GetY(pos) -= strs.GetSize() * h * sy * div;
             Matrix<T> tmp = pos;
-            for (const String& s : strs) {
+            for (const Sequence<char>& s : strs) {
                 pos = tmp;
                 GetX(pos) -= s.GetSize() * w * sx * div;
                 const Matrix<T> center = pos;
-                for (const char& chr : s) {
+                s.Foreach(MakeFunctionT<void, char>(nullptr, [this, font, &pos, fgColor, bgColor, div, w, h, sx, sy, sz, center, rotation, bytesPerGlyph] (const void*, char chr) -> void {
                     const uint8_t* fontPtr = font->GetGlyph(chr);
                     for (T y = -h; y < h; y++) {
                         for (T x = -w; x < w; x++)
@@ -247,7 +252,7 @@ namespace MathLib {
                         fontPtr += bytesPerGlyph;
                     }
                     GetX(pos) += w * 2 * sx * div;
-                }
+                }));
                 GetY(tmp) -= h * 2 * sy * div;
             }
             ReturnFromBenchmark(true);
@@ -307,9 +312,11 @@ namespace MathLib {
         /// @tparam T Type of number
         /// @param values Values generated by function
         template <typename T>
-        void DrawComplexFunction(const Collection<ComplexPosition<T>>& values) {
+        void DrawComplexFunction(const Sequence<ComplexPosition<T>>& values) {
             StartBenchmark
-            for (const ComplexPosition<T>& x : values) SetPixel<T>(x.GetPosition(), x.GetColor());
+            values.Foreach(MakeFunctionT<void, ComplexPosition<T>>(nullptr, [this] (const void*, ComplexPosition<T> x) -> void {
+                SetPixel<T>(x.GetPosition(), x.GetColor());
+            }));
             EndBenchmark
         }
         /// @brief Draws function based on its values
@@ -317,12 +324,12 @@ namespace MathLib {
         /// @param values Values generated by function
         /// @param color Color of function
         template <typename T>
-        void DrawFunction(const Collection<Line<T>>& values, uint32_t color) {
+        void DrawFunction(const Sequence<Line<T>>& values, uint32_t color) {
             StartBenchmark
-            for (const Line<T>& x : values) {
+            values.Foreach(MakeFunctionT<void, Line<T>>(nullptr, [this, color] (const void*, Line<T> x) -> void {
                 if (!fillGapsInFunctions) SetPixel<T>(x.end, color);
                 else if (!IsNaN(GetX(x.start))) DrawLine<T>(Line<T>(x.start, x.end), color);
-            }
+            }));
             EndBenchmark
         }
         /// @brief Draws function based on its values
@@ -333,15 +340,15 @@ namespace MathLib {
         /// @param y Y size
         /// @param z Z size
         template <typename T>
-        void DrawFunction(const Collection<Line<T>>& values, uint32_t color, const Interval<T>& x, const Interval<T>& y, const Interval<T>& z) {
+        void DrawFunction(const Sequence<Line<T>>& values, uint32_t color, const Interval<T>& x, const Interval<T>& y, const Interval<T>& z) {
             StartBenchmark
             const Matrix<Interval<T>> interval = MathLib::CreateVector<Interval<T>>(x, y, z);
-            for (const Line<T>& x : values) {
+            values.Foreach(MakeFunctionT<void, Line<T>>(nullptr, [this, color, interval] (const void*, Line<T> x) -> void {
                 if (x.end.IsInside(interval)) {
                     if (!fillGapsInFunctions) SetPixel<T>(x.end, color);
                     else if (x.start.IsInside(interval)) DrawLine<T>(Line<T>(x.start, x.end), color);
                 }
-            }
+            }));
             EndBenchmark
         }
         /// @brief f(x + y * i)

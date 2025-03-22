@@ -16,11 +16,11 @@ namespace MathLib {
         };
         String path;
 
-        FileInfo(Type type = Type::Unknown, const String& path = "");
+        FileInfo(Type type = Type::Unknown, const Sequence<char>& path = ""_M);
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
     };
 }
 

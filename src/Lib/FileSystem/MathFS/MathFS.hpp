@@ -12,7 +12,7 @@ namespace MathLib {
         /// @param path Path to file
         /// @param mode Mode to open file in
         /// @return File index
-        [[nodiscard]] virtual size_t OpenInternal(const String& path, OpenMode mode) override;
+        [[nodiscard]] virtual size_t OpenInternal(const Sequence<char>& path, OpenMode mode) override;
         /// @brief Closes file
         /// @param file File index
         /// @return Status
@@ -35,7 +35,7 @@ namespace MathLib {
         /// @param file File index
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) override;
-        [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const String& path) override;
+        [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) override;
 
         private:
         uint64_t root;

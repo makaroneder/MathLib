@@ -41,7 +41,7 @@ namespace MathLib {
         Set8(Get8(false) & (0b1111 << (upper ? 0 : 4)), false);
         EndBenchmark
     }
-    String Register::ToString(const String& padding) const {
-        StartAndReturnFromBenchmark(padding + "0x" + MathLib::ToString(value, 16));
+    String Register::ToString(const Sequence<char>& padding) const {
+        StartAndReturnFromBenchmark(CollectionToString(padding) + "0x" + MathLib::ToString(value, 16));
     }
 }

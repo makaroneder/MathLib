@@ -8,10 +8,10 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-[[nodiscard]] bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::String& type) {
-    if (type == "P6") return renderer.SetImage<MathLib::P6>();
-    else if (type == "TGA") return renderer.SetImage<MathLib::TGA>();
-    else if (type == "Aseprite") return renderer.SetImage<MathLib::Aseprite>();
+[[nodiscard]] bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::Sequence<char>& type) {
+    if (type == "P6"_M) return renderer.SetImage<MathLib::P6>();
+    else if (type == "TGA"_M) return renderer.SetImage<MathLib::TGA>();
+    else if (type == "Aseprite"_M) return renderer.SetImage<MathLib::Aseprite>();
     else return false;
 }
 /// @brief Entry point for this program
@@ -25,10 +25,10 @@ int main(int argc, char** argv) {
         MathLib::DummyRenderer dummyRenderer = MathLib::DummyRenderer(0, 0);
         MathLib::HostFileSystem fs;
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
-        if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("inputType").Get("No input type specified"))) MathLib::Panic("Invalid inputType");
-        if (!dummyRenderer.LoadFromPath(fs, cmdLine.GetEntry("input").Get("No input specified"))) MathLib::Panic("Failed to load image data");
-        if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("outputType").Get("No output type specified"))) MathLib::Panic("Invalid outputType");
-        if (!dummyRenderer.SaveFromPath(fs, cmdLine.GetEntry("output").Get("No output specified"))) MathLib::Panic("Failed to save image data");
+        if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("inputType"_M).Get("No input type specified"))) MathLib::Panic("Invalid inputType");
+        if (!dummyRenderer.LoadFromPath(fs, cmdLine.GetEntry("input"_M).Get("No input specified"))) MathLib::Panic("Failed to load image data");
+        if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("outputType"_M).Get("No output type specified"))) MathLib::Panic("Invalid outputType");
+        if (!dummyRenderer.SaveFromPath(fs, cmdLine.GetEntry("output"_M).Get("No output specified"))) MathLib::Panic("Failed to save image data");
         if (!renderer.DrawImage<MathLib::num_t>(dummyRenderer, MathLib::CreateVector<MathLib::num_t>(0, 0, 0))) MathLib::Panic("Failed to render image");
         while (renderer.GetEvent().type != MathLib::Event::Type::Quit)
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");

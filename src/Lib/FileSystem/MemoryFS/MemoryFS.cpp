@@ -1,10 +1,10 @@
 #include "MemoryFS.hpp"
 
 namespace MathLib {
-    MemoryFS::MemoryFS(void) : resources(Array<MemoryFSResource>()), files(Array<MemoryFSFile>()) {
+    MemoryFS::MemoryFS(void) : resources(), files() {
         EmptyBenchmark
     }
-    size_t MemoryFS::OpenInternal(const String& path, OpenMode mode) {
+    size_t MemoryFS::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         StartBenchmark
         size_t resource = SIZE_MAX;
         for (size_t i = 0; i < resources.GetSize() && resource == SIZE_MAX; i++)
@@ -55,9 +55,9 @@ namespace MathLib {
         if (files.GetSize() <= file || resources.GetSize() <= files.At(file).resource) ReturnFromBenchmark(0);
         ReturnFromBenchmark(resources.At(files.At(file).resource).buffer.GetSize());
     }
-    Array<FileInfo> MemoryFS::ReadDirectory(const String& path) {
+    Array<FileInfo> MemoryFS::ReadDirectory(const Sequence<char>& path) {
         StartBenchmark
-        if (path.IsEmpty() || path == "/") {
+        if (path.IsEmpty() || path == '/'_M) {
             Array<FileInfo> ret = Array<FileInfo>(resources.GetSize());
             for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = FileInfo(FileInfo::Type::File, resources.At(i).name);
             ReturnFromBenchmark(ret);

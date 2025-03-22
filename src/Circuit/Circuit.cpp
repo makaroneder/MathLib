@@ -1,7 +1,9 @@
 #include "Circuit.hpp"
 
+#include <iostream>
+
 Circuit::Circuit(void) {}
-Circuit::Circuit(const MathLib::Array<CircuitElementConnection>& children) : CircuitElement(children) {}
+Circuit::Circuit(const MathLib::Sequence<CircuitElementConnection>& children) : CircuitElement(children) {}
 MathLib::Expected<MathLib::Bitmap> Circuit::Evaluate(void) const {
     MathLib::Bitmap ret = MathLib::Bitmap(children.GetSize());
     for (size_t i = 0; i < children.GetSize(); i++) {
@@ -10,8 +12,8 @@ MathLib::Expected<MathLib::Bitmap> Circuit::Evaluate(void) const {
     }
     return MathLib::Expected<MathLib::Bitmap>(ret);
 }
-MathLib::String Circuit::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + "Circuit: {\n";
-    for (const CircuitElementConnection& child : children) ret += child.ToString(padding + '\t') + '\n';
+MathLib::String Circuit::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + "Circuit: {\n";
+    for (const CircuitElementConnection& child : children) ret += child.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
     return ret + padding + '}';
 }

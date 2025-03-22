@@ -10,4 +10,7 @@ namespace MathLib {
     bool MBRPartitionEntry::IsValid(void) const {
         StartAndReturnFromBenchmark((type == Type::Normal || type == Type::Active) && !(id == ID::Empty && type == Type::Active));
     }
+    Interval<size_t> MBRPartitionEntry::GetInterval(void) const {
+        StartAndReturnFromBenchmark(Interval<size_t>((startLBA + 1) * 512, (startLBA + sectorCount + 1) * 512));
+    }
 }

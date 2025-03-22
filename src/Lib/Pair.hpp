@@ -14,6 +14,12 @@ namespace MathLib {
         Pair(const A& first, const B& second) : first(first), second(second) {
             EmptyBenchmark
         }
+        bool operator==(const Pair<A, B>& other) const {
+            return first == other.first && second == other.second;
+        }
+        bool operator!=(const Pair<A, B>& other) const {
+            return first != other.first || second != other.second;
+        }
     };
 }
 

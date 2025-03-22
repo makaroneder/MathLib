@@ -1,18 +1,17 @@
 #ifndef MathLib_MBR_H
 #define MathLib_MBR_H
 #include "MBRHeader.hpp"
-#include "../Interval.hpp"
-#include "../Interfaces/ByteDevice.hpp"
+#include "../PartitionManager.hpp"
 
 namespace MathLib {
-    struct MBR {
+    struct MBR : PartitionManager {
         MBR(ByteDevice& base);
         [[nodiscard]] size_t GetSectorSize(void) const;
-        [[nodiscard]] Array<Interval<size_t>> GetPartitionRanges(void) const;
+        [[nodiscard]] Array<MBRPartitionEntry> GetPartitionEntries(void) const;
+        [[nodiscard]] virtual Array<Interval<size_t>> GetPartitionRanges(void) const override;
 
         private:
-        ByteDevice& base;
-        Array<Interval<size_t>> partitionRanges;
+        Array<MBRPartitionEntry> partitions;
     };
 }
 

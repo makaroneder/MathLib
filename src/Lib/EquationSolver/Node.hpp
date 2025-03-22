@@ -38,7 +38,7 @@ namespace MathLib {
         /// @param value Value
         /// @param left Left child
         /// @param right Right child
-        Node(Type type = Type::None, const String& value = "", Node* left = nullptr, Node* right = nullptr);
+        Node(Type type = Type::None, const Sequence<char>& value = ""_M, Node* left = nullptr, Node* right = nullptr);
         /// @brief Destroys current node and it's children
         virtual ~Node(void) override;
         /// @brief Creates a new node with the same values as the current node
@@ -50,7 +50,7 @@ namespace MathLib {
         [[nodiscard]] Array<complex_t> ToNumber(void) const;
         /// @brief Converts values of the current node to string
         /// @param padding Padding of the generated strings
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
     };
     /// @brief Converts node to array
     /// @param node Node to convert
@@ -59,18 +59,18 @@ namespace MathLib {
     /// @brief Converts array to node
     /// @param array Array to convert
     /// @return Converted node
-    [[nodiscard]] Node* ArrayToComma(const Array<Node*>& array);
+    [[nodiscard]] Node* ArrayToComma(const Sequence<Node*>& array);
     /// @brief Replaces every node containing specified variable with specified replacement
     /// @param node Root node to replace
     /// @param name Name of the variable to replace
     /// @param replacement Node to replace with
     /// @return New root node
-    [[nodiscard]] Node* ReplaceVariable(const Node* node, const String& name, const Node* replacement);
+    [[nodiscard]] Node* ReplaceVariable(const Node* node, const Sequence<char>& name, const Node* replacement);
     /// @brief Checks whether node contains specified variable
     /// @param node Root node to check
     /// @param name Name of the variable
     /// @return Status
-    [[nodiscard]] bool ContainsVariable(const Node* node, const String& name);
+    [[nodiscard]] bool ContainsVariable(const Node* node, const Sequence<char>& name);
 }
 
 #endif

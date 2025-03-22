@@ -11,7 +11,7 @@
 #endif
 
 namespace MathLib {
-    size_t HostFileSystem::OpenInternal(const String& path, OpenMode mode) {
+    size_t HostFileSystem::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         StartBenchmark
         const char* modeStr = "";
         switch (mode) {
@@ -29,7 +29,11 @@ namespace MathLib {
             }
             default: ReturnFromBenchmark(SIZE_MAX);
         }
-        FILE* file = fopen(path.GetValue(), modeStr);
+        const size_t size = path.GetSize();
+        char buff[size + 1];
+        for (size_t i = 0; i < size; i++) buff[i] = path.At(i);
+        buff[size] = '\0';
+        FILE* file = fopen(buff, modeStr);
         if (!file) ReturnFromBenchmark(SIZE_MAX);
         for (size_t i = 0; i < files.GetSize(); i++) {
             if (!files[i]) {
@@ -68,7 +72,7 @@ namespace MathLib {
         if (fseek(raw, pos, SEEK_SET)) ReturnFromBenchmark(0);
         ReturnFromBenchmark(ret);
     }
-    Array<FileInfo> HostFileSystem::ReadDirectory(const String& path_) {
+    Array<FileInfo> HostFileSystem::ReadDirectory(const Sequence<char>& path_) {
         StartBenchmark
         #ifndef __MINGW32__
         const String path = String(fs::current_path().c_str()) + '/' + path_;
@@ -78,7 +82,7 @@ namespace MathLib {
             FileInfo::Type type = FileInfo::Type::Unknown;
             if (fs::is_directory(entry.status())) type = FileInfo::Type::Directory;
             else if (fs::is_regular_file(entry.status())) type = FileInfo::Type::File;
-            if (!ret.Add(FileInfo(type, entry.path().filename().string()))) ReturnFromBenchmark(Array<FileInfo>());
+            if (!ret.Add(FileInfo(type, String(entry.path().filename().string())))) ReturnFromBenchmark(Array<FileInfo>());
         }
         ReturnFromBenchmark(ret);
         #else

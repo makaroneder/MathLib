@@ -8,6 +8,6 @@ MathLib::Expected<bool> CircuitElementConnection::Evaluate(void) const {
     if (!ret.HasValue()) return MathLib::Expected<bool>();
     return ret.Get().Get(pin);
 }
-MathLib::String CircuitElementConnection::ToString(const MathLib::String& padding) const {
+MathLib::String CircuitElementConnection::ToString(const MathLib::Sequence<char>& padding) const {
     return elements.At(index)->ToString(padding) + " (" + MathLib::ToString(pin) + ')';
 }

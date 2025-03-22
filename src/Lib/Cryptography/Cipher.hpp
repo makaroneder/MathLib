@@ -1,23 +1,23 @@
 #ifndef MathLib_Cryptography_Cipher_H
 #define MathLib_Cryptography_Cipher_H
-#include "../Interval.hpp"
+#include "OneWayCipher.hpp"
 
 namespace MathLib {
-    struct Cipher : Allocatable {
-        Cipher(void);
-        Cipher(const String& letters, const String& upperLetters, const String& digits);
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Collection<uint8_t>& data, const String& key) const = 0;
-        [[nodiscard]] virtual Array<uint8_t> Decrypt(const Collection<uint8_t>& data, const String& key) const = 0;
-        [[nodiscard]] String EncryptString(const String& str, const String& key) const;
-        [[nodiscard]] String DecryptString(const String& str, const String& key) const;
-
-        private:
-        [[nodiscard]] String GetString(const String& str, const String& key, bool encrypt) const;
-        [[nodiscard]] uint8_t GetIndex(char chr) const;
-
-        String letters;
-        String upperLetters;
-        String digits;
+    struct Cipher : OneWayCipher {
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, bool encrypt) const = 0;
+        [[nodiscard]] String EncryptString(const Sequence<char>& str, const Sequence<uint64_t>& key, bool encrypt) const;
+        template <typename T>
+        Array<T> TestEncryption(const Sequence<T>& data, const Sequence<uint64_t>& key) const {
+            return DecryptT<T>(EncryptT<T>(data, key), key);
+        }
+        template <typename T>
+        [[nodiscard]] Array<T> DecryptT(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+            StartBenchmark
+            const Array<uint8_t> ret = Encrypt(data, key, false);
+            const size_t size = ret.GetSize();
+            ReturnFromBenchmark(size % sizeof(T) ? Array<T>() : Array<T>((const T*)ret.GetValue(), size / sizeof(T)));
+        }
     };
 }
 

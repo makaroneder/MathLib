@@ -1,7 +1,7 @@
 #include "StepEmulator.hpp"
 
 namespace MathLib {
-    StepEmulator::StepEmulator(const Array<uint8_t>& memory) : Emulator(memory) {
+    StepEmulator::StepEmulator(const Sequence<uint8_t>& memory) : Emulator(memory) {
         EmptyBenchmark
     }
     bool StepEmulator::Run(void) {

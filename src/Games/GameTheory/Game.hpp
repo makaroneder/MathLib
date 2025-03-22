@@ -5,7 +5,7 @@
 
 template <typename T>
 struct Game : MathLib::Printable {
-    Game(const MathLib::Array<Player<T>*>& players, const Tensor<T>& payoffs) : players(players), payoffs(payoffs) {}
+    Game(const MathLib::Sequence<Player<T>*>& players, const Tensor<T>& payoffs) : players(MathLib::CollectionToArray(players)), payoffs(payoffs) {}
     virtual ~Game(void) override {
         for (Player<T>*& player : players) delete player;
     }
@@ -23,11 +23,11 @@ struct Game : MathLib::Printable {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::String& padding = "") const override {
+    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         MathLib::String ret = "{\n";
-        ret += padding + "\tPayoffs: " + payoffs.ToString() + '\n';
+        ret += MathLib::CollectionToString(padding) + "\tPayoffs: " + payoffs.ToString() + '\n';
         for (size_t i = 0; i < players.GetSize(); i++)
-            ret += padding + "\tPlayer " + MathLib::ToString(i, 10) + ": " + players.At(i)->ToString(padding + '\t') + '\n';
+            ret += MathLib::CollectionToString(padding) + "\tPlayer " + MathLib::ToString(i, 10) + ": " + players.At(i)->ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
         return ret + padding + '}';
     }
 

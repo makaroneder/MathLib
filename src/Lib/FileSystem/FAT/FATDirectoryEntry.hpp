@@ -4,7 +4,7 @@
 
 namespace MathLib {
     struct FATDirectoryEntry {
-        static constexpr uint8_t unusedEntry = 0xeb;
+        static constexpr char unusedEntry = 0xeb;
         char name[11];
         bool readOnly : 1;
         bool hidden : 1;

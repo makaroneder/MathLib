@@ -1,7 +1,7 @@
 #include "TriggerAction.hpp"
 #include "ConstantStrategy.hpp"
 
-TriggerAction::TriggerAction(GameStrategy* strategy, const MathLib::Array<size_t>& triggers) : strategy(strategy), triggers(triggers) {}
+TriggerAction::TriggerAction(GameStrategy* strategy, const MathLib::Sequence<size_t>& triggers) : strategy(strategy), triggers(MathLib::CollectionToArray<size_t>(triggers)) {}
 TriggerAction::~TriggerAction(void) {
     delete strategy;
 }

@@ -91,8 +91,8 @@ bool IsLinear(const MathLib::Tree<size_t>& tree) {
     }
     return true;
 }
-MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLib::String& padding = "") {
-    MathLib::String ret = padding + symbols[tree.data].first;
+MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLib::Sequence<char>& padding = ""_M) {
+    MathLib::String ret = MathLib::CollectionToString(padding) + symbols[tree.data].first;
     if (!tree.children.GetSize()) return ret;
     MathLib::Pair<MathLib::String, size_t> tmp = MathLib::Pair<MathLib::String, size_t>("", 0);
     const bool isLinear = IsLinear(tree);
@@ -113,7 +113,7 @@ MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLi
             ret += '-'_M + MathLib::SubString(tmp, padding.GetSize(), tmp.GetSize() - padding.GetSize());
         }
         else {
-            const MathLib::String tmp = ToChemicalString(child, padding + '\t');
+            const MathLib::String tmp = ToChemicalString(child, MathLib::CollectionToString(padding) + '\t');
             bool found = false;
             for (MathLib::Pair<MathLib::String, size_t>& x : children) {
                 if (x.first == tmp) {
@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <carbons>");
         const MathLib::Second<MathLib::num_t> start = MathLib::GetTime();
-        const MathLib::Array<MathLib::Tree<size_t>> connections = CreateComponent(MathLib::StringToNumber(argv[1]));
+        const MathLib::Array<MathLib::Tree<size_t>> connections = CreateComponent(MathLib::StringToNumber(MathLib::String(argv[1])));
         for (const MathLib::Tree<size_t>& root : connections) std::cout << ToChemicalString(root) << '\n';
         std::cout << "Isomers: " << connections.GetSize() << std::endl;
         std::cout << "Time: " << MathLib::Second<MathLib::num_t>(MathLib::GetTime()) - start << std::endl;

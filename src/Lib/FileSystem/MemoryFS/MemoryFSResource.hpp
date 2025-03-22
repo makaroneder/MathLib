@@ -7,7 +7,7 @@ namespace MathLib {
         String name;
         Array<uint8_t> buffer;
 
-        MemoryFSResource(const String& name = "");
+        MemoryFSResource(const Sequence<char>& name = ""_M);
     };
 }
 

@@ -7,7 +7,7 @@ namespace MathLib {
         FileSystem* fs;
         String name;
 
-        VFSEntry(FileSystem* fs = nullptr, String name = "");
+        VFSEntry(FileSystem* fs = nullptr, const Sequence<char>& name = ""_M);
     };
 }
 

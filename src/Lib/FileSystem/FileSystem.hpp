@@ -12,12 +12,12 @@ namespace MathLib {
         /// @param path Path to file
         /// @param mode Mode to open file in
         /// @return File
-        [[nodiscard]] File Open(const String& path, OpenMode mode);
+        [[nodiscard]] File Open(const Sequence<char>& path, OpenMode mode);
         /// @brief Opens file
         /// @param path Path to file
         /// @param mode Mode to open file in
         /// @return File index
-        [[nodiscard]] virtual size_t OpenInternal(const String& path, OpenMode mode) = 0;
+        [[nodiscard]] virtual size_t OpenInternal(const Sequence<char>& path, OpenMode mode) = 0;
         /// @brief Closes file
         /// @param file File index
         /// @return Status
@@ -40,8 +40,8 @@ namespace MathLib {
         /// @param file File index
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) = 0;
-        [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const String& path) = 0;
-        [[nodiscard]] String ListFiles(const String& path, size_t maxDepth, const String& padding = "");
+        [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) = 0;
+        [[nodiscard]] String ListFiles(const Sequence<char>& path, size_t maxDepth, const Sequence<char>& padding = ""_M);
     };
 }
 

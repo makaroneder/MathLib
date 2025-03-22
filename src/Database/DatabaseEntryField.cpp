@@ -1,7 +1,7 @@
 #include "DatabaseEntryField.hpp"
 
 DatabaseEntryField::DatabaseEntryField(void) {}
-DatabaseEntryField::DatabaseEntryField(const MathLib::String& name, const MathLib::String& value) : name(name), value(value) {}
+DatabaseEntryField::DatabaseEntryField(const MathLib::Sequence<char>& name, const MathLib::Sequence<char>& value) : name(MathLib::CollectionToString(name)), value(MathLib::CollectionToString(value)) {}
 MathLib::String DatabaseEntryField::GetName(void) const {
     return name;
 }
@@ -13,6 +13,6 @@ bool DatabaseEntryField::Load(MathLib::Readable& file) {
     value = file.ReadUntil('\0');
     return true;
 }
-MathLib::String DatabaseEntryField::ToString(const MathLib::String& padding) const {
-    return padding + name + ": " + value;
+MathLib::String DatabaseEntryField::ToString(const MathLib::Sequence<char>& padding) const {
+    return MathLib::CollectionToString(padding) + name + ": " + value;
 }

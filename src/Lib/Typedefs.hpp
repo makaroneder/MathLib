@@ -1,6 +1,5 @@
 #ifndef MathLib_Typedefs_H
 #define MathLib_Typedefs_H
-#include <stdint.h>
 #include "Swap.hpp"
 #ifdef Freestanding
 #include "CharBuffer.hpp"
@@ -48,7 +47,7 @@ namespace MathLib {
     /// @brief Default error tolerance
     extern num_t eps;
 
-    [[noreturn]] void Panic(const char*);
+    [[noreturn]] void Panic(const char* str);
     [[nodiscard]] num_t Abs(num_t x);
     [[nodiscard]] num_t Sqrt(num_t x);
     [[nodiscard]] num_t RandomFloat(void);
@@ -66,12 +65,25 @@ namespace MathLib {
     struct Tree;
     [[nodiscard]] Tree<num_t> StopBenchmarking(void);
 
+    template <typename Arr, typename T>
+    Arr ConvertCollection(const Sequence<T>& sequence) {
+        Arr ret = Arr(sequence.GetSize());
+        for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = sequence.At(i);
+        return ret;
+    }
     template <typename T>
-    Array<T> CollectionToArray(const Collection<T>& collection) {
-        // Array<T> ret = Array<T>(collection.GetSize());
-        // for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = collection.At(i);
-        // return ret;
-        return Array<T>(collection.GetValue(), collection.GetSize());
+    Array<T> CollectionToArray(const Sequence<T>& sequence) {
+        return ConvertCollection<Array<T>, T>(sequence);
+    }
+    String CollectionToString(const Sequence<char>& sequence);
+    template <typename T>
+    T Pop(Array<T>& array) {
+        const size_t size = array.GetSize() - 1;
+        const T ret = array.At(size);
+        Array<T> tmp = Array<T>(0, size);
+        for (size_t i = 0; i < size; i++) tmp.At(i) = array.At(i);
+        array = tmp;
+        return ret;
     }
     template <typename T>
     Array<T> MakeArray(T arg) {
@@ -140,9 +152,9 @@ namespace MathLib {
     /// @param array Array to be sorted
     /// @return Sorted array
     template <typename T>
-    [[nodiscard]] Array<T> BubbleSort(const Array<T>& array, bool largestFirst) {
+    [[nodiscard]] Array<T> BubbleSort(const Sequence<T>& array, bool largestFirst) {
         StartBenchmark
-        Array<T> ret = array;
+        Array<T> ret = CollectionToArray<T>(array);
         while (true) {
             bool any = false;
             for (size_t i = 0; i < ret.GetSize() - 1; i++) {

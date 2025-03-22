@@ -1,6 +1,5 @@
 #ifndef MathLib_Host_H
 #define MathLib_Host_H
-#include "Math/Complex.hpp"
 #include "Thread.hpp"
 #include "Utils.hpp"
 #ifndef Freestanding
@@ -16,7 +15,7 @@ namespace MathLib {
     /// @param stream Stream to print string into
     /// @param string String to print
     /// @return Stream
-    std::ostream& operator<<(std::ostream& stream, const String& string);
+    std::ostream& operator<<(std::ostream& stream, const Sequence<char>& string);
     /// @brief Prints a string representation of printable structures
     /// @param stream Stream to print data into
     /// @param printable Data to print
@@ -25,7 +24,7 @@ namespace MathLib {
     #endif
 
     [[noreturn]] void Panic(const char* str);
-    [[nodiscard]] num_t StringToNumber(String str);
+    [[nodiscard]] num_t StringToNumber(const Sequence<char>& str);
     [[nodiscard]] String ToString(num_t x);
     [[nodiscard]] num_t GetTime(void);
     [[nodiscard]] size_t GetThreadCount(void);

@@ -4,7 +4,7 @@
 
 template <typename T>
 struct Tasks : Task<T> {
-    Tasks(MathLib::Array<Task<T>*> tasks) : tasks(tasks), current(0) {}
+    Tasks(const MathLib::Sequence<Task<T>*>& tasks) : tasks(MathLib::CollectionToArray<Task<T>*>(tasks)), current(0) {}
     virtual ~Tasks(void) override {
         for (Task<T>*& task : tasks) delete task;
     }

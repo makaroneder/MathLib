@@ -17,7 +17,7 @@ struct MultibootAPM {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] MathLib::String ToString(const MathLib::String& padding = "") const;
+    [[nodiscard]] MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const;
 };
 struct MultibootFramebuffer {
     enum class Type : uint8_t {
@@ -41,7 +41,7 @@ struct MultibootFramebuffer {
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
-    [[nodiscard]] MathLib::String ToString(const MathLib::String& padding = "") const;
+    [[nodiscard]] MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const;
 } __attribute__((packed));
 enum class MultibootMemoryMapEntryType : uint32_t {
     Available = 1,

@@ -6,10 +6,10 @@
 namespace MathLib {
     struct ChemicalReaction : Printable  {
         ChemicalReaction(void);
-        ChemicalReaction(const Array<ChemicalMolecule>& left, const Array<ChemicalMolecule>& right);
-        [[nodiscard]] static Expected<ChemicalReaction> Create(const Array<ChemicalMolecule>& input);
+        ChemicalReaction(const Sequence<ChemicalMolecule>& left, const Sequence<ChemicalMolecule>& right);
+        [[nodiscard]] static Expected<ChemicalReaction> Create(const Sequence<ChemicalMolecule>& input);
         [[nodiscard]] Expected<ChemicalReaction> Balance(void) const;
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
         [[nodiscard]] Array<ChemicalReactionElement> GetReactionElements(bool left_) const;

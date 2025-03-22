@@ -4,7 +4,7 @@ namespace MathLib {
     String ToString(const Printable& printable) {
         StartAndReturnFromBenchmark(printable.ToString());
     }
-    String ToString(const String& string) {
-        StartAndReturnFromBenchmark(string);
+    String ToString(const Sequence<char>& string) {
+        StartAndReturnFromBenchmark(CollectionToString(string));
     }
 }

@@ -2,7 +2,7 @@
 
 KernelRenderer* renderer = nullptr;
 KernelRenderer::KernelRenderer(size_t width, size_t height) : KernelRenderer(width, height, nullptr, MathLib::Color(0)) {}
-KernelRenderer::KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const MathLib::Color& fieldPosition) : Renderer(width, height), events(MathLib::Array<MathLib::Event>()), framebuffer(framebuffer), fieldPosition(fieldPosition) {}
+KernelRenderer::KernelRenderer(size_t width, size_t height, uint32_t* framebuffer, const MathLib::Color& fieldPosition) : Renderer(width, height), events(), framebuffer(framebuffer), fieldPosition(fieldPosition) {}
 bool KernelRenderer::Update(void) {
     if (framebuffer) {
         const size_t width = GetWidth();

@@ -21,7 +21,7 @@ namespace MathLib {
         /// @param args Arguments of the function
         /// @param body Code of the function
         /// @param dataType Data type of the function
-        FunctionNode(const String& name, const Array<Variable>& args, Node* body, const String& dataType);
+        FunctionNode(const Sequence<char>& name, const Sequence<Variable>& arguments, Node* body, const Sequence<char>& dataType);
     };
 }
 

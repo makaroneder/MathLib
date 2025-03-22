@@ -7,13 +7,13 @@ namespace MathLib {
     AMLObject::AMLObject(void) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const String& name) : type(Type::Normal), name(name) {
+    AMLObject::AMLObject(const Sequence<char>& name) : type(Type::Normal), name(CollectionToString(name)) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const String& name, const Array<uint64_t>& data) : type(Type::Normal), name(name), data(data) {
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data) : type(Type::Normal), name(CollectionToString(name)), data(CollectionToArray<uint64_t>(data)) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const String& name, const Array<uint64_t>& data, Type type) : type(type), name(name), data(data) {
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type) : type(type), name(CollectionToString(name)), data(CollectionToArray<uint64_t>(data)) {
         EmptyBenchmark
     }
     Array<uint64_t> AMLObject::GetData(void) const {
@@ -22,7 +22,7 @@ namespace MathLib {
     bool AMLObject::AddChild(const AMLObject& child) {
         return children.Add(child);
     }
-    String AMLObject::ToString(const String& padding) const {
+    String AMLObject::ToString(const Sequence<char>& padding) const {
         if (name == "_HID" || false) {
             String str;
             if (data.GetSize() == 1) {
@@ -36,22 +36,22 @@ namespace MathLib {
                 for (const char& chr : tmp) str += ToUpper(chr);
             }
             else for (size_t i = 0; i < data.GetSize() - 1; i++) str += (char)data.At(i);
-            return padding + name + ": " + str;
+            return CollectionToString(padding) + name + ": " + str;
         }
-        String ret = padding + name + ": {\n";
+        String ret = CollectionToString(padding) + name + ": {\n";
         switch (type) {
             case Type::Normal: {
                 if (children.IsEmpty()) {
-                    if (data.IsEmpty()) return padding + name;
-                    if (data.GetSize() == 1) return padding + name + ": 0x" + MathLib::ToString(data.At(0), 16, 8);
-                    for (const uint64_t& x : data) ret += padding + "\t0x" + MathLib::ToString(x, 16, 8) + '\n';
+                    if (data.IsEmpty()) return CollectionToString(padding) + name;
+                    if (data.GetSize() == 1) return CollectionToString(padding) + name + ": 0x" + MathLib::ToString(data.At(0), 16, 8);
+                    for (const uint64_t& x : data) ret += CollectionToString(padding) + "\t0x" + MathLib::ToString(x, 16, 8) + '\n';
                     break;
                 }
-                for (const AMLObject& child : children) ret += child.ToString(padding + '\t') + '\n';
+                for (const AMLObject& child : children) ret += child.ToString(CollectionToString(padding) + '\t') + '\n';
                 break;
             }
             case Type::OperationRegion: {
-                ret += padding + "\tSpace: ";
+                ret += CollectionToString(padding) + "\tSpace: ";
                 switch (data.At(0)) {
                     case 0x01: {
                         ret += "System IO";
@@ -100,14 +100,14 @@ namespace MathLib {
                     default: ret += "Unknown";
                 }
                 ret += " (0x"_M + MathLib::ToString(data.At(0), 16, 2) + ")\n";
-                ret += padding + "\tOffset: 0x" + MathLib::ToString(data.At(1), 16, 8) + '\n';
-                ret += padding + "\tLength: 0x" + MathLib::ToString(data.At(2), 16, 8) + '\n';
+                ret += CollectionToString(padding) + "\tOffset: 0x" + MathLib::ToString(data.At(1), 16, 8) + '\n';
+                ret += CollectionToString(padding) + "\tLength: 0x" + MathLib::ToString(data.At(2), 16, 8) + '\n';
                 break;
             }
             case Type::Field: {
                 const AMLFieldFlags flags = AMLFieldFlags(data.At(0));
-                ret += padding + "\tLock: " + BoolToString(flags.lock) + '\n';
-                ret += padding + "\tAccess type: ";
+                ret += CollectionToString(padding) + "\tLock: " + BoolToString(flags.lock) + '\n';
+                ret += CollectionToString(padding) + "\tAccess type: ";
                 switch ((AMLFieldFlags::AccessType)flags.accessType) {
                     case AMLFieldFlags::AccessType::Any: {
                         ret += "Any";
@@ -152,7 +152,7 @@ namespace MathLib {
                     default: ret += "Unknown";
                 }
                 ret += '\n';
-                for (const AMLObject& child : children) ret += child.ToString(padding + '\t') + '\n';
+                for (const AMLObject& child : children) ret += child.ToString(CollectionToString(padding) + '\t') + '\n';
                 break;
             }
         }

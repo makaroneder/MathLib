@@ -3,7 +3,7 @@
 #include "MOS6502Instruction.hpp"
 
 namespace MathLib {
-    MOS6502::MOS6502(const Array<uint8_t>& memory) : StepEmulator(memory) {
+    MOS6502::MOS6502(const Sequence<uint8_t>& memory) : StepEmulator(memory) {
         EmptyBenchmark
     }
     bool MOS6502::OrA(uint16_t addr) {
@@ -42,10 +42,10 @@ namespace MathLib {
     Register MOS6502::GetPC(void) const {
         StartAndReturnFromBenchmark(pc);
     }
-    String MOS6502::ToString(const String& padding) const {
+    String MOS6502::ToString(const Sequence<char>& padding) const {
         StartBenchmark
-        String ret = padding + "{\n";
-        ret += padding + "\tFlags: ";
+        String ret = "{\n";
+        ret += CollectionToString(padding) + "\tFlags: ";
         ret += flags.carry ? 'C' : '-';
         ret += flags.zero ? 'Z' : '-';
         ret += flags.interruptDisable ? 'I' : '-';
@@ -54,10 +54,10 @@ namespace MathLib {
         ret += flags.overflow ? 'V' : '-';
         ret += flags.negative ? 'N' : '-';
         ret += '\n'_M + padding + "\tPC: " + pc.ToString() + '\n';
-        ret += padding + "\tSP: " + sp.ToString() + '\n';
-        ret += padding + "\tA: " + a.ToString() + '\n';
-        ret += padding + "\tX: " + x.ToString() + '\n';
-        ret += padding + "\tY: " + y.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tSP: " + sp.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tA: " + a.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tX: " + x.ToString() + '\n';
+        ret += CollectionToString(padding) + "\tY: " + y.ToString() + '\n';
         ReturnFromBenchmark(ret + padding + '}');
     }
 }

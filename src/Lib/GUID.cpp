@@ -9,9 +9,9 @@ namespace MathLib {
         data3 = guid.data3;
         EndBenchmark
     }
-    String GUID::ToString(const String& padding) const {
+    String GUID::ToString(const Sequence<char>& padding) const {
         StartBenchmark
-        String ret = padding + MathLib::ToString(data1, 16, sizeof(uint32_t) * 2) + '-';
+        String ret = CollectionToString(padding) + MathLib::ToString(data1, 16, sizeof(uint32_t) * 2) + '-';
         for (size_t i = 0; i < SizeOfArray(data2); i++)
             ret += MathLib::ToString(data2[i], 16, sizeof(uint16_t) * 2) + '-';
         ReturnFromBenchmark(ret + MathLib::ToString(data3, 16, 6 * 2));

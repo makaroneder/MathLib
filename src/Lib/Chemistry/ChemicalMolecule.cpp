@@ -4,7 +4,7 @@ namespace MathLib {
     ChemicalMolecule::ChemicalMolecule(void) : count(0), elements(Array<ChemicalElement>()) {
         EmptyBenchmark
     }
-    ChemicalMolecule::ChemicalMolecule(const Array<ChemicalElement>& elements, size_t count) : count(count), elements(elements) {
+    ChemicalMolecule::ChemicalMolecule(const Sequence<ChemicalElement>& elements, size_t count) : count(count), elements(CollectionToArray<ChemicalElement>(elements)) {
         EmptyBenchmark
     }
     Array<ChemicalElement> ChemicalMolecule::GetElements(void) const {
@@ -34,10 +34,10 @@ namespace MathLib {
     bool ChemicalMolecule::IsOxide(void) const {
         StartAndReturnFromBenchmark(IsCompound() && !IsWater() && elements.At(elements.GetSize() - 1).GetSymbol() == "O");
     }
-    String ChemicalMolecule::ToString(const String& padding) const {
+    String ChemicalMolecule::ToString(const Sequence<char>& padding) const {
         StartBenchmark
         String str = "";
         for (const ChemicalElement& element : elements) str += element.ToString();
-        ReturnFromBenchmark(padding + (count == 1 ? "" : MathLib::ToString(count)) + str);
+        ReturnFromBenchmark(CollectionToString(padding) + (count == 1 ? "" : MathLib::ToString(count)) + str);
     }
 }

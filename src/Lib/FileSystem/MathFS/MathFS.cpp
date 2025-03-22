@@ -4,7 +4,7 @@
 #include "MathFSFileHeader.hpp"
 
 namespace MathLib {
-    MathFS::MathFS(ByteDevice& disk) : PhysicalFileSystem(disk), root(0), files(Array<MathFSFile>()) {
+    MathFS::MathFS(ByteDevice& disk) : PhysicalFileSystem(disk), root(0), files() {
         StartBenchmark
         const Expected<MathFSBootSector> bootSector = disk.ReadPositioned<MathFSBootSector>(0);
         if (!bootSector.HasValue()) Panic("Failed to read MathFS boot sector");
@@ -17,14 +17,14 @@ namespace MathLib {
     bool MathFS::Create(void) {
         StartBenchmark
         root = 1;
-        ReturnFromBenchmark(disk.WritePositioned<MathFSBootSector>(MathFSBootSector(root), 0) && disk.WritePositioned<MathFSFileHeader>(MathFSFileHeader(MathFSFileHeader::Type::Directory, root + 1, 0, ""), root * 512));
+        ReturnFromBenchmark(disk.WritePositioned<MathFSBootSector>(MathFSBootSector(root), 0) && disk.WritePositioned<MathFSFileHeader>(MathFSFileHeader(MathFSFileHeader::Type::Directory, root + 1, 0, ""_M), root * 512));
     }
-    size_t MathFS::OpenInternal(const String& path, OpenMode mode) {
+    size_t MathFS::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         StartBenchmark
         MathFSFileHeader prev = MathFSFileHeader();
         if (!disk.ReadPositioned<MathFSFileHeader>(prev, root * 512)) ReturnFromBenchmark(SIZE_MAX);
-        const Array<String> split = Split(path, "/", false);
-        for (const String& name : split) {
+        const Array<String> split = Split(path, '/'_M, false);
+        for (const Sequence<char>& name : split) {
             bool found = false;
             if (prev.type != MathFSFileHeader::Type::Directory) ReturnFromBenchmark(SIZE_MAX);
             for (size_t i = 0; i < prev.size && !found; i += sizeof(MathFSFileHeader)) {
@@ -75,7 +75,7 @@ namespace MathLib {
         StartBenchmark
         ReturnFromBenchmark(0);
     }
-    Array<FileInfo> MathFS::ReadDirectory(const String& path) {
+    Array<FileInfo> MathFS::ReadDirectory(const Sequence<char>& path) {
         // TODO:
         (void)path;
         StartBenchmark

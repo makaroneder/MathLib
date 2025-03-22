@@ -4,7 +4,7 @@ namespace MathLib {
     FunctionNode::FunctionNode(void) {
         EmptyBenchmark
     }
-    FunctionNode::FunctionNode(const String& name, const Array<Variable>& args, Node* body, const String& dataType) : name(name), arguments(args), body(body), dataType(dataType) {
+    FunctionNode::FunctionNode(const Sequence<char>& name, const Sequence<Variable>& arguments, Node* body, const Sequence<char>& dataType) : name(CollectionToString(name)), arguments(CollectionToArray<Variable>(arguments)), body(body), dataType(CollectionToString(dataType)) {
         EmptyBenchmark
     }
 }

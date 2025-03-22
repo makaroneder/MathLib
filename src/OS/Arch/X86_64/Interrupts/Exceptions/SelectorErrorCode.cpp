@@ -2,8 +2,8 @@
 #include "SelectorErrorCode.hpp"
 #include <String.hpp>
 
-MathLib::String SelectorErrorCode::ToString(const MathLib::String& padding) const {
-    MathLib::String ret = padding + (external ? "External" : "Internal") + '\n' + padding;
+MathLib::String SelectorErrorCode::ToString(const MathLib::Sequence<char>& padding) const {
+    MathLib::String ret = MathLib::CollectionToString(padding) + (external ? "External" : "Internal") + '\n' + padding;
     switch ((Table)table) {
         case Table::GDT: {
             ret += "GDT";

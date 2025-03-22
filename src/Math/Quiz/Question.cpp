@@ -3,7 +3,7 @@
 #include <EquationSolver/Optimizer.hpp>
 #include <Host.hpp>
 
-Question::Question(const MathLib::String& equation) : equation(equation), solution(MathLib::nan) {
+Question::Question(const MathLib::Sequence<char>& equation) : equation(MathLib::CollectionToString(equation)), solution(MathLib::nan) {
     MathLib::Node* root = MathLib::Tokenize(equation);
     MathLib::Optimizer optimizer = MathLib::Optimizer();
     MathLib::Node* optimizedRoot = optimizer.Optimize(root);
@@ -20,6 +20,6 @@ Question::Question(const MathLib::String& equation) : equation(equation), soluti
 bool Question::IsSolution(MathLib::num_t sol, MathLib::num_t eps) const {
     return MathLib::FloatsEqual<MathLib::num_t>(solution, sol, eps);
 }
-MathLib::String Question::ToString(const MathLib::String& padding) const {
-    return padding + equation;
+MathLib::String Question::ToString(const MathLib::Sequence<char>& padding) const {
+    return MathLib::CollectionToString(padding) + equation;
 }

@@ -4,7 +4,6 @@
 namespace MathLib {
     MBRHeader::MBRHeader(void) : uniqueDiskID(0xbeefed00), attributes(Attributes::Normal), signature(expectedSignature) {
         StartBenchmark
-        for (uint8_t i = 0; i < SizeOfArray(code); i++) code[i] = 0;
         for (uint8_t i = 0; i < 4; i++) entries[i] = MBRPartitionEntry();
         EndBenchmark
     }

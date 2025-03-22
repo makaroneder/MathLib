@@ -26,14 +26,14 @@ void SwapCards(Hand<T>& hand, MathLib::Matrix<Card>& cards) {
         }
     }
 }
-[[nodiscard]] size_t FindVariable(const MathLib::Collection<MathLib::Variable>& variables, const MathLib::String& name) {
+[[nodiscard]] size_t FindVariable(const MathLib::Sequence<MathLib::Variable>& variables, const MathLib::Sequence<char>& name) {
     for (size_t i = 0; i < variables.GetSize(); i++)
         if (name == variables.At(i).name) return i;
     return SIZE_MAX;
 }
 template <typename T>
-[[nodiscard]] T Evaluate(MathLib::Optimizer& optimizer, const MathLib::FunctionNode& func, size_t variable, const MathLib::String& value) {
-    optimizer.variables.At(variable).value->value = value;
+[[nodiscard]] T Evaluate(MathLib::Optimizer& optimizer, const MathLib::FunctionNode& func, size_t variable, const MathLib::Sequence<char>& value) {
+    optimizer.variables.At(variable).value->value = MathLib::CollectionToString(value);
     MathLib::Node* tmp = optimizer.Optimize(func.body);
     const MathLib::Array<MathLib::complex_t> tmpArr = tmp->ToNumber();
     const T ret = tmpArr.At(0);
@@ -44,7 +44,7 @@ template <typename T>
     MathLib::FunctionNode vname = optimizer.GetFunction(identifier);                                                                                                        \
     size_t vname##Variable = FindVariable(optimizer.variables, vname.arguments.At(0).name);                                                                                 \
     if (vname##Variable == SIZE_MAX) {                                                                                                                                      \
-        if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, "0", true))) MathLib::Panic("Failed to add variable");   \
+        if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, '0'_M, true))) MathLib::Panic("Failed to add variable"); \
         vname##Variable = optimizer.variables.GetSize() - 1;                                                                                                                \
     }
 /// @brief Entry point for this program
@@ -74,9 +74,9 @@ int main(int, char**) {
         #endif
         delete optimizedRoot;
         optimizer.runtime = true;
-        AddFunction(hands, "hands")
-        AddFunction(discards, "discards")
-        AddFunction(requiredPoints, "points")
+        AddFunction(hands, "hands"_M)
+        AddFunction(discards, "discards"_M)
+        AddFunction(requiredPoints, "points"_M)
         MathLib::Matrix<Card> cards = MathLib::Matrix<Card>((size_t)Card::Type::TypeCount, (size_t)Card::Color::ColorCount);
         for (size_t color = 0; color < cards.GetHeight(); color++) {
             for (size_t type = 0; type < cards.GetWidth(); type++) {

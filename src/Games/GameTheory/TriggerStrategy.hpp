@@ -3,7 +3,7 @@
 #include "TriggerAction.hpp"
 
 struct TriggerStrategy : GameStrategy {
-    TriggerStrategy(const MathLib::Array<TriggerAction*>& actions);
+    TriggerStrategy(const MathLib::Sequence<TriggerAction*>& actions);
     virtual ~TriggerStrategy(void) override;
     [[nodiscard]] virtual size_t GetMove(size_t prevEnemyMove) override;
 

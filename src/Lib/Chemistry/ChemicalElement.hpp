@@ -5,12 +5,12 @@
 namespace MathLib {
     struct ChemicalElement : Printable {
         ChemicalElement(void);
-        ChemicalElement(const String& symbol, size_t count, bool metal);
+        ChemicalElement(const Sequence<char>& symbol, size_t count, bool metal);
         ChemicalElement(const ChemicalElement& self, size_t count);
         [[nodiscard]] String GetSymbol(void) const;
         [[nodiscard]] size_t GetCount(void) const;
         [[nodiscard]] bool IsMetal(void) const;
-        [[nodiscard]] virtual String ToString(const String& padding = "") const override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         ChemicalElement& operator*=(size_t num);
 
         private:
@@ -18,12 +18,12 @@ namespace MathLib {
         size_t count;
         bool metal;
     };
-    #define CreateChemicalElement(name, symbolStr, metal)               \
-    struct name : ChemicalElement {                                     \
-        static constexpr const char* symbol = #symbolStr;               \
-        name(size_t count) : ChemicalElement(symbol, count, metal) {    \
-            EmptyBenchmark                                              \
-        }                                                               \
+    #define CreateChemicalElement(name, symbolStr, metal)                       \
+    struct name : ChemicalElement {                                             \
+        static constexpr const char* symbol = #symbolStr;                       \
+        name(size_t count) : ChemicalElement(String(symbol), count, metal) {    \
+            EmptyBenchmark                                                      \
+        }                                                                       \
     }
     CreateChemicalElement(Hydrogen, H, false);
     CreateChemicalElement(Helium, He, false);

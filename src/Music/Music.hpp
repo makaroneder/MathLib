@@ -2,18 +2,19 @@
 #define Music_H
 #include "MusicNote.hpp"
 #include <Interfaces/Saveable.hpp>
+#include <FunctionT.hpp>
 
 template <typename T>
 struct Music : MathLib::Saveable {
     Music(void) {}
-    Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Collection<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
-        for (const MusicNote<T>& note : notes) {
+    Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Sequence<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
+        notes.Foreach(MathLib::MakeFunctionT<void, MusicNote<T>>(nullptr, [this, amplitude] (const void*, MusicNote<T> note) -> void {
             const size_t sampleCount = (note.duration * sampleRate).GetValue();
             const MathLib::Hertz<T> frequency = note.GetFrequency();
             samples = MathLib::Array<int16_t>(sampleCount);
             for (size_t i = 0; i < sampleCount; i++)
                 samples.At(i) = (int16_t)(amplitude * MathLib::Sin((frequency * 2 * MathLib::pi * i / sampleRate).GetValue()));
-        }
+        }));
     }
     /// @brief Saves data
     /// @param file File to save data into

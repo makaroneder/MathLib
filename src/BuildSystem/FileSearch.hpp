@@ -6,7 +6,7 @@ struct FileSearch {
     MathLib::String directory;
     MathLib::String extension;
 
-    FileSearch(const MathLib::String& directory, const MathLib::String& extension);
+    FileSearch(const MathLib::Sequence<char>& directory, const MathLib::Sequence<char>& extension);
 };
 
 #endif

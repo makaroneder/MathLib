@@ -17,7 +17,7 @@ namespace MathLib {
         /// @brief Writes text
         /// @param str Text to write
         /// @return Status
-        [[nodiscard]] bool Puts(const String& str);
+        [[nodiscard]] bool Puts(const Sequence<char>& str);
         /// @brief Writes text
         /// @param str Text to write
         /// @return Status

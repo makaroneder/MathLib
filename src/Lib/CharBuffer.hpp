@@ -5,6 +5,9 @@
 
 namespace MathLib {
     struct CharBuffer : Buffer<char> {
+        using Sequence<char>::operator==;
+        using Sequence<char>::operator!=;
+        using Collection<char>::operator+=;
         CharBuffer(void) : CharBuffer("") {}
         CharBuffer(const char* str) : Buffer<char>() {
             for (; str[size]; size++) {}
@@ -16,6 +19,7 @@ namespace MathLib {
             buffer = new char[size + 1];
             MemoryCopy(str, buffer, size);
             buffer[size] = '\0';
+            this->size = size;
         }
         CharBuffer(const char& chr) {
             buffer = new char[2];
@@ -23,31 +27,20 @@ namespace MathLib {
             buffer[1] = '\0';
             size = 1;
         }
-        CharBuffer& operator+=(const CharBuffer& other) {
-            char* ptr = new char[size + other.size + 1];
-            if (!ptr) return *this;
-            MemoryCopy(buffer, ptr, size);
-            MemoryCopy(other.buffer, ptr + size, other.size);
-            size += other.size;
-            ptr[size] = '\0';
-            delete [] buffer;
-            buffer = ptr;
-            return *this;
-        }
         CharBuffer& operator+=(const char* other) {
-            return *this += CharBuffer(other);
-        }
-        CharBuffer& operator+=(char chr) {
-            char* ptr = new char[size + 2];
+            size_t otherSize = 0;
+            while (other[otherSize]) otherSize++;
+            char* ptr = new char[size + otherSize + 1];
             if (!ptr) return *this;
             MemoryCopy(buffer, ptr, size);
-            ptr[size++] = chr;
+            MemoryCopy(other, ptr + size, otherSize);
+            size += otherSize;
             ptr[size] = '\0';
             delete [] buffer;
             buffer = ptr;
             return *this;
         }
-        [[nodiscard]] CharBuffer operator+(const CharBuffer& other) const {
+        [[nodiscard]] CharBuffer operator+(const Sequence<char>& other) const {
             CharBuffer tmp = *this;
             tmp += other;
             return tmp;
@@ -62,17 +55,8 @@ namespace MathLib {
             tmp += chr;
             return tmp;
         }
-        [[nodiscard]] bool operator==(const CharBuffer& other) const {
-            if (size != other.size) return false;
-            for (size_t i = 0; i < size; i++)
-                if (At(i) != other.At(i)) return false;
-            return true;
-        }
         [[nodiscard]] bool operator==(const char* other) const {
             return *this == CharBuffer(other);
-        }
-        [[nodiscard]] bool operator!=(const CharBuffer& other) const {
-            return !(*this == other);
         }
         [[nodiscard]] bool operator!=(const char* other) const {
             return !(*this == other);

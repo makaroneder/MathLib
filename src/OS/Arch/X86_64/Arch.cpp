@@ -4,7 +4,6 @@
 #include "Multiboot/Multiboot1.hpp"
 #include "Multiboot/Multiboot2.hpp"
 #include "ControlRegisters.hpp"
-#include "TaskState.hpp"
 #include "ACPI/ACPI.hpp"
 #include "GDT/TSS.hpp"
 #include "../Arch.hpp"
@@ -88,14 +87,8 @@ bool InitArch(uintptr_t signature, void* info) {
 }
 [[noreturn]] void ArchPanic(void) {
     if (cmos) cmos->SetNMI(false);
-    SetInterrupts(false);
+    ArchSetInterrupts(false);
     while (true) asm volatile("hlt");
-}
-void* ArchCreateTask(const MathLib::FunctionPointer<void>& function, void* stack, size_t stackSize) {
-    TaskState* state = new TaskState();
-    state->ip = (uintptr_t)function.GetFunction();
-    state->sp = (uintptr_t)&stack + stackSize;
-    return state;
 }
 
 #endif

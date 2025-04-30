@@ -4,7 +4,7 @@
 #include "Theory.hpp"
 
 struct FormalSystem {
-    FormalSystem(const MathLib::Array<Operation*>& operations, const MathLib::Array<Theory>& axioms);
+    FormalSystem(const MathLib::Sequence<Operation*>& operations, const MathLib::Sequence<Theory>& axioms);
     ~FormalSystem(void);
     [[nodiscard]] bool Prove(const Theory& proof);
 

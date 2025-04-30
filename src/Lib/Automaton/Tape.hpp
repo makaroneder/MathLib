@@ -20,7 +20,7 @@ namespace MathLib {
         [[nodiscard]] T Get(void) const {
             StartAndReturnFromBenchmark(data.At(position));
         }
-        void Set(const T& x) const {
+        void Set(const T& x) {
             const size_t size = data.GetSize();
             if (position >= size) {
                 Array<T> tmp = Array<T>(position + 1);

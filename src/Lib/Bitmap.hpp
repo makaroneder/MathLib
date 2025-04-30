@@ -3,9 +3,11 @@
 #include "Interfaces/ByteArray.hpp"
 
 namespace MathLib {
-    struct Bitmap : Sequence<bool>, Saveable {
+    struct Bitmap : WritableSequence<bool>, Saveable {
+        using WritableSequence<bool>::Add;
         Bitmap(void);
         Bitmap(size_t size);
+        Bitmap(const Sequence<bool>& data);
         Bitmap(const Sequence<uint8_t>& array);
         Bitmap(const Sequence<uint8_t>& array, uint8_t lastByteSize);
         void Fill(bool value);
@@ -14,12 +16,11 @@ namespace MathLib {
         [[nodiscard]] uint8_t GetLastByteSize(void) const;
         [[nodiscard]] virtual size_t GetSize(void) const override;
         [[nodiscard]] virtual bool At(size_t index) const override;
-        [[nodiscard]] bool Reverse(void);
-        [[nodiscard]] bool Add(bool value);
-        [[nodiscard]] bool Add(const Sequence<bool>& other);
+        [[nodiscard]] virtual bool Add(const bool& value) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] bool Flip(size_t index);
         [[nodiscard]] Expected<bool> Get(size_t index) const;
-        [[nodiscard]] bool Set(size_t index, bool value);
+        [[nodiscard]] virtual bool Set(size_t index, const bool& value) override;
         [[nodiscard]] uint64_t Read(size_t index, uint8_t bits) const;
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
@@ -37,6 +38,13 @@ namespace MathLib {
         ByteArray array;
         uint8_t lastByteSize;
     };
+    Bitmap MakeBitmap(bool arg);
+    template <typename ...Args>
+    Bitmap MakeBitmap(bool arg, Args... args) {
+        StartBenchmark
+        Bitmap ret = MakeBitmap(arg);
+        ReturnFromBenchmark(ret.AddSequence(MakeBitmap(args...)) ? ret : Bitmap());
+    }
 }
 
 #endif

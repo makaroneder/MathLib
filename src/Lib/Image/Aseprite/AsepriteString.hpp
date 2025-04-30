@@ -6,6 +6,8 @@ namespace MathLib {
     struct AsepriteString {
         uint16_t size;
         char data[];
+
+        AsepriteString(void);
     } __attribute__((packed));
 }
 

@@ -7,7 +7,7 @@ namespace MathLib {
     struct Function : Allocatable {
         void* data;
 
-        Function(void) {}
+        Function(void) : data(nullptr) {}
         Function(void* data) : data(data) {}
         [[nodiscard]] Ret operator()(Args... args) const {
             return Invoke(data, args...);

@@ -15,6 +15,11 @@ namespace MathLib {
         array = Array<uint8_t>(s);
         EndBenchmark
     }
+    Bitmap::Bitmap(const Sequence<bool>& data) : Bitmap(data.GetSize()) {
+        const size_t size = GetSize();
+        for (size_t i = 0; i < size; i++)
+            if (!Set(i, data.At(i))) Panic("Failed to create bitmap");
+    }
     Bitmap::Bitmap(const Sequence<uint8_t>& array) : array(CollectionToArray<uint8_t>(array)), lastByteSize(8) {
         EmptyBenchmark
     }
@@ -60,17 +65,7 @@ namespace MathLib {
     bool Bitmap::At(size_t index) const {
         StartAndReturnFromBenchmark(Get(index).Get("Index out of bounds"));
     }
-    bool Bitmap::Reverse(void) {
-        StartBenchmark
-        size_t end = GetSize();
-        size_t start = 0;
-        while (start < end) {
-            const bool tmp = At(start);
-            if (!Set(start, At(--end)) || !Set(end, tmp)) ReturnFromBenchmark(false);
-        }
-        ReturnFromBenchmark(true);
-    }
-    bool Bitmap::Add(bool value) {
+    bool Bitmap::Add(const bool& value) {
         StartBenchmark
         if (lastByteSize != 8) {
             lastByteSize++;
@@ -79,11 +74,10 @@ namespace MathLib {
         lastByteSize = 1;
         ReturnFromBenchmark(array.Add(value));
     }
-    bool Bitmap::Add(const Sequence<bool>& other) {
+    bool Bitmap::Reset(void) {
         StartBenchmark
-        const size_t size = other.GetSize();
-        for (size_t i = 0; i < size; i++)
-            if (!Add(other.At(i))) ReturnFromBenchmark(false);
+        if (!array.Reset()) ReturnFromBenchmark(false);
+        lastByteSize = 8;
         ReturnFromBenchmark(true);
     }
     bool Bitmap::Flip(size_t index) {
@@ -104,7 +98,7 @@ namespace MathLib {
         const uint8_t mask = 1 << bit;
         ReturnFromBenchmark((offset < array.GetSize() && (offset + 1 != array.GetSize() || bit < lastByteSize)) ? array.At(offset) & mask : Expected<bool>());
     }
-    bool Bitmap::Set(size_t index, bool value) {
+    bool Bitmap::Set(size_t index, const bool& value) {
         StartBenchmark
         const size_t offset = index / 8;
         const uint8_t bit = index % 8;
@@ -188,5 +182,11 @@ namespace MathLib {
             else if (!Add(other.Get(i).GetOr(false))) Panic("Failed to or bitmaps");
         }
         ReturnFromBenchmark(*this);
+    }
+    Bitmap MakeBitmap(bool arg) {
+        StartBenchmark
+        Bitmap ret = Bitmap(1);
+        ret.Fill(arg);
+        ReturnFromBenchmark(ret);
     }
 }

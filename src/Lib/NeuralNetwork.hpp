@@ -87,15 +87,56 @@ namespace MathLib {
         /// @return Status 
         [[nodiscard]] bool Forward(void) {
             StartBenchmark
-            for (size_t i = 0; i < count; i++) {
-                const Expected<Matrix<T>> tmp = as.At(i) * ws.At(i);
-                if (!tmp.HasValue()) ReturnFromBenchmark(false);
-                as.At(i + 1) = tmp.Get() + bs.At(i);
-                for (size_t y = 0; y < as.At(i + 1).GetHeight(); y++)
-                    for (size_t x = 0; x < as.At(i + 1).GetWidth(); x++)
-                        as.At(i + 1).At(x, y) = Activation(as.At(i + 1).At(x, y));
+            Function<T, T>* activationFunc = nullptr;
+            switch (activation) {
+                case ActivationFunction::None: {
+                    activationFunc = AllocFunctionT<T, T>(nullptr, [](const void*, T x) -> T {
+                        return x;
+                    });
+                    break;
+                }
+                case ActivationFunction::Sigmoid: {
+                    activationFunc = AllocFunctionT<T, T>(nullptr, [](const void*, T x) -> T {
+                        return Sigmoid<T>(x);
+                    });
+                    break;
+                }
+                case ActivationFunction::Tanh: {
+                    activationFunc = AllocFunctionT<T, T>(nullptr, [](const void*, T x) -> T {
+                        return HyperbolicTan<T>(x);
+                    });
+                    break;
+                }
+                case ActivationFunction::ReLU: {
+                    activationFunc = AllocFunctionT<T, T>(nullptr, [](const void*, T x) -> T {
+                        return x > 0 ? x : x;
+                    });
+                    break;
+                }
+                case ActivationFunction::LeakyReLU: {
+                    activationFunc = AllocFunctionT<T, T>(nullptr, [](const void*, T x) -> T {
+                        return x > 0 ? x : x * eps;
+                    });
+                    break;
+                }
+                default: ReturnFromBenchmark(false);
             }
+            if (!activationFunc) ReturnFromBenchmark(false);
+            for (size_t i = 0; i < count; i++) {
+                const Expected<Matrix<T>> tmp = as.At(i).MultiplyAddTransform(ws.At(i), bs.At(i), *activationFunc);
+                if (!tmp.HasValue()) {
+                    delete activationFunc;
+                    ReturnFromBenchmark(false);
+                }
+                as.At(i + 1) = tmp.Get();
+            }
+            delete activationFunc;
             ReturnFromBenchmark(true);
+        }
+        [[nodiscard]] Matrix<T> Run(const MathLib::Sequence<T>& input) {
+            const size_t size = input.GetSize();
+            for (size_t i = 0; i < size; i++) GetInput().At(i, 0) = input.At(i);
+            return Forward() ? GetOutput() : Matrix<T>();
         }
         /// @brief Calculates average error
         /// @param input Input data
@@ -218,17 +259,6 @@ namespace MathLib {
         }
 
         private:
-        [[nodiscard]] T Activation(const T& x) {
-            StartBenchmark
-            switch (activation) {
-                case ActivationFunction::None: ReturnFromBenchmark(x);
-                case ActivationFunction::Sigmoid: ReturnFromBenchmark(Sigmoid<T>(x));
-                case ActivationFunction::Tanh: ReturnFromBenchmark(HyperbolicTan<T>(x));
-                case ActivationFunction::ReLU: ReturnFromBenchmark(x > 0 ? x : x);
-                case ActivationFunction::LeakyReLU: ReturnFromBenchmark(x > 0 ? x : x * eps);
-                default: ReturnFromBenchmark(nan);
-            }
-        }
         [[nodiscard]] T ActivationDerivate(T y) {
             StartBenchmark
             switch (activation) {

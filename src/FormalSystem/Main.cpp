@@ -1,4 +1,5 @@
 #include "FormalSystem.hpp"
+#include <FunctionT.hpp>
 #include <String.hpp>
 #include <iostream>
 
@@ -15,8 +16,8 @@ int main(int, char**) {
         FormalSystem system = FormalSystem(MathLib::MakeArray<Operation*>(
             new Operation("equal"_M, MathLib::AllocFunctionT<MathLib::Array<Formula>, const MathLib::Sequence<Formula>&>(nullptr, [] (const void*, const MathLib::Sequence<Formula>& args) -> MathLib::Array<Formula> {
                 if (args.GetSize() != 2) return MathLib::Array<Formula>();
-                Formula a = args.At(0);
-                Formula b = args.At(1);
+                const Formula a = args.At(0);
+                const Formula b = args.At(1);
                 MathLib::Array<Formula> ret = MathLib::MakeArray(Formula("equal"_M, b, a));
                 if (a.type == b.type) {
                     if (a == b) {

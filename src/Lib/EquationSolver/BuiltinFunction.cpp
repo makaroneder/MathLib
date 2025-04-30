@@ -10,6 +10,12 @@ namespace MathLib {
     BuiltinFunction::BuiltinFunction(const Sequence<char>& n, const BuiltinFunctionPointer& func) : name(CollectionToString(n)), function(func) {
         EmptyBenchmark
     }
+    bool BuiltinFunction::operator==(const BuiltinFunction& other) const {
+        StartAndReturnFromBenchmark(name == other.name);
+    }
+    bool BuiltinFunction::operator!=(const BuiltinFunction& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 
     #define CreateBuiltinFunction(name, func, argc, ...)                                                                                        \
     static Node* EquationSolverBuiltin##name(const void*, const Sequence<const Node*>& args) {                                           \

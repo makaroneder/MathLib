@@ -44,6 +44,7 @@ namespace MathLib {
     }
     bool RegionAllocator::Dealloc(void* ptr) {
         StartBenchmark
+        if (!ptr) ReturnFromBenchmark(true);
         size_t pos = 0;
         Region* prev = nullptr;
         bool found = false;

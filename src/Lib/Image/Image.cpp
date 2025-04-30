@@ -36,4 +36,10 @@ namespace MathLib {
                         ret.At(x1 * xMultiplier + x2, y1 * yMultiplier + y2) = At(x1, y1);
         ReturnFromBenchmark(ret);
     }
+    bool Image::operator==(const Image& other) const {
+        StartAndReturnFromBenchmark(pixels == other.pixels);
+    }
+    bool Image::operator!=(const Image& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

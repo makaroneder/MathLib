@@ -9,6 +9,7 @@ namespace MathLib {
         /// @param size Size of the buffer
         /// @return Size of bytes read
         [[nodiscard]] virtual size_t ReadSizedBuffer(void* buffer, size_t size) = 0;
+        [[nodiscard]] virtual bool Skip(size_t size) = 0;
         /// @brief Reads data to the buffer
         /// @param buffer Buffer to read data into
         /// @param size Size of the buffer
@@ -38,6 +39,9 @@ namespace MathLib {
             T ret;
             ReturnFromBenchmark(Read<T>(ret) ? Expected<T>(ret) : Expected<T>());
         }
+
+        protected:
+        [[nodiscard]] bool DefaultSkip(size_t size);
     };
 }
 

@@ -7,6 +7,8 @@ namespace MathLib {
         uint16_t width;
         uint16_t height;
         uint32_t pixels[];
+
+        AsepriteImageCelChunk(uint16_t width, uint16_t height, bool raw);
     } __attribute__((packed));
 }
 

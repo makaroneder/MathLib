@@ -27,4 +27,10 @@ namespace MathLib {
         count *= num;
         ReturnFromBenchmark(*this);
     }
+    bool ChemicalElement::operator==(const ChemicalElement& other) const {
+        StartAndReturnFromBenchmark(symbol == other.symbol && count == other.count);
+    }
+    bool ChemicalElement::operator!=(const ChemicalElement& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

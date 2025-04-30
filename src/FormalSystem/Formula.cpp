@@ -1,11 +1,11 @@
 #include "Formula.hpp"
 
-Formula::Formula(void) : type(), value(), children() {}
-Formula::Formula(bool value) : type(Type::Constant), value(value ? "true" : "false"), children() {}
-Formula::Formula(bool constant, const MathLib::Sequence<char>& value) : type(constant ? Type::Constant : Type::Variable), value(MathLib::CollectionToString(value)), children() {}
-Formula::Formula(const MathLib::Sequence<char>& value, const MathLib::Sequence<Formula>& children) : type(Type::Operation), value(MathLib::CollectionToString(value)), children(MathLib::CollectionToArray<Formula>(children)) {}
-Formula::Formula(const MathLib::Sequence<char>& value, const Formula& left, const Formula& right) : type(Type::Operation), value(MathLib::CollectionToString(value)), children(MathLib::MakeArray<Formula>(left, right)) {}
-Formula::Formula(const MathLib::Sequence<char>& value, const Formula& child) : type(Type::Operation), value(MathLib::CollectionToString(value)), children(MathLib::MakeArray<Formula>(child)) {}
+Formula::Formula(void) : value(), children(), type() {}
+Formula::Formula(bool value) : value(value ? "true" : "false"), children(), type(Type::Constant) {}
+Formula::Formula(bool constant, const MathLib::Sequence<char>& value) : value(MathLib::CollectionToString(value)), children(), type(constant ? Type::Constant : Type::Variable) {}
+Formula::Formula(const MathLib::Sequence<char>& value, const MathLib::Sequence<Formula>& children) : value(MathLib::CollectionToString(value)), children(MathLib::CollectionToArray<Formula>(children)), type(Type::Operation) {}
+Formula::Formula(const MathLib::Sequence<char>& value, const Formula& left, const Formula& right) : value(MathLib::CollectionToString(value)), children(MathLib::MakeArray<Formula>(left, right)), type(Type::Operation) {}
+Formula::Formula(const MathLib::Sequence<char>& value, const Formula& child) : value(MathLib::CollectionToString(value)), children(MathLib::MakeArray<Formula>(child)), type(Type::Operation) {}
 bool Formula::IsTrue(void) const {
     return ToBool().GetOr(false);
 }

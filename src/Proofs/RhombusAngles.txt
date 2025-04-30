@@ -1,0 +1,80 @@
+Name: Rhombus angles
+Given: (
+    Rhombus(A, B, C, D) and
+    Line(A, X, C) and
+    Line(B, X, D) and
+    (Angle(A, X, B) = 90^o) and
+    (Angle(B, X, C) = 90^o) and
+    (Angle(C, X, D) = 90^o) and
+    (Angle(D, X, A) = 90^o) and
+    (|AX| = |CX|) and
+    (|BX| = |DX|)
+)
+Prove: (
+    (Angle(A, B, C) = Angle(A, D, C)) and
+    (Angle(B, C, D) = Angle(B, A, D)) and
+    (Angle(A, B, C) = 2 * Angle(A, B, X)) and
+    (Angle(B, A, D) = 2 * Angle(B, A, X))
+)
+Assumptions: Rhombus lengths
+Visualization:
+     B
+    /|\
+   / | \
+  /  |  \
+C |--X--| A
+  \  |  /
+   \ | /
+    \|/
+     D
+Proof: (
+    (Angle(A, B, C) = Angle(A, B, X) + Angle(C, B, X)) and
+    (Angle(A, D, C) = Angle(A, D, X) + Angle(C, D, X)) and
+    (sin(Angle(A, B, X)) = |AX| / |AB|) and
+    (sin(Angle(C, B, X)) = |CX| / |CB|) and
+    (sin(Angle(A, D, X)) = |AX| / |AD|) and
+    (sin(Angle(C, D, X)) = |CX| / |CD|) and
+    (Angle(B, C, D) = Angle(B, C, X) + Angle(D, C, X)) and
+    (Angle(B, A, D) = Angle(B, A, X) + Angle(D, A, X)) and
+    (sin(Angle(B, C, X)) = |BX| / |BC|) and
+    (sin(Angle(D, C, X)) = |DX| / |CD|) and
+    (sin(Angle(B, A, X)) = |BX| / |AB|) and
+    (sin(Angle(D, A, X)) = |DX| / |AD|)
+) <=> (
+    (Angle(A, B, C) = Angle(A, B, X) + Angle(C, B, X)) and
+    (Angle(A, D, C) = Angle(A, D, X) + Angle(C, D, X)) and
+    (sin(Angle(A, B, X)) = |AX| / |AB|) and
+    (sin(Angle(C, B, X)) = |AX| / |AB|) and
+    (sin(Angle(A, D, X)) = |AX| / |AB|) and
+    (sin(Angle(C, D, X)) = |AX| / |AB|) and
+    (Angle(B, C, D) = Angle(B, C, X) + Angle(D, C, X)) and
+    (Angle(B, A, D) = Angle(B, A, X) + Angle(D, A, X)) and
+    (sin(Angle(B, C, X)) = |BX| / |AB|) and
+    (sin(Angle(D, C, X)) = |BX| / |AB|) and
+    (sin(Angle(B, A, X)) = |BX| / |AB|) and
+    (sin(Angle(D, A, X)) = |BX| / |AB|)
+) => (
+    (Angle(A, B, C) = Angle(A, B, X) + Angle(C, B, X)) and
+    (Angle(A, D, C) = Angle(A, D, X) + Angle(C, D, X)) and
+    (sin(Angle(A, B, X)) = sin(Angle(C, B, X)) = sin(Angle(A, D, X)) = sin(Angle(C, D, X))) and
+    (Angle(B, C, D) = Angle(B, C, X) + Angle(D, C, X)) and
+    (Angle(B, A, D) = Angle(B, A, X) + Angle(D, A, X)) and
+    (sin(Angle(B, C, X)) = sin(Angle(D, C, X)) = sin(Angle(B, A, X)) = sin(Angle(D, A, X)))
+) <=> (
+    (Angle(A, B, C) = Angle(A, B, X) + Angle(C, B, X)) and
+    (Angle(A, D, C) = Angle(A, D, X) + Angle(C, D, X)) and
+    (Angle(A, B, X) = Angle(C, B, X) = Angle(A, D, X) = Angle(C, D, X)) and
+    (Angle(B, C, D) = Angle(B, C, X) + Angle(D, C, X)) and
+    (Angle(B, A, D) = Angle(B, A, X) + Angle(D, A, X)) and
+    (Angle(B, C, X) = Angle(D, C, X) = Angle(B, A, X) = Angle(D, A, X))
+) => (
+    (Angle(A, B, C) = Angle(A, B, X) + Angle(A, B, X)) and
+    (Angle(A, D, C) = Angle(A, B, X) + Angle(A, B, X)) and
+    (Angle(B, C, D) = Angle(B, A, X) + Angle(B, A, X)) and
+    (Angle(B, A, D) = Angle(B, A, X) + Angle(B, A, X))
+) <=> (
+    (Angle(A, B, C) = Angle(A, D, C)) and
+    (Angle(B, C, D) = Angle(B, A, D)) and
+    (Angle(A, B, C) = 2 * Angle(A, B, X)) and
+    (Angle(B, A, D) = 2 * Angle(B, A, X))
+)

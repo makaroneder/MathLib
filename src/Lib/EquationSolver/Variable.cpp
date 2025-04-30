@@ -11,6 +11,12 @@ namespace MathLib {
     Variable::Variable(const Sequence<char>& name, const Sequence<char>& dataType, const Sequence<char>& value, bool constant) : name(CollectionToString(name)), dataType(CollectionToString(dataType)), value(new Node(Node::Type::Constant, value)), constant(constant) {
         EmptyBenchmark
     }
+    bool Variable::operator==(const Variable& other) const {
+        StartAndReturnFromBenchmark(name == other.name && dataType == other.dataType && constant == other.constant);
+    }
+    bool Variable::operator!=(const Variable& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
     Array<Variable> CreateDefaultVariables(void) {
         const Variable defaultVariables[] = {
             Variable("true"_M, "Bool"_M, '1'_M, true),

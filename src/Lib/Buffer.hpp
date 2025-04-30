@@ -18,7 +18,7 @@ namespace MathLib {
             }
         }
         virtual ~Buffer(void) override {
-            delete [] buffer;
+            if (buffer) delete [] buffer;
         }
         [[nodiscard]] virtual T At(size_t index) const override {
             if (index >= size) Panic("Index out of bounds");
@@ -35,8 +35,13 @@ namespace MathLib {
             if (!tmp) return false;
             for (size_t i = 0; i < size; i++) tmp[i] = buffer[i];
             tmp[size++] = val;
-            delete [] buffer;
+            if (buffer) delete [] buffer;
             buffer = tmp;
+            return true;
+        }
+        [[nodiscard]] virtual bool Reset(void) override {
+            if (buffer) delete [] buffer;
+            size = 0;
             return true;
         }
         [[nodiscard]] virtual size_t GetSize(void) const override {
@@ -46,7 +51,7 @@ namespace MathLib {
             return buffer;
         }
         Buffer<T>& operator=(const Buffer<T>& other) {
-            delete [] buffer;
+            if (buffer) delete [] buffer;
             size = other.size;
             if (size) {
                 buffer = new T[size];

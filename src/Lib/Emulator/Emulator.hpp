@@ -4,8 +4,10 @@
 
 namespace MathLib {
     struct Emulator : ByteDevice {
+        Emulator(void);
         Emulator(const Sequence<uint8_t>& memory);
         [[nodiscard]] virtual bool Run(void) = 0;
+        virtual void Reset(void) = 0;
         /// @brief Returns memory size
         /// @return Memory size
         [[nodiscard]] virtual size_t GetSize(void) const override;
@@ -22,7 +24,6 @@ namespace MathLib {
         /// @return Size of written bytes
         [[nodiscard]] virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
 
-        protected:
         Array<uint8_t> memory;
     };
 }

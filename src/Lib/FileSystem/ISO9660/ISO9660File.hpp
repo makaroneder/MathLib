@@ -10,6 +10,8 @@ namespace MathLib {
         bool free;
 
         ISO9660File(ISO9660DirectoryEntry entry = ISO9660DirectoryEntry(), OpenMode mode = OpenMode::Read);
+        [[nodiscard]] bool operator==(const ISO9660File& other) const;
+        [[nodiscard]] bool operator!=(const ISO9660File& other) const;
     };
 }
 

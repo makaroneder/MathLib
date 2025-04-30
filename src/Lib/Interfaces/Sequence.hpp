@@ -1,13 +1,13 @@
 #ifndef MathLib_Interfaces_Sequence_H
 #define MathLib_Interfaces_Sequence_H
 #include "../MinMax.hpp"
+#include "Container.hpp"
 #include "Function.hpp"
-#include <stddef.h>
 #include <stdint.h>
 
 namespace MathLib {
     template <typename T>
-    struct Sequence : Function<T, size_t> {
+    struct Sequence : Container<T>, Function<T, size_t> {
         [[nodiscard]] virtual size_t GetSize(void) const = 0;
         [[nodiscard]] virtual T At(size_t index) const = 0;
         [[nodiscard]] bool IsEmpty(void) const {
@@ -19,31 +19,61 @@ namespace MathLib {
         [[nodiscard]] T operator[](size_t index) const {
             return At(index);
         }
-        [[nodiscard]] bool Contains(const T& value) const {
-            for (size_t i = 0; i < GetSize(); i++)
+        [[nodiscard]] bool IsSorted(const Function<bool, T, T>& compare) const {
+            const size_t size = GetSize();
+            for (size_t i = 1; i < size; i++)
+                if (compare(At(i - 1), At(i))) return false;
+            return true;
+        }
+        [[nodiscard]] bool HasDuplicate(void) const {
+            const size_t size = GetSize();
+            for (size_t i = 1; i < size; i++)
+                if (Find(At(i - 1), i) != SIZE_MAX) return true;
+            return false;
+        }
+        [[nodiscard]] bool Contains(const T& value, size_t start) const {
+            const size_t size = GetSize();
+            for (size_t i = start; i < size; i++)
                 if (At(i) == value) return true;
             return false;
         }
-        [[nodiscard]] bool Contains(const Sequence<T>& other) const {
-            return Find(other, 0) != SIZE_MAX;
+        [[nodiscard]] virtual bool Contains(const T& value) const override {
+            return Contains(value, 0);
+        }
+        [[nodiscard]] bool Contains(const Sequence<T>& other, size_t start = 0) const {
+            return Find(other, start) != SIZE_MAX;
+        }
+        [[nodiscard]] bool StartsWith(const T& value) const {
+            return !IsEmpty() && At(0) == value;
+        }
+        [[nodiscard]] bool StartsWith(const Sequence<T>& other) const {
+            const size_t size = other.GetSize();
+            if (GetSize() < size) return false;
+            for (size_t i = 0; i < size; i++)
+                if (At(i) != other.At(i)) return false;
+            return true;
         }
         [[nodiscard]] size_t Find(const T& value, size_t start = 0) const {
-            for (size_t i = start; i < GetSize(); i++)
+            const size_t size = GetSize();
+            for (size_t i = start; i < size; i++)
                 if (At(i) == value) return i;
             return SIZE_MAX;
         }
         [[nodiscard]] size_t Find(const Sequence<T>& other, size_t start = 0) const {
-            if (GetSize() < other.GetSize()) return SIZE_MAX;
-            for (size_t i = start; i < GetSize() - other.GetSize(); i++) {
+            const size_t size1 = GetSize();
+            const size_t size2 = other.GetSize();
+            if (size1 < size2) return SIZE_MAX;
+            for (size_t i = start; i < size1 - size2; i++) {
                 bool found = true;
-                for (size_t j = 0; j < other.GetSize() && found; j++)
+                for (size_t j = 0; j < size2 && found; j++)
                     if (At(i + j) != other.At(j)) found = false;
                 if (found) return i;
             }
             return SIZE_MAX;
         }
         [[nodiscard]] size_t Find(const Function<bool, T>& function, size_t start = 0) const {
-            for (size_t i = start; i < GetSize(); i++)
+            const size_t size = GetSize();
+            for (size_t i = start; i < size; i++)
                 if (function(At(i))) return i;
             return SIZE_MAX;
         }
@@ -84,8 +114,9 @@ namespace MathLib {
             return ret;
         }
         [[nodiscard]] bool operator==(const Sequence<T>& other) const {
-            if (GetSize() != other.GetSize()) return false;
-            for (size_t i = 0; i < GetSize(); i++)
+            const size_t size = GetSize();
+            if (size != other.GetSize()) return false;
+            for (size_t i = 0; i < size; i++)
                 if (At(i) != other.At(i)) return false;
             return true;
         }

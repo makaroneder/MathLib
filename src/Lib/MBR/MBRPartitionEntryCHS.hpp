@@ -9,6 +9,8 @@ namespace MathLib {
         uint16_t cylinder : 10;
 
         MBRPartitionEntryCHS(uint32_t lba, uint8_t heads = 16, uint8_t sectors = 63);
+        [[nodiscard]] bool operator==(const MBRPartitionEntryCHS& other) const;
+        [[nodiscard]] bool operator!=(const MBRPartitionEntryCHS& other) const;
     } __attribute__((packed));
 }
 

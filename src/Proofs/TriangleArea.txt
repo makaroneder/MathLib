@@ -1,0 +1,27 @@
+Name: Triangle area
+Given: (
+    Triangle(A, B, C) and
+    Line(A, D, B) and
+    (Angle(A, D, C) = 90^o) and
+    (Angle(B, D, C) = 90^o)
+)
+Prove: Area(Triangle(A, B, C)) = |AB| * |AC| * sin(Angle(C, A, B)) / 2
+Assumptions: None
+Visualization:
+             C
+            |||
+          |  |  |
+        |    |    |
+      |      |      |
+    |        |        |
+  |          |          |
+|            |            |
+A------------D------------B
+Proof: (
+    (Area(Triangle(A, B, C)) = |AB| * |CD| / 2) and
+    sin(Angle(C, A, B)) = |CD| / |AC|
+) <=> (
+    (Area(Triangle(A, B, C)) = |AB| * |CD| / 2) and
+    |CD| = sin(Angle(C, A, B)) * |AC|
+) =>
+Area(Triangle(A, B, C)) = |AB| * |AC| * sin(Angle(C, A, B)) / 2

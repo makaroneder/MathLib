@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         const size_t size = file.GetSize();
         uint8_t memory[size];
         if (!file.ReadBuffer(memory, size)) MathLib::Panic("Failed to read input file");
-        MathLib::X86 x86 = MathLib::X86(MathLib::ExternArray<uint8_t>(memory, size), MathLib::X86State(0, 0));
+        MathLib::X86 x86 = MathLib::X86(MathLib::ExternArray<uint8_t>(memory, size));
         if (!x86.Run()) MathLib::Panic("Failed to update emulator");
         std::cout << "State: " << x86 << std::endl;
         return EXIT_SUCCESS;

@@ -8,6 +8,8 @@ namespace MathLib {
         String name;
 
         VFSEntry(FileSystem* fs = nullptr, const Sequence<char>& name = ""_M);
+        [[nodiscard]] bool operator==(const VFSEntry& other) const;
+        [[nodiscard]] bool operator!=(const VFSEntry& other) const;
     };
 }
 

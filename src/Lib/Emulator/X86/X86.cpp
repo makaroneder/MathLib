@@ -126,8 +126,13 @@ namespace MathLib {
             default: ReturnFromBenchmark(false)                                         \
         })                                                                              \
     }
-    X86::X86(const Sequence<uint8_t>& memory, const X86State& state) : StepEmulator(memory), state(state) {
+    X86::X86(const Sequence<uint8_t>& memory) : StepEmulator(memory), state(0, 0) {
         EmptyBenchmark
+    }
+    void X86::Reset(void) {
+        StartBenchmark
+        state = X86State(0, 0);
+        EndBenchmark
     }
     void X86::UpdateFlags(uint64_t val, uint64_t a, uint64_t b) {
         StartBenchmark

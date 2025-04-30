@@ -22,6 +22,8 @@ namespace MathLib {
         };
         uint32_t size;
         Type type;
+
+        AsepriteChunkHeader(uint32_t size, Type type);
     } __attribute__((packed));
 }
 

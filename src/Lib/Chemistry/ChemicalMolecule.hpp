@@ -15,10 +15,13 @@ namespace MathLib {
         [[nodiscard]] bool IsHydroxide(void) const;
         [[nodiscard]] bool IsOxide(void) const;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] bool operator==(const ChemicalMolecule& other) const;
+        [[nodiscard]] bool operator!=(const ChemicalMolecule& other) const;
 
-        size_t count;
         private:
         Array<ChemicalElement> elements;
+        public:
+        size_t count;
     };
 }
 

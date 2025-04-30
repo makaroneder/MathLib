@@ -1,10 +1,10 @@
 #include "ChemicalMolecule.hpp"
 
 namespace MathLib {
-    ChemicalMolecule::ChemicalMolecule(void) : count(0), elements(Array<ChemicalElement>()) {
+    ChemicalMolecule::ChemicalMolecule(void) : elements(Array<ChemicalElement>()), count(0) {
         EmptyBenchmark
     }
-    ChemicalMolecule::ChemicalMolecule(const Sequence<ChemicalElement>& elements, size_t count) : count(count), elements(CollectionToArray<ChemicalElement>(elements)) {
+    ChemicalMolecule::ChemicalMolecule(const Sequence<ChemicalElement>& elements, size_t count) : elements(CollectionToArray<ChemicalElement>(elements)), count(count) {
         EmptyBenchmark
     }
     Array<ChemicalElement> ChemicalMolecule::GetElements(void) const {
@@ -39,5 +39,11 @@ namespace MathLib {
         String str = "";
         for (const ChemicalElement& element : elements) str += element.ToString();
         ReturnFromBenchmark(CollectionToString(padding) + (count == 1 ? "" : MathLib::ToString(count)) + str);
+    }
+    bool ChemicalMolecule::operator==(const ChemicalMolecule& other) const {
+        StartAndReturnFromBenchmark(count == other.count && elements == other.elements);
+    }
+    bool ChemicalMolecule::operator!=(const ChemicalMolecule& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
     }
 }

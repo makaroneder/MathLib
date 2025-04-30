@@ -1,4 +1,5 @@
-#include "Thread.hpp"
+#include "DummyThread.hpp"
+#include "Threads.hpp"
 
 namespace MathLib {
     void Thread::RunAndJoin(const Function<void, Interval<ssize_t>>& function, const Interval<ssize_t>& interval) {
@@ -6,6 +7,12 @@ namespace MathLib {
         Run(function, interval);
         Join();
         EndBenchmark
+    }
+    void RunParallel(const Function<void, Interval<ssize_t>>& function, const Interval<ssize_t>& interval) {
+        const size_t threads = GetThreadCount();
+        Thread* thread = threads ? (Thread*)new Threads(threads) : (Thread*)new DummyThread();
+        thread->RunAndJoin(function, interval);
+        delete thread;
     }
     Array<Interval<ssize_t>> SplitJob(const Interval<ssize_t>& interval, size_t threads) {
         StartBenchmark

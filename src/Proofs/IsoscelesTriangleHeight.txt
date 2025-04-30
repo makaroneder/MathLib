@@ -1,0 +1,28 @@
+Name: Isosceles triangle height
+Given: (
+    Triangle(A, B, C) and
+    Line(A, D, B) and
+    (|AC| = |BC| = |AB|) and
+    (|AD| = |BD| = |AB| / 2) and
+    (Angle(A, D, C) = 90^o) and
+    (Angle(B, D, C) = 90^o)
+)
+Prove: |CD| = |AB| * sqrt(3) / 2
+Assumptions: Pythagorean theorem
+Visualization:
+             C
+            |||
+          |  |  |
+        |    |    |
+      |      |      |
+    |        |        |
+  |          |          |
+|            |            |
+A------------D------------B
+Proof: |CD|^2 + |BD|^2 = |BC|^2 <=>
+|CD|^2 = |BC|^2 - |BD|^2 <=>
+|CD|^2 = |AB|^2 - (|AB| / 2)^2 <=>
+|CD|^2 = |AB|^2 - |AB|^2 / 4 <=>
+|CD|^2 = |AB|^2 * (1 - 1 / 4) <=>
+|CD|^2 = |AB|^2 * 3 / 4 <=>
+|CD| = |AB| * sqrt(3) / 2

@@ -1,14 +1,14 @@
 #ifdef __x86_64__
-#include "Interrupts/Interrupts.hpp"
+#include "../Arch.hpp"
 #include "CMOS.hpp"
 #include "IO.hpp"
 
 CMOS* cmos = nullptr;
 CMOSFloppyData::CMOSFloppyData(uint8_t data) : data(data) {}
 CMOS::CMOS(bool nmi_) : nmi(false) {
-    SetInterrupts(false);
+    ArchSetInterrupts(false);
     SetNMI(nmi_);
-    SetInterrupts(true);
+    ArchSetInterrupts(true);
 }
 void CMOS::AccessRegister(Register reg) const {
     WritePort<uint8_t>(0x70, (uint8_t)reg | (!nmi << 7));

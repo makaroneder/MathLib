@@ -3,13 +3,14 @@
 #include <Expected.hpp>
 
 struct Formula : MathLib::Printable {
-    enum class Type {
+    enum class Type : uint8_t {
         Constant,
         Variable,
         Operation,
-    } type;
+    };
     MathLib::String value;
     MathLib::Array<Formula> children;
+    Type type;
 
     Formula(void);
     Formula(bool value);

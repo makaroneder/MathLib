@@ -9,11 +9,14 @@ namespace MathLib {
     /// @param end Number of iterations
     /// @return Gamma of the complex number
     template <typename T>
-    [[nodiscard]] T Gamma(const T& z, const size_t& end = 2000) {
+    [[nodiscard]] T Gamma(const T& z) {
         StartBenchmark
         T ret = (T)1 / z;
-        for (size_t n = 1; n < end; n++)
-            ret *= Pow((T)1 / (T)n + 1, z) / (z / (T)n + 1);
+        for (size_t n = 1; true; n++) {
+            const T tmp = Pow((T)1 / (T)n + 1, z) / (z / (T)n + 1);
+            ret *= tmp;
+            if (FloatsEqual<T>(tmp, 1, MathLib::eps * MathLib::eps)) break;
+        }
         ReturnFromBenchmark(ret);
     }
     /// @brief z!(a) = gamma(z / a + 1) / gamma(1 / a + 1)

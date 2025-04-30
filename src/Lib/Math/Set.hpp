@@ -22,6 +22,9 @@ namespace MathLib {
         [[nodiscard]] virtual bool Add(const T& val) override {
             return data.Contains(val) ? true : data.Add(val);
         }
+        [[nodiscard]] virtual bool Reset(void) override {
+            return data.Reset();
+        }
         [[nodiscard]] virtual const T* GetValue(void) const override {
             return data.GetValue();
         }
@@ -80,9 +83,9 @@ namespace MathLib {
             ret = tmp.Get();
             for (size_t i = 1; i < others.GetSize(); i++) {
                 Array<Array<T>> data = ret.GetData();
-                for (Array<T>& x : data)
+                for (NonLinearCollection<T>& x : data)
                     if (!x.Add(others.At(i))) return Expected<Set<Array<T>>>();
-                ret = Set<Array<T>>(data);        
+                ret = Set<Array<T>>(data);
             }
             return ret;
         }

@@ -2,6 +2,7 @@
 #define MathLib_Geometry_WavefrontObject_H
 #include "String.hpp"
 #include "LineShape.hpp"
+#include "../FunctionT.hpp"
 #include "../Math/Quaternion.hpp"
 #include "../FileSystem/File.hpp"
 #include "../EquationSolver/Tokenizer.hpp"

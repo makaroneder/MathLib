@@ -10,6 +10,8 @@ namespace MathLib {
         [[nodiscard]] static Expected<ChemicalReaction> Create(const Sequence<ChemicalMolecule>& input);
         [[nodiscard]] Expected<ChemicalReaction> Balance(void) const;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] bool operator==(const ChemicalReaction& other) const;
+        [[nodiscard]] bool operator!=(const ChemicalReaction& other) const;
 
         private:
         [[nodiscard]] Array<ChemicalReactionElement> GetReactionElements(bool left_) const;

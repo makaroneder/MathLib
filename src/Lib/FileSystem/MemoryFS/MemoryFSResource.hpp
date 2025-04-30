@@ -8,6 +8,8 @@ namespace MathLib {
         Array<uint8_t> buffer;
 
         MemoryFSResource(const Sequence<char>& name = ""_M);
+        [[nodiscard]] bool operator==(const MemoryFSResource& other) const;
+        [[nodiscard]] bool operator!=(const MemoryFSResource& other) const;
     };
 }
 

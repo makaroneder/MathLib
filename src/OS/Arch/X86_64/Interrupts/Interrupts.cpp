@@ -74,7 +74,7 @@ extern "C" void InterruptHandler(uintptr_t interrupt, Registers* regs, uintptr_t
 uint8_t GetIRQBase(void) {
     return pic.GetBase();
 }
-void SetInterrupts(bool value) {
+void ArchSetInterrupts(bool value) {
     MathLib::X86Flags flags = GetFlags();
     if (value) {
         if (!--interruptDisabledCount) flags.interruptEnable = true;
@@ -97,7 +97,7 @@ bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment) {
         idt.descriptors[i] = InterruptDescriptor(isrFunctionTable[i], codeSegment, InterruptDescriptor::GateType::Interrupt);
     asm volatile("lidt %0" : : "m"(idtr));
     if (!AlignmentCheck::Enable() || !MachineCheck::Enable()) return false;
-    SetInterrupts(true);
+    ArchSetInterrupts(true);
     initialized = true;
     return true;
 }

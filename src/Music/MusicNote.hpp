@@ -18,13 +18,20 @@ struct MusicNote : MathLib::Allocatable {
         A4B4 = 50,
         B4 = 51,
         C5 = 52,
-    } type;
+    };
     MathLib::Second<T> duration;
+    Type type;
 
     MusicNote(void) {}
-    MusicNote(Type type, const MathLib::Second<T>& duration) : type(type), duration(duration) {}
+    MusicNote(Type type, const MathLib::Second<T>& duration) : duration(duration), type(type) {}
     [[nodiscard]] MathLib::Hertz<T> GetFrequency(void) const {
         return type == Type::None ? MathLib::Hertz<T>(0) : MathLib::Hertz<T>(440) * MathLib::Pow(2, ((ssize_t)type - 49) / 12);
+    }
+    [[nodiscard]] bool operator==(const MusicNote<T>& other) const {
+        return type == other.type && duration == other.duration;
+    }
+    [[nodiscard]] bool operator!=(const MusicNote<T>& other) const {
+        return !(*this == other);
     }
 };
 

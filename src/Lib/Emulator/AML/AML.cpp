@@ -11,6 +11,12 @@ namespace MathLib {
         if (!dsdt->IsValid()) Panic("Invalid DSDT provided");
         EndBenchmark
     }
+    void AML::Reset(void) {
+        StartBenchmark
+        pc = 0;
+        root = AMLObject("Root"_M);
+        EndBenchmark
+    }
     AMLObject AML::GetRoot(void) const {
         return root;
     }

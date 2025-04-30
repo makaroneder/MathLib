@@ -19,4 +19,9 @@ namespace MathLib {
         }
         ReturnFromBenchmark(ret);
     }
+    bool Readable::DefaultSkip(size_t size) {
+        StartBenchmark
+        uint8_t buffer[size];
+        ReturnFromBenchmark(ReadBuffer(buffer, size));
+    }
 }

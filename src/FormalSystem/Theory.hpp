@@ -16,6 +16,8 @@ struct Theory : MathLib::Printable {
     /// @param padding String to pad with
     /// @return String representation
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
+    [[nodiscard]] bool operator==(const Theory& other) const;
+    [[nodiscard]] bool operator!=(const Theory& other) const;
 };
 
 #endif

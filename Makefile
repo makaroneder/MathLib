@@ -40,13 +40,13 @@ $(BUILDDIR)/libExtras.a: $(OBJS)
 	@$(MKDIR) $(@D)
 	@$(AR) $(ARFLAGS) $@ $^
 	@echo "==> Created: $@"
-$(BUILDDIR)/libMath.a: $(BUILDDIR)/Lib/LibStub.o
+$(BUILDDIR)/libMath.a: $(BUILDDIR)/LibStub.o
 	@$(MKDIR) $(@D)
 	@$(AR) $(ARFLAGS) $@ $<
 	@echo "==> Created: $@"
-$(BUILDDIR)/Lib/LibStub.o: $(SRCDIR)/LibStub/Main.cpp $(HEADERS)
+$(BUILDDIR)/LibStub.o: $(SRCDIR)/Lib/MathLib.hpp $(HEADERS)
 	@$(MKDIR) $(@D)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -x c++ -c $< -o $@
 	@echo "==> Created: $@"
 $(BUILDDIR)/Lib/%.o: $(SRCDIR)/Lib/%.psf Makefile
 	@$(MKDIR) $(@D)
@@ -74,7 +74,6 @@ CHEMPROGRAM ?= $(SRCDIR)/TestPrograms/Chemistry/All.txt
 DISKSIZE ?= 4480
 DISKOUTPUT ?= $(BUILDDIR)/Disk.img
 DISKTYPE ?= MBR
-DISKARGS = -diskSize $(DISKSIZE) -diskType $(DISKTYPE) -output $(DISKOUTPUT)
 CARBONS ?= 6
 ANIMATIONFILE ?= $(SRCDIR)/TestPrograms/Math/Trigonometry/Sine.txt
 POLYNOMIAL ?= $(SRCDIR)/TestPrograms/Math/Polynomial.txt
@@ -82,16 +81,18 @@ IMGCONVINPUTTYPE ?= TGA
 IMGCONVINPUT ?= $(SRCDIR)/TestPrograms/RPG/Emoji.tga
 IMGCONVOUTPUTTYPE ?= P6
 IMGCONVOUTPUT ?= $(BUILDDIR)/ImageConverter.ppm
-IMGCONVARGS = -inputType $(IMGCONVINPUTTYPE) -input $(IMGCONVINPUT) -outputType $(IMGCONVOUTPUTTYPE) -output $(IMGCONVOUTPUT)
 ELFPROGRAM ?= $(BUILDDIR)/ELFParser.out
-ELFARGS = -program $(ELFPROGRAM)
 4DPROGRAM ?= $(SRCDIR)/TestPrograms/4D/Tesseract.txt
-4DARGS ?= -program $(4DPROGRAM)
 DBOUTPUT ?= $(BUILDDIR)/DB.bin
-DBARGS = -program $(DBOUTPUT)
 IMGPROCINPUT ?= $(SRCDIR)/TestPrograms/Cards/Prototype.tga
-IMGPROCARGS = -input $(IMGPROCINPUT)
 HEADERTREEINPUT ?= $(SRCDIR)/Lib/Host.hpp
+IMGGENMODEL ?= $(BUILDDIR)/ImageGenerator.bin
+IMGGENINPUT ?= $(SRCDIR)/TestPrograms/ImageGenerator/AI.aseprite
+FSCONVOUTPUT ?= $(BUILDDIR)/FS.tar
+FSCONVINPUT ?= Makefile Makefile TODO.md TODO.md
+BENCODEINPUT ?= $(SRCDIR)/TestPrograms/Bencode/ArchLinux.torrent
+SERVERTYPE ?= client
+SERVERTARGET ?= $(SRCDIR)/TestPrograms/Network/Target.json
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all

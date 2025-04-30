@@ -152,19 +152,14 @@ namespace MathLib {
     /// @param array Array to be sorted
     /// @return Sorted array
     template <typename T>
-    [[nodiscard]] Array<T> BubbleSort(const Sequence<T>& array, bool largestFirst) {
+    [[nodiscard]] Array<T> StalinSort(const Sequence<T>& array, const Function<bool, T, T>& compare) {
         StartBenchmark
-        Array<T> ret = CollectionToArray<T>(array);
-        while (true) {
-            bool any = false;
-            for (size_t i = 0; i < ret.GetSize() - 1; i++) {
-                const bool x = ret.At(i) < ret.At(i + 1);
-                if ((largestFirst && x) || (!largestFirst && !x)) {
-                    Swap<T>(ret.At(i), ret.At(i + 1));
-                    any = true;
-                }
-            }
-            if (!any) break;
+        const size_t size = array.GetSize();
+        if (!size) ReturnFromBenchmark(Array<T>());
+        Array<T> ret = MakeArray<T>(array.At(0));
+        for (size_t i = 1; i < size; i++) {
+            const T tmp = array.At(i);
+            if (!compare(ret.At(ret.GetSize() - 1), tmp) && !ret.Add(tmp)) ReturnFromBenchmark(Array<T>());
         }
         ReturnFromBenchmark(ret);
     }

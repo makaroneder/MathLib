@@ -19,10 +19,12 @@ namespace MathLib {
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] bool operator==(const AMLObject& other) const;
+        [[nodiscard]] bool operator!=(const AMLObject& other) const;
 
         private:
-        Type type;
         String name;
+        Type type;
         Array<uint64_t> data;
         Array<AMLObject> children;
     };

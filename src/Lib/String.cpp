@@ -1,3 +1,4 @@
+#include "FunctionT.hpp"
 #include "String.hpp"
 #include "Host.hpp"
 
@@ -46,6 +47,18 @@ namespace MathLib {
         for (size_t i = buff.GetSize() - 1; i > 0; i--) ret += buff.At(i);
         ret += buff[0];
         ReturnFromBenchmark(ret);
+    }
+    size_t StringToNumber(const Sequence<char>& str, size_t base) {
+        size_t ret = 0;
+        const size_t size = str.GetSize();
+        for (size_t i = 0; i < size; i++) {
+            size_t tmp = str.At(i);
+            if (IsDigit(tmp)) tmp -= '0';
+            else if (IsHexDigit(tmp)) tmp = ToUpper(tmp) - 'A' + 10;
+            if (tmp >= base) return SIZE_MAX;
+            ret = ret * base + tmp;
+        }
+        return ret;
     }
     String DumpMemory(uintptr_t addr, size_t size, size_t lineSize) {
         StartBenchmark

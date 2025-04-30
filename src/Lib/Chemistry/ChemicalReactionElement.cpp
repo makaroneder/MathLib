@@ -24,4 +24,10 @@ namespace MathLib {
     String ChemicalReactionElement::ToString(const Sequence<char>& padding) const {
         StartAndReturnFromBenchmark(CollectionToString(padding) + symbol + ": " + coefficients.ToString());
     }
+    bool ChemicalReactionElement::operator==(const ChemicalReactionElement& other) const {
+        StartAndReturnFromBenchmark(coefficients == other.coefficients && symbol == other.symbol);
+    }
+    bool ChemicalReactionElement::operator!=(const ChemicalReactionElement& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

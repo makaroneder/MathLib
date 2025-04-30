@@ -8,6 +8,8 @@ struct FileTranslation {
     MathLib::String sources;
 
     FileTranslation(const MathLib::Sequence<char>& inputFormat, const MathLib::Sequence<char>& outputFormat, const MathLib::Sequence<char>& sources);
+    [[nodiscard]] bool operator==(const FileTranslation& other) const;
+    [[nodiscard]] bool operator!=(const FileTranslation& other) const;
 };
 
 

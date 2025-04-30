@@ -1,8 +1,8 @@
 #include "CardIndex.hpp"
 
 CardIndex::CardIndex(Card::Type type, Card::Color color) : type(type), color(color), selected(false) {}
-bool CardIndex::operator<(const CardIndex& other) const {
-    return type < other.type;
+bool CardIndex::LessThanEqual(const MathLib::Orderable& other) const {
+    return type <= ((const CardIndex&)other).type;
 }
 MathLib::String CardIndex::ToString(const MathLib::Sequence<char>& padding) const {
     MathLib::String ret = MathLib::CollectionToString(padding);

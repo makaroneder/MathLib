@@ -1,0 +1,40 @@
+Name: Triangle length
+Given: (
+    Triangle(A, B, C) and
+    Line(A, D, B) and
+    (Angle(A, D, C) = 90^o) and
+    (Angle(B, D, C) = 90^o)
+)
+Prove: |BC| = sqrt(2 * Area(Triangle(A, B, C)) * sin(Angle(C, A, B)) / sin(Angle(A, B, C)) / sin(Angle(A, C, B)))
+Assumptions: None
+Visualization:
+             C
+            |||
+          |  |  |
+        |    |    |
+      |      |      |
+    |        |        |
+  |          |          |
+|            |            |
+A------------D------------B
+Proof: (
+    Area(Triangle(A, B, C)) = |AC| * |AB| * sin(Angle(C, A, B)) / 2
+    Area(Triangle(A, B, C)) = |AB| * |BC| * sin(Angle(A, B, C)) / 2
+    Area(Triangle(A, B, C)) = |BC| * |AC| * sin(Angle(B, C, A)) / 2
+) => (
+    2 * Area(Triangle(A, B, C)) = |AC| * |AB| * sin(Angle(C, A, B))
+    2 * Area(Triangle(A, B, C)) = |AB| * |BC| * sin(Angle(A, B, C))
+    2 * Area(Triangle(A, B, C)) = |BC| * |AC| * sin(Angle(B, C, A))
+) <=> (
+    1 = |AC| * |AB| * sin(Angle(C, A, B)) / |AB| / |BC| / sin(Angle(A, B, C))
+    2 * Area(Triangle(A, B, C)) = |BC| * |AC| * sin(Angle(B, C, A))
+) <=> (
+    sin(Angle(A, B, C)) / sin(Angle(C, A, B)) = |AC| / |BC|
+    2 * Area(Triangle(A, B, C)) = |BC| * |AC| * sin(Angle(B, C, A))
+) =>
+sin(Angle(A, B, C)) / sin(Angle(C, A, B)) / 2 / Area(Triangle(A, B, C)) = |AC| / |BC| / |BC| / |AC| / sin(Angle(B, C, A)) <=>
+sin(Angle(A, B, C)) / sin(Angle(C, A, B)) / 2 / Area(Triangle(A, B, C)) = 1 / |BC|^2 / sin(Angle(B, C, A)) <=>
+sin(Angle(A, B, C)) / sin(Angle(C, A, B)) / 2 / Area(Triangle(A, B, C)) * sin(Angle(B, C, A)) = 1 / |BC|^2 <=>
+|BC|^2 = 1 / sin(Angle(A, B, C)) * sin(Angle(C, A, B)) * 2 * Area(Triangle(A, B, C)) / sin(Angle(B, C, A)) <=>
+|BC|^2 = 2 * Area(Triangle(A, B, C)) * sin(Angle(C, A, B)) / sin(Angle(A, B, C)) / sin(Angle(B, C, A)) <=>
+|BC| = sqrt(2 * Area(Triangle(A, B, C)) * sin(Angle(C, A, B)) / sin(Angle(A, B, C)) / sin(Angle(B, C, A)))

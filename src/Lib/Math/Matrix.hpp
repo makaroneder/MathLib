@@ -3,6 +3,7 @@
 #include "../Interfaces/Printable.hpp"
 #include "../Interfaces/Function.hpp"
 #include "../Interfaces/Saveable.hpp"
+#include "../FunctionT.hpp"
 #include "Exponential.hpp"
 #include "MathObject.hpp"
 #include "Factorial.hpp"
@@ -345,6 +346,19 @@ namespace MathLib {
                 ReturnFromBenchmark(ret + padding + ']');
             }
         }
+        [[nodiscard]] Expected<Matrix<T>> MultiplyAddTransform(const Matrix<T>& multiplier, const Matrix<T>& adder, const Function<T, T>& transform) const {
+            StartBenchmark
+            if (width != multiplier.height || multiplier.width != adder.width || height != adder.height) ReturnFromBenchmark(Expected<Matrix<T>>());
+            Matrix<T> ret = Matrix<T>(multiplier.width, height);
+            for (size_t y = 0; y < ret.height; y++) {
+                for (size_t x = 0; x < ret.width; x++) {
+                    ret.At(x, y) = adder.At(x, y);
+                    for (size_t x2 = 0; x2 < width; x2++) ret.At(x, y) += At(x2, y) * multiplier.At(x, x2);
+                    ret.At(x, y) = transform(ret.At(x, y));
+                }
+            }
+            ReturnFromBenchmark(ret);
+        }
         /// @brief Multiplies 2 matrices
         /// @param other Another matrix
         /// @return Result of multiplication
@@ -358,7 +372,7 @@ namespace MathLib {
                     for (size_t x2 = 0; x2 < width; x2++) ret.At(x, y) += At(x2, y) * other.At(x, x2);
                 }
             }
-            ReturnFromBenchmark(Expected<Matrix<T>>(ret));
+            ReturnFromBenchmark(ret);
         }
         /// @brief Compares current matrix with another matrix
         /// @param other Other matrix

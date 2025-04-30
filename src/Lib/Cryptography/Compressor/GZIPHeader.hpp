@@ -41,6 +41,8 @@ namespace MathLib {
         ExtraFlags extraFlags;
         OperatingSystem os;
 
+        GZIPHeader(void);
+        GZIPHeader(bool text, bool crc16, bool extraData, bool name, bool comment, ExtraFlags extraFlags, OperatingSystem os);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

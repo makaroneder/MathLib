@@ -29,6 +29,8 @@ namespace MathLib {
         /// @return Data at specified position
         [[nodiscard]] uint32_t At(size_t x, size_t y) const;
         [[nodiscard]] Image Resize(size_t xMultiplier, size_t yMultiplier) const;
+        [[nodiscard]] bool operator==(const Image& other) const;
+        [[nodiscard]] bool operator!=(const Image& other) const;
 
         /// @brief Pixels
         Matrix<uint32_t> pixels;

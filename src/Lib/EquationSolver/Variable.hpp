@@ -28,6 +28,8 @@ namespace MathLib {
         /// @param value Value of the variable
         /// @brief Is variable constant?
         Variable(const Sequence<char>& name, const Sequence<char>& dataType, const Sequence<char>& value, bool constant);
+        [[nodiscard]] bool operator==(const Variable& other) const;
+        [[nodiscard]] bool operator!=(const Variable& other) const;
     };
     /// @brief Creates default variables for equation solver
     /// @return Default variables

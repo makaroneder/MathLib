@@ -2,9 +2,6 @@
 #include "String.hpp"
 
 namespace MathLib {
-    CommandLineEntry::CommandLineEntry(const Sequence<char>& name, const Sequence<char>& value) : name(CollectionToString(name)), value(CollectionToString(value)) {
-        EmptyBenchmark
-    }
     CommandLine::CommandLine(size_t argc, const char** argv) {
         StartBenchmark
         String prevName = "";

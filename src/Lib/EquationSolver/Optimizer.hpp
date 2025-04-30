@@ -20,6 +20,8 @@ namespace MathLib {
         /// @param node Node to optimize
         /// @return Optimized node
         [[nodiscard]] Node* Optimize(const Node* node);
+        [[nodiscard]] bool operator==(const Optimizer& other) const;
+        [[nodiscard]] bool operator!=(const Optimizer& other) const;
 
         private:
         Optimizer* parent;

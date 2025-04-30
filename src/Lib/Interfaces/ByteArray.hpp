@@ -3,10 +3,11 @@
 #include "Saveable.hpp"
 
 namespace MathLib {
-    struct ByteArray : Collection<uint8_t>, ByteDevice, Saveable {
+    struct ByteArray : Collection<uint8_t>, ByteDevice, Saveable, Printable {
         ByteArray(void);
         ByteArray(size_t size);
         ByteArray(const Sequence<uint8_t>& sequence);
+        ByteArray(ByteDevice& device);
         template <typename T>
         static ByteArray ToByteArray(const Sequence<T>& sequence) {
             StartBenchmark
@@ -26,9 +27,14 @@ namespace MathLib {
         [[nodiscard]] virtual uint8_t At(size_t index) const override;
         [[nodiscard]] virtual uint8_t& At(size_t index) override;
         [[nodiscard]] virtual bool Add(const uint8_t& val) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual const uint8_t* GetValue(void) const override;
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
+        /// @brief Converts struct to string
+        /// @param padding String to pad with
+        /// @return String representation
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
         Array<uint8_t> array;

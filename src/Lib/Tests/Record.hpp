@@ -12,6 +12,8 @@ namespace MathLib {
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] bool operator==(const Record& other) const;
+        [[nodiscard]] bool operator!=(const Record& other) const;
     };
 }
 

@@ -29,7 +29,7 @@ namespace MathLib {
         }
         template <typename F>
         [[nodiscard]] Expected<F> Convert(void) const {
-            return HasValue() ? Expected<F>((F)value) : Expected<F>();
+            StartAndReturnFromBenchmark(HasValue() ? Expected<F>((F)value) : Expected<F>());
         }
 
         private:

@@ -110,4 +110,10 @@ namespace MathLib {
             ret += right.At(i).ToString() + ((i + 1) == right.GetSize() ? "" : " + ");
         ReturnFromBenchmark(ret);
     }
+    bool ChemicalReaction::operator==(const ChemicalReaction& other) const {
+        return left == other.left && right == other.right;
+    }
+    bool ChemicalReaction::operator!=(const ChemicalReaction& other) const {
+        return !(*this == other);
+    }
 }

@@ -183,7 +183,7 @@ namespace MathLib {
     }
 
     #define TokenizeLayer(func, req, next)                                      \
-    Node* Tokenize##func(const Sequence<char>& str, size_t& i) {         \
+    Node* Tokenize##func(const Sequence<char>& str, size_t& i) {                \
         StartBenchmark                                                          \
         Node* ret = Tokenize##next(str, i);                                     \
         SkipWhiteSpace(str, i);                                                 \

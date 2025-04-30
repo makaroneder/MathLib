@@ -5,7 +5,7 @@
 
 namespace MathLib {
     template <typename T>
-    struct Interval : Printable {
+    struct Interval : Container<T>, Printable {
         constexpr Interval(const T& min_ = 0, const T& max_ = 0) : min(min_), max(max_) {
             EmptyBenchmark
         }
@@ -21,26 +21,33 @@ namespace MathLib {
         [[nodiscard]] constexpr T GetSize(void) const {
             StartAndReturnFromBenchmark(max - min);
         }
-        [[nodiscard]] constexpr bool Contains(const T& x) const {
-            StartAndReturnFromBenchmark(IsBetween(x, min, max));
+        [[nodiscard]] virtual bool Contains(const T& value) const override {
+            StartAndReturnFromBenchmark(IsBetween(value, min, max));
         }
-        [[nodiscard]] T constexpr Clamp(const T& x) const {
-            StartAndReturnFromBenchmark(MathLib::Clamp(x, min, max));
+        [[nodiscard]] T constexpr Clamp(const T& value) const {
+            StartAndReturnFromBenchmark(MathLib::Clamp(value, min, max));
         }
         [[nodiscard]] Interval<T> Expand(const T& stepSize) const {
+            StartBenchmark
             Interval<T> ret;
             while (ret.GetMin() > GetMin()) ret.min -= stepSize;
             while (ret.GetMax() < GetMax()) ret.max += stepSize;
-            return ret;
+            ReturnFromBenchmark(ret);
         }
         [[nodiscard]] Interval<T> Min(const Interval<T>& other) const {
-            return Interval<T>(MathLib::Max<T>(min, other.min), MathLib::Min<T>(max, other.max));
+            StartAndReturnFromBenchmark(Interval<T>(MathLib::Max<T>(min, other.min), MathLib::Min<T>(max, other.max)));
         }
         [[nodiscard]] Interval<T> Max(const Interval<T>& other) const {
-            return Interval<T>(MathLib::Min<T>(min, other.min), MathLib::Max<T>(max, other.max));
+            StartAndReturnFromBenchmark(Interval<T>(MathLib::Min<T>(min, other.min), MathLib::Max<T>(max, other.max)));
         }
         [[nodiscard]] T Random(void) const {
-            return RandomNumber<T>(min, max);
+            StartAndReturnFromBenchmark(RandomNumber<T>(min, max));
+        }
+        [[nodiscard]] bool operator==(const Interval<T>& other) const {
+            StartAndReturnFromBenchmark(FloatsEqual<T>(min, other.min) && FloatsEqual<T>(max, other.max));
+        }
+        [[nodiscard]] bool operator!=(const Interval<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
         }
         /// @brief Converts struct to string
         /// @param padding String to pad with

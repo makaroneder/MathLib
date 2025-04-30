@@ -1,0 +1,24 @@
+Name: Isosceles triangle area
+Given: (
+    Triangle(A, B, C) and
+    Line(A, D, B) and
+    (|AC| = |BC| = |AB|) and
+    (|AD| = |BD| = |AB| / 2) and
+    (Angle(A, D, C) = 90^o) and
+    (Angle(B, D, C) = 90^o)
+)
+Prove: Area(Triangle(A, B, C)) = |AB|^2 * sqrt(3) / 4
+Assumptions: Isosceles triangle height
+Visualization:
+             C
+            |||
+          |  |  |
+        |    |    |
+      |      |      |
+    |        |        |
+  |          |          |
+|            |            |
+A------------D------------B
+Proof: Area(Triangle(A, B, C)) = |AB| * |CD| / 2 <=>
+Area(Triangle(A, B, C)) = |AB| * |AB| * sqrt(3) / 2 / 2 <=>
+Area(Triangle(A, B, C)) = |AB|^2 * sqrt(3) / 4

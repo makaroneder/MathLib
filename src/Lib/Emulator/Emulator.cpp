@@ -1,6 +1,9 @@
 #include "Emulator.hpp"
 
 namespace MathLib {
+    Emulator::Emulator(void) {
+        EmptyBenchmark
+    }
     Emulator::Emulator(const Sequence<uint8_t>& memory) : memory(CollectionToArray<uint8_t>(memory)) {
         EmptyBenchmark
     }

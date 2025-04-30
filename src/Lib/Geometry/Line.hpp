@@ -18,6 +18,12 @@ namespace MathLib {
         Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {
             EmptyBenchmark
         }
+        [[nodiscard]] bool operator==(const Line<T>& other) const {
+            StartAndReturnFromBenchmark(start == other.start && end == other.end);
+        }
+        [[nodiscard]] bool operator!=(const Line<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
+        }
     };
     /// @brief Converts a line from one type to another
     /// @tparam T Old type

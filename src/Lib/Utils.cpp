@@ -13,16 +13,16 @@ namespace MathLib {
         StartAndReturnFromBenchmark(IsLower(chr) ? (chr + 'A' - 'a') : chr);
     }
     bool IsUpper(char chr) {
-        StartAndReturnFromBenchmark(chr >= 'A' && chr <= 'Z');
+        StartAndReturnFromBenchmark(IsBetween(chr, 'A', 'Z'));
     }
     bool IsLower(char chr) {
-        StartAndReturnFromBenchmark(chr >= 'a' && chr <= 'z');
+        StartAndReturnFromBenchmark(IsBetween(chr, 'a', 'z'));
     }
     bool IsAlpha(char chr) {
         StartAndReturnFromBenchmark(IsUpper(chr) || IsLower(chr));
     }
     bool IsDigit(char chr) {
-        StartAndReturnFromBenchmark(chr >= '0' && chr <= '9');
+        StartAndReturnFromBenchmark(IsBetween(chr, '0', '9'));
     }
     bool IsWhiteSpace(char chr) {
         StartAndReturnFromBenchmark(chr == ' ' || chr == '\t' || chr == '\n' || chr == '\r');

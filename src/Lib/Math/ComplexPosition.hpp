@@ -33,6 +33,12 @@ namespace MathLib {
         [[nodiscard]] uint32_t GetColor(void) const {
             StartAndReturnFromBenchmark(GetRainbow<T>(CreateVector<T>(value.GetReal(), value.GetImaginary(), 0).GetLength()));
         }
+        [[nodiscard]] bool operator==(const ComplexPosition<T>& other) const {
+            StartAndReturnFromBenchmark(position == other.position && value == other.value);
+        }
+        [[nodiscard]] bool operator!=(const ComplexPosition<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
+        }
     };
 }
 

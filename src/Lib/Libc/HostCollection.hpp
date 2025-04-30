@@ -24,6 +24,10 @@ namespace MathLib {
             buffer.push_back(val);
             return true;
         }
+        [[nodiscard]] virtual bool Reset(void) override {
+            buffer.clear();
+            return true;
+        }
         [[nodiscard]] virtual size_t GetSize(void) const override {
             return buffer.size();
         }

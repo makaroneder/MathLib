@@ -70,14 +70,15 @@ namespace MathLib {
         if (!entry.HasValue() || !entry.Get().directory) ReturnFromBenchmark(Array<FileInfo>());
         Array<ISO9660DirectoryEntry*> rawRet = ReadDirectoryEntry(entry.Get());
         Array<FileInfo> ret;
+        bool status = true;
         for (ISO9660DirectoryEntry*& tmp : rawRet) {
             if (!ret.Add(FileInfo(tmp->directory ? FileInfo::Type::Directory : FileInfo::Type::File, tmp->GetName()))) {
-                delete tmp;
-                ReturnFromBenchmark(Array<FileInfo>());
+                status = false;
+                break;
             }
-            delete tmp;
         }
-        ReturnFromBenchmark(ret);
+        for (ISO9660DirectoryEntry*& tmp : rawRet) delete tmp;
+        ReturnFromBenchmark(status ? ret : Array<FileInfo>());
     }
     Array<ISO9660DirectoryEntry*> ISO9660::ReadDirectoryEntry(const ISO9660DirectoryEntry& parent) {
         StartBenchmark
@@ -116,11 +117,10 @@ namespace MathLib {
                 if (name == entry->GetName()) {
                     found = true;
                     prev = *entry;
-                    delete entry;
                     break;
                 }
-                else delete entry;
             }
+            for (ISO9660DirectoryEntry*& entry : subData) delete entry;
             if (!found) ReturnFromBenchmark(Expected<ISO9660DirectoryEntry>());
         }
         ReturnFromBenchmark(Expected<ISO9660DirectoryEntry>(prev));

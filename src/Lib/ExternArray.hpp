@@ -6,24 +6,31 @@ namespace MathLib {
     template <typename T>
     struct ExternArray : Collection<T> {
         ExternArray(T* buffer, size_t size) : buffer(buffer), size(size) {
+            StartBenchmark
             if (!buffer) Panic("Invalid buffer provided");
+            EndBenchmark
         }
         [[nodiscard]] virtual T At(size_t index) const override {
+            StartBenchmark
             if (index >= size) Panic("Index out of bounds");
-            return buffer[index];
+            ReturnFromBenchmark(buffer[index]);
         }
         [[nodiscard]] virtual T& At(size_t index) override {
+            StartBenchmark
             if (index >= size) Panic("Index out of bounds");
-            return buffer[index];
+            ReturnFromBenchmark(buffer[index]);
         }
         [[nodiscard]] virtual bool Add(const T&) override {
-            return false;
+            StartAndReturnFromBenchmark(false);
         }
         [[nodiscard]] virtual size_t GetSize(void) const override {
-            return size;
+            StartAndReturnFromBenchmark(size);
         }
         [[nodiscard]] virtual const T* GetValue(void) const override {
-            return buffer;
+            StartAndReturnFromBenchmark(buffer);
+        }
+        [[nodiscard]] virtual bool Reset(void) override {
+            StartAndReturnFromBenchmark(false);
         }
 
         private:

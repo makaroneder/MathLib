@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 [[nodiscard]] uint8_t GetIRQBase(void);
-void SetInterrupts(bool value);
 [[nodiscard]] bool InitInterrupts(uint8_t irqBase, uint8_t codeSegment);
 
 #endif

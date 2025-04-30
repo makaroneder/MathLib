@@ -1,0 +1,27 @@
+Name: Isosceles trapezoid lenghts
+Given: (
+    Trapezoid(A, B, C, D) and
+    Line(A, X, B) and
+    (Angle(A, X, C) = 90^o) and
+    Line(A, Y, B) and
+    (Angle(B, Y, D) = 90^o) and
+    (|AC| = |BD|) and
+    (|CX| = |DY|)
+)
+Prove: |AX| = |BY|
+Assumptions: Pythagorean theorem
+Visualization:
+  C----D
+ /|    |\
+/ |    | \
+A-X----Y--B
+Proof: (
+    (|AX|^2 + |CX|^2 = |AC|^2) and
+    (|BY|^2 + |DY|^2 = |BD|^2)
+) <=> (
+    (|AX|^2 + |CX|^2 = |AC|^2) and
+    (|BY|^2 + |CX|^2 = |AC|^2)
+) =>
+|AX|^2 - |BY|^2 = 0 <=>
+|AX|^2 = |BY|^2 <=>
+|AX| = |BY|

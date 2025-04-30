@@ -38,7 +38,7 @@ namespace MathLib {
         bool preferLinkedCels : 1;
         bool displayCollapsed : 1;
         bool referenceLayer : 1;
-        uint16_t reserved1 : 11;
+        uint16_t reserved1 : 9;
         Type type;
         uint16_t childLevel;
         uint16_t defaultWidth;
@@ -47,7 +47,8 @@ namespace MathLib {
         uint8_t opacity;
         uint8_t reserved2[3];
         AsepriteString name;
-        uint32_t tilesetIndex;
+
+        AsepriteLayerChunk(uint16_t width, uint16_t height);
     } __attribute__((packed));
 }
 

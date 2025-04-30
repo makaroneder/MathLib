@@ -26,6 +26,8 @@ namespace MathLib {
 
         [[nodiscard]] bool IsValid(void) const;
         [[nodiscard]] String GetName(void) const;
+        [[nodiscard]] bool operator==(const ISO9660DirectoryEntry& other) const;
+        [[nodiscard]] bool operator!=(const ISO9660DirectoryEntry& other) const;
     } __attribute__((packed));
 }
 

@@ -41,3 +41,9 @@ MathLib::String Theory::ToString(const MathLib::Sequence<char>& padding) const {
         ret += formula.ToString(padd) + '\n';
     return ret + padding + "\t}\n" + padding + '}';
 }
+bool Theory::operator==(const Theory& other) const {
+    return name == other.name && variables == other.variables && data == other.data;
+}
+bool Theory::operator!=(const Theory& other) const {
+    return !(*this == other);
+}

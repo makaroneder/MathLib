@@ -6,7 +6,8 @@
 
 namespace MathLib {
     struct X86 : StepEmulator, Printable {
-        X86(const Sequence<uint8_t>& memory, const X86State& state);
+        X86(const Sequence<uint8_t>& memory);
+        virtual void Reset(void) override;
         [[nodiscard]] virtual bool Step(void) override;
         [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string

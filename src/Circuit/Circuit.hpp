@@ -1,15 +1,26 @@
 #ifndef Circuit_H
 #define Circuit_H
-#include "CircuitElement.hpp"
+#include "Gate/Gate.hpp"
+#include "CircuitConnection.hpp"
+#include <Interfaces/Dictionary.hpp>
+#include <Graph/Network.hpp>
+#include <Bitmap.hpp>
 
-struct Circuit : CircuitElement {
+struct Circuit : Gate, MathLib::Printable {
     Circuit(void);
-    Circuit(const MathLib::Sequence<CircuitElementConnection>& children);
-    [[nodiscard]] virtual MathLib::Expected<MathLib::Bitmap> Evaluate(void) const override;
-    /// @brief Converts struct to string
-    /// @param padding String to pad with
-    /// @return String representation
+    virtual ~Circuit(void) override;
+    [[nodiscard]] bool SetOutput(size_t out);
+    [[nodiscard]] size_t Add(Gate* element);
+    [[nodiscard]] bool Add(const MathLib::Edge& edge, size_t bit);
+    [[nodiscard]] size_t Add(Gate* element, const MathLib::Sequence<CircuitConnection>& inputs);
+    [[nodiscard]] virtual MathLib::Bitmap Update(const MathLib::Sequence<bool>& inputData) override;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
+
+    private:
+    [[nodiscard]] MathLib::Bitmap Update(size_t element, MathLib::Dictionary<size_t, MathLib::Bitmap>& cache);
+
+    MathLib::Network<Gate*, size_t> network;
+    size_t output;
 };
 
 #endif

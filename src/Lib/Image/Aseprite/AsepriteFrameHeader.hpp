@@ -12,6 +12,7 @@ namespace MathLib {
         uint16_t reserved;
         uint32_t chunks32;
 
+        AsepriteFrameHeader(void);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

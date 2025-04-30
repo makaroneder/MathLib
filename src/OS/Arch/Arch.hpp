@@ -1,13 +1,11 @@
 #ifndef Arch_H
 #define Arch_H
-#include <FunctionPointer.hpp>
 #include <Typedefs.hpp>
 
 [[nodiscard]] bool InitArch(uintptr_t signature, void* info);
 [[noreturn]] void ArchPanic(void);
 [[noreturn]] void ShutdownArch(void);
-extern "C" void ArchSwitchTasks(void* prev, void* next);
-void* ArchCreateTask(const MathLib::FunctionPointer<void>& function, void* stack, size_t stackSize);
+void ArchSetInterrupts(bool value);
 [[nodiscard]] MathLib::num_t ArchSqrt(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t GenericSqrt(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t ArchInversedTan2(MathLib::num_t y, MathLib::num_t x);

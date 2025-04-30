@@ -145,6 +145,12 @@ namespace MathLib {
                 ReturnFromBenchmark(ret);
             }
         }
+        [[nodiscard]] Tree<T> Foreach(const Function<Tree<T>, Tree<T>>& func) const {
+            StartBenchmark
+            Tree<T> ret = func(*this);
+            for (Tree<T>& child : ret.children) child = child.Foreach(func);
+            ReturnFromBenchmark(ret);
+        }
         [[nodiscard]] Expected<bool> StrictEquality(const Tree<T>& other) const {
             StartBenchmark
             if (data != other.data || children.GetSize() != other.children.GetSize()) ReturnFromBenchmark(Expected<bool>(false));
@@ -182,23 +188,21 @@ namespace MathLib {
             }
             else ReturnFromBenchmark(ret);
         }
-        [[nodiscard]] Expected<bool> operator==(const Tree<T>& other) const {
+        [[nodiscard]] bool operator==(const Tree<T>& other) const {
             StartBenchmark
             const Array<Tree<T>> centers1 = GetCenters();
             const Array<Tree<T>> centers2 = other.GetCenters();
             for (const Tree<T>& center1 : centers1) {
                 for (const Tree<T>& center2 : centers2) {
                     const Expected<bool> tmp = center1.StrictEquality(center2);
-                    if (!tmp.HasValue()) ReturnFromBenchmark(Expected<bool>());
-                    if (tmp.Get()) ReturnFromBenchmark(Expected<bool>(true));
+                    if (!tmp.HasValue()) ReturnFromBenchmark(false);
+                    if (tmp.Get()) ReturnFromBenchmark(true);
                 }
             }
-            ReturnFromBenchmark(Expected<bool>(false));
+            ReturnFromBenchmark(false);
         }
-        [[nodiscard]] Expected<bool> operator!=(const Tree<T>& other) const {
-            StartBenchmark
-            const Expected<bool> tmp = *this == other;
-            ReturnFromBenchmark(tmp.HasValue() ? Expected<bool>(!tmp.Get()) : Expected<bool>());
+        [[nodiscard]] bool operator!=(const Tree<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
         }
 
         private:

@@ -12,6 +12,8 @@ namespace MathLib {
         [[nodiscard]] bool IsMetal(void) const;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         ChemicalElement& operator*=(size_t num);
+        [[nodiscard]] bool operator==(const ChemicalElement& other) const;
+        [[nodiscard]] bool operator!=(const ChemicalElement& other) const;
 
         private:
         String symbol;

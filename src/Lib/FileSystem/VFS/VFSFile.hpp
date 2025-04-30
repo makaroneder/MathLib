@@ -10,6 +10,8 @@ namespace MathLib {
         bool free;
 
         VFSFile(size_t fs = SIZE_MAX, size_t index = SIZE_MAX);
+        [[nodiscard]] bool operator==(const VFSFile& other) const;
+        [[nodiscard]] bool operator!=(const VFSFile& other) const;
     };
 }
 

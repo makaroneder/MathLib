@@ -3,6 +3,7 @@
 
 namespace MathLib {
     Expected<JSON> LoadJSON(const Sequence<char>& str, size_t& i) {
+        StartBenchmark
         String name = "";
         SkipWhiteSpace(str, i);
         if (str.At(i) == '"') {
@@ -10,7 +11,7 @@ namespace MathLib {
             while (str.At(i) != '"') name += str.At(i++);
             i++;
             SkipWhiteSpace(str, i);
-            if (str.At(i) != ':') return Expected<JSON>();
+            if (str.At(i) != ':') ReturnFromBenchmark(Expected<JSON>());
             i++;
             SkipWhiteSpace(str, i);
         }
@@ -19,17 +20,17 @@ namespace MathLib {
             String value = "";
             while (str.At(i) != '"') value += str.At(i++);
             i++;
-            return Expected<JSON>(JSON(JSON::Type::String, name, value));
+            ReturnFromBenchmark(JSON(JSON::Type::String, name, value));
         }
         else if (IsDigit(str.At(i))) {
             String value = "";
             while (IsDigit(str.At(i)) || str.At(i) == '.' || str.At(i) == 'e') value += str.At(i++);
-            return Expected<JSON>(JSON(JSON::Type::Number, name, value));
+            ReturnFromBenchmark(JSON(JSON::Type::Number, name, value));
         }
         else if (IsAlpha(str.At(i))) {
             String value = "";
             while (IsAlpha(str.At(i))) value += str.At(i++);
-            return Expected<JSON>(JSON(JSON::Type::Keyword, name, value));
+            ReturnFromBenchmark(JSON(JSON::Type::Keyword, name, value));
         }
         else if (str.At(i) == '{' || str.At(i) == '[') {
             const char end = str.At(i) == '{' ? '}' : ']';
@@ -37,34 +38,39 @@ namespace MathLib {
             i++;
             while (true) {
                 const Expected<JSON> tmp = LoadJSON(str, i);
-                if (!tmp.HasValue()) return Expected<JSON>();
+                if (!tmp.HasValue()) ReturnFromBenchmark(Expected<JSON>());
                 SkipWhiteSpace(str, i);
-                if (!ret.AddChild(tmp.Get())) return Expected<JSON>();
+                if (!ret.AddChild(tmp.Get())) ReturnFromBenchmark(Expected<JSON>());
                 if (str.At(i) == ',') i++;
                 else if (str.At(i) == end) {
                     i++;
                     return ret;
                 }
-                else return Expected<JSON>();
+                else ReturnFromBenchmark(Expected<JSON>());
             }
         }
-        else return Expected<JSON>();
+        else ReturnFromBenchmark(Expected<JSON>());
     }
-    JSON::JSON(void) {}
-    JSON::JSON(Type type, const Sequence<char>& name, const Sequence<char>& value) : type(type), name(CollectionToString(name)), value(CollectionToString(value)) {}
+    JSON::JSON(void) {
+        EmptyBenchmark
+    }
+    JSON::JSON(Type type, const Sequence<char>& name, const Sequence<char>& value) : name(CollectionToString(name)), value(CollectionToString(value)), children(), type(type) {
+        EmptyBenchmark
+    }
     JSON::Type JSON::GetType(void) const {
-        return type;
+        StartAndReturnFromBenchmark(type);
     }
     String JSON::GetValue(void) const {
-        return value;
+        StartAndReturnFromBenchmark(value);
     }
     size_t JSON::GetChildrenCount(void) const {
-        return children.GetSize();
+        StartAndReturnFromBenchmark(children.GetSize());
     }
     bool JSON::AddChild(const JSON& child) {
-        return children.Add(child);
+        StartAndReturnFromBenchmark(children.Add(child));
     }
     Expected<JSON> JSON::Find(const Sequence<char>& path) const {
+        StartBenchmark
         const Array<String> split = Split(path, "/"_M, false);
         JSON prev = *this;
         for (const Sequence<char>& name : split) {
@@ -76,42 +82,50 @@ namespace MathLib {
                     break;
                 }
             }
-            if (!found) return Expected<JSON>();
+            if (!found) ReturnFromBenchmark(Expected<JSON>());
         }
-        return Expected<JSON>(prev);
+        ReturnFromBenchmark(prev);
     }
     Iterator<const JSON> JSON::begin(void) const {
-        return children.begin();
+        StartAndReturnFromBenchmark(children.begin());
     }
     Iterator<const JSON> JSON::end(void) const {
-        return children.end();
+        StartAndReturnFromBenchmark(children.end());
     }
     Iterator<JSON> JSON::begin(void) {
-        return children.begin();
+        StartAndReturnFromBenchmark(children.begin());
     }
     Iterator<JSON> JSON::end(void) {
-        return children.end();
+        StartAndReturnFromBenchmark(children.end());
     }
     bool JSON::Save(Writable& file) const {
-        return file.Puts(ToString());
+        StartAndReturnFromBenchmark(file.Puts(ToString()));
     }
     bool JSON::Load(Readable& file) {
+        StartBenchmark
         size_t i = 0;
         const Expected<JSON> tmp = LoadJSON(file.ReadUntil('\0'), i);
-        if (!tmp.HasValue()) return false;
+        if (!tmp.HasValue()) ReturnFromBenchmark(false);
         *this = tmp.Get();
-        return true;
+        ReturnFromBenchmark(true);
     }
     String JSON::ToString(const Sequence<char>& padding) const {
+        StartBenchmark
         String ret = CollectionToString(padding) + (name.IsEmpty() ? "" : '"'_M + name + "\": ");
-        if (type == Type::String) return ret + '"'_M + value + '"';
-        else if (type == Type::Number || type == Type::Keyword) return ret + value;
+        if (type == Type::String) ReturnFromBenchmark(ret + '"'_M + value + '"')
+        else if (type == Type::Number || type == Type::Keyword) ReturnFromBenchmark(ret + value)
         else if (type == Type::Object || type == Type::Array) {
             ret += type == Type::Object ? "{\n" : "[\n";
             for (size_t i = 0; i < children.GetSize(); i++)
                 ret += children.At(i).ToString(CollectionToString(padding) + '\t') + (i + 1 != children.GetSize() ? ",\n" : "\n");
-            return ret + padding + (type == Type::Object ? '}' : ']');
+            ReturnFromBenchmark(ret + padding + (type == Type::Object ? '}' : ']'));
         }
-        else return ret;
+        else ReturnFromBenchmark(ret);
+    }
+    bool JSON::operator==(const JSON& other) const {
+        StartAndReturnFromBenchmark(type == other.type && name == other.name && value == other.value && children == other.children);
+    }
+    bool JSON::operator!=(const JSON& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
     }
 }

@@ -10,6 +10,11 @@ namespace MathLib {
     ByteArray::ByteArray(const Sequence<uint8_t>& sequence) : array(CollectionToArray<uint8_t>(sequence)) {
         EmptyBenchmark
     }
+    ByteArray::ByteArray(ByteDevice& device) : array(device.GetSize()) {
+        StartBenchmark
+        if (!device.ReadBuffer((uint8_t*)array.GetValue(), array.GetSize())) MathLib::Panic("Failed to read byte array");
+        EndBenchmark
+    }
     Array<uint8_t> ByteArray::GetArray(void) const {
         StartAndReturnFromBenchmark(array);
     }
@@ -43,6 +48,9 @@ namespace MathLib {
     bool ByteArray::Add(const uint8_t& val) {
         StartAndReturnFromBenchmark(array.Add(val));
     }
+    bool ByteArray::Reset(void) {
+        StartAndReturnFromBenchmark(array.Reset());
+    }
     const uint8_t* ByteArray::GetValue(void) const {
         StartAndReturnFromBenchmark(array.GetValue());
     }
@@ -61,5 +69,8 @@ namespace MathLib {
         for (uint8_t& x : array)
             if (!file.Read<uint8_t>(x)) ReturnFromBenchmark(false);
         ReturnFromBenchmark(true);
+    }
+    String ByteArray::ToString(const Sequence<char>& padding) const {
+        return MathLib::CollectionToString(padding) + MathLib::ToString<uint8_t>(array);
     }
 }

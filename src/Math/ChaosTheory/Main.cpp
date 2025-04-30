@@ -1,4 +1,5 @@
-#include "LorenzSystem.hpp"
+#include <DynamicalSystem/LorenzSystem.hpp>
+#include <Math/Modulo.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -13,17 +14,18 @@ int main(int, char**) {
         const MathLib::matrix_t epsMatrix = MathLib::CreateVector<MathLib::num_t>(MathLib::eps, MathLib::eps, MathLib::eps);
         const MathLib::matrix_t startPos = MathLib::CreateVector<MathLib::num_t>(0, 1, 1.05);
         const MathLib::matrix_t params = MathLib::CreateVector<MathLib::num_t>(10, 28, 8.0 / 3);
-        LorenzSystem<MathLib::num_t> systems[] = {
-            LorenzSystem<MathLib::num_t>(startPos, params),
-            LorenzSystem<MathLib::num_t>(startPos + epsMatrix, params + epsMatrix),
+        MathLib::LorenzSystem<MathLib::num_t> systems[] = {
+            MathLib::LorenzSystem<MathLib::num_t>(startPos, 10, 28, 8.0 / 3),
+            MathLib::LorenzSystem<MathLib::num_t>((startPos + epsMatrix) * 2, 11, 28, 8.0 / 3),
         };
         renderer.pointMultiplier = 10;
         const MathLib::num_t dt = 0.01;
         while (true) {
-            for (size_t i = 0; i < SizeOfArray(systems); i++)
-                systems[i].Update(dt);
-            renderer.SetPixel<MathLib::num_t>(systems[0].GetData(), 0xff0000ff);
-            renderer.SetPixel<MathLib::num_t>(systems[1].GetData(), 0x00ff00ff);
+            const MathLib::matrix_t a = systems[0].Update(dt);
+            const MathLib::matrix_t b = systems[1].Update(dt);
+            renderer.SetPixel<MathLib::num_t>(a, 0xff0000ff);
+            renderer.SetPixel<MathLib::num_t>(b, 0x00ff00ff);
+            std::cout << (a - b).GetLength() << std::endl;
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");
             if (renderer.GetEvent().type == MathLib::Event::Type::Quit) break;
         }

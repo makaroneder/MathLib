@@ -1,7 +1,8 @@
 #ifndef Freestanding
-#if __has_include("unistd.h") && __has_include("netdb.h")
+#if __has_include("arpa/inet.h") && __has_include("unistd.h") && __has_include("netdb.h")
 #include "HostSocket.hpp"
 #include "../Host.hpp"
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <netdb.h>
 
@@ -31,13 +32,16 @@ namespace MathLib {
         const ssize_t tmp = send(handle, buffer, size, 0);
         ReturnFromBenchmark(tmp < 0 ? 0 : tmp);
     }
-    bool HostSocket::Bind(int port) {
+    bool HostSocket::Skip(size_t size) {
+        StartAndReturnFromBenchmark(DefaultSkip(size));
+    }
+    bool HostSocket::Bind(size_t port) {
         StartBenchmark
         sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
         addr.sin_port = htons(port);
-        ReturnFromBenchmark(!bind(handle, (sockaddr*)&addr, sizeof(sockaddr_in)));
+        ReturnFromBenchmark(!bind(handle, (const sockaddr*)&addr, sizeof(sockaddr_in)));
     }
     Socket* HostSocket::GetConnection(void) {
         StartBenchmark
@@ -45,6 +49,13 @@ namespace MathLib {
         sockaddr_in addr;
         socklen_t size = sizeof(sockaddr_in);
         ReturnFromBenchmark(new HostSocket(accept(handle, (sockaddr*)&addr, &size)));
+    }
+    bool HostSocket::Connect(const IPv4& ip, size_t port) {
+        StartBenchmark
+        sockaddr_in addr;
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(port);
+        ReturnFromBenchmark(inet_pton(addr.sin_family, ip.ToString().GetValue(), &addr.sin_addr) == 1 && !connect(handle, (sockaddr*)&addr, sizeof(sockaddr_in)));
     }
     int HostSocket::GetHandle(void) const {
         StartAndReturnFromBenchmark(handle);

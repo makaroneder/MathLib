@@ -11,6 +11,9 @@ namespace MathLib {
         AugmentedMatrix(size_t width, size_t height, size_t secondStart) : Matrix<T>(width, height), secondStart(secondStart) {
             EmptyBenchmark
         }
+        AugmentedMatrix(size_t width, size_t height, const Sequence<T>& data, size_t secondStart) : Matrix<T>(width, height, data), secondStart(secondStart) {
+            EmptyBenchmark
+        }
         AugmentedMatrix(const Matrix<T>& a, const Matrix<T>& b) : Matrix<T>(a.GetWidth() + b.GetWidth(), a.GetHeight()), secondStart(a.GetWidth()) {
             StartBenchmark
             for (size_t y = 0; y < a.GetHeight(); y++) {

@@ -10,7 +10,7 @@ namespace MathLib {
         Language<T> Concatinate(const Language<T>& other) const {
             Language<T> ret;
             for (const Array<T>& a : *this) {
-                for (const Array<T>& b : other) {
+                for (const NonLinearCollection<T>& b : other) {
                     Array<T> tmp = a;
                     tmp += b;
                     if (!ret.Add(tmp)) return Language<T>();
@@ -35,8 +35,8 @@ namespace MathLib {
         }
         Language<T> Reverse(void) const {
             Language<T> ret = *this;
-            for (Array<T>& arr : ret)
-                if (!arr.Reverse(0, arr.GetSize())) return Language<T>();
+            for (WritableSequence<T>& arr : ret)
+                if (!arr.Reverse()) return Language<T>();
             return ret;
         }
     };

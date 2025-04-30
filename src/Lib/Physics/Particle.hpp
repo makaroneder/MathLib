@@ -39,6 +39,13 @@ namespace MathLib {
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const override {
             StartAndReturnFromBenchmark(this->position == ((const Particle<T>&)other).position);
         }
+        [[nodiscard]] bool operator==(const Particle<T>& other) const {
+            StartAndReturnFromBenchmark(Shape<T>::operator==(other) && fixed == other.fixed && prevPosition == other.prevPosition && acceleration == other.acceleration);
+        }
+        [[nodiscard]] bool operator!=(const Particle<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
+        }
+
         Matrix<T> prevPosition;
 
         private:

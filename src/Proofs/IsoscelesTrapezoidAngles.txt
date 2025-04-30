@@ -1,0 +1,54 @@
+Name: Isosceles trapezoid angles
+Given: (
+    Trapezoid(A, B, C, D) and
+    Line(A, X, B) and
+    (Angle(A, X, C) = 90^o) and
+    (Angle(X, C, D) = 90^o) and
+    Line(A, Y, B) and
+    (Angle(B, Y, D) = 90^o) and
+    (Angle(Y, D, C) = 90^o) and
+    (|AC| = |BD|) and
+    (|CX| = |DY|)
+)
+Prove: (
+    (Angle(X, A, C) = Angle(Y, B, D)) and
+    (Angle(A, C, D) = Angle(B, D, C))
+)
+Assumptions: Isosceles trapezoid lenghts
+Visualization:
+  C----D
+ /|    |\
+/ |    | \
+A-X----Y--B
+Proof: (
+    (sin(Angle(X, A, C)) = |CX| / |AC|) and
+    (sin(Angle(Y, B, D)) = |DY| / |BD|) and
+    (Angle(A, C, D) = Angle(A, C, X) + Angle(X, C, D)) and
+    (Angle(B, D, C) = Angle(B, D, Y) + Angle(Y, D, C)) and
+    (sin(Angle(A, C, X)) = |AX| / |AC|) and
+    (sin(Angle(B, D, Y)) = |BY| / |BD|)
+) <=> (
+    (sin(Angle(X, A, C)) = |CX| / |AC|) and
+    (sin(Angle(Y, B, D)) = |CX| / |AC|) and
+    (Angle(A, C, D) = Angle(A, C, X) + 90^o) and
+    (Angle(B, D, C) = Angle(B, D, Y) + 90^o) and
+    (sin(Angle(A, C, X)) = |AX| / |AC|) and
+    (sin(Angle(B, D, Y)) = |AX| / |AC|)
+) => (
+    (sin(Angle(X, A, C)) = sin(Angle(Y, B, D))) and
+    (Angle(A, C, D) = Angle(A, C, X)) and
+    (Angle(B, D, C) = Angle(B, D, Y)) and
+    (sin(Angle(A, C, X)) = sin(Angle(B, D, Y)))
+) => (
+    (Angle(X, A, C) = Angle(Y, B, D)) and
+    (Angle(A, C, D) = Angle(A, C, X)) and
+    (Angle(B, D, C) = Angle(B, D, Y)) and
+    (Angle(A, C, X) = Angle(B, D, Y))
+) => (
+    (Angle(X, A, C) = Angle(Y, B, D)) and
+    (Angle(A, C, D) = Angle(A, C, X)) and
+    (Angle(B, D, C) = Angle(A, C, X))
+) => (
+    (Angle(X, A, C) = Angle(Y, B, D)) and
+    (Angle(A, C, D) = Angle(B, D, C))
+)

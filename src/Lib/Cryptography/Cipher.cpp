@@ -2,9 +2,6 @@
 #include "../Host.hpp"
 
 namespace MathLib {
-    Array<uint8_t> Cipher::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        return Encrypt(data, key, true);
-    }
     String Cipher::EncryptString(const Sequence<char>& str, const Sequence<uint64_t>& key, bool encrypt) const {
         StartBenchmark
         Array<uint8_t> tmp = Array<uint8_t>(str.GetSize());
@@ -13,7 +10,7 @@ namespace MathLib {
             else if (IsAlpha(str.At(i))) tmp.At(i) = ToUpper(str.At(i)) - 'A';
             else tmp.At(i) = UINT8_MAX;
         }
-        tmp = Encrypt(tmp, key, encrypt);
+        tmp = encrypt ? Encrypt(tmp, key) : Decrypt(tmp, key);
         String ret;
         for (size_t i = 0; i < str.GetSize(); i++) {
             char base;
@@ -38,5 +35,8 @@ namespace MathLib {
             ret += bounds ? base + chr % bounds : str.At(i);
         }
         ReturnFromBenchmark(ret);
+    }
+    Array<uint8_t> Cipher::Decrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+        StartAndReturnFromBenchmark(DecryptPartial(data, key, Interval<size_t>(0, SIZE_MAX)));
     }
 }

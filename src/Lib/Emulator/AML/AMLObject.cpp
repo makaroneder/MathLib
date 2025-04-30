@@ -7,13 +7,13 @@ namespace MathLib {
     AMLObject::AMLObject(void) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const Sequence<char>& name) : type(Type::Normal), name(CollectionToString(name)) {
+    AMLObject::AMLObject(const Sequence<char>& name) : name(CollectionToString(name)), type(Type::Normal) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data) : type(Type::Normal), name(CollectionToString(name)), data(CollectionToArray<uint64_t>(data)) {
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data) : name(CollectionToString(name)), type(Type::Normal), data(CollectionToArray<uint64_t>(data)) {
         EmptyBenchmark
     }
-    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type) : type(type), name(CollectionToString(name)), data(CollectionToArray<uint64_t>(data)) {
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type) : name(CollectionToString(name)), type(type), data(CollectionToArray<uint64_t>(data)) {
         EmptyBenchmark
     }
     Array<uint64_t> AMLObject::GetData(void) const {
@@ -23,6 +23,7 @@ namespace MathLib {
         return children.Add(child);
     }
     String AMLObject::ToString(const Sequence<char>& padding) const {
+        StartBenchmark
         if (name == "_HID" || false) {
             String str;
             if (data.GetSize() == 1) {
@@ -36,7 +37,7 @@ namespace MathLib {
                 for (const char& chr : tmp) str += ToUpper(chr);
             }
             else for (size_t i = 0; i < data.GetSize() - 1; i++) str += (char)data.At(i);
-            return CollectionToString(padding) + name + ": " + str;
+            ReturnFromBenchmark(CollectionToString(padding) + name + ": " + str);
         }
         String ret = CollectionToString(padding) + name + ": {\n";
         switch (type) {
@@ -156,6 +157,12 @@ namespace MathLib {
                 break;
             }
         }
-        return ret + padding + '}';
+        ReturnFromBenchmark(ret + padding + '}');
+    }
+    bool AMLObject::operator==(const AMLObject& other) const {
+        StartAndReturnFromBenchmark(type == other.type && name == other.name && data == other.data && children == other.children);
+    }
+    bool AMLObject::operator!=(const AMLObject& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
     }
 }

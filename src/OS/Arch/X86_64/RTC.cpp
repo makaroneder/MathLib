@@ -1,31 +1,31 @@
 #ifdef __x86_64__
-#include "Interrupts/Interrupts.hpp"
+#include "../Arch.hpp"
 #include "RTC.hpp"
 #include <Host.hpp>
 
 RTC::RTC(bool nmi_, Register centuryRegister) : CMOS(false), centuryRegister(centuryRegister) {
-    SetInterrupts(false);
+    ArchSetInterrupts(false);
     if (!RegisterIRQDevice(IRQ::RTC, this)) MathLib::Panic("Failed to register IRQ");
     Write(Register::StatusRegisterB, Read(Register::StatusRegisterB) | (1 << 6));
     if (!SetRate(3)) MathLib::Panic("Failed to set RTC rate");
     SetNMI(nmi_);
-    SetInterrupts(true);
+    ArchSetInterrupts(true);
     (void)Read(Register::StatusRegisterC);
 }
 RTC::~RTC(void) {
     if (!RegisterIRQDevice(IRQ::RTC, nullptr)) MathLib::Panic("Failed to unregister IRQ");
 }
 uint8_t RTC::GetRate(void) const {
-    SetInterrupts(false);
+    ArchSetInterrupts(false);
     const uint8_t ret = Read(Register::StatusRegisterA) & 0b1111;
-    SetInterrupts(true);
+    ArchSetInterrupts(true);
     return ret;
 }
 bool RTC::SetRate(uint8_t rate) {
     if (rate <= 2 || rate > 15) return false;
-    SetInterrupts(false);
+    ArchSetInterrupts(false);
     Write(Register::StatusRegisterA, (Read(Register::StatusRegisterA) & 0xf0) | rate);
-    SetInterrupts(true);
+    ArchSetInterrupts(true);
     return true;
 }
 void RTC::OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) {

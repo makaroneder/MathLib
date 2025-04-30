@@ -16,6 +16,11 @@ namespace MathLib {
         position += s;
         ReturnFromBenchmark(s);
     }
+    bool ByteDevice::Skip(size_t size) {
+        StartBenchmark
+        position += size;
+        ReturnFromBenchmark(true);
+    }
     bool ByteDevice::ReadPositionedBuffer(void* buffer, size_t size, size_t position) {
         StartAndReturnFromBenchmark(ReadPositionedSizedBuffer(buffer, size, position) == size);
     }
@@ -45,5 +50,8 @@ namespace MathLib {
     }
     size_t ByteDevice::Tell(void) const {
         StartAndReturnFromBenchmark(position);
+    }
+    size_t ByteDevice::GetSizeLeft(void) const {
+        StartAndReturnFromBenchmark(GetSize() - Tell());
     }
 }

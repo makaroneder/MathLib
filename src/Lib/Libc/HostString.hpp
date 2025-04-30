@@ -24,6 +24,10 @@ namespace MathLib {
             string += val;
             return true;
         }
+        [[nodiscard]] virtual bool Reset(void) override {
+            string.clear();
+            return true;
+        }
         [[nodiscard]] virtual size_t GetSize(void) const override {
             return string.size();
         }

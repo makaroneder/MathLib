@@ -1,13 +1,13 @@
 #include "Event.hpp"
 
 namespace MathLib {
-    Event::Event(Type type) : type(type) {
+    Event::Event(Type type) : mousePosition(), type(type), mouseButton(MouseButton::None), pressed(), key() {
         EmptyBenchmark
     }
-    Event::Event(char key, bool pressed) : type(Type::KeyPressed), mouseButton(MouseButton::None), pressed(pressed), key(key) {
+    Event::Event(char key, bool pressed) : mousePosition(), type(Type::KeyPressed), mouseButton(MouseButton::None), pressed(pressed), key(key) {
         EmptyBenchmark
     }
-    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : type(Type::MousePressed), mouseButton(button), pressed(pressed), mousePosition(position) {
+    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : mousePosition(position), type(Type::MousePressed), mouseButton(button), pressed(pressed), key() {
         EmptyBenchmark
     }
     Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {
@@ -52,5 +52,11 @@ namespace MathLib {
             }
             default: ReturnFromBenchmark(CollectionToString(padding) + "Unknown");
         }
+    }
+    bool Event::operator==(const Event& other) const {
+        StartAndReturnFromBenchmark(type == other.type && mouseButton == other.mouseButton && pressed == other.pressed && key == other.key && mousePosition == other.mousePosition);
+    }
+    bool Event::operator!=(const Event& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
     }
 }

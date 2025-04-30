@@ -611,4 +611,10 @@ namespace MathLib {
         }
         else ReturnFromBenchmark(nullptr)
     }
+    bool Optimizer::operator==(const Optimizer& other) const {
+        StartAndReturnFromBenchmark((parent || !other.parent) && (!parent || other.parent) && (parent == other.parent || *parent == *other.parent) && builtinFunctions == other.builtinFunctions && functions == other.functions && variables == other.variables);
+    }
+    bool Optimizer::operator!=(const Optimizer& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

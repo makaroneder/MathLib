@@ -32,6 +32,7 @@ namespace MathLib {
         /// @param size Size of the buffer
         /// @return Size of written bytes
         [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
+        [[nodiscard]] virtual bool Skip(size_t size) override;
         /// @brief Reads data to the buffer
         /// @param buffer Buffer to read data into
         /// @param size Size of the buffer
@@ -52,6 +53,7 @@ namespace MathLib {
         /// @brief Returns current position
         /// @return Current position
         [[nodiscard]] size_t Tell(void) const;
+        [[nodiscard]] size_t GetSizeLeft(void) const;
         /// @brief Reads one T value
         /// @tparam T Type of value
         /// @param value Value to read

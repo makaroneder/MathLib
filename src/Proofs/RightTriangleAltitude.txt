@@ -1,0 +1,40 @@
+Name: Right angle altitude theorem
+Given: (
+    Triangle(A, B, C) and
+    (Angle(C, A, B) = 90^o) and
+    Line(C, D, B) and
+    (Angle(C, D, A) = 90^o) and
+    (Angle(B, D, A) = 90^o)
+)
+Prove: |AD|^2 = |BD||CD|
+Assumptions: Pythagorean theorem
+Visualization:
+C
+||
+|  |
+|    |
+|      | <- D
+|    |   |
+|  |       |
+||           |
+A------------B
+Proof: (
+    (|AD|^2 + |CD|^2 = |AC|^2) and
+    (|AD|^2 + |BD|^2 = |AB|^2) and
+    (|AB|^2 + |AC|^2 = |BC|^2)
+) => (
+    (
+        |AD|^2 + |CD|^2 - |AD|^2 - |BD|^2 - |AB|^2 - |AC|^2 = |AC|^2 - |AB|^2 - |BC|^2 <=>
+        |CD|^2 - |BD|^2 - |AB|^2 - |AC|^2 = |AC|^2 - |AB|^2 - |BC|^2 <=>
+        |CD|^2 - |BD|^2 - |AB|^2 - |AC|^2 - |AC|^2 + |AB|^2 + |BC|^2 = 0 <=>
+        |CD|^2 - |BD|^2 - |AC|^2 - |AC|^2 + |BC|^2 = 0 <=>
+        |CD|^2 - |BD|^2 - 2|AC|^2 + |BC|^2 = 0 <=>
+        |CD|^2 - |BD|^2 - 2|AC|^2 + (|BD| + |CD|)^2 = 0 <=>
+        |CD|^2 - |BD|^2 - 2|AC|^2 + |BD|^2 + |CD|^2 + 2|BD||CD| = 0 <=>
+        2|CD|^2 - 2|AC|^2 + 2|BD||CD| = 0 <=>
+        |CD|^2 - |AC|^2 + |BD||CD| = 0 <=>
+        |CD|^2 + |BD||CD| = |AC|^2
+    ) and |AD|^2 + |CD|^2 = |AC|^2
+) =>
+|CD|^2 + |BD||CD| = |AD|^2 + |CD|^2 <=>
+|AD|^2 = |BD||CD|

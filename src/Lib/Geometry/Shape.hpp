@@ -9,6 +9,12 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const = 0;
+        [[nodiscard]] bool operator==(const Shape<T>& other) const {
+            StartAndReturnFromBenchmark(position == other.position);
+        }
+        [[nodiscard]] bool operator!=(const Shape<T>& other) const {
+            StartAndReturnFromBenchmark(!(*this == other));
+        }
 
         Matrix<T> position;
     };

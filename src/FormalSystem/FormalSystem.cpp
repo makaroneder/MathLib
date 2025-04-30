@@ -1,6 +1,6 @@
 #include "FormalSystem.hpp"
 
-FormalSystem::FormalSystem(const MathLib::Array<Operation*>& operations, const MathLib::Array<Theory>& axioms) : operations(operations), theories(axioms) {}
+FormalSystem::FormalSystem(const MathLib::Sequence<Operation*>& operations, const MathLib::Sequence<Theory>& axioms) : operations(MathLib::CollectionToArray<Operation*>(operations)), theories(MathLib::CollectionToArray<Theory>(axioms)) {}
 FormalSystem::~FormalSystem(void) {
     for (Operation*& operation : operations) delete operation;
 }

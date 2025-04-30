@@ -3,8 +3,18 @@
 #include "MOS6502Instruction.hpp"
 
 namespace MathLib {
-    MOS6502::MOS6502(const Sequence<uint8_t>& memory) : StepEmulator(memory) {
+    MOS6502::MOS6502(const Sequence<uint8_t>& memory) : StepEmulator(memory), flags(), pc(), sp(), a(), x(), y() {
         EmptyBenchmark
+    }
+    void MOS6502::Reset(void) {
+        StartBenchmark
+        flags = MOS6502Flags();
+        pc = Register();
+        sp = Register();
+        a = Register();
+        x = Register();
+        y = Register();
+        EndBenchmark
     }
     bool MOS6502::OrA(uint16_t addr) {
         StartBenchmark

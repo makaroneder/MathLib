@@ -1,0 +1,38 @@
+Name: Rhombus lengths
+Given: (
+    Rhombus(A, B, C, D) and
+    Line(A, X, C) and
+    Line(B, X, D) and
+    (Angle(A, X, B) = 90^o) and
+    (Angle(B, X, C) = 90^o) and
+    (Angle(C, X, D) = 90^o) and
+    (Angle(D, X, A) = 90^o) and
+    (|AX| = |CX|) and
+    (|BX| = |DX|)
+)
+Prove: |AB| = |BC| = |AD| = |CD|
+Assumptions: Pythagorean theorem
+Visualization:
+     B
+    /|\
+   / | \
+  /  |  \
+C |--X--| A
+  \  |  /
+   \ | /
+    \|/
+     D
+Proof: (
+    |AX|^2 + |BX|^2 = |AB|^2
+    |CX|^2 + |BX|^2 = |BC|^2
+    |AX|^2 + |DX|^2 = |AD|^2
+    |CX|^2 + |DX|^2 = |CD|^2
+) <=> (
+    |AX|^2 + |BX|^2 = |AB|^2
+    |AX|^2 + |BX|^2 = |BC|^2
+    |AX|^2 + |BX|^2 = |AD|^2
+    |AX|^2 + |BX|^2 = |CD|^2
+) =>
+|AB|^2 = |BC|^2 = |AD|^2 = |CD|^2 <=>
+abs(|AB|) = abs(|BC|) = abs(|AD|) = abs(|CD|) <=>
+|AB| = |BC| = |AD| = |CD|

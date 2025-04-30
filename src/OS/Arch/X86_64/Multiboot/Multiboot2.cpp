@@ -2,6 +2,7 @@
 #include "../../../KernelRenderer.hpp"
 #include "Multiboot2.hpp"
 #include "../VGA.hpp"
+#include <Memory.hpp>
 #include <Logger.hpp>
 #include <String.hpp>
 
@@ -113,10 +114,10 @@ RSDP* InitMultiboot2(Multiboot2Info* info) {
             }
             case Multiboot2Tag::Type::VBE: {
                 const Multiboot2TagVBE* vbe = (const Multiboot2TagVBE*)tag;
-                char signature[5];
-                for (uint8_t i = 0; i < SizeOfArray(vbe->info.signature); i++)
-                    signature[i] = vbe->info.signature[i];
-                signature[4] = '\0';
+                const size_t size = SizeOfArray(vbe->info.signature);
+                char signature[size + 1];
+                MathLib::MemoryCopy(vbe->info.signature, signature, size);
+                signature[size] = '\0';
                 LogString("VBE: {\n");
                 LogString("\tMode: 0x"_M + MathLib::ToString(vbe->mode, 16) + '\n');
                 LogString("\tInterface segment: 0x"_M + MathLib::ToString(vbe->interfaceSegment, 16) + '\n');

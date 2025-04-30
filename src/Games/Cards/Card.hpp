@@ -7,7 +7,7 @@ struct Card : MathLib::Printable {
     static constexpr MathLib::num_t width = 0.64;
     static constexpr MathLib::num_t height = 0.96;
     static constexpr MathLib::num_t padding = 0.1;
-    enum class Type {
+    enum class Type : uint8_t {
         C2 = 0,
         C3,
         C4,
@@ -23,7 +23,7 @@ struct Card : MathLib::Printable {
         Ace,
         TypeCount,
     };
-    enum class Color {
+    enum class Color : uint8_t {
         Clubs = 0,
         Diamonds,
         Hearts,
@@ -48,6 +48,8 @@ struct Card : MathLib::Printable {
         renderer.DrawImage<T>(*image, position);
         return true;
     }
+    [[nodiscard]] bool operator==(const Card& other) const;
+    [[nodiscard]] bool operator!=(const Card& other) const;
 };
 
 #endif

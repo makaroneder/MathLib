@@ -13,4 +13,10 @@ namespace MathLib {
     Interval<size_t> MBRPartitionEntry::GetInterval(void) const {
         StartAndReturnFromBenchmark(Interval<size_t>((startLBA + 1) * 512, (startLBA + sectorCount + 1) * 512));
     }
+    bool MBRPartitionEntry::operator==(const MBRPartitionEntry& other) const {
+        StartAndReturnFromBenchmark(type == other.type && startCHS == other.startCHS && id == other.id && endCHS == other.endCHS && startLBA == other.startLBA && sectorCount == other.sectorCount);
+    }
+    bool MBRPartitionEntry::operator!=(const MBRPartitionEntry& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

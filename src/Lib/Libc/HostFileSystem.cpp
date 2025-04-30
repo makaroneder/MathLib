@@ -20,7 +20,7 @@ namespace MathLib {
                 break;
             }
             case OpenMode::Write: {
-                modeStr = "wb";
+                modeStr = "wb+";
                 break;
             }
             case OpenMode::ReadWrite: {

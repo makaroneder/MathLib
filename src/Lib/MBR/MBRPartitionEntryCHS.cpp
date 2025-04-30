@@ -9,4 +9,10 @@ namespace MathLib {
         sector = lba % sectors + 1;
         EndBenchmark
     }
+    bool MBRPartitionEntryCHS::operator==(const MBRPartitionEntryCHS& other) const {
+        StartAndReturnFromBenchmark(head == other.head && sector == other.sector && cylinder == other.cylinder);
+    }
+    bool MBRPartitionEntryCHS::operator!=(const MBRPartitionEntryCHS& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

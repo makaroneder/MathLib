@@ -1,4 +1,5 @@
 #include "KernelRenderer.hpp"
+#include "Arch/Arch.hpp"
 
 KernelRenderer* renderer = nullptr;
 KernelRenderer::KernelRenderer(size_t width, size_t height) : KernelRenderer(width, height, nullptr, MathLib::Color(0)) {}
@@ -18,10 +19,13 @@ bool KernelRenderer::Update(void) {
 }
 MathLib::Event KernelRenderer::GetEvent(void) {
     if (!events.GetSize()) return MathLib::Event();
+    ArchSetInterrupts(false);
     const MathLib::Event ret = events.At(0);
-    MathLib::Array<MathLib::Event> newEvents = MathLib::Array<MathLib::Event>(events.GetSize() - 1);
-    for (size_t i = 1; i < events.GetSize(); i++) newEvents.At(i - 1) = events.At(i);
+    const size_t size = events.GetSize();
+    MathLib::Array<MathLib::Event> newEvents = MathLib::Array<MathLib::Event>(size - 1);
+    for (size_t i = 1; i < size; i++) newEvents.At(i - 1) = events.At(i);
     events = newEvents;
+    ArchSetInterrupts(true);
     return ret;
 }
 bool KernelRenderer::AddEvent(const MathLib::Event& event) {

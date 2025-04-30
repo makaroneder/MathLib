@@ -10,6 +10,8 @@ namespace MathLib {
         [[nodiscard]] size_t GetCoefficients(void) const;
         [[nodiscard]] String GetSymbol(void) const;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] bool operator==(const ChemicalReactionElement& other) const;
+        [[nodiscard]] bool operator!=(const ChemicalReactionElement& other) const;
 
         Matrix<ssize_t> coefficients;
         private:

@@ -17,6 +17,8 @@ namespace MathLib {
         Type type;
         uint16_t z;
         uint8_t reserved[5];
+
+        AsepriteCelChunk(uint32_t size, Type type);
     } __attribute__((packed));
 }
 

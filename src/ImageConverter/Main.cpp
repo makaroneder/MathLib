@@ -1,8 +1,10 @@
 #define SDL_MAIN_HANDLED
+#include <Image/SaveableImageFromVideo.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <DummyRenderer.hpp>
 #include <Image/TGA/TGA.hpp>
+#include <Image/PNG/PNG.hpp>
 #include <Image/PPM/P6.hpp>
 #include <CommandLine.hpp>
 #include <SDL2.cpp>
@@ -11,7 +13,8 @@
 [[nodiscard]] bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::Sequence<char>& type) {
     if (type == "P6"_M) return renderer.SetImage<MathLib::P6>();
     else if (type == "TGA"_M) return renderer.SetImage<MathLib::TGA>();
-    else if (type == "Aseprite"_M) return renderer.SetImage<MathLib::Aseprite>();
+    else if (type == "PNG"_M) return renderer.SetImage<MathLib::PNG>();
+    else if (type == "Aseprite"_M) return renderer.SetImage<MathLib::SaveableImageFromVideo>(new MathLib::Aseprite(), 0);
     else return false;
 }
 /// @brief Entry point for this program

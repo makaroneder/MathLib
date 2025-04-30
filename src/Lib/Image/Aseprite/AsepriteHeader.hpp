@@ -26,6 +26,7 @@ namespace MathLib {
         uint16_t gridHeight;
         uint32_t reserved4[21];
 
+        AsepriteHeader(void);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

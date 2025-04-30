@@ -10,6 +10,8 @@ namespace MathLib {
         bool free;
 
         MemoryFSFile(size_t resource = SIZE_MAX, bool write = false);
+        [[nodiscard]] bool operator==(const MemoryFSFile& other) const;
+        [[nodiscard]] bool operator!=(const MemoryFSFile& other) const;
     };
 }
 

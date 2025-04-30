@@ -22,6 +22,8 @@ namespace MathLib {
         /// @param body Code of the function
         /// @param dataType Data type of the function
         FunctionNode(const Sequence<char>& name, const Sequence<Variable>& arguments, Node* body, const Sequence<char>& dataType);
+        [[nodiscard]] bool operator==(const FunctionNode& other) const;
+        [[nodiscard]] bool operator!=(const FunctionNode& other) const;
     };
 }
 

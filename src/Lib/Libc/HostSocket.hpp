@@ -18,8 +18,10 @@ namespace MathLib {
         /// @param size Size of the buffer
         /// @return Size of written bytes
         [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
-        [[nodiscard]] virtual bool Bind(int port) override;
+        [[nodiscard]] virtual bool Skip(size_t size) override;
+        [[nodiscard]] virtual bool Bind(size_t port) override;
         [[nodiscard]] virtual Socket* GetConnection(void) override;
+        [[nodiscard]] virtual bool Connect(const IPv4& ip, size_t port) override;
         [[nodiscard]] int GetHandle(void) const;
 
         private:

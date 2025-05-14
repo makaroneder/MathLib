@@ -73,7 +73,9 @@ bool constructorsCalled = false;
     constructorsCalled = true;
 }
 uint8_t  stack[4096] __attribute__((aligned(16)));
+extern "C" void _init(void);
 extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
+    _init();
     if (!constructorsCalled) MathLib::Panic("Failed to call global constructors");
     if (!InitArch(signature, info)) MathLib::Panic("Failed to initialize architecture");
     if (!renderer) {

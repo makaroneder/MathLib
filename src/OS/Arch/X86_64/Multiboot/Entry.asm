@@ -201,7 +201,6 @@ Entry:
         jmp $
 
 bits 64
-extern _init
 extern Main
 extern end
 
@@ -213,9 +212,4 @@ Entry64:
     mov gs, ax
     mov ss, ax
     xor rbp, rbp
-    push rdi
-    push rsi
-    call _init
-    pop rsi
-    pop rdi
     jmp Main

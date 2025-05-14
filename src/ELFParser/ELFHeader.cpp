@@ -6,202 +6,202 @@ bool ELFHeader::IsValid(void) const {
     return *(const uint32_t*)signature == *(const uint32_t*)expectedSignature && version == expectedVersion && bitMode != BitMode::Invalid && endianness != Endianness::Invalid;
 }
 MathLib::String ELFHeader::ToString(const MathLib::Sequence<char>& padding) const {
-    MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
-    ret += MathLib::CollectionToString(padding) + "\tSignature: 0x" + MathLib::ToString(signature[0], 16) + ' ' + signature[1] + signature[2] + signature[3] + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tBit mode: ";
+    MathLib::String bitModeStr;
     switch (bitMode) {
         case BitMode::Invalid: {
-            ret += "Invalid";
+            bitModeStr = "Invalid";
             break;
         }
         case BitMode::Bit32: {
-            ret += "32 bit";
+            bitModeStr = "32 bit";
             break;
         }
         case BitMode::Bit64: {
-            ret += "64 bit";
+            bitModeStr = "64 bit";
             break;
         }
-        default: ret += "Unknown";
+        default: bitModeStr = "Unknown";
     }
-    ret += " (0x"_M + MathLib::ToString((uint8_t)bitMode, 16) + ")\n";
-    ret += MathLib::CollectionToString(padding) + "\tEndianness: ";
+    MathLib::String endiannessStr;
     switch (endianness) {
         case Endianness::Invalid: {
-            ret += "Invalid";
+            endiannessStr = "Invalid";
             break;
         }
         case Endianness::Big: {
-            ret += "Big endian";
+            endiannessStr = "Big endian";
             break;
         }
         case Endianness::Little: {
-            ret += "Little endian";
+            endiannessStr = "Little endian";
             break;
         }
-        default: ret += "Unknown";
+        default: endiannessStr = "Unknown";
     }
-    ret += " (0x"_M + MathLib::ToString((uint8_t)endianness, 16) + ")\n";
-    ret += MathLib::CollectionToString(padding) + "\tHeader version: " + MathLib::ToString(headerVersion, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tABI: ";
+    MathLib::String abiStr;
     switch (abi) {
         case ABI::SystemV: {
-            ret += "SystemV";
+            abiStr = "SystemV";
             break;
         }
         case ABI::HPUX: {
-            ret += "HP-UX";
+            abiStr = "HP-UX";
             break;
         }
         case ABI::NetBSD: {
-            ret += "NetBSD";
+            abiStr = "NetBSD";
             break;
         }
         case ABI::GNU: {
-            ret += "GNU";
+            abiStr = "GNU";
             break;
         }
         case ABI::Solaris: {
-            ret += "Solaris";
+            abiStr = "Solaris";
             break;
         }
         case ABI::AIX: {
-            ret += "AIX";
+            abiStr = "AIX";
             break;
         }
         case ABI::Irix: {
-            ret += "Irix";
+            abiStr = "Irix";
             break;
         }
         case ABI::FreeBSD: {
-            ret += "FreeBSD";
+            abiStr = "FreeBSD";
             break;
         }
         case ABI::TRU64: {
-            ret += "TRU64";
+            abiStr = "TRU64";
             break;
         }
         case ABI::Modesto: {
-            ret += "Modesto";
+            abiStr = "Modesto";
             break;
         }
         case ABI::OpenBSD: {
-            ret += "OpenBSD";
+            abiStr = "OpenBSD";
             break;
         }
         case ABI::ARMEABI: {
-            ret += "ARM EABI";
+            abiStr = "ARM EABI";
             break;
         }
         case ABI::ARM: {
-            ret += "ARM";
+            abiStr = "ARM";
             break;
         }
         case ABI::Standalone: {
-            ret += "Standalone";
+            abiStr = "Standalone";
             break;
         }
-        default: ret += "Unknown";
+        default: abiStr = "Unknown";
     }
-    ret += " (0x"_M + MathLib::ToString((uint8_t)abi, 16) + ")\n";
-    ret += MathLib::CollectionToString(padding) + "\tABI version: " + MathLib::ToString(abiVersion, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tReserved: 0x" + MathLib::ToString(reserved, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tType: ";
+    MathLib::String typeStr;
     switch (type) {
         case Type::None: {
-            ret += "None";
+            typeStr = "None";
             break;
         }
         case Type::Relocatable: {
-            ret += "Relocatable";
+            typeStr = "Relocatable";
             break;
         }
         case Type::Executable: {
-            ret += "Executable";
+            typeStr = "Executable";
             break;
         }
         case Type::Dynamic: {
-            ret += "Dynamic";
+            typeStr = "Dynamic";
             break;
         }
         case Type::Core: {
-            ret += "Core";
+            typeStr = "Core";
             break;
         }
         case Type::OSSpecificStart ... Type::OSSpecificEnd: {
-            ret += "OS specific";
+            typeStr = "OS specific";
             break;
         }
         case Type::CPUSpecificStart ... Type::CPUSpecificEnd: {
-            ret += "CPU specific";
+            typeStr = "CPU specific";
             break;
         }
-        default: ret += "Unknown";
+        default: typeStr = "Unknown";
     }
-    ret += " (0x"_M + MathLib::ToString((uint16_t)type, 16) + ")\n";
-    ret += MathLib::CollectionToString(padding) + "\tArch: ";
+    MathLib::String archStr;
     switch (arch) {
         case Arch::None: {
-            ret += "None";
+            archStr = "None";
             break;
         }
         case Arch::M32: {
-            ret += "M32";
+            archStr = "M32";
             break;
         }
         case Arch::Sparc: {
-            ret += "Sparc";
+            archStr = "Sparc";
             break;
         }
         case Arch::X86: {
-            ret += "X86";
+            archStr = "X86";
             break;
         }
         case Arch::MIPS: {
-            ret += "MIPS";
+            archStr = "MIPS";
             break;
         }
         case Arch::PowerPC: {
-            ret += "PowerPC";
+            archStr = "PowerPC";
             break;
         }
         case Arch::ARM: {
-            ret += "ARM";
+            archStr = "ARM";
             break;
         }
         case Arch::SuperH: {
-            ret += "SuperH";
+            archStr = "SuperH";
             break;
         }
         case Arch::IA64: {
-            ret += "IA64";
+            archStr = "IA64";
             break;
         }
         case Arch::X86_64: {
-            ret += "X86_64";
+            archStr = "X86_64";
             break;
         }
         case Arch::AArch64: {
-            ret += "AArch64";
+            archStr = "AArch64";
             break;
         }
         case Arch::RISCV: {
-            ret += "RISC-V";
+            archStr = "RISC-V";
             break;
         }
-        default: ret += "Unknown";
+        default: archStr = "Unknown";
     }
-    ret += " (0x"_M + MathLib::ToString((uint16_t)arch, 16) + ")\n";
-    ret += MathLib::CollectionToString(padding) + "\tVersion: " + MathLib::ToString(version, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tEntry: 0x" + MathLib::ToString(entry, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tProgram header: 0x" + MathLib::ToString(programHeader, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tSection header: 0x" + MathLib::ToString(sectionHeader, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tHeader size: " + MathLib::ToString(headerSize, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tProgram header entry size: " + MathLib::ToString(programHeaderEntrySize, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tProgram header entries: " + MathLib::ToString(programHeaderEntries, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tSection header entry size: " + MathLib::ToString(sectionHeaderEntrySize, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tSection header entries: " + MathLib::ToString(sectionHeaderEntries, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tString table: 0x" + MathLib::ToString(stringTable, 16) + '\n';
-    return ret + padding + '}';
+    return MathLib::CollectionToString(padding) + "{\n" +
+        padding + "\tSignature: 0x" + MathLib::ToString(signature[0], 16) + ' ' + signature[1] + signature[2] + signature[3] + '\n' +
+        padding + "\tBit mode: " + bitModeStr + " (0x"_M + MathLib::ToString((uint8_t)bitMode, 16) + ")\n" +
+        padding + "\tEndianness: " + endiannessStr + " (0x"_M + MathLib::ToString((uint8_t)endianness, 16) + ")\n" +
+        padding + "\tHeader version: " + MathLib::ToString(headerVersion, 10) + '\n' +
+        padding + "\tABI: " + abiStr + " (0x"_M + MathLib::ToString((uint8_t)abi, 16) + ")\n" +
+        padding + "\tABI version: " + MathLib::ToString(abiVersion, 10) + '\n' +
+        padding + "\tReserved: 0x" + MathLib::ToString(reserved, 16) + '\n' +
+        padding + "\tType: " + typeStr + " (0x"_M + MathLib::ToString((uint16_t)type, 16) + ")\n" +
+        padding + "\tArch: " + archStr + " (0x"_M + MathLib::ToString((uint16_t)arch, 16) + ")\n" +
+        padding + "\tVersion: " + MathLib::ToString(version, 10) + '\n' +
+        padding + "\tEntry: 0x" + MathLib::ToString(entry, 16) + '\n' +
+        padding + "\tProgram header: 0x" + MathLib::ToString(programHeader, 16) + '\n' +
+        padding + "\tSection header: 0x" + MathLib::ToString(sectionHeader, 16) + '\n' +
+        padding + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n' +
+        padding + "\tHeader size: " + MathLib::ToString(headerSize, 10) + '\n' +
+        padding + "\tProgram header entry size: " + MathLib::ToString(programHeaderEntrySize, 10) + '\n' +
+        padding + "\tProgram header entries: " + MathLib::ToString(programHeaderEntries, 10) + '\n' +
+        padding + "\tSection header entry size: " + MathLib::ToString(sectionHeaderEntrySize, 10) + '\n' +
+        padding + "\tSection header entries: " + MathLib::ToString(sectionHeaderEntries, 10) + '\n' +
+        padding + "\tString table: 0x" + MathLib::ToString(stringTable, 16) + '\n' +
+    padding + '}';
 }

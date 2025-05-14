@@ -9,6 +9,7 @@ enum class NodeType {
     Identifier,
     VariableDefinition,
     FunctionDefinition,
+    FunctionCall,
     Addition,
     Multiplication,
 };

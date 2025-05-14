@@ -2,8 +2,7 @@
 #include <String.hpp>
 
 MathLib::String ELFProgramHeader::ToString(const MathLib::Sequence<char>& padding) const {
-    MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
-    ret += MathLib::CollectionToString(padding) + "\tType: ";
+    MathLib::String ret = MathLib::CollectionToString(padding) + "{\n" + padding + "\tType: ";
     switch (type) {
         case Type::Unused: {
             ret += "Unused";
@@ -71,15 +70,14 @@ MathLib::String ELFProgramHeader::ToString(const MathLib::Sequence<char>& paddin
             else ret += "Unknown";
         }
     }
-    ret += " (0x"_M + MathLib::ToString((uint32_t)type, 16) + ")\n" + padding + "\tExecutable: " + MathLib::BoolToString(executable) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tWritable: " + MathLib::BoolToString(Writable) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tReadable: " + MathLib::BoolToString(readable) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tOffset: 0x" + MathLib::ToString(offset, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tVirtual address: 0x" + MathLib::ToString(virtualAddress, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tPhysical address: 0x" + MathLib::ToString(physicalAddress, 16) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tFile size: " + MathLib::ToString(fileSize, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tMemory size: " + MathLib::ToString(memorySize, 10) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tAlignment: " + MathLib::ToString(alignment, 10) + '\n';
-    return ret + padding + '}';
+    return ret + " (0x"_M + MathLib::ToString((uint32_t)type, 16) + ")\n" +
+        padding + "\tPermissions: " + (readable ? 'r' : '-') + (writable ? 'w' : '-') + (executable ? 'x' : '-') + '\n' +
+        padding + "\tFlags: 0x" + MathLib::ToString(flags, 16) + '\n' +
+        padding + "\tOffset: 0x" + MathLib::ToString(offset, 16) + '\n' +
+        padding + "\tVirtual address: 0x" + MathLib::ToString(virtualAddress, 16) + '\n' +
+        padding + "\tPhysical address: 0x" + MathLib::ToString(physicalAddress, 16) + '\n' +
+        padding + "\tFile size: " + MathLib::ToString(fileSize, 10) + '\n' +
+        padding + "\tMemory size: " + MathLib::ToString(memorySize, 10) + '\n' +
+        padding + "\tAlignment: " + MathLib::ToString(alignment, 10) + '\n' +
+    padding + '}';
 }

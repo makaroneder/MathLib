@@ -1,6 +1,7 @@
 # TODO
 
 [Programming language theory](https://en.wikipedia.org/wiki/Programming_language_theory)
+[Compiler optimizations](https://en.wikipedia.org/wiki/Category:Compiler_optimizations)
 [Semantics](https://en.wikipedia.org/wiki/Semantics_(computer_science))
 [Type theory](https://en.wikipedia.org/wiki/Type_theory)
 [Program analysis](https://en.wikipedia.org/wiki/Program_analysis)

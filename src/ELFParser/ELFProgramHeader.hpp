@@ -26,7 +26,7 @@ struct ELFProgramHeader {
         CPUSpecificEnd = 0x7fffffff,
     } type;
     bool executable : 1;
-    bool Writable : 1;
+    bool writable : 1;
     bool readable : 1;
     uint32_t flags : 29;
     uint64_t offset;

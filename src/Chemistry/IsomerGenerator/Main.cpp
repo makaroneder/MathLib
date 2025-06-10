@@ -14,15 +14,16 @@ MathLib::String MakeUniqueName(void) {
 }
 [[nodiscard]] MathLib::Array<MathLib::Tree<size_t>> CreateConnections(const MathLib::Tree<size_t>& connection, size_t firstFreeConnection) {
     MathLib::Array<MathLib::Tree<size_t>> ret;
-    if (firstFreeConnection != (symbols[connection.data].second - connection.children.GetSize())) {
+    const size_t size = connection.children.GetSize();
+    if (firstFreeConnection != (symbols[connection.data].second - size)) {
         MathLib::Tree<size_t> tmp = connection;
         if (!tmp.Add(MathLib::Tree<size_t>(MakeUniqueName(), 1)) || !ret.Add(tmp)) return MathLib::Array<MathLib::Tree<size_t>>();
     }
     MathLib::Array<size_t> done;
-    for (size_t i = 0; i < connection.children.GetSize(); i++) {
+    for (size_t i = 0; i < size; i++) {
         bool found = false;
         for (const size_t& j : done) {
-            if (connection.children.At(i).ToString() == connection.children.At(j).ToString()) {
+            if (connection.children.At(i) == connection.children.At(j)) {
                 found = true;
                 break;
             }
@@ -59,8 +60,6 @@ MathLib::String MakeUniqueName(void) {
         }
         ret = swap;
     }
-    for (MathLib::Tree<size_t>& root : ret)
-        if (!AddHydrogens(root, 0)) return MathLib::Array<MathLib::Tree<size_t>>();
     MathLib::Array<MathLib::Tree<size_t>> reduced;
     for (const MathLib::Tree<size_t>& root1 : ret) {
         bool found = false;
@@ -74,13 +73,15 @@ MathLib::String MakeUniqueName(void) {
         }
         if (!found && !reduced.Add(root1)) return MathLib::Array<MathLib::Tree<size_t>>();
     }
+    for (MathLib::Tree<size_t>& root : reduced)
+        if (!AddHydrogens(root, 0)) return MathLib::Array<MathLib::Tree<size_t>>();
     return reduced;
 }
 bool IsLinear(const MathLib::Tree<size_t>& tree) {
     MathLib::String noChildSymbol = "";
     MathLib::String childSymbol = "";
     for (const MathLib::Tree<size_t>& child : tree.children) {
-        if (child.children.GetSize()) {
+        if (!child.children.IsEmpty()) {
             if (childSymbol.IsEmpty()) childSymbol = symbols[child.data].first;
             else return false;
         }
@@ -92,28 +93,31 @@ bool IsLinear(const MathLib::Tree<size_t>& tree) {
     return true;
 }
 MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLib::Sequence<char>& padding = ""_M) {
-    MathLib::String ret = MathLib::CollectionToString(padding) + symbols[tree.data].first;
-    if (!tree.children.GetSize()) return ret;
-    MathLib::Pair<MathLib::String, size_t> tmp = MathLib::Pair<MathLib::String, size_t>("", 0);
+    const MathLib::String padd = MathLib::CollectionToString(padding);
+    MathLib::String ret = padd + symbols[tree.data].first;
+    if (tree.children.IsEmpty()) return ret;
     const bool isLinear = IsLinear(tree);
+    MathLib::Pair<MathLib::String, size_t> tmp = MathLib::Pair<MathLib::String, size_t>("", 0);
     for (const MathLib::Tree<size_t>& child : tree.children) {
-        if (child.children.GetSize()) continue;
+        if (!child.children.IsEmpty()) continue;
         if (tmp.first.IsEmpty()) tmp.first = symbols[child.data].first;
         else if (tmp.first != symbols[child.data].first) continue;
         tmp.second++;
     }
-    if (!tmp.first.IsEmpty() && tmp.second == tree.children.GetSize()) return ret + tmp.first + MathLib::ToString(tmp.second, 10);
-    if (!tmp.first.IsEmpty()) ret += tmp.first + (tmp.second == 1 ? "" : MathLib::ToString(tmp.second, 10));
+    if (!tmp.first.IsEmpty()) {
+        if (tmp.second == tree.children.GetSize()) return ret + tmp.first + MathLib::ToString(tmp.second, 10);
+        ret += tmp.first + (tmp.second == 1 ? "" : MathLib::ToString(tmp.second, 10));
+    }
     if (!isLinear) ret += ": {\n";
     MathLib::Array<MathLib::Pair<MathLib::String, size_t>> children;
     for (const MathLib::Tree<size_t>& child : tree.children) {
         if (symbols[child.data].first == tmp.first) continue;
         else if (isLinear) {
-            const MathLib::String tmp = ToChemicalString(child, padding);
-            ret += '-'_M + MathLib::SubString(tmp, padding.GetSize(), tmp.GetSize() - padding.GetSize());
+            const MathLib::String tmp = ToChemicalString(child, padd);
+            ret += '-'_M + MathLib::SubString(tmp, padd.GetSize(), tmp.GetSize() - padd.GetSize());
         }
         else {
-            const MathLib::String tmp = ToChemicalString(child, MathLib::CollectionToString(padding) + '\t');
+            const MathLib::String tmp = ToChemicalString(child, padd + '\t');
             bool found = false;
             for (MathLib::Pair<MathLib::String, size_t>& x : children) {
                 if (x.first == tmp) {
@@ -134,14 +138,14 @@ MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLi
         }
     }
     if (isLinear) return ret;
-    else if (children.GetSize() == 1) {
+    if (children.GetSize() == 1) {
         size_t i = ret.Find(':');
         const MathLib::String name = MathLib::SubString(ret, 0, i);
         i += 3;
         MathLib::SkipWhiteSpace(ret, i);
         return name + '-' + MathLib::SubString(ret, i, ret.GetSize() - i - 1);
     }
-    else return ret + padding + '}';
+    return ret + padding + '}';
 }
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments

@@ -15,7 +15,7 @@ namespace MathLib {
     bool Aseprite::Save(Writable& file) const {
         StartBenchmark
         AsepriteHeader header;
-        header.frames = GetFrameCount();
+        header.frames = GetSize();
         header.width = GetWidth();
         header.height = GetHeight();
         header.bpp = 32;
@@ -29,7 +29,13 @@ namespace MathLib {
         if (!file.Write<AsepriteHeader>(header)) ReturnFromBenchmark(false);
         for (uint32_t i = 0; i < header.frames; i++) {
             frame.duration = Millisecond<num_t>(Second<num_t>(frames.At(i).GetDuration())).GetValue();
-            if (!file.Write<AsepriteFrameHeader>(frame) || !file.Write<AsepriteLayerChunk>(layer) || !file.Write<AsepriteImageCelChunk>(celChunk) || !file.WriteBuffer(frames.At(i).pixels.GetValue().GetValue(), header.width * header.height * sizeof(uint32_t))) ReturnFromBenchmark(false);
+            if (!file.Write<AsepriteFrameHeader>(frame) || !file.Write<AsepriteLayerChunk>(layer) || !file.Write<AsepriteImageCelChunk>(celChunk)) ReturnFromBenchmark(false);
+            for (uint32_t y = 0; y < header.height; y++) {
+                for (uint32_t x = 0; x < header.width; x++) {
+                    const Color pixel = frames.At(i).pixels.At(x, y);
+                    if (!file.Write<uint8_t>(pixel.rgba.r) || !file.Write<uint8_t>(pixel.rgba.g) || !file.Write<uint8_t>(pixel.rgba.b) || !file.Write<uint8_t>(pixel.rgba.a)) ReturnFromBenchmark(false);
+                }
+            }
         }
         ReturnFromBenchmark(true);
     }
@@ -43,7 +49,7 @@ namespace MathLib {
             if (!file.Read<AsepriteFrameHeader>(frame) || !frame.IsValid()) ReturnFromBenchmark(false);
             const uint32_t chunks = frame.chunks16 == UINT16_MAX && frame.chunks32 ? frame.chunks32 : frame.chunks16;
             for (uint64_t j = 0; j < chunks; j++) {
-                uint32_t size;
+                uint32_t size = 0;
                 if (!file.Read<uint32_t>(size) || size < sizeof(AsepriteChunkHeader)) ReturnFromBenchmark(false);
                 uint8_t buff[size];
                 MemoryCopy(&size, buff, sizeof(uint32_t));

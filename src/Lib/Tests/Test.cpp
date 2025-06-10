@@ -222,6 +222,12 @@ namespace MathLib {
         const IdentitySequence<uint8_t> identitySequence = IdentitySequence<uint8_t>(UINT8_MAX + 1);
         TestOperation(test, identitySequence.IsSorted(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThan)));
         TestOperation(test, identitySequence.IsSorted(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThanEqual)));
+        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).Fold(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>(nullptr, [](const void*, uint8_t a, uint8_t b) -> uint8_t {
+            return a * b;
+        }), true) == 120);
+        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).Fold(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>(nullptr, [](const void*, uint8_t a, uint8_t b) -> uint8_t {
+            return a * b;
+        }), false) == 120);
 
         const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& bubbleSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.BubbleSort(compare);

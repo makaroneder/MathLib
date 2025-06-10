@@ -3,10 +3,10 @@
 namespace MathLib {
     SaveableImageFromVideo::SaveableImageFromVideo(size_t width, size_t height, SaveableVideo* video, size_t frame) : SaveableImage(width, height), video(video), frame(frame) {
         StartBenchmark
-        if (!video->GetFrameCount()) {
+        if (video->IsEmpty()) {
             for (size_t i = 0; i < frame; i++)
-                if (!video->AddFrame(Frame(width, height, 0))) Panic("Failed to add frame to video");
-            if (!video->AddFrame(Frame(width, height, 1))) Panic("Failed to add frame to video");
+                if (!video->Add(Frame(width, height, 0))) Panic("Failed to add frame to video");
+            if (!video->Add(Frame(width, height, 1))) Panic("Failed to add frame to video");
         }
         EndBenchmark
     }

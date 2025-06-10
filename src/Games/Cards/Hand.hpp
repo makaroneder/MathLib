@@ -1,7 +1,9 @@
 #ifndef Hand_H
 #define Hand_H
-#include "CardIndex.hpp"
+#include "Card.hpp"
 #include <Interfaces/ComparisionFunction.hpp>
+#include <Image/Video.hpp>
+#include <Renderer.hpp>
 
 template <typename T>
 struct Hand : MathLib::Printable {
@@ -17,22 +19,22 @@ struct Hand : MathLib::Printable {
         FourOfAKind,
         StraightFlush,
     };
-    Hand(const MathLib::Matrix<T>& position) : cards(MathLib::Array<CardIndex>(size)), position(position) {
-        for (CardIndex& card : cards) card.selected = true;
+    Hand(const MathLib::Matrix<T>& position) : cards(MathLib::Array<Card>(size)), position(position) {
+        for (Card& card : cards) card.selected = true;
     }
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
-        for (const CardIndex& card : cards) ret += card.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
+        for (const Card& card : cards) ret += card.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';
         return ret + padding + '}';
     }
     [[nodiscard]] bool ShouldSwap(size_t i) const {
         return cards.At(i).selected;
     }
-    [[nodiscard]] CardIndex Swap(const CardIndex& card, size_t i) {
-        const CardIndex ret = cards.At(i);
+    [[nodiscard]] Card Swap(const Card& card, size_t i) {
+        const Card ret = cards.At(i);
         cards.At(i) = card;
         return ret;
     }
@@ -43,8 +45,8 @@ struct Hand : MathLib::Printable {
         return true;
     }
     [[nodiscard]] bool IsStraight(void) const {
-        MathLib::Array<CardIndex> sorted = cards;
-        if (!sorted.BubbleSort(MathLib::ComparisionFunction<CardIndex>(MathLib::ComparisionFunctionType::LessThan))) return false;
+        MathLib::Array<Card> sorted = cards;
+        if (!sorted.BubbleSort(MathLib::ComparisionFunction<Card>(MathLib::ComparisionFunctionType::LessThan))) return false;
         for (size_t i = 1; i < sorted.GetSize(); i++)
             if ((size_t)sorted.At(i - 1).type - (size_t)sorted.At(i).type != 1) return false;
         return true;
@@ -82,7 +84,7 @@ struct Hand : MathLib::Printable {
     }
     [[nodiscard]] size_t GetPoints(void) const {
         size_t points = 0;
-        for (const CardIndex& card : cards) points += (size_t)card.type + 1;
+        for (const Card& card : cards) points += (size_t)card.type + 1;
         return points * (size_t)GetType();
     }
     [[nodiscard]] MathLib::Matrix<T> GetPosition(size_t card) const {
@@ -102,16 +104,16 @@ struct Hand : MathLib::Printable {
         return false;
     }
     void SelectAll(void) {
-        for (CardIndex& card : cards) card.selected = true;
+        for (Card& card : cards) card.selected = true;
     }
-    [[nodiscard]] bool Draw(MathLib::Renderer& renderer, const MathLib::Matrix<Card>& cardsData) const {
+    [[nodiscard]] bool Draw(MathLib::Renderer& renderer, const MathLib::Video& cardsData) const {
         for (size_t i = 0; i < cards.GetSize(); i++)
-            if (!cardsData.At((size_t)cards.At(i).type, (size_t)cards.At(i).color).Draw(renderer, GetPosition(i))) return false;
+            renderer.DrawImage<T>(cardsData.At((size_t)cards.At(i).color * (size_t)Card::Type::TypeCount + (size_t)cards.At(i).type), GetPosition(i));
         return true;
     }
 
     private:
-    MathLib::Array<CardIndex> cards;
+    MathLib::Array<Card> cards;
     MathLib::Matrix<T> position;
 };
 

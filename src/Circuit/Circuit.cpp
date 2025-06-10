@@ -32,8 +32,11 @@ size_t Circuit::Add(Gate* element, const MathLib::Sequence<CircuitConnection>& i
     return ret;
 }
 MathLib::Bitmap Circuit::Update(const MathLib::Sequence<bool>& inputData) {
-    MathLib::Dictionary<size_t, MathLib::Bitmap> cache = MathLib::Dictionary<size_t, MathLib::Bitmap>(1);
-    cache.At(0) = MathLib::DictionaryElement<size_t, MathLib::Bitmap>(SIZE_MAX, MathLib::Bitmap(inputData));
+    MathLib::Dictionary<size_t, MathLib::Bitmap> cache = MathLib::Dictionary<size_t, MathLib::Bitmap>(
+        MathLib::MakeArray<MathLib::DictionaryElement<size_t, MathLib::Bitmap>>(
+            MathLib::DictionaryElement<size_t, MathLib::Bitmap>(SIZE_MAX, MathLib::Bitmap(inputData))
+        )
+    );
     return Update(output, cache);
 }
 MathLib::Bitmap Circuit::Update(size_t element, MathLib::Dictionary<size_t, MathLib::Bitmap>& cache) {

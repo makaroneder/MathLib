@@ -1,6 +1,7 @@
 #ifdef __x86_64__
 #include "PCI.hpp"
 #include "PCIHeader.hpp"
+#include "../RTL8139.hpp"
 #include "../USB/UHCI.hpp"
 #include "../AHCI/AHCI.hpp"
 #include <Logger.hpp>
@@ -160,7 +161,11 @@ bool InitPCI(const MCFG* mcfg) {
                         } break;
                         case 0x02: switch (functionEntry->subClass) {
                             case 0x00: {
-                                LogString("Found ethernet controller on "_M + PCIAddressToString(mcfg->entries[i].pciSegment, bus, device, function) + '\n');
+                                if (functionEntry->vendorID == 0x10ec && functionEntry->deviceID == 0x8139) {
+                                    LogString("Found RTL8139 on "_M + PCIAddressToString(mcfg->entries[i].pciSegment, bus, device, function) + '\n');
+                                    new RTL8139(functionEntry);
+                                }
+                                else LogString("Found ethernet controller on "_M + PCIAddressToString(mcfg->entries[i].pciSegment, bus, device, function) + '\n');
                                 break;
                             }
                             case 0x01: {

@@ -29,7 +29,7 @@ namespace MathLib {
         if (!readable.Read<ZLibHeader>(header) || header.compressionMethod != (uint8_t)ZLibHeader::CompressionMethod::Deflate || header.dictionary) ReturnFromBenchmark(Array<uint8_t>());
         if (key.IsEmpty() || !key.At(0)) {
             const Array<uint8_t> ret = Deflate().DecryptReadable(readable, Array<uint64_t>());
-            uint32_t adler32;
+            uint32_t adler32 = 0;
             if (!readable.Read<uint32_t>(adler32) || Adler32().Get(ret) != SwapEndian32(adler32)) ReturnFromBenchmark(Array<uint8_t>());
             const size_t start = range.GetMin();
             const size_t end = Min<size_t>(range.GetMax(), ret.GetSize());

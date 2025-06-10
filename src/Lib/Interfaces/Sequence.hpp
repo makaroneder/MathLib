@@ -19,6 +19,13 @@ namespace MathLib {
         [[nodiscard]] T operator[](size_t index) const {
             return At(index);
         }
+        [[nodiscard]] T Fold(T initialValue, const Function<T, T, T>& func, bool left) const {
+            const size_t size = GetSize();
+            T ret = initialValue;
+            if (left) for (size_t i = 0; i < size; i++) ret = func(ret, At(i));
+            else for (size_t i = size; i; i--) ret = func(At(i - 1), ret);
+            return ret;
+        }
         [[nodiscard]] bool IsSorted(const Function<bool, T, T>& compare) const {
             const size_t size = GetSize();
             for (size_t i = 1; i < size; i++)

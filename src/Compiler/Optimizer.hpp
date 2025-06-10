@@ -1,9 +1,9 @@
 #ifndef Optimizer_H
 #define Optimizer_H
-#include "Toolchain/Evaluator.hpp"
+#include <Compiler/Evaluator.hpp>
 
-struct Optimizer : Evaluator<Node> {
-    [[nodiscard]] virtual Node Evaluate(const Node& node) override;
+struct Optimizer : MathLib::Evaluator<MathLib::ParserNode> {
+    [[nodiscard]] virtual MathLib::ParserNode Evaluate(const MathLib::ParserNode& node) override;
 };
 
 #endif

@@ -4,27 +4,30 @@
 #include <Allocator/RegionAllocator.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
+#include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
-#include <Image/TGA/TGA.hpp>
+#include <Bitmap.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
 template <typename T>
-void SwapCards(Hand<T>& hand, MathLib::Matrix<Card>& cards) {
+[[nodiscard]] bool SwapCards(Hand<T>& hand, MathLib::Bitmap& cards) {
     for (size_t i = 0; i < Hand<T>::size; i++) {
-        if (hand.ShouldSwap(i)) {
-            size_t x;
-            size_t y;
-            while (true) {
-                x = MathLib::RandomNumber<size_t>(0, (size_t)Card::Type::TypeCount);
-                y = MathLib::RandomNumber<size_t>(0, (size_t)Card::Color::ColorCount);
-                if (cards.At(x, y).free) break;
-            }
-            cards.At(x, y).free = false;
-            const CardIndex card = hand.Swap(CardIndex((Card::Type)x, (Card::Color)y), i);
-            if (card.type != Card::Type::TypeCount) cards.At((size_t)card.type, (size_t)card.color).free = true;
+        if (!hand.ShouldSwap(i)) continue;
+        size_t x;
+        size_t y;
+        while (true) {
+            x = MathLib::RandomNumber<size_t>(0, (size_t)Card::Type::TypeCount);
+            y = MathLib::RandomNumber<size_t>(0, (size_t)Card::Color::ColorCount);
+            const MathLib::Expected<bool> tmp = cards.Get(y * (size_t)Card::Type::TypeCount + x);
+            if (!tmp.HasValue()) return false;
+            if (tmp.Get()) break;
         }
+        if (!cards.Set(y * (size_t)Card::Type::TypeCount + x, false)) return false;
+        const Card card = hand.Swap(Card((Card::Type)x, (Card::Color)y), i);
+        if (card.type != Card::Type::TypeCount && !cards.Set((size_t)card.color * (size_t)Card::Type::TypeCount + (size_t)card.type, true)) return false;
     }
+    return true;
 }
 [[nodiscard]] size_t FindVariable(const MathLib::Sequence<MathLib::Variable>& variables, const MathLib::Sequence<char>& name) {
     for (size_t i = 0; i < variables.GetSize(); i++)
@@ -41,7 +44,7 @@ template <typename T>
     return ret;
 }
 #define AddFunction(vname, identifier)                                                                                                                                      \
-    MathLib::FunctionNode vname = optimizer.GetFunction(identifier);                                                                                                        \
+const MathLib::FunctionNode vname = optimizer.GetFunction(identifier);                                                                                                      \
     size_t vname##Variable = FindVariable(optimizer.variables, vname.arguments.At(0).name);                                                                                 \
     if (vname##Variable == SIZE_MAX) {                                                                                                                                      \
         if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, '0'_M, true))) MathLib::Panic("Failed to add variable"); \
@@ -77,92 +80,14 @@ int main(int, char**) {
         AddFunction(hands, "hands"_M)
         AddFunction(discards, "discards"_M)
         AddFunction(requiredPoints, "points"_M)
-        MathLib::Matrix<Card> cards = MathLib::Matrix<Card>((size_t)Card::Type::TypeCount, (size_t)Card::Color::ColorCount);
-        for (size_t color = 0; color < cards.GetHeight(); color++) {
-            for (size_t type = 0; type < cards.GetWidth(); type++) {
-                MathLib::String str = "";
-                switch ((Card::Color)color) {
-                    case Card::Color::Clubs: {
-                        str = "Clubs";
-                        break;
-                    }
-                    case Card::Color::Diamonds: {
-                        str = "Diamonds";
-                        break;
-                    }
-                    case Card::Color::Hearts: {
-                        str = "Hearts";
-                        break;
-                    }
-                    case Card::Color::Spades: {
-                        str = "Spades";
-                        break;
-                    }
-                    default: MathLib::Panic("Failed to load hand");
-                }
-                str += "/";
-                switch ((Card::Type)type) {
-                    case Card::Type::C2: {
-                        str += "2";
-                        break;
-                    }
-                    case Card::Type::C3: {
-                        str += "3";
-                        break;
-                    }
-                    case Card::Type::C4: {
-                        str += "4";
-                        break;
-                    }
-                    case Card::Type::C5: {
-                        str += "5";
-                        break;
-                    }
-                    case Card::Type::C6: {
-                        str += "6";
-                        break;
-                    }
-                    case Card::Type::C7: {
-                        str += "7";
-                        break;
-                    }
-                    case Card::Type::C8: {
-                        str += "8";
-                        break;
-                    }
-                    case Card::Type::C9: {
-                        str += "9";
-                        break;
-                    }
-                    case Card::Type::C10: {
-                        str += "10";
-                        break;
-                    }
-                    case Card::Type::Jack: {
-                        str += "Jack";
-                        break;
-                    }
-                    case Card::Type::Queen: {
-                        str += "Queen";
-                        break;
-                    }
-                    case Card::Type::King: {
-                        str += "King";
-                        break;
-                    }
-                    case Card::Type::Ace: {
-                        str += "Ace";
-                        break;
-                    }
-                    default: MathLib::Panic("Failed to load hand");
-                }
-                MathLib::TGA* tga = new MathLib::TGA(0, 0);
-                if (!tga || !tga->LoadFromPath(fs, path + str + ".tga")) MathLib::Panic("Failed to load image");
-                cards.At(type, color) = Card(tga);
-            }
-        }
-        Hand<MathLib::num_t> hand = Hand<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
-        SwapCards<MathLib::num_t>(hand, cards);
+        MathLib::Aseprite table;
+        if (!table.LoadFromPath(fs, path + "Table.aseprite")) MathLib::Panic("Failed to load table image");
+        MathLib::Aseprite cardsImage;
+        if (!cardsImage.LoadFromPath(fs, path + "Cards.aseprite")) MathLib::Panic("Failed to load cards");
+        MathLib::Bitmap cards = MathLib::Bitmap((size_t)Card::Type::TypeCount * (size_t)Card::Color::ColorCount);
+        cards.Fill(true);
+        Hand<MathLib::num_t> hand = Hand<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, -1, 0));
+        if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to initialize deck");
         bool update = true;
         size_t round = 0;
         size_t remainingHands = 0;
@@ -182,11 +107,12 @@ int main(int, char**) {
             }
             if (update) {
                 renderer.Fill(0);
-                if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0, 3.6, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0, 3.4, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0, 3.2, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0, 3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!hand.Draw(renderer, cards)) MathLib::Panic("Failed to draw hand");
+                renderer.DrawImage<MathLib::num_t>(table.At(0), MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
+                if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!hand.Draw(renderer, cardsImage)) MathLib::Panic("Failed to draw hand");
                 update = false;
             }
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");
@@ -201,14 +127,14 @@ int main(int, char**) {
                         remainingHands--;
                         if (remainingPoints < 0) remainingPoints = 0;
                         hand.SelectAll();
-                        SwapCards<MathLib::num_t>(hand, cards);
+                        if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to play hand");
                         update = true;
                         break;
                     }
                     case 'r': {
                         if (remainingDiscards) {
                             remainingDiscards--;
-                            SwapCards<MathLib::num_t>(hand, cards);
+                            if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to discard cards");
                             update = true;
                         }
                         break;

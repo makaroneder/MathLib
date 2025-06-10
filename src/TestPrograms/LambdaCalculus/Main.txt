@@ -1,0 +1,38 @@
+Predecessor = pattern (
+    ("Successor" . n) -> n
+),
+Add = pattern (
+    "Zero" -> (n -> n),
+    ("Successor" . a) -> (b -> ("Successor" . (Add . a . b)))
+),
+Append = pattern (
+    "End" -> (other -> other),
+    ("Element" . element . next) -> (other -> ("Element" . element . (Append . next . other)))
+),
+AppendSingle = collection -> item -> (Append . collection . ("Element" . item . "End")),
+Size = pattern (
+    "End" -> "Zero",
+    ("Element" . _ . next) -> ("Successor" . (Size . next))
+),
+At = pattern (
+    ("Element" . element . next) -> pattern (
+        "Zero" -> element,
+        ("Successor" . n) -> (At . next . n)
+    )
+),
+SubSequence = pattern (
+    "Zero" -> pattern (
+        "Zero" -> pattern (
+            ("Element" . element . _) -> ("Element" . element . "End")
+        ),
+        ("Successor" . n) -> pattern (
+            ("Element" . element . next) -> ("Element" . element . (SubSequence . "Zero" . n . next))
+        )
+    ),
+    ("Successor" . a) -> pattern (
+        ("Successor" . b) -> pattern (
+            ("Element" . _ . next) -> (SubSequence . a . b . next)
+        )
+    )
+),
+Main = At . ("Element" . a . ("Element" . b . "End")) . ("Successor" . "Zero")

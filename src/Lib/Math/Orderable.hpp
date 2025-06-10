@@ -17,10 +17,10 @@ namespace MathLib {
             return !LessThanEqual(other) || !other.LessThanEqual(*this);
         }
         [[nodiscard]] bool operator<(const Orderable& other) const {
-            return LessThanEqual(other) && *this != other;
+            return LessThanEqual(other) && !other.LessThanEqual(*this);
         }
         [[nodiscard]] bool operator>(const Orderable& other) const {
-            return other.LessThanEqual(*this) && *this != other;
+            return other.LessThanEqual(*this) && !LessThanEqual(other);
         }
         [[nodiscard]] bool Uncomparable(const Orderable& other) const {
             return !LessThanEqual(other) && !other.LessThanEqual(*this);

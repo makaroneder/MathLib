@@ -1,9 +1,12 @@
 #ifdef __x86_64__
 #include "Interrupts/Exceptions/DivisionError.hpp"
 #include "Interrupts/Interrupts.hpp"
+#include "SerialPort/SerialPort.hpp"
 #include "Multiboot/Multiboot1.hpp"
 #include "Multiboot/Multiboot2.hpp"
+#include "QEMU/QEMUFileSystem.hpp"
 #include "ControlRegisters.hpp"
+#include "../../VFS.hpp"
 #include "ACPI/ACPI.hpp"
 #include "GDT/TSS.hpp"
 #include "../Arch.hpp"
@@ -17,9 +20,34 @@
 #include <Logger.hpp>
 #include <String.hpp>
 
+bool InitLogger(MathLib::Writable* logger, const MathLib::Sequence<char>& str) {
+    #ifdef NoLoggerStartMessage
+    (void)logger;
+    (void)str;
+    return true;
+    #else
+    return logger->Puts(str);
+    #endif
+}
 bool InitArch(uintptr_t signature, void* info) {
-    if (E9::IsPresent()) MathLib::logger = new E9();
-    LogString("Logger initialized\n");
+    if (E9::IsPresent()) {
+        E9* e9 = new E9();
+        if (e9 && InitLogger(e9, "E9 logger initialized\n"_M)) MathLib::logger = e9;
+        else delete e9;
+    }
+    do {
+        const SerialPort::Port ports[] = {
+            SerialPort::Port::COM1, SerialPort::Port::COM2,
+            SerialPort::Port::COM3, SerialPort::Port::COM4,
+            SerialPort::Port::COM5, SerialPort::Port::COM6,
+            SerialPort::Port::COM7, SerialPort::Port::COM8,
+        };
+        for (size_t i = 0; i < SizeOfArray(ports); i++) {
+            SerialPort* serial = new SerialPort(ports[i]);
+            if (serial && serial->Init() && InitLogger(serial, "COM"_M + MathLib::ToString(i, 10) + " initialized\n") && !MathLib::logger) MathLib::logger = serial;
+            else delete serial;
+        }
+    } while (false);
     InitTSS();
     if (HasMSR()) {
         const MathLib::Expected<uint64_t> tmp = GetMSR(0xc0000080);
@@ -70,6 +98,10 @@ bool InitArch(uintptr_t signature, void* info) {
         DivisionError::Trigger(regs);
     }
     #endif
+    QEMUFileSystem* qemu = new QEMUFileSystem();
+    if (!qemu) return false;
+    if (!qemu->IsValid()) delete qemu;
+    else if (!vfs.AddFileSystem(MathLib::VFSEntry(qemu, "qemu"_M))) return false;
     return true;
 }
 [[noreturn]] void ShutdownArch(void) {

@@ -13,7 +13,7 @@ PYTHON = python3
 MKDIR = $(PYTHON) $(SCRIPTSDIR)/MakeDirectory.py
 rwildcard = $(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
-CXXFLAGS = -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
+CXXFLAGS = -Wno-packed-bitfield-compat -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ASFLAGS = -Werror -f elf64 -I $(SRCDIR) -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
 OBJCPYFLAGS = -O elf64-x86-64 -B i386 -I binary
@@ -95,12 +95,14 @@ SERVERTYPE ?= client
 SERVERTARGET ?= $(SRCDIR)/TestPrograms/Network/Target.json
 COMPILERINPUT ?= $(SRCDIR)/TestPrograms/Compiler/Main.txt
 COMPILEROUTPUT ?= $(BUILDDIR)/Compiler.asm
+LAMBDAINPUT ?= $(SRCDIR)/TestPrograms/LambdaCalculus/Main.txt
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
 OSLINKER = $(SRCDIR)/OS/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -T $(OSLINKER) -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map
-OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk -boot d
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -boot d -serial file:$(BUILDDIR)/OS.log -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
+-device rtl8139,netdev=net0 -netdev user,id=net0,hostfwd=tcp::$(SERVERPORT)-:$(SERVERPORT)
 
 clean:
 	@$(MKDIR) $(BUILDDIR)

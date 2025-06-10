@@ -1,9 +1,8 @@
 #ifndef Card_H
 #define Card_H
-#include <DummyRenderer.hpp>
 #include <Geometry/Cuboid.hpp>
 
-struct Card : MathLib::Printable {
+struct Card : MathLib::Orderable, MathLib::Printable {
     static constexpr MathLib::num_t width = 0.64;
     static constexpr MathLib::num_t height = 0.96;
     static constexpr MathLib::num_t padding = 0.1;
@@ -30,10 +29,11 @@ struct Card : MathLib::Printable {
         Spades,
         ColorCount,
     };
-    MathLib::Image* image;
-    bool free;
+    Type type;
+    Color color;
+    bool selected;
 
-    Card(MathLib::Image* image = nullptr);
+    Card(Type type = Type::TypeCount, Color color = Color::ColorCount);
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
@@ -42,14 +42,9 @@ struct Card : MathLib::Printable {
     [[nodiscard]] static MathLib::Cuboid<T> ToCuboid(const MathLib::Matrix<T>& position) {
         return MathLib::Cuboid<T>(position, MathLib::CreateVector<T>(width, height, 0.01));
     }
-    template <typename T>
-    [[nodiscard]] bool Draw(MathLib::Renderer& renderer, const MathLib::Matrix<T>& position) const {
-        if (!image) return false;
-        renderer.DrawImage<T>(*image, position);
-        return true;
-    }
-    [[nodiscard]] bool operator==(const Card& other) const;
-    [[nodiscard]] bool operator!=(const Card& other) const;
+
+    protected:
+    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
 };
 
 #endif

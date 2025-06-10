@@ -1,50 +1,152 @@
 #include "LambdaTerm.hpp"
-#include <Host.hpp>
+#include <Compiler/Parser/UnwrapperParserLayer.hpp>
+#include <Compiler/Parser/IdentityParserLayer.hpp>
+#include <Compiler/Lexer/IdentifierLexerRule.hpp>
+#include <Compiler/Lexer/SingleCharLexerRule.hpp>
+#include <Compiler/Lexer/WhitespaceLexerRule.hpp>
+#include <Compiler/Parser/KeywordParserLayer.hpp>
+#include <Compiler/Parser/MiddleParserLayer.hpp>
+#include <Compiler/Lexer/StringLexerRule.hpp>
+#include <Compiler/IdentityEvaluator.hpp>
+#include <Libc/HostFileSystem.hpp>
+#include <Compiler/Toolchain.hpp>
+#include <String.hpp>
 #include <iostream>
 
-LambdaTerm ToChurchNumeral(const LambdaTerm& zero, const LambdaTerm& successor, size_t n) {
-    LambdaTerm ret = zero;
-    for (size_t i = 0; i < n; i++) ret = successor.Apply(ret);
-    return ret;
+enum class TokenType : uint8_t {
+    ParenthesesStart,
+    ParenthesesEnd,
+    Variable,
+    Abstraction,
+    Application,
+    Definition,
+    Comma,
+    String,
+    Pattern,
+};
+MathLib::Array<MathLib::String> NodeToArgs(const MathLib::ParserNode& node) {
+    if (node.GetType() == (size_t)TokenType::Variable) return MathLib::MakeArray<MathLib::String>(node.GetData());
+    if (node.GetType() != (size_t)TokenType::Abstraction) return MathLib::Array<MathLib::String>();
+    MathLib::Array<MathLib::String> l = NodeToArgs(node.At(0));
+    l += NodeToArgs(node.At(1));
+    return l;
 }
+MathLib::Array<MathLib::ParserNode> CommaToArray(const MathLib::ParserNode& node) {
+    if (node.GetType() != (size_t)TokenType::Comma) return MathLib::MakeArray<MathLib::ParserNode>(node);
+    MathLib::Array<MathLib::ParserNode> tmp = CommaToArray(node.At(0));
+    tmp += CommaToArray(node.At(1));
+    return tmp;
+}
+LambdaTerm FromNodeInternal(const MathLib::ParserNode& node) {
+    switch ((TokenType)node.GetType()) {
+        case TokenType::Variable: return LambdaTerm(node.GetData(), false);
+        case TokenType::String: {
+            const MathLib::String tmp = node.GetData();
+            return LambdaTerm(MathLib::SubString(tmp, 1, tmp.GetSize() - 2), true);
+        }
+        case TokenType::Abstraction: {
+            MathLib::Array<MathLib::String> args = NodeToArgs(node.At(0));
+            const size_t size = args.GetSize();
+            LambdaTerm ret = FromNodeInternal(node.At(1));
+            for (size_t i = size; i; i--) ret = LambdaTerm(ret, args.At(i - 1));
+            return ret;
+        }
+        case TokenType::Application: return LambdaTerm(FromNodeInternal(node.At(0)), FromNodeInternal(node.At(1)));
+        case TokenType::Definition: return LambdaTerm(node.At(0).GetData(), FromNodeInternal(node.At(1)));
+        case TokenType::Pattern: {
+            const MathLib::Array<MathLib::ParserNode> cases = CommaToArray(node.At(0));
+            const size_t size = cases.GetSize();
+            MathLib::Array<LambdaTerm> terms = MathLib::Array<LambdaTerm>(size * 2);
+            for (size_t i = 0; i < size; i++) {
+                if (cases.At(i).GetType() != (size_t)TokenType::Abstraction) return LambdaTerm();
+                terms.At(i * 2) = FromNodeInternal(cases.At(i).At(0));
+                terms.At(i * 2 + 1) = FromNodeInternal(cases.At(i).At(1));
+            }
+            return LambdaTerm(terms);
+        }
+        default: return LambdaTerm();
+    }
+}
+MathLib::Array<LambdaTerm> FromNode(const MathLib::ParserNode& node) {
+    switch ((TokenType)node.GetType()) {
+        case TokenType::Comma: {
+            MathLib::Array<LambdaTerm> tmp = FromNode(node.At(0));
+            tmp += FromNode(node.At(1));
+            return tmp;
+        }
+        default: return MathLib::MakeArray<LambdaTerm>(FromNodeInternal(node));
+    }
+}
+struct GroupedLexerRule : MathLib::LexerRule {
+    GroupedLexerRule(size_t type, char start, char end) : MathLib::LexerRule(type), start(start), end(end) {}
+    virtual void Match(const MathLib::Sequence<char>& str, size_t& i) const override {
+        if (str.At(i) != start) return;
+        const size_t tmp = str.Find(end, i + 1);
+        if (tmp != SIZE_MAX) i = tmp + 1;
+    }
+
+    private:
+    char start;
+    char end;
+};
+struct PatternParserLayer : MathLib::ParserLayer {
+    [[nodiscard]] virtual MathLib::ParserNode Parse(const MathLib::Function<MathLib::ParserNode>& root, const MathLib::Function<MathLib::ParserNode>& next, const MathLib::Sequence<MathLib::Token>& tokens, size_t& i) const override {
+        if (!tokens.At(i).CheckType((size_t)TokenType::Variable) || tokens.At(i).GetValue() != "pattern") return next();
+        i++;
+        if (!tokens.At(i).CheckType((size_t)TokenType::ParenthesesStart)) return MathLib::ParserNode();
+        i++;
+        const MathLib::ParserNode ret = MathLib::ParserNode((size_t)TokenType::Pattern, ""_M, MathLib::MakeArray<MathLib::ParserNode>(root()));
+        if (!tokens.At(i).CheckType((size_t)TokenType::ParenthesesEnd)) return MathLib::ParserNode();
+        i++;
+        return ret;
+    }
+};
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
 /// @param argv Array of command line arguments
 /// @return Status
-int main(int, char**) {
+int main(int argc, char** argv) {
     try {
-        const LambdaTerm zero = LambdaTerm(LambdaTerm(LambdaTerm('x'_M), 'x'_M), 'f'_M);
-        const LambdaTerm successor = LambdaTerm(LambdaTerm(
-            LambdaTerm(
-                LambdaTerm(LambdaTerm('f'_M), LambdaTerm(
-                    LambdaTerm(LambdaTerm('n'_M), LambdaTerm('f'_M)), LambdaTerm('x'_M)
-                )), 'x'_M
-            ), 'f'_M
-        ), 'n'_M);
-        const LambdaTerm add = LambdaTerm(LambdaTerm(
-            LambdaTerm(
-                LambdaTerm(
-                    LambdaTerm(
-                        LambdaTerm(
-                            LambdaTerm('m'_M),
-                            LambdaTerm('f'_M)
-                        ),
-                        LambdaTerm(
-                            LambdaTerm(
-                                LambdaTerm('n'_M),
-                                LambdaTerm('f'_M)
-                            ),
-                            LambdaTerm('x'_M)
-                        )
-                    ), 'x'_M
-                ), 'f'_M
-            ), 'n'_M
-        ), 'm'_M);
-        // TODO: FromChurchNumeral
-        std::cout << "SUCC := " << successor << std::endl;
-        std::cout << "ADD := " << add << std::endl;
-        for (size_t i = 0; i < 10; i++)
-            std::cout << i << " := " << ToChurchNumeral(zero, successor, i) << std::endl;
+        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
+            new MathLib::WhitespaceLexerRule(SIZE_MAX),
+            new GroupedLexerRule((size_t)TokenType::String, '"', '"'),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
+            new MathLib::IdentifierLexerRule((size_t)TokenType::Variable),
+            new MathLib::StringLexerRule((size_t)TokenType::Abstraction, "->"_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::Application, '.'_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
+        )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
+            new MathLib::MiddleParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+            new MathLib::MiddleParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
+            new MathLib::MiddleParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction),
+            new MathLib::MiddleParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
+            new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
+            new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
+            new PatternParserLayer(),
+            new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
+        )), new MathLib::IdentityEvaluator());
+        MathLib::HostFileSystem fs;
+        toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
+        const MathLib::Array<LambdaTerm> bindings = FromNode(toolchain.GetNode());
+        const size_t size = bindings.GetSize();
+        size_t main = SIZE_MAX;
+        for (size_t i = 0; i < size; i++) {
+            if (i) std::cout << ",\n";
+            std::cout << bindings.At(i);
+            if (bindings.At(i).value == "Main") main = i;
+        }
+        std::cout << std::endl;
+        if (main == SIZE_MAX) MathLib::Panic("No Main function specified");
+        LambdaTerm ret = bindings.At(main);
+        while (true) {
+            const LambdaTerm tmp = ret.Run(bindings);
+            if (ret == tmp) break;
+            ret = tmp;
+        }
+        std::cout << "Output: " << ret << std::endl;
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

@@ -1,5 +1,10 @@
 # TODO
 
+[Parallel port](https://wiki.osdev.org/Parallel_port)
+[QEMU fw cfg](https://wiki.osdev.org/QEMU_fw_cfg)
+[RTL8139](https://wiki.osdev.org/RTL8139)
+[RTL8139 docs](http://realtek.info/pdf/rtl8139cp.pdf)
+
 [Programming language theory](https://en.wikipedia.org/wiki/Programming_language_theory)
 [Compiler optimizations](https://en.wikipedia.org/wiki/Category:Compiler_optimizations)
 [Semantics](https://en.wikipedia.org/wiki/Semantics_(computer_science))
@@ -21,9 +26,6 @@
 [ZIP file format](https://en.wikipedia.org/wiki/ZIP_(file_format))
 [Torrent file format](https://en.wikipedia.org/wiki/Torrent_file)
 [VCDIFF](https://datatracker.ietf.org/doc/html/rfc3284)
-
-[Bitonic sorter](https://en.wikipedia.org/wiki/Bitonic_sorter)
-[Pancake sorting](https://en.wikipedia.org/wiki/Pancake_sorting)
 
 [Peer to peer model](https://en.wikipedia.org/wiki/Peer-to-peer)
 [Client server model](https://en.wikipedia.org/wiki/Client–server_model)

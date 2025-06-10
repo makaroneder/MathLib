@@ -8,13 +8,11 @@
 
 namespace MathLib {
     HostSocket::HostSocket(void) : HostSocket(socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) {
-        StartBenchmark
-        if (handle == -1) Panic("Failed to create socket");
-        EndBenchmark
+        EmptyBenchmark
     }
-    HostSocket::HostSocket(int handle_) {
+    HostSocket::HostSocket(int handle) : handle(handle) {
         StartBenchmark
-        handle = handle_;
+        if (handle == -1) Panic("Invalid socket handle provided");
         EndBenchmark
     }
     HostSocket::~HostSocket(void) {

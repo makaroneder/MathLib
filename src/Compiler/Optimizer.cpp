@@ -2,8 +2,8 @@
 #include "NodeType.hpp"
 #include <String.hpp>
 
-Node Optimizer::Evaluate(const Node& node) {
-    Node ret = node;
+MathLib::ParserNode Optimizer::Evaluate(const MathLib::ParserNode& node) {
+    MathLib::ParserNode ret = node;
     const size_t size = node.GetSize();
     for (size_t i = 0; i < size; i++) ret.At(i) = Evaluate(node.At(i));
     switch ((NodeType)ret.GetType()) {
@@ -13,9 +13,9 @@ Node Optimizer::Evaluate(const Node& node) {
                 const size_t a = MathLib::StringToNumber(ret.At(0).GetData(), 10);
                 const size_t b = MathLib::StringToNumber(ret.At(1).GetData(), 10);
                 const MathLib::String operation = ret.GetData();
-                if (operation == "+") return Node((size_t)tmp, MathLib::ToString(a + b, 10), MathLib::Array<Node>());
-                else if (operation == "-") return Node((size_t)tmp, MathLib::ToString(a - b, 10), MathLib::Array<Node>());
-                else return Node();
+                if (operation == "+") return MathLib::ParserNode((size_t)tmp, MathLib::ToString(a + b, 10), MathLib::Array<MathLib::ParserNode>());
+                else if (operation == "-") return MathLib::ParserNode((size_t)tmp, MathLib::ToString(a - b, 10), MathLib::Array<MathLib::ParserNode>());
+                else return MathLib::ParserNode();
             }
             break;
         }
@@ -25,9 +25,9 @@ Node Optimizer::Evaluate(const Node& node) {
                 const size_t a = MathLib::StringToNumber(ret.At(0).GetData(), 10);
                 const size_t b = MathLib::StringToNumber(ret.At(1).GetData(), 10);
                 const MathLib::String operation = ret.GetData();
-                if (operation == "*") return Node((size_t)tmp, MathLib::ToString(a * b, 10), MathLib::Array<Node>());
-                else if (operation == "/") return Node((size_t)tmp, MathLib::ToString(a / b, 10), MathLib::Array<Node>());
-                else return Node();
+                if (operation == "*") return MathLib::ParserNode((size_t)tmp, MathLib::ToString(a * b, 10), MathLib::Array<MathLib::ParserNode>());
+                else if (operation == "/") return MathLib::ParserNode((size_t)tmp, MathLib::ToString(a / b, 10), MathLib::Array<MathLib::ParserNode>());
+                else return MathLib::ParserNode();
             }
             break;
         }

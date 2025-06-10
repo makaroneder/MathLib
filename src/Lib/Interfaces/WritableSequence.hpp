@@ -20,6 +20,14 @@ namespace MathLib {
             const T tmp = this->At(x);
             return Set(x, this->At(y)) && Set(y, tmp);
         }
+        [[nodiscard]] bool Copy(WritableSequence<T>& sequence, size_t start, size_t n) const {
+            if (start + n >= this->GetSize()) return false;
+            const size_t size = sequence.GetSize();
+            if (n >= size) return false;
+            for (size_t i = 0; i < size; i++)
+                if (!sequence.Set(i, this->At(start + i))) return false;
+            return true;
+        }
         [[nodiscard]] bool Foreach(const Function<T, T>& function) {
             const size_t size = this->GetSize();
             for (size_t i = 0; i < size; i++)

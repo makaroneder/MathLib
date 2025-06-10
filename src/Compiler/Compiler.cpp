@@ -21,7 +21,7 @@ MathLib::Expected<Variable> Compiler::FindVariable(const MathLib::Sequence<char>
         if (variable.name == name) return variable;
     return parent ? parent->FindVariable(name) : MathLib::Expected<Variable>();
 }
-MathLib::String Compiler::CompileCompound(const Node& node) {
+MathLib::String Compiler::CompileCompound(const MathLib::ParserNode& node) {
     if (node.GetType() != (size_t)NodeType::Comma) return LoadInto(node);
     const size_t size = node.GetSize();
     MathLib::String ret;
@@ -32,7 +32,7 @@ MathLib::String Compiler::AllocStack(ssize_t size) {
     pushOffset += size;
     return (size < 0 ? "add"_M : "sub") + " rsp, "_M + MathLib::ToString(MathLib::Abs(size), 10) + '\n';
 }
-MathLib::String Compiler::LoadInto(const Node& node) {
+MathLib::String Compiler::LoadInto(const MathLib::ParserNode& node) {
     switch ((NodeType)node.GetType()) {
         case NodeType::Return: return LoadInto(node.At(0)) + returnInstruction;
         case NodeType::Digit: return "mov qword [rsp], "_M + node.GetData() + '\n' + AllocStack(wordSize);
@@ -59,7 +59,7 @@ MathLib::String Compiler::LoadInto(const Node& node) {
             return ret + " rbx\nmov [rsp + 16], rax\n" + AllocStack(-wordSize);
         }
         case NodeType::VariableDefinition: {
-            const Node type = node.At(0);
+            const MathLib::ParserNode type = node.At(0);
             if (type.GetType() != (size_t)NodeType::Identifier) return "";
             const size_t typeIndex = FindType(type.GetData());
             if (typeIndex == SIZE_MAX) return "";
@@ -81,7 +81,7 @@ MathLib::String Compiler::LoadInto(const Node& node) {
         default: return "";
     }
 }
-MathLib::String Compiler::Evaluate(const Node& node) {
+MathLib::String Compiler::Evaluate(const MathLib::ParserNode& node) {
     if (parent || !variables.Reset() || !types.Reset() || !types.Add(Type("uint64"_M, sizeof(uint64_t)))) return "";
     pushOffset = 0;
     return "bits 64\nsection .text\nReturn:\nmov rax, [rsp + 8]\nmov rsp, rbp\npop rbp\nret\nglobal _start\n_start:\ncall Main\nmov rdi, rax\nmov rax, 60\nsyscall\n"_M + CompileCompound(node);

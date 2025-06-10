@@ -8,6 +8,7 @@
 #include "LocalAPIC.hpp"
 #include "../PCI/PCI.hpp"
 #include "../PS2/PS2.hpp"
+#include <Emulator/AML/AML.hpp>
 #include <Logger.hpp>
 #include <String.hpp>
 #include <Host.hpp>
@@ -209,9 +210,11 @@ bool InitACPI(const RSDP* rsdp, bool nmi) {
             if (!cmos) return false;
         }
         else if (!InitRTC(nmi, fadt->rtcCenturyRegister)) return false;
+        MathLib::AML aml = MathLib::AML(fadt->GetDSDT());
+        if (!aml.Run()) LogString("Failed to parse AML");
+        else LogString("AML:\n"_M + aml.GetRoot().ToString('\t'_M) + '\n');
     }
     else if (!NoFADTInit(nmi)) return false;
-    // TODO: Parse AML
     // TODO: Init SMP
     // TODO: Init IO APIC
     // TODO: Init local APIC

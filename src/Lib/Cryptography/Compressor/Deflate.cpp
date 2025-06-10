@@ -29,7 +29,7 @@ namespace MathLib {
             sum += tree.lengthTable[i];
         }
         for (uint16_t i = 0; i < size; i++)
-        if (lengths[i]) tree.translationTable[offsets[lengths[i]]++] = i;
+            if (lengths[i]) tree.translationTable[offsets[lengths[i]]++] = i;
         EndBenchmark
     }
     uint16_t Deflate::Decode(const DeflateTree& tree, Readable& readable, Bitmap& bitmap, size_t& i) const {
@@ -41,8 +41,7 @@ namespace MathLib {
             curr = curr * 2 + Read(readable, bitmap, i, 1);
             sum += tree.lengthTable[++len];
             curr -= tree.lengthTable[len];
-            
-        };
+        }
         sum += curr;
         ReturnFromBenchmark(tree.translationTable[sum]);
     }

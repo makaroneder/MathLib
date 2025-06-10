@@ -9,23 +9,29 @@ struct LambdaTerm : MathLib::Comparable, MathLib::Printable {
         Variable,
         Abstraction,
         Application,
+        Binding,
+        String,
+        Pattern,
     };
     MathLib::String value;
     MathLib::Array<LambdaTerm> children;
     Type type;
 
     LambdaTerm(void);
-    LambdaTerm(const MathLib::Sequence<char>& value);
+    LambdaTerm(const MathLib::Sequence<char>& value, bool string);
     LambdaTerm(const LambdaTerm& func, const LambdaTerm& arg);
     LambdaTerm(const LambdaTerm& func, const MathLib::Sequence<char>& arg);
-    [[nodiscard]] LambdaTerm Apply(const LambdaTerm& arg) const;
+    LambdaTerm(const MathLib::Sequence<char>& name, const LambdaTerm& value);
+    LambdaTerm(const MathLib::Sequence<LambdaTerm>& cases);
+    [[nodiscard]] bool Match(const LambdaTerm& term, MathLib::WritableSequence<LambdaTerm>& bindings) const;
+    [[nodiscard]] LambdaTerm Run(const MathLib::Sequence<LambdaTerm>& bindings) const;
+    [[nodiscard]] MathLib::Array<MathLib::String> GetVariables(void) const;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
 
     protected:
     [[nodiscard]] virtual bool Equals(const MathLib::Comparable& other_) const override;
 
     private:
-    [[nodiscard]] LambdaTerm ApplyInternal(const LambdaTerm& val, const MathLib::Sequence<char>& arg) const;
     [[nodiscard]] MathLib::String ToStringInternal(bool root) const;
 };
 

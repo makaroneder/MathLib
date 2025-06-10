@@ -82,8 +82,8 @@ namespace MathLib {
                 for (size_t x = 0; x < image.GetWidth(); x++) {
                     const ssize_t wx = GetX(tmp) + x;
                     if (wx < 0) continue;
-                    else if ((size_t)wx >= GetWidth()) break;
-                    else At(wx, wy) = image.At(x, y);
+                    if ((size_t)wx >= GetWidth()) break;
+                    At(wx, wy) = BlendColor(At(wx, wy), image.At(x, y));
                 }
             }
             EndBenchmark

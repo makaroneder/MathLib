@@ -5,7 +5,6 @@
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <Libc/HostFileSystem.hpp>
-#include <FileSystem/File.hpp>
 #include <iostream>
 
 MathLib::HostFileSystem fileSystem;

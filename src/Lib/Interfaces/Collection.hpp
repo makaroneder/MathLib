@@ -2,6 +2,7 @@
 #define MathLib_Interfaces_Collection_H
 #include "NonLinearCollection.hpp"
 #include "../Iteratable.hpp"
+#include "../Memory.hpp"
 
 namespace MathLib {
     template <typename T>
@@ -18,6 +19,13 @@ namespace MathLib {
         }
         [[nodiscard]] virtual Iterator<T> end(void) override {
             return Iterator<T>((T*)GetValue() + this->GetSize());
+        }
+        [[nodiscard]] bool Copy(Collection<T>& collection, size_t start, size_t n) const {
+            if (start + n >= this->GetSize()) return false;
+            const size_t size = collection.GetSize();
+            if (n >= size) return false;
+            MemoryCopy(GetValue() + n, collection.GetValue(), size);
+            return true;
         }
     };
 }

@@ -43,12 +43,10 @@ MathLib::Tree<size_t> GenerateHeaderTreeInternal(MathLib::FileSystem& fileSystem
             }
             else if (!basePathSplit.Add(MathLib::CollectionToString(str))) return MathLib::Tree<size_t>();
         }
+        const size_t size = basePathSplit.GetSize();
         MathLib::String bp = "";
-        MathLib::String p = "";
-        for (size_t i = 0; i < basePathSplit.GetSize(); i++) {
-            if (i + 1 == basePathSplit.GetSize()) p = basePathSplit.At(i);
-            else bp += basePathSplit.At(i) + '/';
-        }
+        for (size_t i = 1; i < size; i++) bp += basePathSplit.At(i - 1) + '/';
+        const MathLib::String p = basePathSplit.At(size - 1);
         if (!ret.Add(end == '>' ? MathLib::Tree<size_t>(p, 0) : GenerateHeaderTreeInternal(fileSystem, MathLib::SubString(bp, 0, bp.GetSize() - 1), bp + p, visited))) return MathLib::Tree<size_t>();
     }
     const size_t tmp = ret.children.GetSize();

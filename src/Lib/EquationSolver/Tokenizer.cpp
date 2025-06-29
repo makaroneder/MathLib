@@ -64,8 +64,10 @@ namespace MathLib {
         StartBenchmark
         Node* ret = TokenizeInternal(str, i);
         SkipWhiteSpace(str, i);
-        while (i < str.GetSize() && str.At(i) == ',')
-            ret = new Node(GetType(str, i), ""_M, ret, TokenizeInternal(str, i));
+        while (i < str.GetSize() && str.At(i) == ',') {
+            const Node::Type type = GetType(str, i);
+            ret = new Node(type, ""_M, ret, TokenizeInternal(str, i));
+        }
         ReturnFromBenchmark(ret);
     }
     /// @brief Tokenizes string into nodes
@@ -191,7 +193,8 @@ namespace MathLib {
         Node::Type type = GetType(str, i);                                      \
         i = tmp;                                                                \
         while (i < str.GetSize() && (req)) {                                    \
-            ret = new Node(GetType(str, i), ""_M, ret, Tokenize##next(str, i)); \
+            const Node::Type currentType = GetType(str, i);                     \
+            ret = new Node(currentType, ""_M, ret, Tokenize##next(str, i));     \
             if (!ret) ReturnFromBenchmark(nullptr);                             \
             tmp = i;                                                            \
             type = GetType(str, i);                                             \

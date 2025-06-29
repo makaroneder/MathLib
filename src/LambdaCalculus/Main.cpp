@@ -140,12 +140,7 @@ int main(int argc, char** argv) {
         }
         std::cout << std::endl;
         if (main == SIZE_MAX) MathLib::Panic("No Main function specified");
-        LambdaTerm ret = bindings.At(main);
-        while (true) {
-            const LambdaTerm tmp = ret.Run(bindings);
-            if (ret == tmp) break;
-            ret = tmp;
-        }
+        LambdaTerm ret = bindings.At(main).Run(bindings);
         std::cout << "Output: " << ret << std::endl;
         return EXIT_SUCCESS;
     }

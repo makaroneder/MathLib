@@ -22,7 +22,7 @@ void AtExitFunction::operator()(void) {
     function = nullptr;
 }
 extern "C" int __cxa_atexit(AtExitFunction::Function function, void* arg, void* dso) {
-    if (atExitFunctionCount >= SizeOfArray(atExitFunctions)) {return -1;};
+    if (atExitFunctionCount >= SizeOfArray(atExitFunctions)) return -1;
     atExitFunctions[atExitFunctionCount++] = AtExitFunction(function, arg, dso);
     return 0;
 }

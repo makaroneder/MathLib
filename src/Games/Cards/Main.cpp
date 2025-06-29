@@ -39,7 +39,7 @@ template <typename T>
     optimizer.variables.At(variable).value->value = MathLib::CollectionToString(value);
     MathLib::Node* tmp = optimizer.Optimize(func.body);
     const MathLib::Array<MathLib::complex_t> tmpArr = tmp->ToNumber();
-    const T ret = tmpArr.At(0);
+    const T ret = tmpArr.At(0).ToReal();
     delete tmp;
     return ret;
 }

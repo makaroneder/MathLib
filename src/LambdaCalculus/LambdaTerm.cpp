@@ -108,7 +108,7 @@ LambdaTerm LambdaTerm::Run(const MathLib::Sequence<LambdaTerm>& bindings) const 
                         MathLib::Array<LambdaTerm> tmp;
                         for (size_t i = 0; i < vars.GetSize(); i++)
                             if (!bindings.Contains(vars.At(i)) && !tmp.Add(vars.At(i))) return LambdaTerm();
-                        return body.children.At(i + 1).Run(tmp);
+                        return body.children.At(i + 1).Run(tmp).Run(bindings);
                     }
                 }
             }

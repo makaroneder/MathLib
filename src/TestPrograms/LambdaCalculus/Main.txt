@@ -21,18 +21,14 @@ At = pattern (
     )
 ),
 SubSequence = pattern (
-    "Zero" -> pattern (
+    ("Element" . element . next) -> pattern (
         "Zero" -> pattern (
-            ("Element" . element . _) -> ("Element" . element . "End")
+            "Zero" -> ("Element" . element . "End"),
+            ("Successor" . n) -> ("Element" . element . (SubSequence . next . "Zero" . n))
         ),
-        ("Successor" . n) -> pattern (
-            ("Element" . element . next) -> ("Element" . element . (SubSequence . "Zero" . n . next))
-        )
-    ),
-    ("Successor" . a) -> pattern (
-        ("Successor" . b) -> pattern (
-            ("Element" . _ . next) -> (SubSequence . a . b . next)
+        ("Successor" . a) -> pattern (
+            ("Successor" . b) -> (SubSequence . next. a . b)
         )
     )
 ),
-Main = At . ("Element" . a . ("Element" . b . "End")) . ("Successor" . "Zero")
+Main = SubSequence . ("Element" . a . ("Element" . b . "End")) . "Zero" . ("Successor" . "Zero")

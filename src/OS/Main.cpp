@@ -63,7 +63,7 @@ bool InitDisk(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName
         if (!tmp.Get()) {
             tmp = AddPartitions<MathLib::MBR>(disk, diskName);
             if (!tmp.HasValue()) return false;
-            if (!tmp.Get()) LogString("No file system found "_M + " on disk " + diskName + '\n');
+            if (!tmp.Get()) LogString("No file system found on disk "_M + diskName + '\n');
         }
     }
     return true;

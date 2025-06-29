@@ -63,8 +63,8 @@ Date RTC::GetDate(void) const {
     if (!(regB & 1 << 1) && date.hour & 1 << 7) date.hour = ((date.hour & ((1 << 7) - 1)) + 12) % 24;
     if ((uint8_t)centuryRegister) date.year += century * 100;
     else {
-        date.year += creationData.year / 100 * 100;
-        if (date.year < creationData.year) date.year += 100;
+        date.year += Date::currentYear / 100 * 100;
+        if (date.year < Date::currentYear) date.year += 100;
     }
     return date;
 }

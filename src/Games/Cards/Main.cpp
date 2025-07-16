@@ -108,10 +108,10 @@ int main(int, char**) {
             if (update) {
                 renderer.Fill(0);
                 renderer.DrawImage<MathLib::num_t>(table.At(0), MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
-                if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                if (!renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
                 if (!hand.Draw(renderer, cardsImage)) MathLib::Panic("Failed to draw hand");
                 update = false;
             }

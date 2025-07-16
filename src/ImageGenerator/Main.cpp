@@ -1,4 +1,5 @@
 #define SDL_MAIN_HANDLED
+#include <Interfaces/VariadicSequence.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <NeuralNetwork.hpp>
@@ -42,9 +43,9 @@ int main(int argc, char** argv) {
         MathLib::HostFileSystem fs;
         MathLib::NeuralNetwork<MathLib::num_t> neuralNetwork;
         if (!neuralNetwork.LoadFromPath(fs, model)) {
-            neuralNetwork = MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::Sigmoid, MathLib::MakeArray<size_t>(
+            neuralNetwork = MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::Sigmoid, MathLib::VariadicSequence<size_t,
                 2, 16, 1
-            ));
+            >());
             neuralNetwork.Random(0, 1);
         }
         MathLib::Aseprite data;

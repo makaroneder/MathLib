@@ -12,7 +12,7 @@ namespace MathLib {
     }
     ByteArray::ByteArray(ByteDevice& device) : array(device.GetSize()) {
         StartBenchmark
-        if (!device.ReadBuffer((uint8_t*)array.GetValue(), array.GetSize())) MathLib::Panic("Failed to read byte array");
+        if (!device.ReadBuffer(array.GetValue(), array.GetSize())) MathLib::Panic("Failed to read byte array");
         EndBenchmark
     }
     Array<uint8_t> ByteArray::GetArray(void) const {
@@ -39,17 +39,14 @@ namespace MathLib {
             if (!array.Add(buff[i])) ReturnFromBenchmark(i);
         ReturnFromBenchmark(size);
     }
-    uint8_t ByteArray::At(size_t index) const {
-        StartAndReturnFromBenchmark(array.At(index));
-    }
-    uint8_t& ByteArray::At(size_t index) {
-        StartAndReturnFromBenchmark(array.At(index));
-    }
     bool ByteArray::Add(const uint8_t& val) {
         StartAndReturnFromBenchmark(array.Add(val));
     }
     bool ByteArray::Reset(void) {
         StartAndReturnFromBenchmark(array.Reset());
+    }
+    uint8_t* ByteArray::GetValue(void) {
+        StartAndReturnFromBenchmark(array.GetValue());
     }
     const uint8_t* ByteArray::GetValue(void) const {
         StartAndReturnFromBenchmark(array.GetValue());

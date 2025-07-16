@@ -9,7 +9,7 @@ MathLib::Pair<MathLib::String, size_t> symbols[] = {
     MathLib::Pair<MathLib::String, size_t>(MathLib::Carbon::symbol, 4),
 };
 size_t uniqueName = 0;
-MathLib::String MakeUniqueName(void) {
+[[nodiscard]] MathLib::String MakeUniqueName(void) {
     return MathLib::ToString(uniqueName++, 10);
 }
 [[nodiscard]] MathLib::Array<MathLib::Tree<size_t>> CreateConnections(const MathLib::Tree<size_t>& connection, size_t firstFreeConnection) {

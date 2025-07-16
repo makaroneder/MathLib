@@ -1,5 +1,5 @@
-#include <Cryptography/Compressor/BytePairEncoding/BytePairEncoding.hpp>
 #include "BNF.hpp"
+#include <Cryptography/Compressor/BytePairEncoding/BytePairEncoding.hpp>
 #include <iostream>
 
 template <typename T>

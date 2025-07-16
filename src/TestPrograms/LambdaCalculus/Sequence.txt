@@ -1,0 +1,38 @@
+Append = pattern (
+    "End" -> (other -> other),
+    ("Element" . element . next) -> (other -> ("Element" . element . (Append . next . other)))
+),
+AppendSingle = collection -> item -> (Append . collection . ("Element" . item . "End")),
+Size = pattern (
+    "End" -> "Zero",
+    ("Element" . _ . next) -> ("Successor" . (Size . next))
+),
+At = pattern (
+    ("Element" . element . next) -> pattern (
+        "Zero" -> element,
+        ("Successor" . n) -> (At . next . n)
+    )
+),
+SubSequence = pattern (
+    ("Element" . element . next) -> pattern (
+        "Zero" -> pattern (
+            "Zero" -> ("Element" . element . "End"),
+            ("Successor" . n) -> ("Element" . element . (SubSequence . next . "Zero" . n))
+        ),
+        ("Successor" . a) -> pattern (
+            ("Successor" . b) -> (SubSequence . next. a . b)
+        )
+    )
+),
+Map = pattern (
+    "End" -> (_ -> "End"),
+    ("Element" . element . next) -> (func -> ("Element" . (func . element) . (Map . next . func)))
+),
+Foldr = pattern (
+    "End" -> (_ -> start -> start),
+    ("Element" . element . next) -> (func -> start -> (func . element . (Foldr . next . func . start)))
+),
+Foldl = pattern (
+    "End" -> (_ -> start -> start),
+    ("Element" . element . next) -> (func -> start -> (func . (Foldl . next . func . start) . element))
+)

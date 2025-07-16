@@ -1,0 +1,12 @@
+Not = pattern (
+    "True" -> "False",
+    "False" -> "True"
+),
+And = pattern (
+    "True" -> (other -> other),
+    "False" -> (_ -> "False")
+),
+Or = pattern (
+    "False" -> (other -> other),
+    "True" -> (_ -> "True")
+)

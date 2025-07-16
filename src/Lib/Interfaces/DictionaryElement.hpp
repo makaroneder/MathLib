@@ -1,6 +1,6 @@
 #ifndef MathLib_Interfaces_DictionaryElement_H
 #define MathLib_Interfaces_DictionaryElement_H
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     template <typename Key, typename Value>

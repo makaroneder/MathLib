@@ -1,5 +1,5 @@
 #include "Memory.hpp"
-#include "Typedefs.hpp"
+#include "Benchmark.hpp"
 
 namespace MathLib {
     void MemoryCopy(const void* src, void* dst, size_t size) {

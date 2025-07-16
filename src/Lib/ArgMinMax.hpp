@@ -5,6 +5,7 @@
 namespace MathLib {
     template <typename Ret, typename Arg>
     ArgMinMaxData<Ret, Arg> ArgMinMax(const Sequence<Arg>& sequence, const Function<Ret, Arg>& func, bool max) {
+        StartBenchmark
         Ret ret = max ? -MathLib::infinity : MathLib::infinity;
         Array<Arg> args;
         const size_t size = sequence.GetSize();
@@ -12,14 +13,14 @@ namespace MathLib {
             const Arg arg = sequence.At(i);
             const Ret tmp = func(arg);
             if (FloatsEqual<Ret>(ret, tmp)) {
-                if (!args.Add(arg)) return ArgMinMaxData<Ret, Arg>();
+                if (!args.Add(arg)) ReturnFromBenchmark((ArgMinMaxData<Ret, Arg>()));
             }
             else if ((ret < tmp) == max) {
                 ret = tmp;
                 args = MakeArray<Arg>(arg);
             }
         }
-        return ArgMinMaxData<Ret, Arg>(ret, args);
+        ReturnFromBenchmark((ArgMinMaxData<Ret, Arg>(ret, args)));
     }
 }
 

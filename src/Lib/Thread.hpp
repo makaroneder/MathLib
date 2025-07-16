@@ -1,6 +1,5 @@
 #ifndef MathLib_Thread_H
 #define MathLib_Thread_H
-#include "Interfaces/Function.hpp"
 #include "Interval.hpp"
 
 namespace MathLib {

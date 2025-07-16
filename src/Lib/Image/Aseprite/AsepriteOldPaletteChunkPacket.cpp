@@ -1,5 +1,5 @@
 #include "AsepriteOldPaletteChunkPacket.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     uint16_t AsepriteOldPaletteChunkPacket::GetColorCount(void) const {

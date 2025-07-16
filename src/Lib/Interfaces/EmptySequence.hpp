@@ -1,7 +1,6 @@
 #ifndef MathLib_Interfaces_EmptySequence_H
 #define MathLib_Interfaces_EmptySequence_H
 #include "Sequence.hpp"
-#include "../Typedefs.hpp"
 
 namespace MathLib {
     template <typename T>

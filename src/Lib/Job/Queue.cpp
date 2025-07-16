@@ -1,5 +1,5 @@
 #include "Queue.hpp"
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     JobState Queue::RunInternal(void) {

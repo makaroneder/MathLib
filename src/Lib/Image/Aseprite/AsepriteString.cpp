@@ -1,5 +1,5 @@
 #include "AsepriteString.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     AsepriteString::AsepriteString(void) : size(0) {

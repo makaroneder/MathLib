@@ -1,6 +1,7 @@
 #ifndef MathLib_Pair_H
 #define MathLib_Pair_H
-#include "Typedefs.hpp"
+#include "Allocator/Allocatable.hpp"
+#include "Benchmark.hpp"
 
 namespace MathLib {
     template <typename A, typename B>
@@ -15,10 +16,10 @@ namespace MathLib {
             EmptyBenchmark
         }
         bool operator==(const Pair<A, B>& other) const {
-            return first == other.first && second == other.second;
+            StartAndReturnFromBenchmark(first == other.first && second == other.second);
         }
         bool operator!=(const Pair<A, B>& other) const {
-            return first != other.first || second != other.second;
+            StartAndReturnFromBenchmark(first != other.first || second != other.second);
         }
     };
 }

@@ -9,16 +9,19 @@ namespace MathLib {
         using Sequence<T>::operator[];
         [[nodiscard]] virtual T& At(size_t index) = 0;
         [[nodiscard]] virtual bool Set(size_t index, const T& val) override {
-            if (index >= this->GetSize()) return false;
+            StartBenchmark
+            if (index >= this->GetSize()) ReturnFromBenchmark(false);
             At(index) = val;
-            return true;
+            ReturnFromBenchmark(true);
         }
         void Foreach(const Function<void, T&>& function) {
+            StartBenchmark
             const size_t size = this->GetSize();
             for (size_t i = 0; i < size; i++) function(At(i));
+            EndBenchmark
         }
         [[nodiscard]] T& operator[](size_t index) {
-            return At(index);
+            StartAndReturnFromBenchmark(At(index));
         }
     };
 }

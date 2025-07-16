@@ -1,6 +1,6 @@
 #ifndef MathLib_Interfaces_BaumSweetSequence_H
 #define MathLib_Interfaces_BaumSweetSequence_H
-#include "../Typedefs.hpp"
+#include "Function.hpp"
 
 namespace MathLib {
     struct BaumSweetSequence : Function<bool, size_t> {

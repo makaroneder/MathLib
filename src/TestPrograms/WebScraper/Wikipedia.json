@@ -1,0 +1,40 @@
+{
+    "url" : "https://en.wikipedia.org/wiki/URL",
+    "maxDepth": 2,
+    "ignore": [
+        "https://en.wikipedia.org/wiki/Main_Page",
+        "https://en.wikipedia.org/wiki/Talk:",
+        "https://en.wikipedia.org/wiki/User:",
+        "https://en.wikipedia.org/wiki/User_talk:",
+        "https://en.wikipedia.org/wiki/Wikipedia:",
+        "https://en.wikipedia.org/wiki/Wikipedia_talk:",
+        "https://en.wikipedia.org/wiki/File:",
+        "https://en.wikipedia.org/wiki/File_talk:",
+        "https://en.wikipedia.org/wiki/MediaWiki:",
+        "https://en.wikipedia.org/wiki/MediaWiki_talk:",
+        "https://en.wikipedia.org/wiki/Template:",
+        "https://en.wikipedia.org/wiki/Template_talk:",
+        "https://en.wikipedia.org/wiki/Help:",
+        "https://en.wikipedia.org/wiki/Help_talk:",
+        "https://en.wikipedia.org/wiki/Category:",
+        "https://en.wikipedia.org/wiki/Category_talk:",
+        "https://en.wikipedia.org/wiki/Portal:",
+        "https://en.wikipedia.org/wiki/Portal_talk:",
+        "https://en.wikipedia.org/wiki/Draft:",
+        "https://en.wikipedia.org/wiki/Draft_talk:",
+        "https://en.wikipedia.org/wiki/MOS:",
+        "https://en.wikipedia.org/wiki/MOS_talk:",
+        "https://en.wikipedia.org/wiki/TimedText:",
+        "https://en.wikipedia.org/wiki/TimedText_talk:",
+        "https://en.wikipedia.org/wiki/Module:",
+        "https://en.wikipedia.org/wiki/Module_talk:",
+        "https://en.wikipedia.org/wiki/Event:",
+        "https://en.wikipedia.org/wiki/Event_talk:",
+        "https://en.wikipedia.org/wiki/Special:",
+        "https://en.wikipedia.org/wiki/Media:"
+    ],
+    "scrape": [
+        "https://en.wikipedia.org/wiki"
+    ],
+    "save": []
+}

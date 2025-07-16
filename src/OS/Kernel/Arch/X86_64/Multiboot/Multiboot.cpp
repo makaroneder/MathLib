@@ -23,7 +23,7 @@ MathLib::String MultibootFramebuffer::ToString(const MathLib::Sequence<char>& pa
     ret += MathLib::CollectionToString(padding) + "\tHeight: " + MathLib::ToString(height) + '\n';
     ret += MathLib::CollectionToString(padding) + "\tDepth: " + MathLib::ToString(bitsPerPixel) + '\n';
     ret += MathLib::CollectionToString(padding) + "\tPitch: " + MathLib::ToString(pitch) + '\n';
-    ret += MathLib::CollectionToString(padding) + "\tType: " + (type < Type::TypeCount ? typeStr[(uint8_t)type] : "Unknown(0x"_M + MathLib::ToString((uint8_t)type, 16) + ')') + '\n';
+    ret += MathLib::CollectionToString(padding) + "\tType: " + (type < Type::TypeCount ? typeStr[(uint8_t)type] : "Unknown (0x"_M + MathLib::ToString((uint8_t)type, 16) + ')') + '\n';
     return ret + padding + "}\n";
 }
 

@@ -1,7 +1,6 @@
 #ifndef MathLib_Interfaces_LinkedList_H
 #define MathLib_Interfaces_LinkedList_H
 #include "NonLinearCollection.hpp"
-#include "../Typedefs.hpp"
 
 namespace MathLib {
     template <typename T>

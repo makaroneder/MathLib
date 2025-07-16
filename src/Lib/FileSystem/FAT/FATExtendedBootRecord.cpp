@@ -1,5 +1,5 @@
 #include "FATExtendedBootRecord.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     bool FATExtendedBootRecord::IsValid(void) const {

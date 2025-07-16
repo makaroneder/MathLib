@@ -1,6 +1,7 @@
 #ifndef MathLib_Interfaces_IndicatorFunction_H
 #define MathLib_Interfaces_IndicatorFunction_H
-#include "../Typedefs.hpp"
+#include "Function.hpp"
+#include "Container.hpp"
 
 namespace MathLib {
     template <typename T>

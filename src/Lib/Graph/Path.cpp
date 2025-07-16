@@ -5,17 +5,14 @@ namespace MathLib {
     size_t Path::GetSize(void) const {
         StartAndReturnFromBenchmark(vertices.GetSize());
     }
-    size_t Path::At(size_t index) const {
-        StartAndReturnFromBenchmark(vertices.At(index));
-    }
-    size_t& Path::At(size_t index) {
-        StartAndReturnFromBenchmark(vertices.At(index));
-    }
     bool Path::Add(const size_t& value) {
         StartAndReturnFromBenchmark(vertices.Add(value));
     }
     bool Path::Reset(void) {
         StartAndReturnFromBenchmark(vertices.Reset());
+    }
+    size_t* Path::GetValue(void) {
+        StartAndReturnFromBenchmark(vertices.GetValue());
     }
     const size_t* Path::GetValue(void) const {
         StartAndReturnFromBenchmark(vertices.GetValue());

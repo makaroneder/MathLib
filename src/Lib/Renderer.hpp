@@ -9,7 +9,6 @@
 #include "Math/Quaternion.hpp"
 #include "Geometry/LineShape.hpp"
 #include "Image/SaveableImage.hpp"
-#include "Interfaces/Function.hpp"
 #include "Math/ComplexPosition.hpp"
 
 namespace MathLib {

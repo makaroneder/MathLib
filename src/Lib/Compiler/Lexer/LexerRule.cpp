@@ -1,5 +1,5 @@
 #include "LexerRule.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     LexerRule::LexerRule(size_t type) : type(type) {

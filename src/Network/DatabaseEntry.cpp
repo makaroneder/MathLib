@@ -10,7 +10,7 @@ bool DatabaseEntry::Load(MathLib::Readable& file) {
     size_t size;
     if (!file.Read<size_t>(size)) return false;
     data = MathLib::Array<uint8_t>(size);
-    return file.ReadBuffer((uint8_t*)data.GetValue(), size);
+    return file.ReadBuffer(data.GetValue(), size);
 }
 bool DatabaseEntry::operator==(const DatabaseEntry& other) const {
     return data == other.data;

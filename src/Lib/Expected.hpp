@@ -17,12 +17,12 @@ namespace MathLib {
         [[nodiscard]] T Get(const Sequence<char>& panicStr) const {
             StartBenchmark
             if (error) Panic(panicStr);
-            else ReturnFromBenchmark(value);
+            ReturnFromBenchmark(value);
         }
         [[nodiscard]] T Get(const char* panicStr = "Expected value doesn't exist") const {
             StartBenchmark
             if (error) Panic(panicStr);
-            else ReturnFromBenchmark(value);
+            ReturnFromBenchmark(value);
         }
         [[nodiscard]] bool HasValue(void) const {
             StartAndReturnFromBenchmark(!error);

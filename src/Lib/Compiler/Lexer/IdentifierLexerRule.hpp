@@ -4,8 +4,11 @@
 
 namespace MathLib {
     struct IdentifierLexerRule : LexerRule {
-        IdentifierLexerRule(size_t type);
+        IdentifierLexerRule(size_t type, bool startWithDigit);
         virtual void Match(const Sequence<char>& str, size_t& i) const override;
+
+        private:
+        bool startWithDigit;
     };
 }
 

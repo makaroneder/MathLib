@@ -1,5 +1,5 @@
 #include "PSF1.hpp"
-#include "Typedefs.hpp"
+#include "Benchmark.hpp"
 
 namespace MathLib {
     bool PSF1::IsValid(void) const {

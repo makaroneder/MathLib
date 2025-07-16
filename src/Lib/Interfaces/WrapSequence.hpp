@@ -1,6 +1,7 @@
 #ifndef MathLib_Interfaces_WrapSequence_H
 #define MathLib_Interfaces_WrapSequence_H
-#include "../Typedefs.hpp"
+#include "Sequence.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     template <typename T>

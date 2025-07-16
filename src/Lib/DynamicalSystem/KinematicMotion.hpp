@@ -5,7 +5,9 @@
 namespace MathLib {
     template <typename T>
     struct KinematicMotion : DynamicalSystem<T> {
-        KinematicMotion(const Sequence<Matrix<T>>& data) : data(CollectionToArray<Matrix<T>>(data)) {}
+        KinematicMotion(const Sequence<Matrix<T>>& data) : data(CollectionToArray<Matrix<T>>(data)) {
+            EmptyBenchmark
+        }
         virtual Matrix<T> Update(const T& dt) override {
             StartBenchmark
             data.At(data.GetSize() - 1) = GetFinal();

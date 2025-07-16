@@ -1,7 +1,6 @@
 #ifndef MathLib_Interfaces_TransformSequence_H
 #define MathLib_Interfaces_TransformSequence_H
 #include "Sequence.hpp"
-#include "../Typedefs.hpp"
 
 namespace MathLib {
     template <typename T, typename F>

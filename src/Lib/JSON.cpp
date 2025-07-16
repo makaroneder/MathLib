@@ -11,7 +11,7 @@ namespace MathLib {
             while (str.At(i) != '"') name += str.At(i++);
             i++;
             SkipWhiteSpace(str, i);
-            if (str.At(i) != ':') ReturnFromBenchmark(Expected<JSON>());
+            if (str.At(i) != ':') ReturnFromBenchmark(JSON(JSON::Type::String, ""_M, name));
             i++;
             SkipWhiteSpace(str, i);
         }
@@ -36,18 +36,18 @@ namespace MathLib {
             const char end = str.At(i) == '{' ? '}' : ']';
             JSON ret = JSON(end == '}' ? JSON::Type::Object : JSON::Type::Array, name, ""_M);
             i++;
-            while (true) {
+            SkipWhiteSpace(str, i);
+            if (str.At(i) != end) while (true) {
                 const Expected<JSON> tmp = LoadJSON(str, i);
                 if (!tmp.HasValue()) ReturnFromBenchmark(Expected<JSON>());
                 SkipWhiteSpace(str, i);
                 if (!ret.AddChild(tmp.Get())) ReturnFromBenchmark(Expected<JSON>());
                 if (str.At(i) == ',') i++;
-                else if (str.At(i) == end) {
-                    i++;
-                    return ret;
-                }
+                else if (str.At(i) == end) break;
                 else ReturnFromBenchmark(Expected<JSON>());
             }
+            i++;
+            return ret;
         }
         else ReturnFromBenchmark(Expected<JSON>());
     }

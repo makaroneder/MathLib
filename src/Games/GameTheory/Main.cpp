@@ -1,14 +1,15 @@
 #include "ConstantStrategy.hpp"
 #include "Game.hpp"
+#include <Interfaces/VariadicSequence.hpp>
 #include <iostream>
 
 template <typename T>
 Tensor<T> PrisonersDilemmaPayoffMatrix(const T& cooperationPayoff, const T& punishmentPayoff, const T& temptationPayoff, const T& suckersPayoff) {
-    Tensor<T> ret = Tensor<T>(MathLib::MakeArray<size_t>(2, 2, 2));
-    ret.At(MathLib::MakeArray<size_t>(0, 0, 0)) = ret.At(MathLib::MakeArray<size_t>(0, 0, 1)) = cooperationPayoff;
-    ret.At(MathLib::MakeArray<size_t>(1, 0, 0)) = ret.At(MathLib::MakeArray<size_t>(0, 1, 1)) = temptationPayoff;
-    ret.At(MathLib::MakeArray<size_t>(1, 0, 1)) = ret.At(MathLib::MakeArray<size_t>(0, 1, 0)) = suckersPayoff;
-    ret.At(MathLib::MakeArray<size_t>(1, 1, 0)) = ret.At(MathLib::MakeArray<size_t>(1, 1, 1)) = punishmentPayoff;
+    Tensor<T> ret = Tensor<T>(MathLib::VariadicSequence<size_t, 2, 2, 2>());
+    ret.At(MathLib::VariadicSequence<size_t, 0, 0, 0>()) = ret.At(MathLib::VariadicSequence<size_t, 0, 0, 1>()) = cooperationPayoff;
+    ret.At(MathLib::VariadicSequence<size_t, 1, 0, 0>()) = ret.At(MathLib::VariadicSequence<size_t, 0, 1, 1>()) = temptationPayoff;
+    ret.At(MathLib::VariadicSequence<size_t, 1, 0, 1>()) = ret.At(MathLib::VariadicSequence<size_t, 0, 1, 0>()) = suckersPayoff;
+    ret.At(MathLib::VariadicSequence<size_t, 1, 1, 0>()) = ret.At(MathLib::VariadicSequence<size_t, 1, 1, 1>()) = punishmentPayoff;
     return ret;
 }
 /// @brief Entry point for this program

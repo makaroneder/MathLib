@@ -1,5 +1,5 @@
 #include "Allocator.hpp"
-#include "../Host.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     Allocatable::~Allocatable(void) {

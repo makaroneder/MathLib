@@ -1,5 +1,5 @@
 #include "MemoryFSFile.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     MemoryFSFile::MemoryFSFile(size_t resource, bool write) : resource(resource), write(write), free(false) {

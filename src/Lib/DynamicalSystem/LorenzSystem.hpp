@@ -6,7 +6,9 @@
 namespace MathLib {
     template <typename T>
     struct LorenzSystem : DynamicalSystem<T> {
-        LorenzSystem(const Matrix<T>& data, const T& s, const T& p, const T& b) : data(data), s(s), p(p), b(b) {}
+        LorenzSystem(const Matrix<T>& data, const T& s, const T& p, const T& b) : data(data), s(s), p(p), b(b) {
+            EmptyBenchmark
+        }
         virtual Matrix<T> Update(const T& dt) override {
             StartBenchmark
             const T x = GetX(data);

@@ -1,5 +1,5 @@
 #include "QueueState.hpp"
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     QueueState::QueueState(Job* job, JobState state) : job(job), state(state) {

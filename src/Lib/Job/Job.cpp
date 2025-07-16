@@ -1,5 +1,5 @@
 #include "Job.hpp"
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     Job::Job(void) : state(0) {

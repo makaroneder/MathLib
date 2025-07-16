@@ -3,6 +3,7 @@
 #include <Cryptography/Channel/FlipChannel.hpp>
 #include <Cryptography/Channel/Channel.hpp>
 #include <Math/UniformDiscreteMeasure.hpp>
+#include <Interfaces/VariadicSequence.hpp>
 #include <Cryptography/Cipher/ROT13.hpp>
 #include <iostream>
 
@@ -23,7 +24,7 @@ int main(int, char**) {
             )), 1)
         );
         const MathLib::String message = "Hello";
-        const MathLib::String tmp = channel.SendString(message, MathLib::MakeArray<uint64_t>(3));
+        const MathLib::String tmp = channel.SendString(message, MathLib::VariadicSequence<uint64_t, 3>());
         std::cout << "Sent: " << message << std::endl;
         std::cout << "Recieved: " << tmp << std::endl;
         const size_t diff = message.GetSize() - tmp.GetSize();

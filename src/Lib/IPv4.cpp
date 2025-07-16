@@ -7,6 +7,7 @@ namespace MathLib {
         EmptyBenchmark
     }
     IPv4::IPv4(const Sequence<char>& str) {
+        StartBenchmark
         const Array<String> split = Split(str, '.'_M, false);
         const size_t size = split.GetSize();
         if (!size || size > sizeof(uint32_t)) Panic("Invalid IPv4 provided");
@@ -15,8 +16,8 @@ namespace MathLib {
         const size_t final = StringToNumber(split.At(size - 1));
         MemoryCopy(&final, &buff[size - 1], sizeof(uint32_t) - size + 1);
         uint8_t end = sizeof(uint32_t);
-        for (uint8_t i = size - 1; i < end; i++)
-            Swap<uint8_t>(buff[i], buff[--end]);
+        for (uint8_t i = size - 1; i < end; i++) Swap<uint8_t>(buff[i], buff[--end]);
+        EndBenchmark
     }
     bool IPv4::Save(Writable& file) const {
         StartAndReturnFromBenchmark(file.Write<uint32_t>(data));

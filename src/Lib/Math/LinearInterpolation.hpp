@@ -1,6 +1,6 @@
 #ifndef MathLib_Math_LinearInterpolation_H
 #define MathLib_Math_LinearInterpolation_H
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     template <typename F, typename T>

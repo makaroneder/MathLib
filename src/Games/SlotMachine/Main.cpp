@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "Symbol.hpp"
 #include "Consumable.hpp"
+#include <Interfaces/VariadicSequence.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Pair.hpp>
 #include <SDL2.cpp>
@@ -19,14 +20,14 @@ int main(int, char**) {
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/SlotMachine/";
         const Symbol symbols[] = {
-            Symbol(fs, path + "Nothing.obj", "Nothing"_M, MathLib::MakeArray<size_t>(0, 0, 0)),
-            Symbol(fs, path + "Money.obj", "Money"_M, MathLib::MakeArray<size_t>(2, 5, 10)),
-            Symbol(fs, path + "Bell.obj", "Bell"_M, MathLib::MakeArray<size_t>(0, 0, 10)),
-            Symbol(fs, path + "Bar.obj", "Bar"_M, MathLib::MakeArray<size_t>(0, 0, 20)),
-            Symbol(fs, path + "7.obj", "7"_M, MathLib::MakeArray<size_t>(0, 0, 30)),
-            Symbol(fs, path + "Lemon.obj", "Lemon"_M, MathLib::MakeArray<size_t>(0, 0, 40)),
-            Symbol(fs, path + "Banana.obj", "Banana"_M, MathLib::MakeArray<size_t>(0, 0, 60)),
-            Symbol(fs, path + "Orange.obj", "Orange"_M, MathLib::MakeArray<size_t>(0, 0, 100)),
+            Symbol(fs, path + "Nothing.obj", "Nothing"_M, MathLib::VariadicSequence<size_t, 0, 0, 0>()),
+            Symbol(fs, path + "Money.obj", "Money"_M, MathLib::VariadicSequence<size_t, 2, 5, 10>()),
+            Symbol(fs, path + "Bell.obj", "Bell"_M, MathLib::VariadicSequence<size_t, 0, 0, 10>()),
+            Symbol(fs, path + "Bar.obj", "Bar"_M, MathLib::VariadicSequence<size_t, 0, 0, 20>()),
+            Symbol(fs, path + "7.obj", "7"_M, MathLib::VariadicSequence<size_t, 0, 0, 30>()),
+            Symbol(fs, path + "Lemon.obj", "Lemon"_M, MathLib::VariadicSequence<size_t, 0, 0, 40>()),
+            Symbol(fs, path + "Banana.obj", "Banana"_M, MathLib::VariadicSequence<size_t, 0, 0, 60>()),
+            Symbol(fs, path + "Orange.obj", "Orange"_M, MathLib::VariadicSequence<size_t, 0, 0, 100>()),
         };
         const Consumable consumables[] = {
             Consumable(fs, path + "NormalWater.obj", Consumable::Type::RewardMultiplier, 2, 6000),
@@ -53,10 +54,10 @@ int main(int, char**) {
                 Consumable tmp = consumables[i];
                 const MathLib::num_t y = ((ssize_t)i - 1) * 1.3;
                 tmp.position = MathLib::CreateVector<MathLib::num_t>(-3, y, 0);
-                if (!renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+                if (!renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
                 renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0xff0000ff);
             }
-            if (!renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), &_binary_src_Lib_zap_light16_psf_start, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+            if (!renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
             for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
                 Symbol tmp = symbols[symbolIndexes.At(i)];
                 tmp.position = MathLib::CreateVector<MathLib::num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);

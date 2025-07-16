@@ -1,34 +1,4 @@
-Predecessor = pattern (
-    ("Successor" . n) -> n
-),
-Add = pattern (
-    "Zero" -> (n -> n),
-    ("Successor" . a) -> (b -> ("Successor" . (Add . a . b)))
-),
-Append = pattern (
-    "End" -> (other -> other),
-    ("Element" . element . next) -> (other -> ("Element" . element . (Append . next . other)))
-),
-AppendSingle = collection -> item -> (Append . collection . ("Element" . item . "End")),
-Size = pattern (
-    "End" -> "Zero",
-    ("Element" . _ . next) -> ("Successor" . (Size . next))
-),
-At = pattern (
-    ("Element" . element . next) -> pattern (
-        "Zero" -> element,
-        ("Successor" . n) -> (At . next . n)
-    )
-),
-SubSequence = pattern (
-    ("Element" . element . next) -> pattern (
-        "Zero" -> pattern (
-            "Zero" -> ("Element" . element . "End"),
-            ("Successor" . n) -> ("Element" . element . (SubSequence . next . "Zero" . n))
-        ),
-        ("Successor" . a) -> pattern (
-            ("Successor" . b) -> (SubSequence . next. a . b)
-        )
-    )
-),
-Main = SubSequence . ("Element" . a . ("Element" . b . "End")) . "Zero" . ("Successor" . "Zero")
+$Number.txt$,
+$Sequence.txt$,
+$Bool.txt$,
+Main = Foldl . ("Element" . ("Successor" . "Zero") . ("Element" . ("Successor" . "Zero") . "End")) . Add . ("Successor" . "Zero")

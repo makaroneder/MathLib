@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 namespace MathLib {
-    void XorSwap(uint64_t x, uint64_t y);
+    void XorSwap(uint64_t& x, uint64_t& y);
 }
 
 #endif

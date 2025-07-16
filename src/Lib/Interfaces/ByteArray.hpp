@@ -24,10 +24,9 @@ namespace MathLib {
         [[nodiscard]] virtual size_t GetSize(void) const override;
         [[nodiscard]] virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;
         [[nodiscard]] virtual size_t WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) override;
-        [[nodiscard]] virtual uint8_t At(size_t index) const override;
-        [[nodiscard]] virtual uint8_t& At(size_t index) override;
         [[nodiscard]] virtual bool Add(const uint8_t& val) override;
         [[nodiscard]] virtual bool Reset(void) override;
+        [[nodiscard]] virtual uint8_t* GetValue(void) override;
         [[nodiscard]] virtual const uint8_t* GetValue(void) const override;
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;

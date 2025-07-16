@@ -4,9 +4,6 @@ namespace MathLib {
     Video::Video(void) : frames() {
         EmptyBenchmark
     }
-    const Frame* Video::GetValue(void) const {
-        StartAndReturnFromBenchmark(frames.GetValue());
-    }
     bool Video::Add(const Frame& value) {
         StartAndReturnFromBenchmark(value.IsValid() && frames.Add(value));
     }
@@ -16,11 +13,11 @@ namespace MathLib {
     size_t Video::GetSize(void) const {
         StartAndReturnFromBenchmark(frames.GetSize());
     }
-    Frame Video::At(size_t index) const {
-        StartAndReturnFromBenchmark(frames.At(index));
+    Frame* Video::GetValue(void) {
+        StartAndReturnFromBenchmark(frames.GetValue());
     }
-    Frame& Video::At(size_t index) {
-        StartAndReturnFromBenchmark(frames.At(index));
+    const Frame* Video::GetValue(void) const {
+        StartAndReturnFromBenchmark(frames.GetValue());
     }
     size_t Video::GetWidth(void) const {
         StartAndReturnFromBenchmark(frames.At(0).GetWidth());

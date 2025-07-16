@@ -1,6 +1,8 @@
 #ifndef MathLib_Graph_NetworkElement_H
 #define MathLib_Graph_NetworkElement_H
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
+#include <stddef.h>
+#include <stdint.h>
 
 namespace MathLib {
     struct NetworkElement {

@@ -1,4 +1,5 @@
 #include <Interfaces/TransformSequence.hpp>
+#include <Interfaces/VariadicSequence.hpp>
 #include <Interfaces/Comparable.hpp>
 #include <FunctionT.hpp>
 #include <String.hpp>
@@ -53,11 +54,11 @@ struct ArtificialChemistry {
 /// @return Status
 int main(int, char**) {
     try {
-        const Reaction reaction = Reaction(MathLib::MakeArray<size_t>(
+        const Reaction reaction = Reaction(MathLib::VariadicSequence<size_t,
             0, 1, 2, 3
-        ), MathLib::MakeArray<size_t>(
+        >(), MathLib::VariadicSequence<size_t,
             0, 1, 2, 3
-        ));
+        >());
         std::cout << reaction << std::endl;
         return EXIT_SUCCESS;
     }

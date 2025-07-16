@@ -1,29 +1,30 @@
 #ifndef MathLib_Math_Orderable_H
 #define MathLib_Math_Orderable_H
-#include "../Typedefs.hpp"
+#include "../Allocator/Allocatable.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     struct Orderable : Allocatable {
         [[nodiscard]] bool operator<=(const Orderable& other) const {
-            return LessThanEqual(other);
+            StartAndReturnFromBenchmark(LessThanEqual(other));
         }
         [[nodiscard]] bool operator>=(const Orderable& other) const {
-            return other.LessThanEqual(*this);
+            StartAndReturnFromBenchmark(other.LessThanEqual(*this));
         }
         [[nodiscard]] bool operator==(const Orderable& other) const {
-            return LessThanEqual(other) && other.LessThanEqual(*this);
+            StartAndReturnFromBenchmark(LessThanEqual(other) && other.LessThanEqual(*this));
         }
         [[nodiscard]] bool operator!=(const Orderable& other) const {
-            return !LessThanEqual(other) || !other.LessThanEqual(*this);
+            StartAndReturnFromBenchmark(!LessThanEqual(other) || !other.LessThanEqual(*this));
         }
         [[nodiscard]] bool operator<(const Orderable& other) const {
-            return LessThanEqual(other) && !other.LessThanEqual(*this);
+            StartAndReturnFromBenchmark(LessThanEqual(other) && !other.LessThanEqual(*this));
         }
         [[nodiscard]] bool operator>(const Orderable& other) const {
-            return other.LessThanEqual(*this) && !LessThanEqual(other);
+            StartAndReturnFromBenchmark(other.LessThanEqual(*this) && !LessThanEqual(other));
         }
         [[nodiscard]] bool Uncomparable(const Orderable& other) const {
-            return !LessThanEqual(other) && !other.LessThanEqual(*this);
+            StartAndReturnFromBenchmark(!LessThanEqual(other) && !other.LessThanEqual(*this));
         }
 
         protected:

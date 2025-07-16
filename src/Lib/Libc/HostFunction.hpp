@@ -2,7 +2,6 @@
 #ifndef MathLib_Libc_HostFunction_H
 #define MathLib_Libc_HostFunction_H
 #include "../Interfaces/Function.hpp"
-#include "Typedefs.hpp"
 #include <functional>
 
 namespace MathLib {

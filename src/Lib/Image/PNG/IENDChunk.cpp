@@ -1,5 +1,5 @@
 #include "IENDChunk.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     IENDChunk::IENDChunk(void) : PNGChunk(0, expectedType) {

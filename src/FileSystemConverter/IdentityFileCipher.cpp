@@ -14,6 +14,6 @@ MathLib::Array<uint8_t> IdentityFileCipher::DecryptReadablePartial(MathLib::Read
     if (start >= end || !readable.Skip(start)) return MathLib::Array<uint8_t>();
     const size_t size = end - start;
     MathLib::Array<uint8_t> ret = MathLib::Array<uint8_t>(size);
-    if (!readable.ReadBuffer((uint8_t*)ret.GetValue(), size)) return MathLib::Array<uint8_t>();
+    if (!readable.ReadBuffer(ret.GetValue(), size)) return MathLib::Array<uint8_t>();
     return ret;
 }

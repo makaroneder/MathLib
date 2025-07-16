@@ -1,5 +1,5 @@
 #include "ISO9660DirectoryEntryDate.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     bool ISO9660DirectoryEntryDate::IsValid(void) const {

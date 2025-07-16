@@ -16,7 +16,6 @@ rwildcard = $(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(
 CXXFLAGS = -Wno-packed-bitfield-compat -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ASFLAGS = -Werror -f elf64 -I $(SRCDIR) -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ARFLAGS = -rcs
-OBJCPYFLAGS = -O elf64-x86-64 -B i386 -I binary
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
 ASLFLAGS = -oa
 
@@ -29,17 +28,14 @@ endif
 
 HEADERS = $(call rwildcard,$(SRCDIR),*.hpp)
 HEADERS += $(call rwildcard,$(SRCDIR)/Platform,*.cpp)
+HEADERS += $(SRCDIR)/Lib/Font.hpp
 HEADERS += $(SRCDIR)/Lib/MathLib.hpp
 
 BUILDSYSDEPS = $(call rwildcard,$(SRCDIR)/BuildSystem,*.cpp)
-SRCXX = $(call rwildcard,$(SRCDIR)/Lib,*.cpp)
 SRCPSF = $(call rwildcard,$(SRCDIR)/Lib,*.psf)
-OBJS = $(patsubst $(SRCDIR)/Lib/%.psf, $(BUILDDIR)/Lib/%.o, $(SRCPSF))
+SRCXX = $(call rwildcard,$(SRCDIR)/Lib,*.cpp)
+SRCXX += $(SRCDIR)/Lib/Font.cpp
 
-$(BUILDDIR)/libExtras.a: $(OBJS)
-	@$(MKDIR) $(@D)
-	@$(AR) $(ARFLAGS) $@ $^
-	@echo "==> Created: $@"
 $(BUILDDIR)/libMath.a: $(BUILDDIR)/LibStub.o
 	@$(MKDIR) $(@D)
 	@$(AR) $(ARFLAGS) $@ $<
@@ -48,17 +44,17 @@ $(BUILDDIR)/LibStub.o: $(SRCDIR)/Lib/MathLib.hpp $(HEADERS)
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CXXFLAGS) -x c++ -c $< -o $@
 	@echo "==> Created: $@"
-$(BUILDDIR)/Lib/%.o: $(SRCDIR)/Lib/%.psf Makefile
+$(SRCDIR)/Lib/Font.cpp: $(SRCPSF) $(SCRIPTSDIR)/PSFToCXX.py Makefile
 	@$(MKDIR) $(@D)
-	@$(OBJCPY) $(OBJCPYFLAGS) $< $@
+	@$(PYTHON) $(SCRIPTSDIR)/PSFToCXX.py $@ $(SRCDIR)/Lib/Font.hpp $(SRCPSF)
 	@echo "==> Created: $@"
 $(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX) Makefile
 	@$(MKDIR) $(@D)
 	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
 	@echo "==> Created: $@"
-$(BUILDDIR)/TmpBuild.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libExtras.a $(BUILDDIR)/libMath.a
+$(BUILDDIR)/TmpBuild.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libMath.a
 	@$(MKDIR) $(@D)
-	@$(CXX) $(CXXFLAGS) $(BUILDSYSDEPS) -o $@ -L $(BUILDDIR) -l Extras -l Math
+	@$(CXX) $(CXXFLAGS) $(BUILDSYSDEPS) -o $@ -L $(BUILDDIR) -l Math
 	@echo "==> Created: $@"
 $(BUILDDIR)/Build.mk: $(BUILDDIR)/TmpBuild.out Build.txt
 	@$(MKDIR) $(@D)
@@ -96,13 +92,19 @@ SERVERTARGET ?= $(SRCDIR)/TestPrograms/Network/Target.json
 COMPILERINPUT ?= $(SRCDIR)/TestPrograms/Compiler/Main.txt
 COMPILEROUTPUT ?= $(BUILDDIR)/Compiler.asm
 LAMBDAINPUT ?= $(SRCDIR)/TestPrograms/LambdaCalculus/Main.txt
+SCRAPERINPUT ?= $(SRCDIR)/TestPrograms/WebScraper/Wikipedia.json
+SEQUENTINPUT ?= $(SRCDIR)/TestPrograms/SequentCalculus/ModusPonens.txt
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
+OSOBJCPY = x86_64-elf-$(OBJCPY)
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
-OSLINKER = $(SRCDIR)/OS/Linker.ld
-OSLDFLAGS = $(OSCXXFLAGS) -T $(OSLINKER) -Bsymbolic -nostdlib -Xlinker -Map=$(BUILDDIR)/Kernel.map
-OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -boot d -serial file:$(BUILDDIR)/OS.log -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
--device rtl8139,netdev=net0 -netdev user,id=net0,hostfwd=tcp::$(SERVERPORT)-:$(SERVERPORT)
+OSLINKER = $(SRCDIR)/OS/Kernel/Linker.ld
+BOOTLINKER = $(SRCDIR)/OS/Bootloader/Linker.ld
+OSLDFLAGS = $(OSCXXFLAGS) -Bsymbolic -nostdlib
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -boot d \
+-serial file:$(BUILDDIR)/OS.log -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
+-drive file=$(BUILDDIR)/Bootloader.bin,format=raw,media=disk -device rtl8139,netdev=net0 \
+-netdev user,id=net0,hostfwd=tcp::$(SERVERPORT)-:$(SERVERPORT)
 
 clean:
 	@$(MKDIR) $(BUILDDIR)

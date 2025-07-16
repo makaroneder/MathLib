@@ -10,7 +10,7 @@ namespace MathLib {
             EmptyBenchmark
         }
         [[nodiscard]] constexpr bool IsEmpty(void) const {
-            return FloatsEqual<T>(GetSize(), 0);
+            StartAndReturnFromBenchmark(FloatsEqual<T>(GetSize(), 0));
         }
         [[nodiscard]] constexpr T GetMin(void) const {
             StartAndReturnFromBenchmark(min);
@@ -53,7 +53,7 @@ namespace MathLib {
         /// @param padding String to pad with
         /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
-            return CollectionToString(padding) + '[' + MathLib::ToString(min) + ", " + MathLib::ToString(max) + ']';
+            StartAndReturnFromBenchmark(CollectionToString(padding) + '[' + MathLib::ToString(min) + ", " + MathLib::ToString(max) + ']');
         }
 
         private:

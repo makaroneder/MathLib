@@ -16,9 +16,11 @@ namespace MathLib {
         EndBenchmark
     }
     Bitmap::Bitmap(const Sequence<bool>& data) : Bitmap(data.GetSize()) {
+        StartBenchmark
         const size_t size = GetSize();
         for (size_t i = 0; i < size; i++)
             if (!Set(i, data.At(i))) Panic("Failed to create bitmap");
+        EndBenchmark
     }
     Bitmap::Bitmap(const Sequence<uint8_t>& array) : array(CollectionToArray<uint8_t>(array)), lastByteSize(8) {
         EmptyBenchmark

@@ -6,13 +6,13 @@ if __name__ == "__main__":
     if len(argv) < 3:
         print(f"Usage: {argv[0]} <input file> <output file> <flags>")
         exit(1)
-    strings = 0
-    tmpPath = argv[1] + ".tmp.asl"
-    outputPath = path.relpath(argv[2], start = path.dirname(tmpPath))
+    strings : int = 0
+    tmpPath : str = argv[1] + ".tmp.asl"
+    outputPath : str = path.relpath(argv[2], start = path.dirname(tmpPath))
     with open(tmpPath, "w") as tmpFile:
         with open(argv[1], "r") as inputFile:
             while True:
-                chr = inputFile.read(1)
+                chr : str = inputFile.read(1)
                 if not chr: break
                 if chr == '"':
                     strings += 1

@@ -1,0 +1,11 @@
+Predecessor = pattern (
+    ("Successor" . n) -> n
+),
+Add = pattern (
+    "Zero" -> (n -> n),
+    ("Successor" . a) -> (b -> ("Successor" . (Add . a . b)))
+),
+Multiply = pattern (
+    "Zero" -> (_ -> "Zero"),
+    ("Successor" . a) -> (b -> (Add . b . (Multiply . a . b)))
+)

@@ -1,6 +1,5 @@
 #ifndef MathLib_Math_FourierTransformData_H
 #define MathLib_Math_FourierTransformData_H
-#include "../Interfaces/Function.hpp"
 #include "Complex.hpp"
 
 namespace MathLib {

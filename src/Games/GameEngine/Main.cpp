@@ -4,11 +4,12 @@
 #include <iostream>
 
 template <typename T>
-T GetIntersections(const MathLib::Matrix<T>& position, const T& angle, const MathLib::Array<MathLib::Matrix<T>>& objects) {
+T GetIntersections(const MathLib::Matrix<T>& position, const T& angle, const MathLib::Sequence<MathLib::Matrix<T>>& objects) {
+    const size_t size = objects.GetSize();
     T ret = MathLib::infinity;
-    for (const MathLib::Matrix<T>& object : objects) {
-        const T x = MathLib::Abs(GetX(object) - GetX(position));
-        const T y = MathLib::Abs(GetY(object) - GetY(position));
+    for (size_t i = 0; i < size; i++) {
+        const T x = MathLib::Abs(GetX(objects.At(i)) - GetX(position));
+        const T y = MathLib::Abs(GetY(objects.At(i)) - GetY(position));
         if (MathLib::FloatsEqual<T>(angle, MathLib::InversedTan2(y, x))) {
             const T tmp = x * x + y * y;
             if (tmp < ret) ret = tmp;
@@ -17,7 +18,7 @@ T GetIntersections(const MathLib::Matrix<T>& position, const T& angle, const Mat
     return MathLib::Sqrt(ret);
 }
 template <typename T>
-void Draw(MathLib::Renderer& renderer, const T& angle, const T& fov, const MathLib::Matrix<T>& player, const MathLib::Array<MathLib::Matrix<T>>& objects) {
+void Draw(MathLib::Renderer& renderer, const T& angle, const T& fov, const MathLib::Matrix<T>& player, const MathLib::Sequence<MathLib::Matrix<T>>& objects) {
     const size_t width = renderer.GetWidth();
     const size_t height = renderer.GetHeight();
     for (size_t i = 0; i < width; i++) {

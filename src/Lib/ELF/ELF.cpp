@@ -50,7 +50,7 @@ namespace MathLib {
         const Expected<ELFProgramHeader> tmp = ReadProgramHeader(i);
         if (!tmp.HasValue()) return Array<uint8_t>();
         Array<uint8_t> ret = Array<uint8_t>(tmp.Get().memorySize);
-        if (!byteDevice.ReadPositionedBuffer((uint8_t*)ret.GetValue(), tmp.Get().fileSize, programHeaderOffset + i * programHeaderEntrySize)) return Array<uint8_t>();
+        if (!byteDevice.ReadPositionedBuffer(ret.GetValue(), tmp.Get().fileSize, programHeaderOffset + i * programHeaderEntrySize)) return Array<uint8_t>();
         for (uint64_t i = tmp.Get().fileSize; i < tmp.Get().memorySize; i++) ret.At(i) = 0;
         return ret;
     }

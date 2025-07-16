@@ -1,5 +1,5 @@
 #include "GZIPHeader.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     GZIPHeader::GZIPHeader(void) : signature(0), compressionMethod(), text(false), crc16(false), extraData(false), name(false), comment(false), reserved(0), time(0), extraFlags(), os(OperatingSystem::Unknown) {

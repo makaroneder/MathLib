@@ -1,6 +1,7 @@
 #ifndef MathLib_PRNG_H
 #define MathLib_PRNG_H
-#include "../Typedefs.hpp"
+#include "../Allocator/Allocatable.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     template <typename T>

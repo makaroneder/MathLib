@@ -1,5 +1,10 @@
 # TODO
 
+[List of algebraic structures](https://en.wikipedia.org/wiki/Outline_of_algebraic_structures)
+[List of lattices](https://en.wikipedia.org/wiki/Map_of_lattices)
+[Algebra of sets](https://en.wikipedia.org/wiki/Algebra_of_sets)
+[Topological space](https://en.wikipedia.org/wiki/Topological_space)
+
 [Parallel port](https://wiki.osdev.org/Parallel_port)
 [QEMU fw cfg](https://wiki.osdev.org/QEMU_fw_cfg)
 [RTL8139](https://wiki.osdev.org/RTL8139)

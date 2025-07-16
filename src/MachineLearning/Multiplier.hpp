@@ -1,6 +1,7 @@
 #ifndef Multiplier_H
 #define Multiplier_H
 #include "NeuralNetworkState.hpp"
+#include <Interfaces/VariadicSequence.hpp>
 
 /// @brief Creates default state for this neural network
 /// @tparam T Type of number
@@ -10,7 +11,7 @@
     const MathLib::num_t multiplier = MathLib::RandomNumber<MathLib::num_t>(-50, 50);
     MathLib::matrix_t ret = MathLib::matrix_t(1, inputSize);
     for (size_t i = 0; i < ret.GetHeight(); i++) ret.At(0, i) = i;
-    return NeuralNetworkState<MathLib::num_t>(1e-1, ret, ret * multiplier, MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::None, MathLib::MakeArray<size_t>(1, 1)), MathLib::MakeArray<MathLib::num_t>(multiplier));
+    return NeuralNetworkState<MathLib::num_t>(1e-1, ret, ret * multiplier, MathLib::NeuralNetwork<MathLib::num_t>(MathLib::NeuralNetwork<MathLib::num_t>::ActivationFunction::None, MathLib::VariadicSequence<size_t, 1, 1>()), MathLib::MakeArray<MathLib::num_t>(multiplier));
 }
 [[nodiscard]] MathLib::String StateToString(NeuralNetworkState<MathLib::num_t>& state) {
     MathLib::String ret;

@@ -18,10 +18,11 @@ namespace MathLib {
     [[nodiscard]] String ToString(num_t x);
     template <typename T>
     String ToString(const Sequence<T>& data) {
+        StartBenchmark
         String ret = '{';
         const size_t size = data.GetSize();
         for (size_t i = 0; i < size; i++) ret += MathLib::ToString(data.At(i)) + (((i + 1) == size) ? "" : ", ");
-        return ret + '}';
+        ReturnFromBenchmark(ret + '}');
     }
 }
 

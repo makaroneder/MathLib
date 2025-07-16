@@ -18,14 +18,11 @@ namespace MathLib {
         [[nodiscard]] virtual size_t GetSize(void) const override {
             StartAndReturnFromBenchmark(elements.GetSize());
         }
-        [[nodiscard]] virtual const DictionaryElement<Key, Value>* GetValue(void) const override {
+        [[nodiscard]] virtual DictionaryElement<Key, Value>* GetValue(void) override {
             StartAndReturnFromBenchmark(elements.GetValue());
         }
-        [[nodiscard]] virtual DictionaryElement<Key, Value> At(size_t index) const override {
-            StartAndReturnFromBenchmark(elements.At(index));
-        }
-        [[nodiscard]] virtual DictionaryElement<Key, Value>& At(size_t index) override {
-            StartAndReturnFromBenchmark(elements.At(index));
+        [[nodiscard]] virtual const DictionaryElement<Key, Value>* GetValue(void) const override {
+            StartAndReturnFromBenchmark(elements.GetValue());
         }
         [[nodiscard]] virtual bool Add(const DictionaryElement<Key, Value>& value) override {
             StartAndReturnFromBenchmark(elements.Add(value));

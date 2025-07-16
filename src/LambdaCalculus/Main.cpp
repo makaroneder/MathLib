@@ -5,11 +5,12 @@
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Parser/KeywordParserLayer.hpp>
-#include <Compiler/Parser/MiddleParserLayer.hpp>
+#include <Compiler/Parser/BinaryParserLayer.hpp>
 #include <Compiler/Lexer/StringLexerRule.hpp>
 #include <Compiler/IdentityEvaluator.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
+#include <FileSystem/Path.hpp>
 #include <String.hpp>
 #include <iostream>
 
@@ -101,6 +102,23 @@ struct PatternParserLayer : MathLib::ParserLayer {
         return ret;
     }
 };
+MathLib::String Preprocess(MathLib::FileSystem& fileSystem, const MathLib::Sequence<char>& path) {
+    const MathLib::String basePath = MathLib::RemoveLastPathElement(path);
+    MathLib::String str = fileSystem.Open(path, MathLib::OpenMode::Read).ReadUntil('\0');
+    const size_t size = str.GetSize();
+    MathLib::String ret;
+    for (size_t i = 0; i < size;) {
+        const char tmp = str.At(i++);
+        if (tmp == '$') {
+            const size_t index = str.Find('$', i);
+            if (index == SIZE_MAX) return "";
+            ret += Preprocess(fileSystem, MathLib::AppendPath(basePath, MathLib::SubString(str, i, index - i)));
+            i = index + 1;
+        }
+        else ret += tmp;
+    }
+    return ret;
+}
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
 /// @param argv Array of command line arguments
@@ -113,23 +131,23 @@ int main(int argc, char** argv) {
             new GroupedLexerRule((size_t)TokenType::String, '"', '"'),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
-            new MathLib::IdentifierLexerRule((size_t)TokenType::Variable),
+            new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
             new MathLib::StringLexerRule((size_t)TokenType::Abstraction, "->"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Application, '.'_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::MiddleParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
-            new MathLib::MiddleParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
-            new MathLib::MiddleParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction),
-            new MathLib::MiddleParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
+            new MathLib::BinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma, true),
+            new MathLib::BinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition, true),
+            new MathLib::BinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction, true),
+            new MathLib::BinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application, true),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
             new PatternParserLayer(),
             new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
         )), new MathLib::IdentityEvaluator());
         MathLib::HostFileSystem fs;
-        toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
+        toolchain.LoadInput(Preprocess(fs, MathLib::String(argv[1])));
         const MathLib::Array<LambdaTerm> bindings = FromNode(toolchain.GetNode());
         const size_t size = bindings.GetSize();
         size_t main = SIZE_MAX;

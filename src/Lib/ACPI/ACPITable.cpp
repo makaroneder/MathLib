@@ -1,5 +1,5 @@
 #include "ACPITable.hpp"
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     bool ACPITable::IsValid(void) const {

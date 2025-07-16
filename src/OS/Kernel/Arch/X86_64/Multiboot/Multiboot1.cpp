@@ -62,7 +62,7 @@ void InitMultiboot1(Multiboot1Info* info) {
         LogString(info->framebuffer.ToString());
         if (info->framebuffer.type == MultibootFramebuffer::Type::RGB && info->framebuffer.bitsPerPixel == sizeof(uint32_t) * 8)
             renderer = new KernelRenderer(info->framebuffer.width, info->framebuffer.height, (uint32_t*)info->framebuffer.address, MathLib::Color(info->redFieldPos, info->greenFieldPos, info->blueFieldPos, 0));
-        else if (info->framebuffer.type == MultibootFramebuffer::Type::EGA && info->framebuffer.bitsPerPixel == sizeof(uint16_t) * 2)
+        else if (info->framebuffer.type == MultibootFramebuffer::Type::EGA && info->framebuffer.bitsPerPixel == sizeof(uint16_t) * 8)
             textUI = new VGA(VGA::colors[(uint8_t)VGA::Color::Black], VGA::colors[(uint8_t)VGA::Color::Gray], (uint8_t*)info->framebuffer.address, info->framebuffer.width, info->framebuffer.height);
     }
     if (info->hasMemoryMap) {

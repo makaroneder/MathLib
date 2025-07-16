@@ -44,4 +44,10 @@ namespace MathLib {
     String Register::ToString(const Sequence<char>& padding) const {
         StartAndReturnFromBenchmark(CollectionToString(padding) + "0x" + MathLib::ToString(value, 16));
     }
+    bool Register::operator==(const Register& other) const {
+        StartAndReturnFromBenchmark(value == other.value);
+    }
+    bool Register::operator!=(const Register& other) const {
+        StartAndReturnFromBenchmark(!(*this == other));
+    }
 }

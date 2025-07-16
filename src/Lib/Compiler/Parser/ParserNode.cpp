@@ -14,17 +14,14 @@ namespace MathLib {
     MathLib::String ParserNode::GetData(void) const {
         StartAndReturnFromBenchmark(value);
     }
-    ParserNode ParserNode::At(size_t index) const {
-        StartAndReturnFromBenchmark(children.At(index));
-    }
-    ParserNode& ParserNode::At(size_t index) {
-        StartAndReturnFromBenchmark(children.At(index));
-    }
     bool ParserNode::Add(const ParserNode& val) {
         StartAndReturnFromBenchmark(children.Add(val));
     }
     bool ParserNode::Reset(void) {
         StartAndReturnFromBenchmark(children.Reset());
+    }
+    ParserNode* ParserNode::GetValue(void) {
+        StartAndReturnFromBenchmark(children.GetValue());
     }
     const ParserNode* ParserNode::GetValue(void) const {
         StartAndReturnFromBenchmark(children.GetValue());

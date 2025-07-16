@@ -1,5 +1,5 @@
 #include "FATFSInfo.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     bool FATFSInfo::IsValid(void) const {

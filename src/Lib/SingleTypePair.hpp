@@ -1,5 +1,6 @@
 #ifndef MathLib_SingleTypePair_H
 #define MathLib_SingleTypePair_H
+#include "Interfaces/NonLinearCollection.hpp"
 #include "Pair.hpp"
 
 namespace MathLib {

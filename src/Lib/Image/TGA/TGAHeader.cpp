@@ -1,5 +1,5 @@
 #include "TGAHeader.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     TGAHeader::TGAHeader(void) : idLength(0), colorMapType(0), imageType(ImageType::None), colorMapFirstEntryIndex(0), colorMapLength(0), colorMapEntrySize(0), xOrigin(0), yOrigin(0), width(0), height(0), pixelDepth(0), alphaDepth(0), rightLeft(false), topBottom(true), reserved(0) {

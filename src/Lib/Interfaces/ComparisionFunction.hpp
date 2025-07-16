@@ -1,6 +1,6 @@
 #ifndef MathLib_Interfaces_ComparisionFunction_H
 #define MathLib_Interfaces_ComparisionFunction_H
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     enum class ComparisionFunctionType : uint8_t {

@@ -1,5 +1,5 @@
 #include "ThreadJobState.hpp"
-#include "../Typedefs.hpp"
+#include "../Benchmark.hpp"
 
 namespace MathLib {
     ThreadJobState::ThreadJobState(void) {

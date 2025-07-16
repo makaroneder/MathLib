@@ -5,10 +5,9 @@
 namespace MathLib {
     struct Path : Collection<size_t>, Printable {
         [[nodiscard]] virtual size_t GetSize(void) const override;
-        [[nodiscard]] virtual size_t At(size_t index) const override;
-        [[nodiscard]] virtual size_t& At(size_t index) override;
         [[nodiscard]] virtual bool Add(const size_t& value) override;
         [[nodiscard]] virtual bool Reset(void) override;
+        [[nodiscard]] virtual size_t* GetValue(void) override;
         [[nodiscard]] virtual const size_t* GetValue(void) const override;
         [[nodiscard]] size_t GetEnd(void) const;
         [[nodiscard]] Edge GetEdge(void) const;

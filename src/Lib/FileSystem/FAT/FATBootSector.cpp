@@ -1,5 +1,5 @@
 #include "FATBootSector.hpp"
-#include "../../Typedefs.hpp"
+#include "../../Benchmark.hpp"
 
 namespace MathLib {
     bool FATBootSector::IsValid(void) const {

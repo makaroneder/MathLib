@@ -4,36 +4,32 @@
 
 namespace MathLib {
     String Erase(const Sequence<char>& str, size_t pos, size_t len) {
-        StartBenchmark
         String ret = "";
         for (size_t i = 0; i < pos; i++) ret += str.At(i);
         for (size_t i = pos + len; i < str.GetSize(); i++) ret += str.At(i);
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     String SubString(const Sequence<char>& str, size_t pos, size_t len) {
-        StartBenchmark
         String ret;
         for (size_t i = 0; i < len; i++) ret += str.At(pos + i);
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     Array<String> Split(const Sequence<char>& str_, const Sequence<char>& delim, bool preserveDelim) {
-        StartBenchmark
         Array<String> ret;
         size_t pos = 0;
         String token;
         String str = CollectionToString(str_);
         while ((pos = str.Find(delim)) != SIZE_MAX) {
             token = SubString(str, 0, pos + delim.GetSize() * preserveDelim);
-            if (!ret.Add(token)) ReturnFromBenchmark(Array<String>());
+            if (!ret.Add(token)) return Array<String>();
             str = Erase(str, 0, pos + delim.GetSize());
         }
-        ReturnFromBenchmark(ret.Add(str) ? ret : Array<String>());
+        return ret.Add(str) ? ret : Array<String>();
     }
     String BoolToString(bool x) {
-        StartAndReturnFromBenchmark(x ? "true" : "false");
+        return x ? "true" : "false";
     }
     String ToString(size_t x, size_t base, size_t size) {
-        StartBenchmark
         String buff;
         if (!x) buff = "0";
         while (x) {
@@ -46,7 +42,7 @@ namespace MathLib {
         for (size_t i = buff.GetSize(); i < size; i++) ret += '0';
         for (size_t i = buff.GetSize() - 1; i > 0; i--) ret += buff.At(i);
         ret += buff[0];
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     size_t StringToNumber(const Sequence<char>& str, size_t base) {
         size_t ret = 0;
@@ -61,7 +57,6 @@ namespace MathLib {
         return ret;
     }
     String DumpMemory(uintptr_t addr, size_t size, size_t lineSize) {
-        StartBenchmark
         String ret;
         const uint8_t* buff = (const uint8_t*)addr;
         for (size_t y = 0; y < size; y += lineSize) {
@@ -74,7 +69,7 @@ namespace MathLib {
             }
             ret.At(ret.GetSize() - 1) = '\n';
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     [[nodiscard]] bool MatchRepeatable(const Sequence<char>& pattern, size_t& i, size_t& j, const Function<bool, size_t&>& function) {
         Interval<size_t> repeat = Interval<size_t>(1, 1);
@@ -105,16 +100,15 @@ namespace MathLib {
                         const size_t tmp = StringToNumber(SubString(pattern, start, end - start));
                         repeat = Interval<size_t>(tmp, tmp);
                         j = end + 1;
+                        break;
                     }
-                    else {
-                        j = end1 + 1;
-                        const size_t end2 = pattern.Find('}', j);
-                        const String min = SubString(pattern, start, end1 - start);
-                        if (end2 == SIZE_MAX) return false;
-                        const String max = SubString(pattern, end1 + 1, end2 - end1 - 1);
-                        repeat = Interval<size_t>(min.IsEmpty() ? 0 : StringToNumber(min), max.IsEmpty() ? SIZE_MAX : StringToNumber(max));
-                        j = end2 + 1;
-                    }
+                    j = end1 + 1;
+                    const size_t end2 = pattern.Find('}', j);
+                    const String min = SubString(pattern, start, end1 - start);
+                    if (end2 == SIZE_MAX) return false;
+                    const String max = SubString(pattern, end1 + 1, end2 - end1 - 1);
+                    repeat = Interval<size_t>(min.IsEmpty() ? 0 : StringToNumber(min), max.IsEmpty() ? SIZE_MAX : StringToNumber(max));
+                    j = end2 + 1;
                     break;
                 }
                 default: break;
@@ -161,7 +155,7 @@ namespace MathLib {
                         if (!i || i + 1 == tmp.GetSize() || tmp.At(i) != '-') patt += tmp.At(i);
                         else for (char chr = tmp.At(i - 1) + 1; chr < tmp.At(i + 1); chr++) patt += chr;
                     }
-                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1, negate, patt, &str] (const void*, size_t& i) -> bool {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>([size1, negate, patt, &str](size_t& i) -> bool {
                         return i >= size1 || negate == patt.Contains(str.At(i++));
                     }))) return false;
                     break;
@@ -171,13 +165,13 @@ namespace MathLib {
                     if (end == SIZE_MAX) return false;
                     const size_t start = j;
                     j = end + 1;
-                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [&str, &pattern, start, end] (const void*, size_t& i) -> bool {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>([&str, &pattern, start, end](size_t& i) -> bool {
                         return !MatchInternal(str, pattern, i, Interval<size_t>(start, end));
                     }))) return false;
                     break;
                 }
                 case '.': {
-                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1] (const void*, size_t& i) -> bool {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>([size1](size_t& i) -> bool {
                         return i++ >= size1;
                     }))) return false;
                     break;
@@ -187,7 +181,7 @@ namespace MathLib {
                     break;
                 }
                 default: {
-                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>(nullptr, [size1, &str, chr] (const void*, size_t& i) -> bool {
+                    if (!MatchRepeatable(pattern, i, j, MakeFunctionT<bool, size_t&>([size1, &str, chr](size_t& i) -> bool {
                         return i >= size1 || str.At(i++) != chr;
                     }))) return false;
                     break;

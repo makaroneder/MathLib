@@ -1,14 +1,10 @@
 #include "Test.hpp"
-#include "../MinMax.hpp"
-#include "../Interval.hpp"
-#include "../FunctionT.hpp"
 #include "../Math/Matrix.hpp"
 #include "../Math/Sigmoid.hpp"
-#include "../Math/Factorial.hpp"
 #include "../Physics/SIUnits.hpp"
 #include "../Math/Trigonometry.hpp"
+#include "../FileSystem/Cipher/Ar/Ar.hpp"
 #include "../Cryptography/Cipher/ROT13.hpp"
-#include "../Interfaces/IdentitySequence.hpp"
 #include "../Cryptography/Code/UnaryCode.hpp"
 #include "../Cryptography/Compressor/ZLib.hpp"
 #include "../Cryptography/Compressor/GZIP.hpp"
@@ -21,30 +17,31 @@
 #include "../Cryptography/Cipher/AtbashCipher.hpp"
 #include "../Cryptography/Cipher/IdentityCipher.hpp"
 #include "../Cryptography/Code/RunLengthEncoding.hpp"
+#include "../FileSystem/Cipher/TAR/GNUTAR/GNUTAR.hpp"
+#include "../Interfaces/Sequence/IdentitySequence.hpp"
 #include "../Cryptography/Cipher/PolyalphabeticCipher.hpp"
+#include "../FileSystem/Cipher/TAR/UnixStandardTAR/UnixStandardTAR.hpp"
 #include "../Cryptography/Compressor/BytePairEncoding/BytePairEncoding.hpp"
 
 // TODO: Add test cases
 
 namespace MathLib {
     bool Test::ReportRecord(const Record& record) {
-        StartAndReturnFromBenchmark(records.Add(record));
+        return records.Add(record);
     }
     bool Test::Passed(void) const {
-        StartBenchmark
         size_t ret = 0;
         for (const Record& record : records) ret += record.passed;
-        ReturnFromBenchmark(ret == records.GetSize());
+        return ret == records.GetSize();
     }
     String Test::ToString(const Sequence<char>& padding) const {
-        StartBenchmark
         String ret;
         size_t passed = 0;
         for (const Record& record : records) {
             ret += record.ToString(padding) + '\n';
             passed += record.passed;
         }
-        ReturnFromBenchmark(ret + padding + MathLib::ToString(passed) + '/' + MathLib::ToString(records.GetSize()) + " tests passed");
+        return ret + padding + Formatter<size_t>::ToString(passed) + '/' + Formatter<size_t>::ToString(records.GetSize()) + " tests passed";
     }
     void TestSort(Test& test, const Sequence<uint8_t>& data, const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& sort, ComparisionFunctionType type) {
         Array<uint8_t> sorted = CollectionToArray<uint8_t>(data);
@@ -53,7 +50,6 @@ namespace MathLib {
         TestOperation(test, sorted.IsSorted(compare));
     }
     Test TestSelf(void) {
-        StartBenchmark
         Test test;
         TestOperation(test, IsNaN(nan));
         TestOperation(test, IsInf(infinity));
@@ -222,42 +218,42 @@ namespace MathLib {
         const IdentitySequence<uint8_t> identitySequence = IdentitySequence<uint8_t>(UINT8_MAX + 1);
         TestOperation(test, identitySequence.IsSorted(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThan)));
         TestOperation(test, identitySequence.IsSorted(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThanEqual)));
-        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).Fold(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>(nullptr, [](const void*, uint8_t a, uint8_t b) -> uint8_t {
+        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).LeftFold<uint8_t>(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>([](uint8_t a, uint8_t b) -> uint8_t {
             return a * b;
-        }), true) == 120);
-        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).Fold(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>(nullptr, [](const void*, uint8_t a, uint8_t b) -> uint8_t {
+        })) == 120);
+        TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).RightFold<uint8_t>(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>([](uint8_t a, uint8_t b) -> uint8_t {
             return a * b;
-        }), false) == 120);
+        })) == 120);
 
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& bubbleSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& bubbleSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.BubbleSort(compare);
         });
         TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::LessThan);
         TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::LessThanEqual);
         TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::GreaterThan);
         TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& stoogeSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& stoogeSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.StoogeSort(compare);
         });
         TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::LessThan);
         TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::LessThanEqual);
         TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::GreaterThan);
         TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& oddEvenSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& oddEvenSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.OddEvenSort(compare);
         });
         TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::LessThan);
         TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::LessThanEqual);
         TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::GreaterThan);
         TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& cocktailShakerSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& cocktailShakerSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.CocktailShakerSort(compare);
         });
         TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::LessThan);
         TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::LessThanEqual);
         TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::GreaterThan);
         TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& insertationSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>(nullptr, [] (const void*, Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& insertationSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.InsertationSort(compare);
         });
         TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::LessThan);
@@ -282,6 +278,10 @@ namespace MathLib {
         TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(false)));
         TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(true)));
         TestOperation(test, DeltaEncoding().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        ReturnFromBenchmark(test);
+        TestOperation(test, TAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
+        TestOperation(test, GNUTAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
+        TestOperation(test, UnixStandardTAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
+        TestOperation(test, Ar().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
+        return test;
     }
 }

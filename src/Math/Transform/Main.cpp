@@ -2,7 +2,7 @@
 #include "DiscreteSineTransform2.hpp"
 #include "DiscreteSineTransform3.hpp"
 #include "DiscreteSineTransform4.hpp"
-#include <Interfaces/IdentitySequence.hpp>
+#include <Interfaces/Sequence/IdentitySequence.hpp>
 #include <iostream>
 
 template <typename T>

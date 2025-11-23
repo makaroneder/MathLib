@@ -1,29 +1,27 @@
 #ifndef MathLib_ExternArray_H
 #define MathLib_ExternArray_H
-#include "Benchmark.hpp"
 
 namespace MathLib {
+    [[noreturn]] void Panic(const char* str);
     template <typename T>
     struct ExternArray : Collection<T> {
         ExternArray(T* buffer, size_t size) : buffer(buffer), size(size) {
-            StartBenchmark
-            if (!buffer) Panic("Invalid buffer provided");
-            EndBenchmark
+            if (!buffer && size) Panic("Invalid buffer provided");
         }
         [[nodiscard]] virtual bool Add(const T&) override {
-            StartAndReturnFromBenchmark(false);
+            return false;
         }
         [[nodiscard]] virtual size_t GetSize(void) const override {
-            StartAndReturnFromBenchmark(size);
+            return size;
         }
         [[nodiscard]] virtual T* GetValue(void) override {
-            StartAndReturnFromBenchmark(buffer);
+            return buffer;
         }
         [[nodiscard]] virtual const T* GetValue(void) const override {
-            StartAndReturnFromBenchmark(buffer);
+            return buffer;
         }
         [[nodiscard]] virtual bool Reset(void) override {
-            StartAndReturnFromBenchmark(false);
+            return false;
         }
 
         private:

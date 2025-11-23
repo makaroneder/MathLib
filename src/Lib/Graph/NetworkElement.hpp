@@ -1,6 +1,5 @@
 #ifndef MathLib_Graph_NetworkElement_H
 #define MathLib_Graph_NetworkElement_H
-#include "../Benchmark.hpp"
 #include <stddef.h>
 #include <stdint.h>
 
@@ -9,17 +8,13 @@ namespace MathLib {
         size_t node;
         size_t link;
     
-        NetworkElement(void) : node(SIZE_MAX), link(SIZE_MAX) {
-            EmptyBenchmark
-        }
-        NetworkElement(size_t node, size_t link) : node(node), link(link) {
-            EmptyBenchmark
-        }
+        NetworkElement(void) : node(SIZE_MAX), link(SIZE_MAX) {}
+        NetworkElement(size_t node, size_t link) : node(node), link(link) {}
         [[nodiscard]] bool operator==(const NetworkElement& other) const {
-            StartAndReturnFromBenchmark(node == other.node && link == other.link);
+            return node == other.node && link == other.link;
         }
         [[nodiscard]] bool operator!=(const NetworkElement& other) const {
-            StartAndReturnFromBenchmark(!(*this == other));
+            return !(*this == other);
         }
     };
 }

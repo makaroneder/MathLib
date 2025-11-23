@@ -47,7 +47,7 @@ namespace MathLib {
 
         private:
         [[nodiscard]] size_t ClusterToSector(size_t cluster) const;
-        [[nodiscard]] uint32_t GetNextCluster(size_t cluster, size_t fat) const;
+        [[nodiscard]] uint32_t GetNextCluster(size_t cluster, uint8_t fat) const;
         [[nodiscard]] Expected<FATDirectoryEntry> GetDirectoryEntry(const Sequence<char>& path);
 
         Type type;

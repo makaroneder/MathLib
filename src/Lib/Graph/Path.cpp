@@ -3,43 +3,42 @@
 
 namespace MathLib {
     size_t Path::GetSize(void) const {
-        StartAndReturnFromBenchmark(vertices.GetSize());
+        return vertices.GetSize();
     }
     bool Path::Add(const size_t& value) {
-        StartAndReturnFromBenchmark(vertices.Add(value));
+        return vertices.Add(value);
     }
     bool Path::Reset(void) {
-        StartAndReturnFromBenchmark(vertices.Reset());
+        return vertices.Reset();
     }
     size_t* Path::GetValue(void) {
-        StartAndReturnFromBenchmark(vertices.GetValue());
+        return vertices.GetValue();
     }
     const size_t* Path::GetValue(void) const {
-        StartAndReturnFromBenchmark(vertices.GetValue());
+        return vertices.GetValue();
     }
     size_t Path::GetEnd(void) const {
-        StartAndReturnFromBenchmark(vertices.At(vertices.GetSize() - 1));
+        return vertices.At(vertices.GetSize() - 1);
     }
     Edge Path::GetEdge(void) const {
-        StartAndReturnFromBenchmark(Edge(vertices.At(0), GetEnd()));
+        return Edge(vertices.At(0), GetEnd());
     }
     bool Path::IsCyclic(void) const {
-        StartAndReturnFromBenchmark(vertices.HasDuplicate());
+        return vertices.HasDuplicate();
     }
-    MathLib::String Path::ToString(const MathLib::Sequence<char>& padding) const {
-        StartBenchmark
+    String Path::ToString(const Sequence<char>& padding) const {
         const size_t size = vertices.GetSize();
-        MathLib::String ret = MathLib::CollectionToString(padding);
+        String ret = CollectionToString(padding);
         for (size_t i = 0; i < size; i++) {
             if (i) ret += " -> ";
-            ret += MathLib::ToString(vertices.At(i), 10);
+            ret += Formatter<size_t>::ToString(vertices.At(i));
         }
-        ReturnFromBenchmark(ret + ';');
+        return ret + ';';
     }
     bool Path::operator==(const Path& other) const {
-        StartAndReturnFromBenchmark(vertices == other.vertices);
+        return vertices == other.vertices;
     }
     bool Path::operator!=(const Path& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
 }

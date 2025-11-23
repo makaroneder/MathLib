@@ -6,25 +6,20 @@
 namespace MathLib {
     template <typename T>
     struct Ray : LineShape<T> {
-        Ray(Matrix<T> position, Matrix<T> direction) : LineShape<T>(position), direction(direction.Normalize()) {
-            EmptyBenchmark
-        }
-        Ray(Line<T> line) : LineShape<T>(line.start), direction((line.end - line.start).Normalize()) {
-            EmptyBenchmark
-        }
+        Ray(Matrix<T> position, Matrix<T> direction) : LineShape<T>(position), direction(direction.Normalize()) {}
+        Ray(Line<T> line) : LineShape<T>(line.start), direction((line.end - line.start).Normalize()) {}
         [[nodiscard]] Matrix<T> At(const T& t) const {
-            StartAndReturnFromBenchmark(this->position + direction * t);
+            return this->position + direction * t;
         }
         [[nodiscard]] Matrix<T> GetDirection(void) const {
-            StartAndReturnFromBenchmark(direction);
+            return direction;
         }
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
-            StartBenchmark
-            ReturnFromBenchmark(false);
+            return false;
         }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
-            StartAndReturnFromBenchmark(MakeArray<Line<T>>(Line<T>(this->position, RotateVector<T>(At(1), this->position, rotation))));
+            return MakeArray<Line<T>>(Line<T>(this->position, RotateVector<T>(At(1), this->position, rotation)));
         }
 
         private:

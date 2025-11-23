@@ -20,7 +20,6 @@ namespace MathLib {
             End,
         };
         Unit<T>(const T& count_ = 0, const T& amountOfSubstance_ = 0, const T& electricCurrent_ = 0, const T& length_ = 0, const T& luminousIntensity_ = 0, const T& mass_ = 0, const T& thermodynamicTemperature_ = 0, const T& time_ = 0) : count(count_) {
-            StartBenchmark
             this->baseUnits[BaseUnit::AmountOfSubstance] = amountOfSubstance_;
             this->baseUnits[BaseUnit::ElectricCurrent] = electricCurrent_;
             this->baseUnits[BaseUnit::Length] = length_;
@@ -28,10 +27,8 @@ namespace MathLib {
             this->baseUnits[BaseUnit::Mass] = mass_;
             this->baseUnits[BaseUnit::ThermodynamicTemperature] = thermodynamicTemperature_;
             this->baseUnits[BaseUnit::Time] = time_;
-            EndBenchmark
         }
         Unit<T>(const T& count_, const T* baseUnits_) : count(count_) {
-            StartBenchmark
             this->baseUnits[BaseUnit::AmountOfSubstance] = baseUnits_[BaseUnit::AmountOfSubstance];
             this->baseUnits[BaseUnit::ElectricCurrent] = baseUnits_[BaseUnit::ElectricCurrent];
             this->baseUnits[BaseUnit::Length] = baseUnits_[BaseUnit::Length];
@@ -39,31 +36,29 @@ namespace MathLib {
             this->baseUnits[BaseUnit::Mass] = baseUnits_[BaseUnit::Mass];
             this->baseUnits[BaseUnit::ThermodynamicTemperature] = baseUnits_[BaseUnit::ThermodynamicTemperature];
             this->baseUnits[BaseUnit::Time] = baseUnits_[BaseUnit::Time];
-            EndBenchmark
         }
         [[nodiscard]] virtual T GetValue(void) const {
-            StartAndReturnFromBenchmark(count);
+            return count;
         }
         [[nodiscard]] T GetBaseUnit(const size_t& i) const {
-            StartAndReturnFromBenchmark(baseUnits[i]);
+            return baseUnits[i];
         }
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
-            StartBenchmark
-            if (FloatsEqual<T>(count, 0)) ReturnFromBenchmark(CollectionToString(padding) + '0');
+            if (FloatsEqual<T>(count, 0)) return CollectionToString(padding) + '0';
             String str = CoefficientToString(count, ""_M);
             bool first = true;
             for (size_t i = 0; i < BaseUnit::End; i++) {
                 if (baseUnits[i] != 0) {
                     if (!first) str += " * ";
                     str += baseUnitsStr[i];
-                    if (baseUnits[i] != 1) str += '^'_M + MathLib::ToString(baseUnits[i]);
+                    if (baseUnits[i] != 1) str += '^'_M + Formatter<T>::ToString(baseUnits[i]);
                     first = false;
                 }
             }
-            ReturnFromBenchmark(CollectionToString(padding) + ((first && count == 1) ? '1'_M : str));
+            return CollectionToString(padding) + ((first && count == 1) ? '1'_M : str);
         }
         [[nodiscard]] Unit<T> Pow(const T& scalar) const {
-            StartAndReturnFromBenchmark(Unit<T>(
+            return Unit<T>(
                 MathLib::Pow(count, scalar),
                 this->baseUnits[BaseUnit::AmountOfSubstance] * scalar,
                 this->baseUnits[BaseUnit::ElectricCurrent] * scalar,
@@ -72,10 +67,10 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Mass] * scalar,
                 this->baseUnits[BaseUnit::ThermodynamicTemperature] * scalar,
                 this->baseUnits[BaseUnit::Time] * scalar
-            ));
+            );
         }
         [[nodiscard]] Unit<T> operator*(const Unit<T>& other) const {
-            StartAndReturnFromBenchmark(Unit<T>(
+            return Unit<T>(
                 count * other.count,
                 this->baseUnits[BaseUnit::AmountOfSubstance] + other.baseUnits[BaseUnit::AmountOfSubstance],
                 this->baseUnits[BaseUnit::ElectricCurrent] + other.baseUnits[BaseUnit::ElectricCurrent],
@@ -84,10 +79,10 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Mass] + other.baseUnits[BaseUnit::Mass],
                 this->baseUnits[BaseUnit::ThermodynamicTemperature] + other.baseUnits[BaseUnit::ThermodynamicTemperature],
                 this->baseUnits[BaseUnit::Time] + other.baseUnits[BaseUnit::Time]
-            ));
+            );
         }
         [[nodiscard]] Unit<T> operator/(const Unit<T>& other) const {
-            StartAndReturnFromBenchmark(Unit<T>(
+            return Unit<T>(
                 count / other.count,
                 this->baseUnits[BaseUnit::AmountOfSubstance] - other.baseUnits[BaseUnit::AmountOfSubstance],
                 this->baseUnits[BaseUnit::ElectricCurrent] - other.baseUnits[BaseUnit::ElectricCurrent],
@@ -96,25 +91,22 @@ namespace MathLib {
                 this->baseUnits[BaseUnit::Mass] - other.baseUnits[BaseUnit::Mass],
                 this->baseUnits[BaseUnit::ThermodynamicTemperature] - other.baseUnits[BaseUnit::ThermodynamicTemperature],
                 this->baseUnits[BaseUnit::Time] - other.baseUnits[BaseUnit::Time]
-            ));
+            );
         }
         Unit<T>& operator*=(const Unit<T>& other) {
-            StartBenchmark
             count *= other.count;
             for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] += other.baseUnits[i];
-            ReturnFromBenchmark(*this);
+            return *this;
         }
         Unit<T>& operator/=(const Unit<T>& other) {
-            StartBenchmark
             count /= other.count;
             for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] -= other.baseUnits[i];
-            ReturnFromBenchmark(*this);
+            return *this;
         }
         [[nodiscard]] bool operator==(const Unit<T>& other) const {
-            StartBenchmark
             bool ret = true;
             for (size_t i = 0; i < BaseUnit::End && ret; i++) ret = this->baseUnits[i] == other.baseUnits[i];
-            ReturnFromBenchmark(ret && FloatsEqual<T>(this->count, other.count));
+            return ret && FloatsEqual<T>(this->count, other.count);
         }
 
         protected:
@@ -126,64 +118,48 @@ namespace MathLib {
 
         private:
         void Add(const Unit<T>& other) {
-            StartBenchmark
             for (size_t i = 0; i < BaseUnit::End; i++)
                 if (this->baseUnits[i] != other.baseUnits[i]) Panic("Invalid units added");
             this->count += other.count;
-            EndBenchmark
         }
         void Multiply(const T& scalar) {
-            StartBenchmark
             this->count *= scalar;
-            EndBenchmark
         }
     };
     template <typename T>
     struct Gram : Unit<T> {
-        Gram<T>(const T& count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {
-            EmptyBenchmark
-        }
+        Gram<T>(const T& count_ = 0) : Unit<T>(count_ / 1000, 0, 0, 0, 0, 1) {}
         Gram<T>(const Unit<T>& other) : Unit<T>(other.GetValue(), 0, 0, 0, 0, 1) {
-            StartBenchmark
             for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)
                 if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");
-            EndBenchmark
         }
         [[nodiscard]] virtual T GetValue(void) const override {
-            StartAndReturnFromBenchmark(this->count * 1000);
+            return this->count * 1000;
         }
     };
 
     #define CreateUnit(name, ...)                                                                                       \
     template <typename T>                                                                                               \
     struct name : Unit<T> {                                                                                             \
-        name<T>(const T& count_ = 0) : Unit<T>(count_, __VA_ARGS__) {                                                   \
-            EmptyBenchmark                                                                                              \
-        }                                                                                                               \
+        name<T>(const T& count_ = 0) : Unit<T>(count_, __VA_ARGS__) {}                                                  \
         name<T>(const Unit<T>& other) : Unit<T>(other.GetValue(), __VA_ARGS__) {                                        \
-            StartBenchmark                                                                                              \
             for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
                 if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");                       \
-            EndBenchmark                                                                                                \
         }                                                                                                               \
     }
     #define CreateAlternativeUnit(name, base, mul)                                                                      \
     template <typename T>                                                                                               \
     struct name : base<T> {                                                                                             \
-        name<T>(const T& count_ = 0) : base<T>(count_ * (mul)) {                                                        \
-            EmptyBenchmark                                                                                              \
-        }                                                                                                               \
+        name<T>(const T& count_ = 0) : base<T>(count_ * (mul)) {}                                                       \
         name<T>(const base<T>& other) : base<T>(other.GetValue()) {                                                     \
-            StartBenchmark                                                                                              \
             for (size_t i = 0; i < Unit<T>::BaseUnit::End; i++)                                                         \
                 if (this->baseUnits[i] != other.GetBaseUnit(i)) Panic("Invalid units converted");                       \
-            EndBenchmark                                                                                                \
         }                                                                                                               \
         [[nodiscard]] base<T> ToBaseUnit(void) const {                                                                  \
-            StartAndReturnFromBenchmark(base<T>(this->count));                                                          \
+            return base<T>(this->count);                                                                                \
         }                                                                                                               \
         [[nodiscard]] virtual T GetValue(void) const override {                                                         \
-            StartAndReturnFromBenchmark(this->count / (mul));                                                           \
+            return this->count / (mul);                                                                                 \
         }                                                                                                               \
     }
     #define CreateUnitPrefix(name, base)                                                                                \

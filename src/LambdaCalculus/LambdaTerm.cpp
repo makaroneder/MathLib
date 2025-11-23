@@ -147,8 +147,7 @@ MathLib::Array<MathLib::String> LambdaTerm::GetVariables(void) const {
 MathLib::String LambdaTerm::ToString(const MathLib::Sequence<char>& padding) const {
     return MathLib::CollectionToString(padding) + ToStringInternal(true);
 }
-bool LambdaTerm::Equals(const MathLib::Comparable& other_) const {
-    const LambdaTerm& other = (const LambdaTerm&)other_;
+bool LambdaTerm::Equals(const LambdaTerm& other) const {
     return type == other.type && value == other.value && children == other.children;
 }
 MathLib::String LambdaTerm::ToStringInternal(bool root) const {
@@ -161,7 +160,7 @@ MathLib::String LambdaTerm::ToStringInternal(bool root) const {
             return root ? ret : '('_M + ret + ')';
         }
         case Type::Abstraction: {
-            const MathLib::String ret = value + " -> " + children.At(0).ToStringInternal(children.At(0).type == Type::Abstraction);
+            const MathLib::String ret = value + " -> " + children.At(0).ToStringInternal(true);
             return root ? ret : '('_M + ret + ')';
         }
         case Type::Pattern: {
@@ -169,7 +168,7 @@ MathLib::String LambdaTerm::ToStringInternal(bool root) const {
             const size_t size = children.GetSize();
             for (size_t i = 0; i < size; i += 2) {
                 if (i) ret += ", ";
-                ret += children.At(i).ToStringInternal(false) + " -> " + children.At(i + 1).ToStringInternal(false);
+                ret += children.At(i).ToStringInternal(true) + " -> " + children.At(i + 1).ToStringInternal(true);
             }
             ret += ')';
             return root ? ret : '('_M + ret + ')';

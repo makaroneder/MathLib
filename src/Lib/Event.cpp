@@ -1,24 +1,15 @@
 #include "Event.hpp"
 
 namespace MathLib {
-    Event::Event(Type type) : mousePosition(), type(type), mouseButton(MouseButton::None), pressed(), key() {
-        EmptyBenchmark
-    }
-    Event::Event(char key, bool pressed) : mousePosition(), type(Type::KeyPressed), mouseButton(MouseButton::None), pressed(pressed), key(key) {
-        EmptyBenchmark
-    }
-    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : mousePosition(position), type(Type::MousePressed), mouseButton(button), pressed(pressed), key() {
-        EmptyBenchmark
-    }
-    Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {
-        EmptyBenchmark
-    }
+    Event::Event(Type type) : mousePosition(), type(type), mouseButton(MouseButton::None), pressed(), key() {}
+    Event::Event(char key, bool pressed) : mousePosition(), type(Type::KeyPressed), mouseButton(MouseButton::None), pressed(pressed), key(key) {}
+    Event::Event(const Matrix<size_t>& position, MouseButton button, bool pressed) : mousePosition(position), type(Type::MousePressed), mouseButton(button), pressed(pressed), key() {}
+    Event::Event(const Matrix<size_t>& position) : Event(position, MouseButton::None, false) {}
     String Event::ToString(const Sequence<char>& padding) const {
-        StartBenchmark
         switch (type) {
-            case Event::Type::None: ReturnFromBenchmark(CollectionToString(padding) + "None");
-            case Event::Type::Quit: ReturnFromBenchmark(CollectionToString(padding) + "Quit");
-            case Event::Type::KeyPressed: ReturnFromBenchmark(CollectionToString(padding) + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'');
+            case Event::Type::None: return CollectionToString(padding) + "None";
+            case Event::Type::Quit: return CollectionToString(padding) + "Quit";
+            case Event::Type::KeyPressed: return CollectionToString(padding) + (pressed ? "Pressed" : "Released") + " '" + (key == '\n' ? "\\n" : String(key)) + '\'';
             case Event::Type::MousePressed: {
                 String ret = CollectionToString(padding) + (pressed ? "Pressed" : "Released") + ' ';
                 switch (mouseButton) {
@@ -48,15 +39,15 @@ namespace MathLib {
                     }
                     default: ret += "unknown";
                 }
-                ReturnFromBenchmark(ret + " button at " + mousePosition.ToString());
+                return ret + " button at " + mousePosition.ToString();
             }
-            default: ReturnFromBenchmark(CollectionToString(padding) + "Unknown");
+            default: return CollectionToString(padding) + "Unknown";
         }
     }
     bool Event::operator==(const Event& other) const {
-        StartAndReturnFromBenchmark(type == other.type && mouseButton == other.mouseButton && pressed == other.pressed && key == other.key && mousePosition == other.mousePosition);
+        return type == other.type && mouseButton == other.mouseButton && pressed == other.pressed && key == other.key && mousePosition == other.mousePosition;
     }
     bool Event::operator!=(const Event& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
 }

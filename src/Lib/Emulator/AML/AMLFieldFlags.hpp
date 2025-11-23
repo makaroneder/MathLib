@@ -26,6 +26,8 @@ namespace MathLib {
         } __attribute__((packed));
 
         AMLFieldFlags(uint8_t value = 0);
+        [[nodiscard]] bool operator==(const AMLFieldFlags& other) const;
+        [[nodiscard]] bool operator!=(const AMLFieldFlags& other) const;
     } __attribute__((packed));
 }
 

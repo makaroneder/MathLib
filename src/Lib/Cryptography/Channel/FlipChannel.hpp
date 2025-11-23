@@ -2,7 +2,7 @@
 #define MathLib_Cryptography_Channel_FlipChannel_H
 #include "../Cipher.hpp"
 #include "../../Bitmap.hpp"
-#include "../../Interfaces/IdentitySequence.hpp"
+#include "../../Interfaces/Sequence/IdentitySequence.hpp"
 
 namespace MathLib {
     template <typename Number, typename Measure>

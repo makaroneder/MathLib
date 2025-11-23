@@ -4,6 +4,8 @@
 
 namespace MathLib {
     struct ISO9660VolumeDescriptorSetTerminator : ISO9660VolumeDescriptor {
+        ISO9660VolumeDescriptorSetTerminator(void);
+
         uint8_t reserved[2041];
     } __attribute__((packed));
 }

@@ -1,13 +1,13 @@
 #include "NodeType.hpp"
 #include "Compiler.hpp"
 #include "Optimizer.hpp"
+#include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
 #include <Compiler/Parser/IdentityParserLayer.hpp>
 #include <Compiler/Parser/KeywordParserLayer.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
-#include <Compiler/Parser/BinaryParserLayer.hpp>
 #include <Compiler/Lexer/DigitLexerRule.hpp>
 #include <Compiler/IdentityEvaluator.hpp>
 #include <Libc/HostFileSystem.hpp>
@@ -109,9 +109,9 @@ int main(int argc, char** argv) {
             new MathLib::SingleCharLexerRule((size_t)TokenType::Multiplication, "*/"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Addition, "+-"_M)
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::BinaryParserLayer((size_t)NodeType::Comma, (size_t)TokenType::Comma, true),
-            new MathLib::BinaryParserLayer((size_t)NodeType::Addition, (size_t)TokenType::Addition, true),
-            new MathLib::BinaryParserLayer((size_t)NodeType::Multiplication, (size_t)TokenType::Multiplication, true),
+            new MathLib::LeftBinaryParserLayer((size_t)NodeType::Comma, (size_t)TokenType::Comma),
+            new MathLib::LeftBinaryParserLayer((size_t)NodeType::Addition, (size_t)TokenType::Addition),
+            new MathLib::LeftBinaryParserLayer((size_t)NodeType::Multiplication, (size_t)TokenType::Multiplication),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::BracesStart, (size_t)TokenType::BracesEnd),
             new MathLib::KeywordParserLayer((size_t)NodeType::Return, MathLib::Token((size_t)TokenType::Identifier, "return"_M)),

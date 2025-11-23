@@ -4,8 +4,7 @@
 namespace MathLib {
     Array<uint8_t> CRC::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
         // TODO: Support for bits < 8
-        StartBenchmark
-        if (key.GetSize() != 6) ReturnFromBenchmark(Array<uint8_t>());
+        if (key.GetSize() != 6) return Array<uint8_t>();
         const size_t bits = key.At(0);
         Bitmap byteShift = Bitmap(bits - 8);
         byteShift.Fill(false);
@@ -22,12 +21,12 @@ namespace MathLib {
         for (size_t i = 0; i < size; i++) {
             const uint8_t x = data.At(i);
             Bitmap tmp = byteShift;
-            if (!tmp.AddSequence(Bitmap(MakeArray<uint8_t>(reverseInput ? BitReverse<uint8_t>(x) : x)))) ReturnFromBenchmark(Array<uint8_t>());
+            if (!tmp.AddSequence(Bitmap(MakeArray<uint8_t>(reverseInput ? BitReverse<uint8_t>(x) : x)))) return Array<uint8_t>();
             ret ^= tmp & mask;
             for (uint8_t j = 0; j < 8; j++) {
                 Bitmap tmpBitmap = Bitmap(1);
                 tmpBitmap.Fill(false);
-                if (!tmpBitmap.AddSequence(ret)) ReturnFromBenchmark(Array<uint8_t>());
+                if (!tmpBitmap.AddSequence(ret)) return Array<uint8_t>();
                 ret = tmpBitmap;
                 if (ret.At(bits)) ret = (ret ^ polynomialBitmap) & mask;
             }
@@ -35,7 +34,7 @@ namespace MathLib {
         const Bitmap xorBitmap = Bitmap(Array<uint8_t>((const uint8_t*)&xorValue, sizeof(uint64_t)));
         Bitmap tmp = Bitmap(bits);
         for (size_t i = 0; i < bits; i++)
-            if (!tmp.Set(i, ret.At(reverseOutput ? (bits - 1 - i) : i) ^ xorBitmap.At(i))) ReturnFromBenchmark(Array<uint8_t>());
-        ReturnFromBenchmark(tmp.GetArray());
+            if (!tmp.Set(i, ret.At(reverseOutput ? (bits - 1 - i) : i) ^ xorBitmap.At(i))) return Array<uint8_t>();
+        return tmp.GetArray();
     }
 }

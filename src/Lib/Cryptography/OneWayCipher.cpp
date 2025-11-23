@@ -3,7 +3,6 @@
 
 namespace MathLib {
     Array<uint64_t> OneWayCipher::StringToKey(const Sequence<char>& key) {
-        StartBenchmark
         Array<uint64_t> ret;
         const size_t size = key.GetSize();
         String tmp = "";
@@ -11,11 +10,11 @@ namespace MathLib {
             const char chr = key.At(i);
             if (IsDigit(chr) || chr == '-') tmp += chr;
             else if (IsWhiteSpace(chr)) {
-                if (!ret.Add(StringToNumber(tmp))) ReturnFromBenchmark(Array<uint64_t>());
+                if (!ret.Add(StringToNumber(tmp))) return Array<uint64_t>();
                 tmp = "";
             }
-            else ReturnFromBenchmark(Array<uint64_t>());
+            else return Array<uint64_t>();
         }
-        ReturnFromBenchmark(tmp.IsEmpty() || ret.Add(StringToNumber(tmp)) ? ret : Array<uint64_t>());
+        return tmp.IsEmpty() || ret.Add(StringToNumber(tmp)) ? ret : Array<uint64_t>();
     }
 }

@@ -2,47 +2,57 @@
 #include "../../String.hpp"
 
 namespace MathLib {
-    ParserNode::ParserNode(void) : value(), children(), type(SIZE_MAX) {
-        EmptyBenchmark
-    }
-    ParserNode::ParserNode(size_t type, const Sequence<char>& value, const Sequence<ParserNode>& children) : value(CollectionToString(value)), children(CollectionToArray<ParserNode>(children)), type(type) {
-        EmptyBenchmark
-    }
+    ParserNode::ParserNode(void) : value(), children(), type(SIZE_MAX) {}
+    ParserNode::ParserNode(size_t type, const Sequence<char>& value, const Sequence<ParserNode>& children) : value(CollectionToString(value)), children(CollectionToArray<ParserNode>(children)), type(type) {}
     size_t ParserNode::GetType(void) const {
-        StartAndReturnFromBenchmark(type);
+        return type;
     }
-    MathLib::String ParserNode::GetData(void) const {
-        StartAndReturnFromBenchmark(value);
+    String ParserNode::GetData(void) const {
+        return value;
+    }
+    void ParserNode::Replace(const ParserNode& element, const ParserNode& replacement) {
+        if (*this == element) {
+            value = replacement.value;
+            children = replacement.children;
+            type = replacement.type;
+        }
+        else for (ParserNode& child : children) child.Replace(element, replacement);
+    }
+    void ParserNode::ReplaceValue(const Sequence<char>& element, const Sequence<char>& replacement) {
+        if (value == element) value = CollectionToString(replacement);
+        for (ParserNode& child : children) child.ReplaceValue(element, replacement);
+    }
+    void ParserNode::ModifyValue(const Function<String, const Sequence<char>&>& func) {
+        value = func(value);
+        for (ParserNode& child : children) child.ModifyValue(func);
     }
     bool ParserNode::Add(const ParserNode& val) {
-        StartAndReturnFromBenchmark(children.Add(val));
+        return children.Add(val);
     }
     bool ParserNode::Reset(void) {
-        StartAndReturnFromBenchmark(children.Reset());
+        return children.Reset();
     }
     ParserNode* ParserNode::GetValue(void) {
-        StartAndReturnFromBenchmark(children.GetValue());
+        return children.GetValue();
     }
     const ParserNode* ParserNode::GetValue(void) const {
-        StartAndReturnFromBenchmark(children.GetValue());
+        return children.GetValue();
     }
     size_t ParserNode::GetSize(void) const {
-        StartAndReturnFromBenchmark(children.GetSize());
+        return children.GetSize();
     }
-    MathLib::String ParserNode::ToString(const MathLib::Sequence<char>& padding) const {
-        StartBenchmark
-        const MathLib::String padd = MathLib::CollectionToString(padding);
-        if (children.IsEmpty()) ReturnFromBenchmark(padd + MathLib::ToString(type, 10) + ": " + value);
-        const MathLib::String padd2 = padd + "\t\t";
-        MathLib::String ret = padd + MathLib::ToString(type, 10) + ": {\n" + padd + "\tValue: " + value + '\n' + padd + "\tChildren: {\n";
-        for (const ParserNode& child : children)
-            ret += child.ToString(padd2) + '\n';
-        ReturnFromBenchmark(ret + padd + "\t}\n" + padd + '}');
+    String ParserNode::ToString(const Sequence<char>& padding) const {
+        const String padd = CollectionToString(padding);
+        if (children.IsEmpty()) return padd + Formatter<size_t>::ToString(type) + ": " + value;
+        const String padd2 = padd + "\t\t";
+        String ret = padd + Formatter<size_t>::ToString(type) + ": {\n" + padd + "\tValue: " + value + '\n' + padd + "\tChildren: {\n";
+        for (const ParserNode& child : children) ret += child.ToString(padd2) + '\n';
+        return ret + padd + "\t}\n" + padd + '}';
     }
     bool ParserNode::operator==(const ParserNode& other) const {
-        StartAndReturnFromBenchmark(type == other.type && value == other.value && children == other.children);
+        return type == other.type && value == other.value && children == other.children;
     }
     bool ParserNode::operator!=(const ParserNode& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
 }

@@ -1,7 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include "Symbol.hpp"
 #include "Consumable.hpp"
-#include <Interfaces/VariadicSequence.hpp>
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Pair.hpp>
 #include <SDL2.cpp>
@@ -45,37 +45,43 @@ int main(int, char**) {
         size_t bet = 50;
         size_t multiplier = 1;
         size_t rankIncreaser = 0;
+        bool update = true;
         while (true) {
             const MathLib::num_t currTime = MathLib::GetTime();
             const MathLib::num_t deltaTime = currTime - prevTime;
+            std::cout << 1 / deltaTime << std::endl;
             prevTime = currTime;
-            renderer.Fill(0);
-            for (size_t i = 0; i < SizeOfArray(consumables); i++) {
-                Consumable tmp = consumables[i];
-                const MathLib::num_t y = ((ssize_t)i - 1) * 1.3;
-                tmp.position = MathLib::CreateVector<MathLib::num_t>(-3, y, 0);
-                if (!renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
-                renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0xff0000ff);
+            if (update) {
+                renderer.Fill(0);
+                for (size_t i = 0; i < SizeOfArray(consumables); i++) {
+                    Consumable tmp = consumables[i];
+                    const MathLib::num_t y = ((ssize_t)i - 1) * 1.3;
+                    tmp.position = MathLib::CreateVector<MathLib::num_t>(-3, y, 0);
+                    if (!renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+                    renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0xff0000ff);
+                }
+                if (!renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+                for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
+                    Symbol tmp = symbols[symbolIndexes.At(i)];
+                    tmp.position = MathLib::CreateVector<MathLib::num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);
+                    renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, MathLib::IsNaN(specialTime) ? 0 : specialTime), MathLib::IsNaN(specialTime) ? 0x0000ffff : MathLib::GetRainbow<MathLib::num_t>(specialTime));
+                }
+                renderer.DrawShape<MathLib::num_t>(machine, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0x00ff00ff);
+                update = !MathLib::IsNaN(specialTime);
             }
-            if (!renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
-            for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
-                Symbol tmp = symbols[symbolIndexes.At(i)];
-                tmp.position = MathLib::CreateVector<MathLib::num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);
-                renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, MathLib::IsNaN(specialTime) ? 0 : specialTime), MathLib::IsNaN(specialTime) ? 0x0000ffff : MathLib::GetRainbow<MathLib::num_t>(specialTime));
-            }
-            renderer.DrawShape<MathLib::num_t>(machine, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0x00ff00ff);
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");
             const MathLib::Event event = renderer.GetEvent();
             if (event.type == MathLib::Event::Type::Quit) break;
             else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
                 switch (event.key) {
                     case ' ': {
+                        update = true;
                         specialTime = MathLib::nan;
                         bool special = true;
                         symbolIndexes = MathLib::Array<size_t>(3);
                         for (size_t& i : symbolIndexes) i = MathLib::Round(MathLib::RandomNumber<MathLib::num_t>(0, SizeOfArray(symbols) - 1));
                         for (size_t i = 0; i < symbolIndexes.GetSize() - 1 && special; i++)
-                            special = (symbolIndexes.At(i) == symbolIndexes.At(i + 1));
+                            special = symbolIndexes.At(i) == symbolIndexes.At(i + 1);
                         if (special) specialTime = 0;
                         MathLib::Array<MathLib::Pair<Symbol, size_t>> scores;
                         for (const size_t& i : symbolIndexes) {
@@ -96,6 +102,7 @@ int main(int, char**) {
                         break;
                     }
                     case '1' ... '9': {
+                        update = true;
                         const size_t index = event.key - '1';
                         if (score < consumables[index].cost) break;
                         score -= consumables[index].cost;

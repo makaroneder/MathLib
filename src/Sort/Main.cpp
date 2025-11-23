@@ -1,7 +1,7 @@
 #include "Action.hpp"
 #include "SignaledWritableSequence.hpp"
 #include <Interfaces/ComparisionFunction.hpp>
-#include <Interfaces/RandomSequence.hpp>
+#include <Interfaces/Sequence/RandomSequence.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -23,22 +23,25 @@ int main(int, char**) {
             MathLib::Interval<size_t>(0, height - 1), width / blockWidth
         ));
         for (size_t x = 0; x < width; x += blockWidth) {
-            const size_t h = base.At(x / blockWidth);
-            for (size_t rx = 0; rx < blockWidth; rx++)
-                for (size_t y = 0; y < height; y++)
-                    renderer.At(x + rx, height - 1 - y) = y <= h ? UINT32_MAX : 0;
+            const size_t h = base.AtUnsafe(x / blockWidth);
+            for (size_t y = 0; y < height; y++) {
+                const uint32_t color = y <= h ? UINT32_MAX : 0;
+                const size_t ry = height - 1 - y;
+                for (size_t rx = 0; rx < blockWidth; rx++) renderer.AtUnsafe(x + rx, ry) = color;
+            }
         }
         if (!renderer.Update()) MathLib::Panic("Failed to update UI");
         bool running = true;
-        const auto func = MathLib::MakeFunctionT<bool, size_t, size_t>(nullptr, [&renderer, &running, blockWidth, height](const void*, size_t x, size_t h) -> bool {
-            for (size_t rx = 0; rx < blockWidth; rx++)
-                for (size_t y = 0; y < height; y++)
-                    renderer.At(x * blockWidth + rx, height - 1 - y) = y <= h ? UINT32_MAX : 0;
-            if (renderer.GetEvent().type == MathLib::Event::Type::Quit) {
-                running = false;
-                return false;
+        const auto func = MathLib::MakeFunctionT<bool, size_t, size_t>([&renderer, &running, blockWidth, height](size_t x, size_t h) -> bool {
+            for (size_t y = 0; y < height; y++) {
+                const uint32_t color = y <= h ? UINT32_MAX : 0;
+                const size_t ry = height - 1 - y;
+                for (size_t rx = 0; rx < blockWidth; rx++)
+                    renderer.AtUnsafe(x * blockWidth + rx, ry) = color;
             }
-            return renderer.Update();
+            if (renderer.GetEvent().type != MathLib::Event::Type::Quit) return renderer.Update();
+            running = false;
+            return false;
         });
         SignaledWritableSequence<size_t> sequence = SignaledWritableSequence<size_t>(base, func);
         Action actions[] = {

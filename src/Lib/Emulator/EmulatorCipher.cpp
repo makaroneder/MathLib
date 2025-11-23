@@ -1,22 +1,16 @@
 #include "EmulatorCipher.hpp"
 
 namespace MathLib {
-    EmulatorCipher::EmulatorCipher(Emulator& emulator) : Emulator(), emulator(emulator) {
-        EmptyBenchmark
-    }
-    void EmulatorCipher::Reset(void) {
-        EmptyBenchmark
+    EmulatorCipher::EmulatorCipher(Emulator& emulator) : Emulator(), emulator(emulator) {}
+    bool EmulatorCipher::Reset(void) {
+        return true;
     }
     bool EmulatorCipher::Run(void) {
-        StartBenchmark
-        emulator.Reset();
-        ReturnFromBenchmark(emulator.Run());
+        return emulator.Reset() && emulator.Run();
     }
     Array<uint8_t> EmulatorCipher::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        StartBenchmark
-        if (!key.IsEmpty()) ReturnFromBenchmark(Array<uint8_t>());
-        emulator.Reset();
+        if (!key.IsEmpty() || !emulator.Reset()) return Array<uint8_t>();
         emulator.memory = CollectionToArray<uint8_t>(data);
-        ReturnFromBenchmark(emulator.Run() ? emulator.memory : Array<uint8_t>());
+        return emulator.Run() ? emulator.memory : Array<uint8_t>();
     }
 }

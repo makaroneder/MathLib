@@ -1,9 +1,9 @@
 #include "ISO9660.hpp"
 #include "../../String.hpp"
+#include "../../FunctionT.hpp"
 
 namespace MathLib {
     ISO9660::ISO9660(ByteDevice& disk) : PhysicalFileSystem(disk), pvd(ISO9660PrimaryVolumeDescriptor()), files() {
-        StartBenchmark
         if (!disk.Seek(16 * 2048, SeekMode::Set)) Panic("Failed to set disk position");
         uint8_t buff[2048];
         while (disk.Tell() < disk.GetSize()) {
@@ -14,115 +14,90 @@ namespace MathLib {
                 break;
             }
         }
-        EndBenchmark
     }
     bool ISO9660::IsValid(void) const {
-        StartAndReturnFromBenchmark(pvd.IsValid());
+        return pvd.IsValid();
     }
     bool ISO9660::Create(void) {
         // TODO: Create file system
-        StartBenchmark
-        ReturnFromBenchmark(false);
+        return false;
     }
     size_t ISO9660::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         // TODO: Create file and overwrite its data
-        StartBenchmark
-        if (mode == OpenMode::Write) ReturnFromBenchmark(SIZE_MAX);
+        if (mode == OpenMode::Write) return SIZE_MAX;
         const Expected<ISO9660DirectoryEntry> prev = GetDirectoryEntry(path);
-        if (!prev.HasValue()) ReturnFromBenchmark(SIZE_MAX);
+        if (!prev.HasValue()) return SIZE_MAX;
         const ISO9660File ret = ISO9660File(prev.Get(), mode);
-        for (size_t i = 0; i < files.GetSize(); i++) {
+        const size_t size = files.GetSize();
+        for (size_t i = 0; i < size; i++) {
             if (files.At(i).free) {
                 files.At(i) = ret;
-                ReturnFromBenchmark(i);
+                return i;
             }
         }
-        ReturnFromBenchmark(files.Add(ret) ? files.GetSize() - 1 : SIZE_MAX);
+        return files.Add(ret) ? size : SIZE_MAX;
     }
     bool ISO9660::Close(size_t file) {
-        StartBenchmark
-        if (file >= files.GetSize() || files.At(file).free) ReturnFromBenchmark(false);
+        if (file >= files.GetSize() || files.At(file).free) return false;
         files.At(file).free = true;
-        ReturnFromBenchmark(true);
+        return true;
     }
     size_t ISO9660::Read(size_t file, void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        if (file >= files.GetSize()) ReturnFromBenchmark(0);
+        if (file >= files.GetSize()) return 0;
         const ISO9660DirectoryEntry& raw = files.At(file).entry;
-        if (!disk.Seek(raw.extent.little * 2048 + position, SeekMode::Set)) ReturnFromBenchmark(0);
-        ReturnFromBenchmark(disk.ReadSizedBuffer(buffer, raw.bytesPerExtent.little < size + position ? raw.bytesPerExtent.little - position : size));
+        if (!disk.Seek(raw.extent.little * 2048 + position, SeekMode::Set)) return 0;
+        return disk.ReadSizedBuffer(buffer, raw.bytesPerExtent.little < size + position ? raw.bytesPerExtent.little - position : size);
     }
     size_t ISO9660::Write(size_t file, const void* buffer, size_t size, size_t position) {
-        StartBenchmark
-        if (file >= files.GetSize()) ReturnFromBenchmark(0);
+        if (file >= files.GetSize()) return 0;
         const ISO9660File& raw = files.At(file);
-        if (raw.mode != OpenMode::Write || raw.mode != OpenMode::ReadWrite) ReturnFromBenchmark(0);
+        if (raw.mode != OpenMode::Write || raw.mode != OpenMode::ReadWrite) return 0;
         // TODO: Resize file
-        if (raw.entry.bytesPerExtent.little < size + position || !disk.Seek(raw.entry.extent.little * 2048 + position, SeekMode::Set)) ReturnFromBenchmark(0);
-        ReturnFromBenchmark(disk.WriteSizedBuffer(buffer, size));
+        if (raw.entry.bytesPerExtent.little < size + position || !disk.Seek(raw.entry.extent.little * 2048 + position, SeekMode::Set)) return 0;
+        return disk.WriteSizedBuffer(buffer, size);
     }
     size_t ISO9660::GetSize(size_t file) {
-        StartAndReturnFromBenchmark(file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0);
+        return file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0;
     }
     Array<FileInfo> ISO9660::ReadDirectory(const Sequence<char>& path) {
-        StartBenchmark
         Expected<ISO9660DirectoryEntry> entry = GetDirectoryEntry(path);
-        if (!entry.HasValue() || !entry.Get().directory) ReturnFromBenchmark(Array<FileInfo>());
-        Array<ISO9660DirectoryEntry*> rawRet = ReadDirectoryEntry(entry.Get());
+        if (!entry.HasValue() || !entry.Get().directory) return Array<FileInfo>();
         Array<FileInfo> ret;
-        bool status = true;
-        for (ISO9660DirectoryEntry*& tmp : rawRet) {
-            if (!ret.Add(FileInfo(tmp->directory ? FileInfo::Type::Directory : FileInfo::Type::File, tmp->GetName()))) {
-                status = false;
-                break;
-            }
-        }
-        for (ISO9660DirectoryEntry*& tmp : rawRet) delete tmp;
-        ReturnFromBenchmark(status ? ret : Array<FileInfo>());
+        return ReadDirectoryEntry(entry.Get(), MakeFunctionT<bool, const ISO9660DirectoryEntry*>([&ret](const ISO9660DirectoryEntry* tmp) -> bool {
+            return ret.Add(FileInfo(tmp->directory ? FileInfo::Type::Directory : FileInfo::Type::File, tmp->GetName()));
+        })) ? ret : Array<FileInfo>();
     }
-    Array<ISO9660DirectoryEntry*> ISO9660::ReadDirectoryEntry(const ISO9660DirectoryEntry& parent) {
-        StartBenchmark
+    bool ISO9660::ReadDirectoryEntry(const ISO9660DirectoryEntry& parent, const Function<bool, const ISO9660DirectoryEntry*>& function) {
         uint8_t buff[parent.bytesPerExtent.little];
-        if (!disk.Seek(parent.extent.little * 2048, SeekMode::Set) || !disk.ReadBuffer(buff, parent.bytesPerExtent.little)) ReturnFromBenchmark(Array<ISO9660DirectoryEntry*>());
+        if (!disk.ReadPositionedBuffer(buff, parent.bytesPerExtent.little, parent.extent.little * 2048)) return false;
         size_t off = 0;
-        Array<ISO9660DirectoryEntry*> ret;
         while (off != parent.bytesPerExtent.little) {
             ISO9660DirectoryEntry* entry = (ISO9660DirectoryEntry*)&buff[off];
             if (!entry->IsValid()) break;
             if (entry->nameLength && (IsAlphaDigit(entry->name[0]) || IsWhiteSpace(entry->name[0]) || entry->name[0] == '_')) {
-                uint8_t* tmp = new uint8_t[entry->length];
-                if (!tmp) {
-                    for (ISO9660DirectoryEntry*& entry : ret) delete entry;
-                    ReturnFromBenchmark(Array<ISO9660DirectoryEntry*>());
-                }
-                for (size_t j = 0; j < entry->length; j++) tmp[j] = buff[j + off];
-                if (!ret.Add((ISO9660DirectoryEntry*)tmp)) {
-                    for (ISO9660DirectoryEntry*& entry : ret) delete entry;
-                    ReturnFromBenchmark(Array<ISO9660DirectoryEntry*>());
-                }
+                uint8_t tmp[entry->length];
+                MemoryCopy(buff + off, tmp, entry->length);
+                if (!function((const ISO9660DirectoryEntry*)tmp)) return false;
             }
             off += entry->length;
         }
-        ReturnFromBenchmark(ret);
+        return true;
     }
     Expected<ISO9660DirectoryEntry> ISO9660::GetDirectoryEntry(const Sequence<char>& path) {
-        StartBenchmark
         ISO9660DirectoryEntry prev = pvd.root;
         const Array<String> split = Split(path, '/'_M, false);
         for (const Sequence<char>& name : split) {
             if (name.IsEmpty()) continue;
-            Array<ISO9660DirectoryEntry*> subData = ReadDirectoryEntry(prev);
             bool found = false;
-            for (ISO9660DirectoryEntry*& entry : subData) {
+            if (!ReadDirectoryEntry(prev, MakeFunctionT<bool, const ISO9660DirectoryEntry*>([&name, &prev, &found](const ISO9660DirectoryEntry* entry) -> bool {
                 if (name == entry->GetName()) {
+                    if (found) return false;
                     found = true;
                     prev = *entry;
-                    break;
                 }
-            }
-            for (ISO9660DirectoryEntry*& entry : subData) delete entry;
-            if (!found) ReturnFromBenchmark(Expected<ISO9660DirectoryEntry>());
+                return true;
+            })) || !found) return Expected<ISO9660DirectoryEntry>();
         }
-        ReturnFromBenchmark(Expected<ISO9660DirectoryEntry>(prev));
+        return prev;
     }
 }

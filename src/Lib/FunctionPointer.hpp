@@ -5,18 +5,14 @@
 namespace MathLib {
     template <typename Ret, typename... Args>
     struct FunctionPointer : Function<Ret, Args...> {
-        using RawFunction = Ret (*)(const void*, Args...);
-        FunctionPointer(void) {
-            EmptyBenchmark
-        }
-        FunctionPointer(void* data, RawFunction function) : Function<Ret, Args...>(data), function(function) {
-            EmptyBenchmark
-        }
+        using RawFunction = Ret (*)(Args...);
+        FunctionPointer(void) {}
+        FunctionPointer(const RawFunction& function) : function(function) {}
         [[nodiscard]] RawFunction GetFunction(void) const {
-            StartAndReturnFromBenchmark(function);
+            return function;
         }
-        [[nodiscard]] virtual Ret Invoke(const void* data, Args... args) const override {
-            StartAndReturnFromBenchmark(function(data, args...));
+        [[nodiscard]] virtual Ret Invoke(Args... args) const override {
+            return function(args...);
         }
 
         private:

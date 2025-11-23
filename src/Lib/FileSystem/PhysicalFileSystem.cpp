@@ -1,10 +1,8 @@
 #include "PhysicalFileSystem.hpp"
 
 namespace MathLib {
-    PhysicalFileSystem::PhysicalFileSystem(ByteDevice& disk) : disk(disk) {
-        EmptyBenchmark
-    }
+    PhysicalFileSystem::PhysicalFileSystem(ByteDevice& disk) : disk(disk) {}
     ByteDevice& PhysicalFileSystem::GetDisk(void) {
-        StartAndReturnFromBenchmark(disk);
+        return disk;
     }
 }

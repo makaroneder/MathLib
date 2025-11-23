@@ -5,14 +5,11 @@
 namespace MathLib {
     template <typename T>
     struct KinematicMotion : DynamicalSystem<T> {
-        KinematicMotion(const Sequence<Matrix<T>>& data) : data(CollectionToArray<Matrix<T>>(data)) {
-            EmptyBenchmark
-        }
+        KinematicMotion(const Sequence<Matrix<T>>& data) : data(CollectionToArray<Matrix<T>>(data)) {    }
         virtual Matrix<T> Update(const T& dt) override {
-            StartBenchmark
             data.At(data.GetSize() - 1) = GetFinal();
             for (size_t i = data.GetSize() - 1; i; i--) data.At(i - 1) += data.At(i) * dt;
-            ReturnFromBenchmark(data.At(0));
+            return data.At(0);
         }
 
         protected:

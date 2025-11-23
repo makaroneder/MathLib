@@ -5,8 +5,7 @@
 
 namespace MathLib {
     struct HostSocket : Socket {
-        HostSocket(void);
-        HostSocket(int handle_);
+        HostSocket(bool tcp);
         virtual ~HostSocket(void) override;
         /// @brief Reads data from the buffer
         /// @param buffer Buffer to read data from

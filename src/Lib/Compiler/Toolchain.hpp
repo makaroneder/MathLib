@@ -12,7 +12,7 @@ namespace MathLib {
         [[nodiscard]] ParserNode GetNode(void) const;
         template <typename T>
         [[nodiscard]] T Evaluate(Evaluator<T>& evaluator) {
-            StartAndReturnFromBenchmark(evaluator.Evaluate(GetNode()));
+            return evaluator.Evaluate(GetNode());
         }
 
         private:

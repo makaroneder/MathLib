@@ -6,7 +6,7 @@
 namespace MathLib {
     struct EmulatorCipher : Emulator, OneWayCipher {
         EmulatorCipher(Emulator& emulator);
-        virtual void Reset(void) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual bool Run(void) override;
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
 

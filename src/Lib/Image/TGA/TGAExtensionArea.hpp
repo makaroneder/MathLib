@@ -10,7 +10,7 @@ namespace MathLib {
         uint16_t timestamp[6];
         char jobName[41];
         uint16_t jobTime[3];
-        char softwareId[41];
+        char softwareID[41];
         uint16_t softwareVersion;
         uint32_t keyColor;
         uint16_t pixelAspectRatio[2];
@@ -19,6 +19,9 @@ namespace MathLib {
         uint32_t postageStampOffset;
         uint32_t scanLineOffset;
         uint8_t attributesType;
+
+        TGAExtensionArea(void);
+        TGAExtensionArea(const Sequence<char>& authorName, const Sequence<char>& jobName, const Sequence<char>& softwareID, const Sequence<char>& authorComments1, const Sequence<char>& authorComments2, const Sequence<char>& authorComments3, const Sequence<char>& authorComments4, uint8_t attributesType);
     } __attribute__((packed));
 }
 

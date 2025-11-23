@@ -8,6 +8,9 @@ namespace MathLib {
         uint32_t extensionOffset;
         uint32_t developerOffset;
         char signature[18];
+
+        TGAFooter(void);
+        TGAFooter(uint32_t extensionOffset, uint32_t developerOffset);
     } __attribute__((packed));
 }
 

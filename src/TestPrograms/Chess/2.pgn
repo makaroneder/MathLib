@@ -1,0 +1,39 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2025.05.26"]
+[Round "-"]
+[White "A"]
+[Black "B"]
+[Result "1/2-1/2"]
+[CurrentPosition "6K1/4q3/2k5/5r1r/6p1/8/8/8 w - - 20 70"]
+[Timezone "UTC"]
+[ECO "C30"]
+[ECOUrl "https://www.chess.com/openings/Kings-Gambit-Panteldakis-Countergambit"]
+[UTCDate "2025.05.26"]
+[UTCTime "15:23:48"]
+[WhiteElo "400"]
+[BlackElo "529"]
+[TimeControl "600"]
+[Termination "Game drawn by stalemate"]
+[StartTime "15:23:48"]
+[EndDate "2025.05.26"]
+[EndTime "15:38:19"]
+[Link "https://www.chess.com/analysis/game/live/142586423943?tab=analysis&move=137"]
+[WhiteUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[WhiteCountry "112"]
+[WhiteTitle ""]
+[BlackUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[BlackCountry "112"]
+[BlackTitle ""]
+
+1. e4 e5 2. f4 f5 3. d4 d5 4. c4 c5 5. b4 b5 6. a4 a5 7. g4 g5 8. h4 h5 9. cxd5
+Nf6 10. fxe5 Nxe4 11. Nc3 Nxc3 12. Bxg5 Nxd1 13. Bxd8 fxg4 14. Rxd1 cxb4 15. Rc1
+Ra7 16. Rxc8 b3 17. Ne2 b2 18. Bg5+ Kf7 19. Rxb8 b1=Q+ 20. Bc1 Qb4+ 21. Nc3
+Qxc3+ 22. Bd2 Qa1+ 23. Kf2 bxa4 24. Rd8 Qa2 25. Be2 Qxd2 26. Rd1 Qb4 27. Rc8 Rh6
+28. d6 a3 29. Ra1 Qa4 30. Bb5 Qxb5 31. Rxa3 Qa6 32. Ra4 Ra8 33. Rc7+ Ke6 34.
+Re7+ Bxe7 35. dxe7 Kxe7 36. Ke3 Rb8 37. Ke4 Qg6+ 38. Kd5 Ra8 39. Kc5 Qe4 40. d5
+Qxe5 41. Rc4 Qc7+ 42. Kb5 Qb7+ 43. Kc5 Rc8+ 44. Kd4 Rxc4+ 45. Kxc4 a4 46. Kd4 a3
+47. d6+ Kd7 48. Ke5 a2 49. Kf5 a1=R 50. Kg5 Rh8 51. Kg6 Rg8+ 52. Kxh5 Ra5+ 53.
+Kh6 Qb8 54. h5 Rh8+ 55. Kg6 Qg8+ 56. Kf6 Ra6 57. Kf5 Rxd6 58. Kf4 Rd4+ 59. Kf5
+Rxh5+ 60. Kf6 Qf8+ 61. Kg6 Rh8 62. Kg5 Rd5+ 63. Kg6 Qd6+ 64. Kg7 Rhh5 65. Kf7
+Kc6 66. Ke8 Rh8+ 67. Kf7 Rf5+ 68. Kg7 Rhh5 69. Kg8 Qe7 1/2-1/2

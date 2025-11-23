@@ -1,11 +1,11 @@
 #include "Circuit.hpp"
-#include <Interfaces/FunctionSequence.hpp>
+#include <Interfaces/Sequence/FunctionSequence.hpp>
 #include <FunctionT.hpp>
 #include <String.hpp>
 
 Circuit::Circuit(void) {}
 Circuit::~Circuit(void) {
-    if (!network.ResetNodes(MathLib::MakeFunctionT<void, Gate*&>(nullptr, [](const void*, Gate*& element) -> void {
+    if (!network.ResetNodes(MathLib::MakeFunctionT<void, Gate*&>([](Gate*& element) -> void {
         delete element;
     }))) MathLib::Panic("Failed to destroy circuit gates");
 }
@@ -43,7 +43,7 @@ MathLib::Bitmap Circuit::Update(size_t element, MathLib::Dictionary<size_t, Math
     const MathLib::Expected<MathLib::Bitmap> ret = cache.Get(element);
     if (ret.HasValue()) return ret.Get();
     const MathLib::Array<MathLib::NetworkElement> inputElements = network.GetConnectionsAttributes(element, true);
-    const MathLib::Bitmap result = network.GetNode(element)->Update(MathLib::FunctionSequence<bool>(MathLib::MakeFunctionT<bool, size_t>(nullptr, [this, &inputElements, &cache](const void*, size_t index) -> bool {
+    const MathLib::Bitmap result = network.GetNode(element)->Update(MathLib::FunctionSequence<bool>(MathLib::MakeFunctionT<bool, size_t>([this, &inputElements, &cache](size_t index) -> bool {
         const MathLib::NetworkElement connection = inputElements.At(index);
         return Update(connection.node, cache).At(network.GetLink(connection.link));
     }), inputElements.GetSize()));

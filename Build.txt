@@ -2,7 +2,7 @@ MakeObjects(dir : String, ext : String, cmd : String, sources : String) : String
 LDTarget(out : String, objs : String, libs : String, ld : String, ldFlags : String, deps : String) : String = DeclareTarget("$(BUILDDIR)/" + out, objs + deps, ld + " " + ldFlags + " " + objs + " -o $@ " + libs, false)
 DefaultRunTargets(name : String, app : String, args : String) : Void = DeclareTarget("run" + name, app, "./$< " + args, true) + DeclareTarget("debug" + name, app, "$(VALGRIND) $(VALGRINDFLAGS) ./$< " + args, true)
 DefaultTarget(out : String, dir : String, libs : String, run : String, args : String, runDeps : String) : Void = {
-    LDTarget(out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs + " -L $(BUILDDIR) -l Math", "$(CXX)", "$(CXXFLAGS)", "$(BUILDDIR)/libMath.a"),
+    LDTarget(out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs + " -L $(BUILDDIR) -l Math", "$(CXX)", "$(CXXFLAGS)", "$(BUILDDIR)/libMath.so"),
     DefaultRunTargets(run, "$(BUILDDIR)/" + out + " " + runDeps, args)
 }
 DefaultTarget("Tests.out", "Tests", "", "Test", "", "")
@@ -32,8 +32,6 @@ DefaultTarget("PolynomialApproximation.out", "Math/PolynomialApproximation", "",
 DefaultTarget("Cards.out", "Games/Cards", "-l SDL2", "Cards", "", "")
 DefaultTarget("GameOfLife.out", "Games/GameOfLife", "-l SDL2", "GOL", "", "")
 DefaultTarget("Ray.out", "Physics/Ray", "-l SDL2", "Ray", "", "")
-DefaultTarget("Quantum.out", "Physics/Quantum", "-l SDL2", "Quantum", "", "")
-DefaultTarget("GameEngine.out", "Games/GameEngine", "-l SDL2", "Engine", "", "")
 DefaultTarget("Channel.out", "Math/Channel", "", "Channel", "", "")
 DefaultTarget("6502.out", "Emulator/6502", "", "6502", "", "")
 DefaultTarget("AML.out", "Emulator/AML", "", "AML", "$(BUILDDIR)/Main.aml", "$(BUILDDIR)/Main.aml")
@@ -41,20 +39,22 @@ DefaultTarget("GameTheory.out", "Games/GameTheory", "", "GameTheory", "", "")
 DefaultTarget("HeaderTree.out", "HeaderTree", "", "HeaderTree", "$(HEADERTREEINPUT)", "")
 DefaultTarget("ChaosTheory.out", "Math/ChaosTheory", "-l SDL2", "Chaos", "", "")
 DefaultTarget("BNF.out", "BNF", "", "BNF", "", "")
-DefaultTarget("FileSystemConverter.out", "FileSystemConverter", "", "FSConv", "$(FSCONVOUTPUT) $(FSCONVINPUT)", "")
+DefaultTarget("FileSystemConverter.out", "FileSystemConverter", "", "FSConv", "$(FSCONVFS) $(FSCONVOUTPUT) $(FSCONVINPUT)", "")
 DefaultTarget("Queue.out", "Queue", "", "Queue", "", "")
 DefaultTarget("ImageGenerator.out", "ImageGenerator", "-l SDL2", "ImgGen", "$(IMGGENMODEL) $(IMGGENINPUT)", "")
 DefaultTarget("Transform.out", "Math/Transform", "", "Transform", "", "")
 DefaultTarget("Bencode.out", "Bencode", "", "Bencode", "$(BENCODEINPUT)", "")
-DefaultTarget("Network.out", "Network", "", "Network", "-type $(SERVERTYPE) -port $(SERVERPORT) -target $(SERVERTARGET)", "")
 DefaultTarget("Sort.out", "Sort", "-l SDL2", "Sort", "", "")
 DefaultTarget("Compiler.out", "Compiler", "", "Compiler", "-input $(COMPILERINPUT) -output $(COMPILEROUTPUT)", "")
 DefaultTarget("LambdaCalculus.out", "LambdaCalculus", "", "Lambda", "$(LAMBDAINPUT)", "")
-DefaultTarget("ArtificialLife.out", "ArtificialLife", "", "ArtificialLife", "", "")
 DefaultTarget("Chess.out", "Chess", "-l SDL2", "Chess", "", "")
 DefaultTarget("WebScraper.out", "WebScraper", "-l curl", "WebScraper", "$(SCRAPERINPUT)", "")
 DefaultTarget("SequentCalculus.out", "SequentCalculus", "", "Sequent", "$(SEQUENTINPUT)", "")
-DefaultTarget("Algebra.out", "Math/Algebra", "", "Algebra", "", "")
+DefaultTarget("StackEmulator.out", "Emulator/Stack", "", "StackEmu", "", "")
+DefaultTarget("Prover.out", "Math/Prover", "", "Prover", "$(PROVERINPUT)", "")
+DefaultTarget("GovernmentSimulator.out", "Games/GovernmentSimulator", "-l SDL2", "GovernmentSimulator", "", "")
+DefaultTarget("ConstantCalculator.out", "Math/ConstantCalculator", "", "ConstantCalc", "", "")
+DefaultTarget("3DViewer.out", "3DViewer", "-l SDL2", "3DViewer", "-inputType $(3DVIEWERINPUTTYPE) -input $(3DVIEWERINPUT)", "")
 
 DeclareTarget("$(BUILDDIR)/Main.aml", "$(SRCDIR)/TestPrograms/ACPI/Main.asl $(SCRIPTSDIR)/CompileASL.py", "$(PYTHON) Scripts/CompileASL.py $< $@ $(ASLFLAGS)", false)
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)
@@ -65,18 +65,10 @@ DeclareTarget("$(BUILDDIR)/OS.gdb", "$(SCRIPTSDIR)/MakeGDB.py", "$(PYTHON) $< $@
 MakeObjects("OS", "s", "$(AS) $(ASFLAGS) $< -o $@", "$(BUILDDIR)/OS/crti.s $(BUILDDIR)/OS/crtn.s")
 kernelObjs : String =
     "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o) " +
-    MakeObjects("OS/Kernel", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Kernel", ".cpp")) +
-    MakeObjects("OS/Kernel", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Kernel", ".asm")) +
+    MakeObjects("OS", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS", ".cpp")) +
+    MakeObjects("OS", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS", ".asm")) +
     "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "
 LDTarget("Kernel.elf", kernelObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS) -T $(OSLINKER) -Xlinker -Map=$(BUILDDIR)/Kernel.map", "$(OSLINKER)")
 
-bootloaderObjs : String =
-    "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o) " +
-    MakeObjects("OS/Bootloader", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Bootloader", ".cpp")) +
-    MakeObjects("OS/Bootloader", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Bootloader", ".asm")) +
-    "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "
-LDTarget("Bootloader.elf", bootloaderObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS) -T $(BOOTLINKER) -Xlinker -Map=$(BUILDDIR)/Bootloader.map", "$(BOOTLINKER)")
-DeclareTarget("$(BUILDDIR)/Bootloader.bin", "$(BUILDDIR)/Bootloader.elf", "$(OSOBJCPY) -O binary $< $@", false)
-
-DeclareTarget("runOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img $(BUILDDIR)/Bootloader.bin", "$(OSQEMUCMD) -debugcon stdio", true)
-DeclareTarget("debugOS", "$(BUILDDIR)/OS.gdb $(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img $(BUILDDIR)/Bootloader.bin", "gdb -x $<", true)
+DeclareTarget("runOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "$(OSQEMUCMD) -debugcon stdio", true)
+DeclareTarget("debugOS", "$(BUILDDIR)/OS.gdb $(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "gdb -x $<", true)

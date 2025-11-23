@@ -1,10 +1,10 @@
 #include "Sequent.hpp"
+#include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
 #include <Compiler/Parser/IdentityParserLayer.hpp>
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
-#include <Compiler/Parser/BinaryParserLayer.hpp>
 #include <Compiler/Parser/UnaryParserLayer.hpp>
 #include <Compiler/Lexer/StringLexerRule.hpp>
 #include <Compiler/IdentityEvaluator.hpp>
@@ -61,11 +61,11 @@ int main(int argc, char** argv) {
             new MathLib::StringLexerRule((size_t)TokenType::Implication, "->"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Negation, '!'_M)
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::BinaryParserLayer((size_t)TokenType::Turnstile, (size_t)TokenType::Turnstile, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Conjunction, (size_t)TokenType::Conjunction, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Disjunction, (size_t)TokenType::Disjunction, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Implication, (size_t)TokenType::Implication, true),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Turnstile, (size_t)TokenType::Turnstile),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Conjunction, (size_t)TokenType::Conjunction),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Disjunction, (size_t)TokenType::Disjunction),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Implication, (size_t)TokenType::Implication),
             new MathLib::UnaryParserLayer((size_t)TokenType::Negation, (size_t)TokenType::Negation),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)

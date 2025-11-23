@@ -4,18 +4,10 @@
 #include "AMLFieldFlags.hpp"
 
 namespace MathLib {
-    AMLObject::AMLObject(void) {
-        EmptyBenchmark
-    }
-    AMLObject::AMLObject(const Sequence<char>& name) : name(CollectionToString(name)), type(Type::Normal) {
-        EmptyBenchmark
-    }
-    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data) : name(CollectionToString(name)), type(Type::Normal), data(CollectionToArray<uint64_t>(data)) {
-        EmptyBenchmark
-    }
-    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type) : name(CollectionToString(name)), type(type), data(CollectionToArray<uint64_t>(data)) {
-        EmptyBenchmark
-    }
+    AMLObject::AMLObject(void) {}
+    AMLObject::AMLObject(const Sequence<char>& name) : name(CollectionToString(name)), type(Type::Normal) {}
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data) : name(CollectionToString(name)), type(Type::Normal), data(CollectionToArray<uint64_t>(data)) {}
+    AMLObject::AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type) : name(CollectionToString(name)), type(type), data(CollectionToArray<uint64_t>(data)) {}
     Array<uint64_t> AMLObject::GetData(void) const {
         return data;
     }
@@ -23,7 +15,6 @@ namespace MathLib {
         return children.Add(child);
     }
     String AMLObject::ToString(const Sequence<char>& padding) const {
-        StartBenchmark
         if (name == "_HID" || false) {
             String str;
             if (data.GetSize() == 1) {
@@ -37,7 +28,7 @@ namespace MathLib {
                 for (const char& chr : tmp) str += ToUpper(chr);
             }
             else for (size_t i = 0; i < data.GetSize() - 1; i++) str += (char)data.At(i);
-            ReturnFromBenchmark(CollectionToString(padding) + name + ": " + str);
+            return CollectionToString(padding) + name + ": " + str;
         }
         String ret = CollectionToString(padding) + name + ": {\n";
         switch (type) {
@@ -157,12 +148,12 @@ namespace MathLib {
                 break;
             }
         }
-        ReturnFromBenchmark(ret + padding + '}');
+        return ret + padding + '}';
     }
     bool AMLObject::operator==(const AMLObject& other) const {
-        StartAndReturnFromBenchmark(type == other.type && name == other.name && data == other.data && children == other.children);
+        return type == other.type && name == other.name && data == other.data && children == other.children;
     }
     bool AMLObject::operator!=(const AMLObject& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
 }

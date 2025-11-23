@@ -3,11 +3,8 @@
 #include "Memory.hpp"
 
 namespace MathLib {
-    IPv4::IPv4(void) : data(0) {
-        EmptyBenchmark
-    }
+    IPv4::IPv4(void) : data(0) {}
     IPv4::IPv4(const Sequence<char>& str) {
-        StartBenchmark
         const Array<String> split = Split(str, '.'_M, false);
         const size_t size = split.GetSize();
         if (!size || size > sizeof(uint32_t)) Panic("Invalid IPv4 provided");
@@ -17,22 +14,23 @@ namespace MathLib {
         MemoryCopy(&final, &buff[size - 1], sizeof(uint32_t) - size + 1);
         uint8_t end = sizeof(uint32_t);
         for (uint8_t i = size - 1; i < end; i++) Swap<uint8_t>(buff[i], buff[--end]);
-        EndBenchmark
+    }
+    uint32_t IPv4::GetRaw(void) const {
+        return data;
     }
     bool IPv4::Save(Writable& file) const {
-        StartAndReturnFromBenchmark(file.Write<uint32_t>(data));
+        return file.Write<uint32_t>(data);
     }
     bool IPv4::Load(Readable& file) {
-        StartAndReturnFromBenchmark(file.Read<uint32_t>(data));
+        return file.Read<uint32_t>(data);
     }
     String IPv4::ToString(const Sequence<char>& padding) const {
-        StartBenchmark
         String ret = CollectionToString(padding);
         const uint8_t* buff8 = (const uint8_t*)&data;
         for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
             if (i) ret += '.';
-            ret += MathLib::ToString(buff8[i], 10);
+            ret += Formatter<uint8_t>::ToString(buff8[i]);
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
 }

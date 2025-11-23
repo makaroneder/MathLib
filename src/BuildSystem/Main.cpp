@@ -13,7 +13,7 @@ MathLib::Array<FileSearch> fileSearchs;
 MathLib::Array<FileTranslation> fileTranslations;
 MathLib::String nonPhonyTargets = "";
 
-[[nodiscard]] MathLib::Node* DeclareTarget(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* DeclareTarget(const MathLib::Sequence<const MathLib::Node*>& args) {
     if (args.GetSize() != 4) return nullptr;
     for (size_t i = 0; i < 3; i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
@@ -22,13 +22,13 @@ MathLib::String nonPhonyTargets = "";
     if (!target.phony && !target.name.Contains('%')) nonPhonyTargets += target.name + ' ';
     return targets.Add(target) ? new MathLib::Node(MathLib::Node::Type::String, ""_M) : nullptr;
 }
-[[nodiscard]] MathLib::Node* CreateObjects(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* CreateObjects(const MathLib::Sequence<const MathLib::Node*>& args) {
     if (args.GetSize() != 3) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
     return fileTranslations.Add(FileTranslation(args.At(0)->value, args.At(1)->value, args.At(2)->value)) ? new MathLib::Node(MathLib::Node::Type::String, "$(FILETRANSLATION"_M + MathLib::ToString(fileTranslations.GetSize()) + ") ") : nullptr;
 }
-[[nodiscard]] MathLib::Node* FindFiles(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* FindFiles(const MathLib::Sequence<const MathLib::Node*>& args) {
     if (args.GetSize() != 2) return nullptr;
     for (size_t i = 0; i < args.GetSize(); i++)
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
@@ -46,9 +46,9 @@ int main(int argc, char** argv) {
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
         MathLib::Optimizer optimizer = MathLib::Optimizer(MathLib::MakeArray<MathLib::BuiltinFunction>(
-            MathLib::BuiltinFunction("DeclareTarget"_M, MathLib::BuiltinFunctionPointer(nullptr, &DeclareTarget)),
-            MathLib::BuiltinFunction("CreateObjects"_M, MathLib::BuiltinFunctionPointer(nullptr, &CreateObjects)),
-            MathLib::BuiltinFunction("FindFiles"_M, MathLib::BuiltinFunctionPointer(nullptr, &FindFiles))
+            MathLib::BuiltinFunction("DeclareTarget"_M, MathLib::BuiltinFunctionPointer(&DeclareTarget)),
+            MathLib::BuiltinFunction("CreateObjects"_M, MathLib::BuiltinFunctionPointer(&CreateObjects)),
+            MathLib::BuiltinFunction("FindFiles"_M, MathLib::BuiltinFunctionPointer(&FindFiles))
         ));
         optimizer.runtime = true;
         MathLib::Node* optimizedRoot = optimizer.Optimize(root);

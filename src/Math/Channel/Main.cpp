@@ -3,7 +3,7 @@
 #include <Cryptography/Channel/FlipChannel.hpp>
 #include <Cryptography/Channel/Channel.hpp>
 #include <Math/UniformDiscreteMeasure.hpp>
-#include <Interfaces/VariadicSequence.hpp>
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Cryptography/Cipher/ROT13.hpp>
 #include <iostream>
 

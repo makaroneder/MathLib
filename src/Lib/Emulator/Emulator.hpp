@@ -7,7 +7,7 @@ namespace MathLib {
         Emulator(void);
         Emulator(const Sequence<uint8_t>& memory);
         [[nodiscard]] virtual bool Run(void) = 0;
-        virtual void Reset(void) = 0;
+        [[nodiscard]] virtual bool Reset(void) = 0;
         /// @brief Returns memory size
         /// @return Memory size
         [[nodiscard]] virtual size_t GetSize(void) const override;

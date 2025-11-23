@@ -16,6 +16,8 @@ namespace MathLib {
         uint32_t signature3;
 
         [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] bool operator==(const FATFSInfo& other) const;
+        [[nodiscard]] bool operator!=(const FATFSInfo& other) const;
     } __attribute__((packed));
 }
 

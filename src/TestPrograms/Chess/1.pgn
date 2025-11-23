@@ -1,0 +1,35 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2025.05.26"]
+[Round "-"]
+[White "A"]
+[Black "B"]
+[Result "1-0"]
+[CurrentPosition "6B1/6P1/k7/1R1R2N1/Q7/p1p5/P1P3PP/6K1 b - - 13 43"]
+[Timezone "UTC"]
+[ECO "A06"]
+[ECOUrl "https://www.chess.com/openings/Reti-Opening-Tennison-Gambit"]
+[UTCDate "2025.05.26"]
+[UTCTime "15:05:59"]
+[WhiteElo "400"]
+[BlackElo "529"]
+[TimeControl "600"]
+[Termination "A won by checkmate"]
+[StartTime "15:05:59"]
+[EndDate "2025.05.26"]
+[EndTime "15:15:36"]
+[Link "https://www.chess.com/analysis/game/live/138884357308?tab=analysis&move=1"]
+[WhiteUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[WhiteCountry "112"]
+[WhiteTitle ""]
+[BlackUrl "https://www.chess.com/bundles/web/images/noavatar_l.84a92436.gif"]
+[BlackCountry "112"]
+[BlackTitle ""]
+
+1. e4 d5 2. Nf3 $2 e6 $6 3. d3 f5 $6 4. Nc3 dxe4 5. dxe4 fxe4 $2 6. Ng5 $9 Qxg5 $4 7.
+Bxg5 h6 $2 8. Bf4 $9 h5 9. Nxe4 h4 10. Bb5+ c6 11. Ba4 b5 12. Bb3 a5 13. O-O e5 14.
+Nd6+ Kd7 15. Nf5+ Ke8 16. Nxh4 exf4 17. Ng6 Rh6 18. Nxf4 $6 Rf6 $6 19. Nh5 Rf5 20.
+Ng3 Rg5 21. Ne4 Rg3 22. Nxg3 c5 23. Bxg8 b4 $6 24. f3 a4 25. f4 Bd6 $6 26. Qxd6
+Ra6 $6 27. Qxb8 $9 Rg6 28. Qxc8+ Ke7 29. Nf5+ Kf6 30. Nd6 $9 Rg4 $6 31. Qxg4 $9 Ke7
+32. f5 c4 33. Ne4 c3 34. bxc3 bxc3 35. f6+ Ke8 $6 36. fxg7 $9 a3 37. Qf4 Kd8 38.
+Ng5 Kc8 39. Rfd1 Kb7 40. Rab1+ Ka6 41. Rd5 Ka7 42. Rbb5 Ka6 43. Qa4# 1-0

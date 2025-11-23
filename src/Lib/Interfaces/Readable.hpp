@@ -28,16 +28,15 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool Read(T& value) {
-            StartAndReturnFromBenchmark(ReadBuffer(&value, sizeof(T)));
+            return ReadBuffer(&value, sizeof(T));
         }
         /// @brief Reads one T value
         /// @tparam T Type of value
         /// @return Value and status
         template <typename T>
         [[nodiscard]] Expected<T> Read(void) {
-            StartBenchmark
             T ret;
-            ReturnFromBenchmark(Read<T>(ret) ? Expected<T>(ret) : Expected<T>());
+            return Read<T>(ret) ? Expected<T>(ret) : Expected<T>();
         }
 
         protected:

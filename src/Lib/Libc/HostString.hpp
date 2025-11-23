@@ -1,7 +1,7 @@
 #ifndef Freestanding
 #ifndef MathLib_Libc_HostString_H
 #define MathLib_Libc_HostString_H
-#include "../Interfaces/Collection.hpp"
+#include "../Interfaces/Sequence/Collection.hpp"
 #include <string>
 
 namespace MathLib {
@@ -9,71 +9,55 @@ namespace MathLib {
         using Sequence<char>::operator==;
         using Sequence<char>::operator!=;
         using Collection<char>::operator+=;
-        HostString(void) {
-            EmptyBenchmark
-        }
-        HostString(const char* str) : string(str) {
-            EmptyBenchmark
-        }
-        HostString(const char* str, size_t size) : string(str, size) {
-            EmptyBenchmark
-        }
-        HostString(const std::string& str) : string(str) {
-            EmptyBenchmark
-        }
-        HostString(char chr) : HostString((HostString() + chr).GetValue()) {
-            EmptyBenchmark
-        }
+        HostString(void) {}
+        HostString(const char* str) : string(str) {}
+        HostString(const char* str, size_t size) : string(str, size) {}
+        HostString(const std::string& str) : string(str) {}
+        HostString(char chr) : string(1, chr) {}
         [[nodiscard]] virtual bool Add(const char& val) override {
-            StartBenchmark
             string += val;
-            ReturnFromBenchmark(true);
+            return true;
         }
         [[nodiscard]] virtual bool Reset(void) override {
-            StartBenchmark
             string.clear();
-            ReturnFromBenchmark(true);
+            return true;
         }
         [[nodiscard]] virtual size_t GetSize(void) const override {
-            StartAndReturnFromBenchmark(string.size());
+            return string.size();
         }
         [[nodiscard]] virtual char* GetValue(void) override {
-            StartAndReturnFromBenchmark(string.data());
+            return string.data();
         }
         [[nodiscard]] virtual const char* GetValue(void) const override {
-            StartAndReturnFromBenchmark(string.c_str());
+            return string.c_str();
         }
         [[nodiscard]] std::string ToStdString(void) const {
-            StartAndReturnFromBenchmark(string);
+            return string;
         }
         HostString& operator+=(const char* other) {
-            StartBenchmark
             string += other;
-            ReturnFromBenchmark(*this);
+            return *this;
         }
         [[nodiscard]] HostString operator+(const Sequence<char>& other) const {
-            StartBenchmark
-            HostString tmp = *this;
+            HostString tmp = string;
             tmp += other;
-            ReturnFromBenchmark(tmp);
+            return tmp;
         }
         [[nodiscard]] HostString operator+(const char* other) const {
-            StartBenchmark
-            HostString tmp = *this;
+            HostString tmp = string;
             tmp += other;
-            ReturnFromBenchmark(tmp);
+            return tmp;
         }
-        [[nodiscard]] HostString operator+(const char& chr) const {
-            StartBenchmark
-            HostString tmp = *this;
+        [[nodiscard]] HostString operator+(char chr) const {
+            HostString tmp = string;
             tmp += chr;
-            ReturnFromBenchmark(tmp);
+            return tmp;
         }
         [[nodiscard]] bool operator==(const char* other) const {
-            StartAndReturnFromBenchmark(string == other);
+            return string == other;
         }
         [[nodiscard]] bool operator!=(const char* other) const {
-            StartAndReturnFromBenchmark(!(*this == other));
+            return string != other;
         }
 
         private:

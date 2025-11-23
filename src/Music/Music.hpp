@@ -8,7 +8,7 @@ template <typename T>
 struct Music : MathLib::Saveable {
     Music(void) {}
     Music(const MathLib::Hertz<T>& sampleRate_, const T& amplitude, const MathLib::Sequence<MusicNote<T>>& notes) : sampleRate(sampleRate_) {
-        notes.Foreach(MathLib::MakeFunctionT<void, MusicNote<T>>(nullptr, [this, amplitude] (const void*, MusicNote<T> note) -> void {
+        notes.Foreach(MathLib::MakeFunctionT<void, MusicNote<T>>([this, amplitude](MusicNote<T> note) -> void {
             const size_t sampleCount = (note.duration * sampleRate).GetValue();
             const MathLib::Hertz<T> frequency = note.GetFrequency();
             samples = MathLib::Array<int16_t>(sampleCount);

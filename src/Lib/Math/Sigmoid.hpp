@@ -9,7 +9,7 @@ namespace MathLib {
     /// @return Return value
     template <typename T>
     [[nodiscard]] T Sigmoid(const T& x) {
-        StartAndReturnFromBenchmark(T(1) / (Exp(-x) + 1));
+        return T(1) / (Exp(-x) + 1);
     }
 }
 

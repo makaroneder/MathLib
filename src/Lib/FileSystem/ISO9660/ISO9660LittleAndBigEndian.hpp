@@ -6,6 +6,8 @@ namespace MathLib {
     struct ISO9660LittleAndBigEndian {
         T little;
         T big;
+
+        ISO9660LittleAndBigEndian(void) : little(), big() {}
     } __attribute__((packed));
 }
 

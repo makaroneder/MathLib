@@ -8,17 +8,13 @@ namespace MathLib {
     template <typename Ret, typename... Args>
     struct HostFunction : Function<Ret, Args...> {
         using RawFunction = std::function<Ret(Args...)>;
-        HostFunction(void) {
-            EmptyBenchmark
-        }
-        HostFunction(RawFunction function) : Function<Ret, Args...>(nullptr), function(function) {
-            EmptyBenchmark
-        }
+        HostFunction(void) {}
+        HostFunction(RawFunction function) : function(function) {}
         [[nodiscard]] RawFunction GetFunction(void) const {
-            StartAndReturnFromBenchmark(function);
+            return function;
         }
-        [[nodiscard]] virtual Ret Invoke(const void*, Args... args) const override {
-            StartAndReturnFromBenchmark(function(args...));
+        [[nodiscard]] virtual Ret Invoke(Args... args) const override {
+            return function(args...);
         }
 
         private:

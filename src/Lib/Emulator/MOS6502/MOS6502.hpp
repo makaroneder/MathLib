@@ -7,7 +7,7 @@
 namespace MathLib {
     struct MOS6502 : StepEmulator, Printable {
         MOS6502(const Sequence<uint8_t>& memory);
-        virtual void Reset(void) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual bool Step(void) override;
         [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string
@@ -20,10 +20,9 @@ namespace MathLib {
 
         template <typename T>
         [[nodiscard]] Expected<T> Fetch(void) {
-            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(pc.value);
             if (ret.HasValue()) pc.value += sizeof(T);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
 
         MOS6502Flags flags;

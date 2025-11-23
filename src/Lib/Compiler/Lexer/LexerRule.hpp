@@ -1,6 +1,6 @@
 #ifndef MathLib_Compiler_Lexer_Rule_H
 #define MathLib_Compiler_Lexer_Rule_H
-#include "../../Interfaces/Sequence.hpp"
+#include "../../Interfaces/Sequence/Sequence.hpp"
 
 namespace MathLib {
     struct LexerRule : Allocatable {

@@ -4,42 +4,55 @@
 
 namespace MathLib {
     template <typename T>
-    struct Expected : Allocatable {
-        Expected(void) : value(T()), error(true) {
-            EmptyBenchmark
-        }
-        Expected(const T& value) : value(value), error(false) {
-            EmptyBenchmark
-        }
+    struct Expected : Collection<T>, Printable {
+        Expected(void) : value(T()), hasValue(false) {}
+        Expected(const T& value) : value(value), hasValue(true) {}
         [[nodiscard]] T GetOr(const T& alternative) const {
-            StartAndReturnFromBenchmark(error ? alternative : value);
+            return hasValue ? value : alternative;
         }
         [[nodiscard]] T Get(const Sequence<char>& panicStr) const {
-            StartBenchmark
-            if (error) Panic(panicStr);
-            ReturnFromBenchmark(value);
+            if (hasValue) return value;
+            Panic(panicStr);
         }
         [[nodiscard]] T Get(const char* panicStr = "Expected value doesn't exist") const {
-            StartBenchmark
-            if (error) Panic(panicStr);
-            ReturnFromBenchmark(value);
+            if (hasValue) return value;
+            Panic(panicStr);
         }
         [[nodiscard]] bool HasValue(void) const {
-            StartAndReturnFromBenchmark(!error);
+            return hasValue;
         }
         template <typename F>
         [[nodiscard]] Expected<F> Convert(void) const {
-            StartAndReturnFromBenchmark(HasValue() ? Expected<F>((F)value) : Expected<F>());
+            return hasValue ? Expected<F>((F)value) : Expected<F>();
+        }
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
+            return CollectionToString(padding) + (hasValue ? Formatter<T>::ToString(Get()) : "No value");
+        }
+        [[nodiscard]] virtual size_t GetSize(void) const override {
+            return hasValue;
+        }
+        [[nodiscard]] virtual bool Add(const T& x) override {
+            if (hasValue) return false;
+            value = x;
+            hasValue = true;
+            return true;
+        }
+        [[nodiscard]] virtual bool Reset(void) override {
+            value = T();
+            hasValue = false;
+            return true;
+        }
+        [[nodiscard]] virtual T* GetValue(void) override {
+            return &value;
+        }
+        [[nodiscard]] virtual const T* GetValue(void) const override {
+            return &value;
         }
 
         private:
         T value;
-        bool error;
+        bool hasValue;
     };
-    template <typename T>
-    [[nodiscard]] String ToString(const Expected<T>& expected) {
-        StartAndReturnFromBenchmark(expected.HasValue() ? MathLib::ToString(expected.Get()) : "No value");
-    }
 }
 
 #endif

@@ -9,6 +9,8 @@ namespace MathLib {
         uint32_t extent;
         uint16_t parentDirectory;
         char identifier[];
+
+        ISO9660PathTable(void);
     } __attribute__((packed));
 }
 

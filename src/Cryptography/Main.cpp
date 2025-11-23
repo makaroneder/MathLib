@@ -7,8 +7,8 @@
 #include <FunctionT.hpp>
 #include <iostream>
 
-[[nodiscard]] MathLib::Node* Encrypt(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
-    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>(nullptr, [] (const void*, bool prev, const MathLib::Node* arg) -> bool {
+[[nodiscard]] MathLib::Node* Encrypt(const MathLib::Sequence<const MathLib::Node*>& args) {
+    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>([](bool prev, const MathLib::Node* arg) -> bool {
         return prev && arg->type == MathLib::Node::Type::String;
     }), true)) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().EncryptString(args.At(1)->value, MathLib::Cipher::StringToKey(args.At(2)->value), true));
@@ -17,8 +17,8 @@
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().EncryptString(args.At(1)->value, MathLib::Cipher::StringToKey(args.At(2)->value), true));
     else return nullptr;
 }
-[[nodiscard]] MathLib::Node* Decrypt(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
-    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>(nullptr, [] (const void*, bool prev, const MathLib::Node* arg) -> bool {
+[[nodiscard]] MathLib::Node* Decrypt(const MathLib::Sequence<const MathLib::Node*>& args) {
+    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>([](bool prev, const MathLib::Node* arg) -> bool {
         return prev && arg->type == MathLib::Node::Type::String;
     }), true)) return nullptr;
     if (args.At(0)->value == "CaesarCipher") return new MathLib::Node(MathLib::Node::Type::String, MathLib::CaesarCipher().EncryptString(args.At(1)->value, MathLib::Cipher::StringToKey(args.At(2)->value), false));
@@ -27,8 +27,8 @@
     else if (args.At(0)->value == "ROT13") return new MathLib::Node(MathLib::Node::Type::String, MathLib::ROT13().EncryptString(args.At(1)->value, MathLib::Cipher::StringToKey(args.At(2)->value), false));
     else return nullptr;
 }
-[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
-    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>(nullptr, [] (const void*, bool prev, const MathLib::Node* arg) -> bool {
+[[nodiscard]] MathLib::Node* Print(const MathLib::Sequence<const MathLib::Node*>& args) {
+    if (!args.Foreach<bool>(MathLib::MakeFunctionT<bool, bool, const MathLib::Node*>([](bool prev, const MathLib::Node* arg) -> bool {
         std::cout << arg->value;
         return prev && arg->type == MathLib::Node::Type::String;
     }), true)) return nullptr;
@@ -48,9 +48,9 @@ int main(int argc, char** argv) {
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
         MathLib::Optimizer optimizer = MathLib::Optimizer(MathLib::MakeArray<MathLib::BuiltinFunction>(
-            MathLib::BuiltinFunction("Encrypt"_M, MathLib::BuiltinFunctionPointer(nullptr, &Encrypt)),
-            MathLib::BuiltinFunction("Decrypt"_M, MathLib::BuiltinFunctionPointer(nullptr, &Decrypt)),
-            MathLib::BuiltinFunction("Print"_M, MathLib::BuiltinFunctionPointer(nullptr, &Print))
+            MathLib::BuiltinFunction("Encrypt"_M, MathLib::BuiltinFunctionPointer(&Encrypt)),
+            MathLib::BuiltinFunction("Decrypt"_M, MathLib::BuiltinFunctionPointer(&Decrypt)),
+            MathLib::BuiltinFunction("Print"_M, MathLib::BuiltinFunctionPointer(&Print))
         ));
         const MathLib::num_t start = MathLib::GetTime();
         MathLib::Node* optimizedRoot = optimizer.Optimize(root);

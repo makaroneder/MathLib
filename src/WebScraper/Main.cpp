@@ -4,7 +4,7 @@
 #include <FunctionT.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Interfaces/Dictionary.hpp>
-#include <Interfaces/SubSequence.hpp>
+#include <Interfaces/Sequence/SubSequence.hpp>
 #include <Interfaces/ComparisionFunction.hpp>
 #include <iostream>
 
@@ -79,7 +79,7 @@ size_t ScrapeInternal(MathLib::FileSystem& fs, const MathLib::Sequence<char>& ba
     std::cout << url << std::endl;
     ret = cache.GetSize() - 1;
     MathLib::String html = MathLib::CollectionToString(curl.Get<char>(url));
-    if (action == Action::Type::Scrape) html = Replace<char, MathLib::String>(html, "href=\""_M, '"'_M, MathLib::MakeFunctionT<MathLib::String, const MathLib::Sequence<char>&>(nullptr, [&fs, &base, &curl, &cache, &url, &actions, maxDepth, action](const void*, const MathLib::Sequence<char>& old) -> MathLib::String {
+    if (action == Action::Type::Scrape) html = Replace<char, MathLib::String>(html, "href=\""_M, '"'_M, MathLib::MakeFunctionT<MathLib::String, const MathLib::Sequence<char>&>([&fs, &base, &curl, &cache, &url, &actions, maxDepth, action](const MathLib::Sequence<char>& old) -> MathLib::String {
         MathLib::String absoluteURL = MathLib::CollectionToString(old);
         absoluteURL = absoluteURL.At(0) == '/' ? ToBaseURL(url) + absoluteURL : absoluteURL;
         const size_t size = actions.GetSize();

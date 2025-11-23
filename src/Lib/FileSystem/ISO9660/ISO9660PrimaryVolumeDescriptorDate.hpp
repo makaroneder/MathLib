@@ -13,6 +13,7 @@ namespace MathLib {
         char hundredthsOfSecond[2];
         uint8_t timeZoneOffset;
 
+        ISO9660PrimaryVolumeDescriptorDate(void);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

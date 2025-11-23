@@ -6,6 +6,8 @@ namespace MathLib {
     struct ISO9660PathTableLocation {
         uint32_t location;
         uint32_t optionalLocation;
+
+        ISO9660PathTableLocation(void);
     } __attribute__((packed));
 }
 

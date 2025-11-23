@@ -1,8 +1,5 @@
 #include "MOS6502Flags.hpp"
-#include "../../Benchmark.hpp"
 
 namespace MathLib {
-    MOS6502Flags::MOS6502Flags(uint8_t value) : value(value) {
-        EmptyBenchmark
-    }
+    MOS6502Flags::MOS6502Flags(uint8_t value) : value(value) {}
 }

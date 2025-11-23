@@ -1,9 +1,8 @@
 #include "Deflate.hpp"
-#include "../../Interfaces/SubSequence.hpp"
+#include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
     Deflate::Deflate(void) {
-        StartBenchmark
         for (uint8_t i = 0; i < 7; i++) fixedDataTree.lengthTable[i] = 0;
         fixedDataTree.lengthTable[7] = 24;
         fixedDataTree.lengthTable[8] = 152;
@@ -15,10 +14,8 @@ namespace MathLib {
         for (uint8_t i = 0; i < 5; i++) fixedDistTree.lengthTable[i] = 0;
         fixedDistTree.lengthTable[5] = 32;
         for (uint8_t i = 0; i < 32; i++) fixedDistTree.translationTable[i] = i;
-        EndBenchmark
     }
     void Deflate::GenerateTree(DeflateTree& tree, const uint8_t* lengths, uint16_t size) const {
-        StartBenchmark
         for (uint8_t i = 0; i < 16; i++) tree.lengthTable[i] = 0;
         for (uint16_t i = 0; i < size; i++) tree.lengthTable[lengths[i]]++;
         tree.lengthTable[0] = 0;
@@ -30,10 +27,8 @@ namespace MathLib {
         }
         for (uint16_t i = 0; i < size; i++)
             if (lengths[i]) tree.translationTable[offsets[lengths[i]]++] = i;
-        EndBenchmark
     }
     uint16_t Deflate::Decode(const DeflateTree& tree, Readable& readable, Bitmap& bitmap, size_t& i) const {
-        StartBenchmark
         uint32_t sum = 0;
         int32_t curr = 0;
         size_t len = 0;
@@ -43,10 +38,10 @@ namespace MathLib {
             curr -= tree.lengthTable[len];
         }
         sum += curr;
-        ReturnFromBenchmark(tree.translationTable[sum]);
+        return tree.translationTable[sum];
     }
     Array<uint8_t> Deflate::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        if (!key.IsEmpty()) ReturnFromBenchmark(Array<uint8_t>());
+        if (!key.IsEmpty()) return Array<uint8_t>();
         Array<uint8_t> ret;
         size_t size = data.GetSize();
         size_t i = 0;
@@ -58,17 +53,17 @@ namespace MathLib {
                 writeSize = size;
             }
             size -= writeSize;
-            if (!ret.Add(last)) ReturnFromBenchmark(Array<uint8_t>());
+            if (!ret.Add(last)) return Array<uint8_t>();
             const uint8_t* tmp = (const uint8_t*)&writeSize;
-            if (!ret.Add(tmp[0]) || !ret.Add(tmp[1])) ReturnFromBenchmark(Array<uint8_t>());
+            if (!ret.Add(tmp[0]) || !ret.Add(tmp[1])) return Array<uint8_t>();
             const uint16_t invWriteSize = ~writeSize;
             tmp = (const uint8_t*)&invWriteSize;
-            if (!ret.Add(tmp[0]) || !ret.Add(tmp[1])) ReturnFromBenchmark(Array<uint8_t>());
+            if (!ret.Add(tmp[0]) || !ret.Add(tmp[1])) return Array<uint8_t>();
             for (uint32_t j = 0; j < writeSize; j++)
-                if (!ret.Add(data.At(i++))) ReturnFromBenchmark(Array<uint8_t>());
+                if (!ret.Add(data.At(i++))) return Array<uint8_t>();
             if (last) break;
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     uint64_t Deflate::Read(Readable& readable, Bitmap& bitmap, size_t& i, uint8_t bits) const {
         uint64_t ret = 0;
@@ -85,7 +80,7 @@ namespace MathLib {
         return ret;
     }
     Array<uint8_t> Deflate::DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        if (!key.IsEmpty()) ReturnFromBenchmark(Array<uint8_t>());
+        if (!key.IsEmpty()) return Array<uint8_t>();
         Array<uint8_t> ret;
         Bitmap bitmap;
         size_t i = 0;
@@ -97,9 +92,9 @@ namespace MathLib {
                     const uint8_t tmp = i % 8;
                     if (tmp) (void)Read(readable, bitmap, i, 8 - tmp);
                     const uint16_t length = Read(readable, bitmap, i, 16);
-                    if (length != (uint16_t)~Read(readable, bitmap, i, 16)) ReturnFromBenchmark(Array<uint8_t>());
+                    if (length != (uint16_t)~Read(readable, bitmap, i, 16)) return Array<uint8_t>();
                     for (uint32_t j = 0; j < length; j++)
-                        if (!ret.Add(Read(readable, bitmap, i, 8))) ReturnFromBenchmark(Array<uint8_t>());
+                        if (!ret.Add(Read(readable, bitmap, i, 8))) return Array<uint8_t>();
                     break;
                 }
                 case 0b01:
@@ -141,7 +136,7 @@ namespace MathLib {
                                     lengths[j++] = code;
                                     continue;
                                 }
-                                default: ReturnFromBenchmark(Array<uint8_t>());
+                                default: return Array<uint8_t>();
                             }
                             length += Read(readable, bitmap, i, extra);
                             for (uint8_t k = 0; k < length; k++) lengths[j++] = value;
@@ -156,7 +151,7 @@ namespace MathLib {
                     while (true) {
                         const uint16_t value = Decode(dataTree, readable, bitmap, i);
                         if (value <= UINT8_MAX) {
-                            if (!ret.Add(value)) ReturnFromBenchmark(Array<uint8_t>());
+                            if (!ret.Add(value)) return Array<uint8_t>();
                         }
                         else if (value == 256) break;
                         else {
@@ -196,7 +191,7 @@ namespace MathLib {
                                     length = 258;
                                     break;
                                 }
-                                default: ReturnFromBenchmark(Array<uint8_t>());
+                                default: return Array<uint8_t>();
                             }
                             length += Read(readable, bitmap, i, extra);
                             const uint16_t distanceCode = Decode(distTree, readable, bitmap, i);
@@ -276,17 +271,17 @@ namespace MathLib {
                             distance += Read(readable, bitmap, i, extra);
                             const size_t start = ret.GetSize() - distance;
                             for (uint16_t j = 0; j < length; j++)
-                                if (!ret.Add(ret.At(j + start))) ReturnFromBenchmark(Array<uint8_t>());
+                                if (!ret.Add(ret.At(j + start))) return Array<uint8_t>();
                         }
                     }
                     break;
                 }
-                default: ReturnFromBenchmark(Array<uint8_t>());
+                default: return Array<uint8_t>();
             }
             if (last) break;
         }
         const size_t start = range.GetMin();
         const size_t end = Min<size_t>(range.GetMax(), ret.GetSize());
-        ReturnFromBenchmark(start < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(start, end))) : Array<uint8_t>());
+        return start < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(start, end))) : Array<uint8_t>();
     }
 }

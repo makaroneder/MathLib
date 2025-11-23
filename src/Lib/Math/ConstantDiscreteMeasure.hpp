@@ -5,11 +5,9 @@
 namespace MathLib {
     template <typename T>
     struct ConstantDiscreteMeasure : DiscreteMeasure<T> {
-        ConstantDiscreteMeasure(const MathLib::Set<T>& events, const T& measure) : DiscreteMeasure<T>(events), measure(measure) {
-            EmptyBenchmark
-        }
+        ConstantDiscreteMeasure(const Set<T>& events, const T& measure) : DiscreteMeasure<T>(events), measure(measure) {}
         virtual T MassFunction(const T&) const override {
-            StartAndReturnFromBenchmark(measure);
+            return measure;
         }
 
         private:

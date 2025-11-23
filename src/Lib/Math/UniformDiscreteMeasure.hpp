@@ -5,11 +5,9 @@
 namespace MathLib {
     template <typename T>
     struct UniformDiscreteMeasure : DiscreteMeasure<T> {
-        UniformDiscreteMeasure(const Set<T>& events) : DiscreteMeasure<T>(events) {
-            EmptyBenchmark
-        }
+        UniformDiscreteMeasure(const Set<T>& events) : DiscreteMeasure<T>(events) {}
         virtual T MassFunction(const T&) const override {
-            StartAndReturnFromBenchmark(1.0 / this->GetEventCount());
+            return 1.0 / this->GetEventCount();
         }
     };
 }

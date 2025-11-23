@@ -1,0 +1,313 @@
+equalityReflexivity(a, proof) = prove(a == a, proof),
+implicationReflexivity(a, proof) = prove(a => a, proof),
+implicationOfEqualityReflexivity(a, b, proof) = prove(a => b == b, proof),
+equalityImpliesImplication(a, b, proof) = prove(a == b => a => b, proof),
+
+associativity(f, a, b, c, proof) = prove(f(f(a, b), c) == f(a, f(b, c)), proof),
+commutativity(f, a, b, proof) = prove(f(a, b) == f(b, a), proof),
+anticommutativity(f, inv, a, b, proof) = prove(f(a, b) == inv(f(b, a)), proof),
+idempotency(f, a, proof) = prove(f(a, a) == a, proof),
+
+leftCancellativity(f, a, b, c, proof) = prove(f(a, b) == f(a, c) => b == c, proof),
+rightCancellativity(f, a, b, c, proof) = prove(f(a, b) == f(c, b) => a == c, proof),
+leftCancellativityAndCommutativityImpliesRightCancellativity(f, a, b, c, equalityReflexivityProof, leftCancellativityProof, commutativityProof) =
+rightCancellativity(f, a, b, c, (
+    splitEquality((
+        splitEquality((
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ), (
+            rewrite(commutativity(f, c, b, commutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(a == c, equalityReflexivityProof))
+    )),
+    leftCancellativity(f, b, a, c, leftCancellativityProof)
+)),
+rightCancellativityAndCommutativityImpliesLeftCancellativity(f, a, b, c, equalityReflexivityProof, rightCancellativityProof, commutativityProof) =
+leftCancellativity(f, a, b, c, (
+    splitEquality((
+        splitEquality((
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ), (
+            rewrite(commutativity(f, a, c, commutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(b == c, equalityReflexivityProof))
+    )),
+    rightCancellativity(f, b, a, c, rightCancellativityProof)
+)),
+
+leftIdentity(f, a, b, id, proof) = prove(a == id => f(a, b) == b, proof),
+rightIdentity(f, a, b, id, proof) = prove(b == id => f(a, b) == a, proof),
+leftIdentityAndCommutativityImpliesRightIdentity(f, a, b, id, equalityReflexivityProof, leftIdentityProof, commutativityProof) =
+rightIdentity(f, a, b, id, (
+    splitEquality((
+        rewrite(equalityReflexivity(b == id, equalityReflexivityProof))
+    ), (
+        splitEquality((
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ), (
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ))
+    )),
+    leftIdentity(f, b, a, id, leftIdentityProof)
+)),
+rightIdentityAndCommutativityImpliesLeftIdentity(f, a, b, id, equalityReflexivityProof, rightIdentityProof, commutativityProof) =
+leftIdentity(f, a, b, id, (
+    splitEquality((
+        rewrite(equalityReflexivity(a == id, equalityReflexivityProof))
+    ), (
+        splitEquality((
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ), (
+            rewrite(equalityReflexivity(b, equalityReflexivityProof))
+        ))
+    )),
+    rightIdentity(f, b, a, id, rightIdentityProof)
+)),
+
+leftDistributivity(mul, add, a, b, c, proof) = prove(mul(a, add(b, c)) == add(mul(a, b), mul(a, c)), proof),
+rightDistributivity(mul, add, a, b, c, proof) = prove(mul(add(b, c), a) == add(mul(b, a), mul(c, a)), proof),
+leftDistributivityAndCommutativityImpliesRightDistributivity(mul, add, a, b, c, equalityReflexivityProof, leftDistributivityProof, mulCommutativityProof) =
+rightDistributivity(mul, add, a, b, c, (
+    splitEquality((
+        rewrite(commutativity(mul, add(b, c), a, mulCommutativityProof)),
+        rewrite(leftDistributivity(mul, add, a, b, c, leftDistributivityProof)),
+        splitFunction((
+            rewrite(commutativity(mul, a, b, mulCommutativityProof))
+        ), (
+            rewrite(commutativity(mul, a, c, mulCommutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(add(mul(b, a), mul(c, a)), equalityReflexivityProof))
+    )),
+    equalityReflexivity(add(mul(b, a), mul(c, a)), equalityReflexivityProof)
+)),
+rightDistributivityAndCommutativityImpliesLeftDistributivity(mul, add, a, b, c, equalityReflexivityProof, rightDistributivityProof, mulCommutativityProof) =
+leftDistributivity(mul, add, a, b, c, (
+    splitEquality((
+        rewrite(commutativity(mul, a, add(b, c), mulCommutativityProof)),
+        rewrite(rightDistributivity(mul, add, a, b, c, rightDistributivityProof)),
+        splitFunction((
+            rewrite(commutativity(mul, b, a, mulCommutativityProof))
+        ), (
+            rewrite(commutativity(mul, c, a, mulCommutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(add(mul(a, b), mul(a, c)), equalityReflexivityProof))
+    )),
+    equalityReflexivity(add(mul(a, b), mul(a, c)), equalityReflexivityProof)
+)),
+
+leftAlternativity(f, a, b, proof) = associativity(f, a, a, b, proof),
+rightAlternativity(f, a, b, proof) = associativity(f, a, b, b, proof),
+associativityImpliesLeftAlternativity(f, a, b, associativityProof) = leftAlternativity(f, a, b, (
+    associativity(f, a, a, b, associativityProof)
+)),
+associativityImpliesRightAlternativity(f, a, b, associativityProof) = rightAlternativity(f, a, b, (
+    associativity(f, a, b, b, associativityProof)
+)),
+leftAlternativityAndCommutativityImpliesRightAlternativity(f, a, b, equalityReflexivityProof, leftAlternativityProof, commutativityProof) =
+rightAlternativity(f, a, b, (
+    splitEquality((
+        rewrite(equalityReflexivity(f(f(a, b), b), equalityReflexivityProof))
+    ), (
+        rewrite(commutativity(f, a, f(b, b), commutativityProof)),
+        rewrite(leftAlternativity(f, b, a, leftAlternativityProof)),
+        rewrite(commutativity(f, b, f(b, a), commutativityProof)),
+        splitFunction((
+            rewrite(commutativity(f, b, a, commutativityProof))
+        ), (
+            rewrite(equalityReflexivity(b, equalityReflexivityProof))
+        ))
+    )),
+    equalityReflexivity(f(f(a, b), b), equalityReflexivityProof)
+)),
+rightAlternativityAndCommutativityImpliesLeftAlternativity(f, a, b, equalityReflexivityProof, rightAlternativityProof, commutativityProof) =
+leftAlternativity(f, a, b, (
+    splitEquality((
+        rewrite(commutativity(f, f(a, a), b, commutativityProof)),
+        rewrite(rightAlternativity(f, b, a, rightAlternativityProof)),
+        rewrite(commutativity(f, f(b, a), a, commutativityProof)),
+        splitFunction((
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ), (
+            rewrite(commutativity(f, b, a, commutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(f(a, f(a, b)), equalityReflexivityProof))
+    )),
+    equalityReflexivity(f(a, f(a, b)), equalityReflexivityProof)
+)),
+flexibility(f, a, b, proof) = associativity(f, a, b, a, proof),
+associativityImpliesFlexibility(f, a, b, associativityProof) = flexibility(f, a, b, (
+    associativity(f, a, b, a, associativityProof)
+)),
+commutativityImpliesFlexibility(f, a, b, equalityReflexivityProof, commutativityProof) = flexibility(f, a, b, (
+    splitEquality((
+        rewrite(commutativity(f, f(a, b), a, commutativityProof)),
+        splitFunction((
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ), (
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(f(a, f(b, a)), equalityReflexivityProof))
+    )),
+    equalityReflexivity(f(a, f(b, a)), equalityReflexivityProof)
+)),
+
+quasiCommutativity(f, a, b, c, proof) = prove(f(f(a, b), c) == f(f(a, c), b), proof),
+associativityAndCommutativityImpliesQuasiCommutativity(f, a, b, c, equalityReflexivityProof, associativityProof, commutativityProof) =
+quasiCommutativity(f, a, b, c, (
+    splitEquality((
+        splitFunction((
+            rewrite(commutativity(f, a, b, commutativityProof))
+        ), (
+            rewrite(equalityReflexivity(c, equalityReflexivityProof))
+        )),
+        rewrite(associativity(f, b, a, c, associativityProof)),
+        rewrite(commutativity(f, b, f(a, c), commutativityProof))
+    ), (
+        rewrite(equalityReflexivity(f(f(a, c), b), equalityReflexivityProof))
+    )),
+    equalityReflexivity(f(f(a, c), b), equalityReflexivityProof)
+)),
+
+jordanIdentity(f, a, b, proof) = prove(f(f(a, b), f(a, a)) == f(a, f(b, f(a, a))), proof),
+rightAlternativityAndCommutativityImpliesJordanIdentity(f, a, b, equalityReflexivityProof, rightAlternativityProof, commutativityProof) =
+jordanIdentity(f, a, b, (
+    splitEquality((
+        rewrite(rightAlternativity(f, f(a, b), a, rightAlternativityProof)),
+        rewrite(commutativity(f, f(f(a, b), a), a, commutativityProof)),
+        splitFunction((
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ), (
+            splitFunction((
+                rewrite(commutativity(f, a, b, commutativityProof))
+            ), (
+                rewrite(equalityReflexivity(a, equalityReflexivityProof))
+            ))
+        ))
+    ), (
+        splitFunction((
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ), (
+            rewrite(rightAlternativity(f, b, a, rightAlternativityProof))
+        ))
+    )),
+    equalityReflexivity(f(a, f(f(b, a), a)), equalityReflexivityProof)
+)),
+associativityImpliesJordanIdentity(f, a, b, equalityReflexivityProof, associativityProof) =
+jordanIdentity(f, a, b, (
+    splitEquality((
+        rewrite(associativity(f, a, b, f(a, a), associativityProof))
+    ), (
+        rewrite(equalityReflexivity(f(a, f(b, f(a, a))), equalityReflexivityProof))
+    )),
+    equalityReflexivity(f(a, f(b, f(a, a))), equalityReflexivityProof)
+)),
+
+definitionOfFirstFunction(first, a, b, proof) = prove(first(a, b) == a, proof),
+associativityOfFirstFunction(first, a, b, c, definitionOfFirstFunctionProof, equalityReflexivityProof) = associativity(first, a, b, c, (
+    splitEquality((
+        rewrite(definitionOfFirstFunction(first, first(a, b), c, definitionOfFirstFunctionProof)),
+        rewrite(definitionOfFirstFunction(first, a, b, definitionOfFirstFunctionProof))
+    ), (
+        rewrite(definitionOfFirstFunction(first, a, first(b, c), definitionOfFirstFunctionProof))
+    )),
+    equalityReflexivity(a, equalityReflexivityProof)
+)),
+idempotencyOfFirstFunction(first, a, definitionOfFirstFunctionProof, equalityReflexivityProof) = idempotency(first, a, (
+    splitEquality((
+        rewrite(definitionOfFirstFunction(first, a, a, definitionOfFirstFunctionProof))
+    ), (
+        rewrite(equalityReflexivity(a, equalityReflexivityProof))
+    )),
+    equalityReflexivity(a, equalityReflexivityProof)
+)),
+rightCancellativityOfFirstFunction(first, a, b, c, definitionOfFirstFunctionProof, equalityReflexivityProof, implicationReflexivityProof) = rightCancellativity(first, a, b, c, (
+    splitEquality((
+        splitEquality((
+            rewrite(definitionOfFirstFunction(first, a, b, definitionOfFirstFunctionProof))
+        ), (
+            rewrite(definitionOfFirstFunction(first, c, b, definitionOfFirstFunctionProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(a == c, equalityReflexivityProof))
+    )),
+    implicationReflexivity(a == c, implicationReflexivityProof)
+)),
+rightIdentityOfFirstFunction(first, a, b, id, definitionOfFirstFunctionProof, equalityReflexivityProof, implicationOfEqualityReflexivityProof) = rightIdentity(first, a, b, id, (
+    splitEquality((
+        rewrite(equalityReflexivity(b == id, equalityReflexivityProof))
+    ), (
+        splitEquality((
+            rewrite(definitionOfFirstFunction(first, a, b, definitionOfFirstFunctionProof))
+        ), (
+            rewrite(equalityReflexivity(a, equalityReflexivityProof))
+        ))
+    )),
+    implicationOfEqualityReflexivity(b == id, a, implicationOfEqualityReflexivityProof)
+)),
+
+definitionOfSecondFunction(second, a, b, proof) = prove(second(a, b) == b, proof),
+associativityOfSecondFunction(second, a, b, c, definitionOfSecondFunctionProof, equalityReflexivityProof) = associativity(second, a, b, c, (
+    splitEquality((
+        rewrite(definitionOfSecondFunction(second, second(a, b), c, definitionOfSecondFunctionProof))
+    ), (
+        rewrite(definitionOfSecondFunction(second, a, second(b, c), definitionOfSecondFunctionProof)),
+        rewrite(definitionOfSecondFunction(second, b, c, definitionOfSecondFunctionProof))
+    )),
+    equalityReflexivity(c, equalityReflexivityProof)
+)),
+idempotencyOfSecondFunction(second, a, definitionOfSecondFunctionProof, equalityReflexivityProof) = idempotency(second, a, (
+    splitEquality((
+        rewrite(definitionOfSecondFunction(second, a, a, definitionOfSecondFunctionProof))
+    ), (
+        rewrite(equalityReflexivity(a, equalityReflexivityProof))
+    )),
+    equalityReflexivity(a, equalityReflexivityProof)
+)),
+leftCancellativityOfSecondFunction(first, a, b, c, definitionOfSecondFunctionProof, equalityReflexivityProof, implicationReflexivityProof) = leftCancellativity(second, a, b, c, (
+    splitEquality((
+        splitEquality((
+            rewrite(definitionOfSecondFunction(second, a, b, definitionOfSecondFunctionProof))
+        ), (
+            rewrite(definitionOfSecondFunction(second, a, c, definitionOfSecondFunctionProof))
+        ))
+    ), (
+        rewrite(equalityReflexivity(b == c, equalityReflexivityProof))
+    )),
+    implicationReflexivity(b == c, implicationReflexivityProof)
+)),
+leftIdentityOfSecondFunction(second, a, b, id, definitionOfSecondFunctionProof, equalityReflexivityProof, implicationOfEqualityReflexivityProof) = leftIdentity(second, a, b, id, (
+    splitEquality((
+        rewrite(equalityReflexivity(a == id, equalityReflexivityProof))
+    ), (
+        splitEquality((
+            rewrite(definitionOfSecondFunction(second, a, b, definitionOfSecondFunctionProof))
+        ), (
+            rewrite(equalityReflexivity(b, equalityReflexivityProof))
+        ))
+    )),
+    implicationOfEqualityReflexivity(a == id, b, implicationOfEqualityReflexivityProof)
+)),
+
+definitionOfConstantFunction(constant, x, a, b, proof) = prove(constant(a, b) == x, proof),
+associativityOfConstantFunction(constant, x, a, b, c, definitionOfConstantFunctionProof, equalityReflexivityProof) = associativity(constant, a, b, c, (
+    splitEquality((
+        rewrite(definitionOfConstantFunction(constant, x, constant(a, b), c, definitionOfConstantFunctionProof))
+    ), (
+        rewrite(definitionOfConstantFunction(constant, x, a, constant(b, c), definitionOfConstantFunctionProof))
+    )),
+    equalityReflexivity(x, equalityReflexivityProof)
+)),
+commutativityOfConstantFunction(constant, x, a, b, definitionOfConstantFunctionProof, equalityReflexivityProof) = commutativity(constant, a, b, (
+    splitEquality((
+        rewrite(definitionOfConstantFunction(constant, x, a, b, definitionOfConstantFunctionProof))
+    ), (
+        rewrite(definitionOfConstantFunction(constant, x, b, a, definitionOfConstantFunctionProof))
+    )),
+    equalityReflexivity(x, equalityReflexivityProof)
+))

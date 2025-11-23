@@ -35,6 +35,7 @@ namespace MathLib {
         uint8_t osSpecific[512];
         uint8_t reserved5[653];
 
+        ISO9660PrimaryVolumeDescriptor(void);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

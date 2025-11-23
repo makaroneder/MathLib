@@ -2,8 +2,7 @@
 
 namespace MathLib {
     Array<uint8_t> PackBits::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        StartBenchmark
-        if (!key.IsEmpty()) ReturnFromBenchmark(Array<uint8_t>());
+        if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         Array<uint8_t> ret;
         for (size_t i = 0; i < size;) {
@@ -28,18 +27,17 @@ namespace MathLib {
                 }
             }
             if (!repeat) {
-                if (!ret.Add(repeats)) ReturnFromBenchmark(Array<uint8_t>());
+                if (!ret.Add(repeats)) return Array<uint8_t>();
                 for (uint8_t j = 0; j <= repeats; j++)
-                    if (!ret.Add(data.At(i + j))) ReturnFromBenchmark(Array<uint8_t>());
+                    if (!ret.Add(data.At(i + j))) return Array<uint8_t>();
             }
-            else if (!ret.Add(-repeats) || !ret.Add(symbol)) ReturnFromBenchmark(Array<uint8_t>());
+            else if (!ret.Add(-repeats) || !ret.Add(symbol)) return Array<uint8_t>();
             i += repeats + 1;
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     Array<uint8_t> PackBits::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        StartBenchmark
-        if (!key.IsEmpty()) ReturnFromBenchmark(Array<uint8_t>());
+        if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         Array<uint8_t> ret;
         size_t pos = 0;
@@ -50,7 +48,7 @@ namespace MathLib {
                 case 0 ... 127: {
                     const uint8_t count = tmp + 1;
                     for (uint8_t j = 0; j < count; j++) {
-                        if (range.Contains(pos++) && !ret.Add(data.At(i++))) ReturnFromBenchmark(Array<uint8_t>());
+                        if (range.Contains(pos++) && !ret.Add(data.At(i++))) return Array<uint8_t>();
                         if (pos >= range.GetMax()) {
                             end = true;
                             break;
@@ -62,7 +60,7 @@ namespace MathLib {
                     const uint8_t count = 1 - tmp;
                     const uint8_t value = data.At(i++);
                     for (uint8_t j = 0; j < count; j++) {
-                        if (range.Contains(pos++) && !ret.Add(value)) ReturnFromBenchmark(Array<uint8_t>());
+                        if (range.Contains(pos++) && !ret.Add(value)) return Array<uint8_t>();
                         if (pos >= range.GetMax()) {
                             end = true;
                             break;
@@ -71,10 +69,10 @@ namespace MathLib {
                     break;
                 }
                 case -128: break;
-                default: ReturnFromBenchmark(Array<uint8_t>());
+                default: return Array<uint8_t>();
             }
             if (end) break;
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
 }

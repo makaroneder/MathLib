@@ -1,5 +1,5 @@
 #include <Emulator/MOS6502/MOS6502.hpp>
-#include <Interfaces/VariadicSequence.hpp>
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Emulator/MOS6502/MOS6502Opcode.hpp>
 #include <iostream>
 

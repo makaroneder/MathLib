@@ -1,7 +1,7 @@
 #ifndef LogicGates_H
 #define LogicGates_H
 #include "NeuralNetworkState.hpp"
-#include <Interfaces/VariadicSequence.hpp>
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 
 /// @brief Creates default state for this neural network
 /// @tparam T Type of number

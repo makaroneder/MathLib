@@ -3,7 +3,6 @@
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <Libc/HostFileSystem.hpp>
-#include <Libc/HostFunction.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -94,7 +93,7 @@ int main(int argc, char** argv) {
             if (!states.Add(optimizer)) MathLib::Panic("Failed to add optimizer");
         }
         size_t state = 0;
-        const MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t> func = MathLib::HostFunction<MathLib::Array<MathLib::num_t>, MathLib::num_t>([&states, &state](MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
+        const MathLib::Function<MathLib::Array<MathLib::num_t>, MathLib::num_t>& func = MathLib::MakeFunctionT<MathLib::Array<MathLib::num_t>, MathLib::num_t>([&states, &state](MathLib::num_t x) -> MathLib::Array<MathLib::num_t> {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, MathLib::ToString(x), true);
@@ -107,7 +106,7 @@ int main(int argc, char** argv) {
             for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = complexRet.At(i).ToReal();
             return ret;
         });
-        const MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t> complexFunc = MathLib::HostFunction<MathLib::complex_t, MathLib::complex_t>([&states, &state](MathLib::complex_t z) -> MathLib::complex_t {
+        const MathLib::Function<MathLib::complex_t, MathLib::complex_t>& complexFunc = MathLib::MakeFunctionT<MathLib::complex_t, MathLib::complex_t>([&states, &state](MathLib::complex_t z) -> MathLib::complex_t {
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);
             MathLib::Optimizer tmp = states.At(state);
             MathLib::Variable var = MathLib::Variable(funcNode.arguments[0].name, funcNode.arguments[0].dataType, z.ToString(), true);
@@ -118,7 +117,7 @@ int main(int argc, char** argv) {
             delete n;
             return ret;
         });
-        if (!HandleEvents<MathLib::num_t>(renderer, MathLib::HostFunction<bool>([&renderer, func, complexFunc, &states, &state](void) -> bool {
+        if (!HandleEvents<MathLib::num_t>(renderer, MathLib::MakeFunctionT<bool>([&renderer, &func, &complexFunc, &states, &state](void) -> bool {
             renderer.Fill(0);
             renderer.DrawAxis<MathLib::num_t>(0xffffffff, 0x808080ff, 1);
             const MathLib::FunctionNode funcNode = states.At(state).GetFunction('f'_M);

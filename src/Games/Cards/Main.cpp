@@ -61,8 +61,6 @@ int main(int, char**) {
         #ifndef Debug
         srand(time(nullptr));
         #endif
-        MathLib::SDL2 sdl2;
-        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Cards", 800, 800);
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/Cards/";
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));
@@ -82,6 +80,8 @@ int main(int, char**) {
         AddFunction(requiredPoints, "points"_M)
         MathLib::Aseprite table;
         if (!table.LoadFromPath(fs, path + "Table.aseprite")) MathLib::Panic("Failed to load table image");
+        MathLib::SDL2 sdl2;
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Cards", table.GetWidth(), table.GetHeight());
         MathLib::Aseprite cardsImage;
         if (!cardsImage.LoadFromPath(fs, path + "Cards.aseprite")) MathLib::Panic("Failed to load cards");
         MathLib::Bitmap cards = MathLib::Bitmap((size_t)Card::Type::TypeCount * (size_t)Card::Color::ColorCount);
@@ -106,8 +106,7 @@ int main(int, char**) {
                 continue;
             }
             if (update) {
-                renderer.Fill(0);
-                renderer.DrawImage<MathLib::num_t>(table.At(0), MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
+                if (!renderer.CopyFromBuffer(table.At(0))) MathLib::Panic("Failed to draw background image");
                 if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
                 if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
                 if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");

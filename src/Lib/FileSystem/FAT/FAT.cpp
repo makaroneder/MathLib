@@ -4,8 +4,7 @@
 
 namespace MathLib {
     FAT::FAT(ByteDevice& disk) : PhysicalFileSystem(disk), type(Type::None) {
-        StartBenchmark
-        if (!disk.ReadPositioned<MathLib::FATBootSector>(bootSector, 0)) MathLib::Panic("Failed to read FAT boot sector");
+        if (!disk.ReadPositioned<FATBootSector>(bootSector, 0)) Panic("Failed to read FAT boot sector");
         if (!bootSector.IsValid()) type = Type::None;
         else if (!bootSector.sectorsPerFAT) {
             if (!bootSector.ebr32.IsValid()) type = Type::None;
@@ -35,16 +34,14 @@ namespace MathLib {
                 type = clusters < 0xff5 ? Type::FAT12 : Type::FAT16;
             }
         }
-        EndBenchmark
     }
     bool FAT::IsValid(void) const {
-        StartAndReturnFromBenchmark(type != Type::None);
+        return type != Type::None;
     }
     size_t FAT::ClusterToSector(size_t cluster) const {
-        StartAndReturnFromBenchmark((cluster - 2) * bootSector.sectorsPerCluster + dataSection);
+        return (cluster - 2) * bootSector.sectorsPerCluster + dataSection;
     }
-    uint32_t FAT::GetNextCluster(size_t cluster, size_t fat) const {
-        StartBenchmark
+    uint32_t FAT::GetNextCluster(size_t cluster, uint8_t fat) const {
         if (fat >= bootSector.fatCount) return UINT32_MAX;
         uint32_t index;
         switch (type) {
@@ -60,36 +57,34 @@ namespace MathLib {
                 index = cluster * 4;
                 break;
             }
-            default: ReturnFromBenchmark(UINT32_MAX);
+            default: return UINT32_MAX;
         }
         uint32_t ret;
-        if (!disk.ReadPositioned<uint32_t>(ret, bootSector.reservedSectors + fat * bootSector.sectorsPerFAT + index)) ReturnFromBenchmark(UINT32_MAX);
+        if (!disk.ReadPositioned<uint32_t>(ret, bootSector.reservedSectors + fat * bootSector.sectorsPerFAT + index)) return UINT32_MAX;
         switch (type) {
             case Type::FAT12: {
                 ret = *(uint16_t*)&ret;
                 ret = cluster % 2 ? ret >> 4 : ret & 0xfff;
-                ReturnFromBenchmark(ret < 0xff7 ? ret : UINT32_MAX);
+                return ret < 0xff7 ? ret : UINT32_MAX;
             }
             case Type::FAT16: {
                 ret = *(uint16_t*)&ret;
-                ReturnFromBenchmark(ret < 0xfff7 ? ret : UINT32_MAX);
+                return ret < 0xfff7 ? ret : UINT32_MAX;
             }
             case Type::FAT32: {
                 ret &= 0xfffffff;
-                ReturnFromBenchmark(ret < 0xffffff7 ? ret : UINT32_MAX);
+                return ret < 0xffffff7 ? ret : UINT32_MAX;
             }
-            default: ReturnFromBenchmark(UINT32_MAX);
+            default: return UINT32_MAX;
         }
     }
     bool FAT::Create(void) {
         // TODO:
-        StartBenchmark
-        ReturnFromBenchmark(false);
+        return false;
     }
     Expected<FATDirectoryEntry> FAT::GetDirectoryEntry(const Sequence<char>& path) {
-        StartBenchmark
         size_t sector = root;
-        FATDirectoryEntry prev = FATDirectoryEntry();
+        FATDirectoryEntry prev;
         prev.name[0] = '\0';
         if (type == Type::FAT32) {
             prev.SetCluster(bootSector.ebr32.rootCluster);
@@ -97,23 +92,23 @@ namespace MathLib {
         }
         const Array<String> split = Split(path, '/'_M, false);
         uint32_t cluster;
-        if (split.IsEmpty()) ReturnFromBenchmark(prev);
+        if (split.IsEmpty()) return prev;
         for (const Sequence<char>& name : split) {
             while (true) {
                 size_t size = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
                 if (prev.name[0]) {
                     size = bootSector.bytesPerSector * bootSector.sectorsPerCluster;
-                    if (cluster == UINT32_MAX) ReturnFromBenchmark(Expected<FATDirectoryEntry>());
+                    if (cluster == UINT32_MAX) return Expected<FATDirectoryEntry>();
                     sector = ClusterToSector(cluster);
                     cluster = GetNextCluster(cluster, 0);
                 }
                 uint8_t buffer[size];
-                if (!disk.ReadPositionedBuffer(buffer, size, sector * bootSector.bytesPerSector)) ReturnFromBenchmark(Expected<FATDirectoryEntry>());
+                if (!disk.ReadPositionedBuffer(buffer, size, sector * bootSector.bytesPerSector)) return Expected<FATDirectoryEntry>();
                 bool found = false;
                 for (size_t i = 0; i < size; i += sizeof(FATDirectoryEntry)) {
                     const FATDirectoryEntry* entry = (const FATDirectoryEntry*)&buffer[i];
                     if (!entry->name[0]) break;
-                    else if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
+                    if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
                     if (!entry->IsLongFileName()) {
                         if (name == entry->GetName()) {
                             prev = *entry;
@@ -124,72 +119,70 @@ namespace MathLib {
                     }
                 }
                 if (found) break;
-                else if (!prev.name[0]) ReturnFromBenchmark(Expected<FATDirectoryEntry>());
+                if (!prev.name[0]) return Expected<FATDirectoryEntry>();
             }
         }
-        ReturnFromBenchmark(Expected<FATDirectoryEntry>(prev));
+        return prev;
     }
     size_t FAT::OpenInternal(const Sequence<char>& path, OpenMode mode) {
-        StartBenchmark
         const Expected<FATDirectoryEntry> entry = GetDirectoryEntry(path);
-        if (!entry.HasValue()) ReturnFromBenchmark(SIZE_MAX);
+        if (!entry.HasValue()) return SIZE_MAX;
         const FATFile ret = FATFile(entry.Get().GetCluster(), entry.Get().size, mode != OpenMode::Read);
-        for (size_t i = 0; i < files.GetSize(); i++) {
+        const size_t size = files.GetSize();
+        for (size_t i = 0; i < size; i++) {
             if (files.At(i).free) {
                 files.At(i) = ret;
-                ReturnFromBenchmark(i);
+                return i;
             }
         }
-        ReturnFromBenchmark(files.Add(ret) ? files.GetSize() - 1 : SIZE_MAX);
+        return files.Add(ret) ? size : SIZE_MAX;
     }
     bool FAT::Close(size_t file) {
-        StartBenchmark
-        if (file >= files.GetSize() || files.At(file).free) ReturnFromBenchmark(false);
+        if (file >= files.GetSize() || files.At(file).free) return false;
         files.At(file).free = true;
-        ReturnFromBenchmark(true);
+        return true;
     }
     size_t FAT::Read(size_t file, void* buffer, size_t size, size_t position) {
-        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.ReadPositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
+        return (file < files.GetSize() && !files.At(file).free) ? disk.ReadPositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0;
     }
     size_t FAT::Write(size_t file, const void* buffer, size_t size, size_t position) {
         // TODO: Resize file
-        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? disk.WritePositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0);
+        return (file < files.GetSize() && !files.At(file).free) ? disk.WritePositionedSizedBuffer(buffer, files.At(file).size < size + position ? files.At(file).size - position : size, ClusterToSector(files.At(file).cluster) * bootSector.bytesPerSector + position) : 0;
     }
     size_t FAT::GetSize(size_t file) {
-        StartAndReturnFromBenchmark((file < files.GetSize() && !files.At(file).free) ? files.At(file).size : 0);
+        return (file < files.GetSize() && !files.At(file).free) ? files.At(file).size : 0;
     }
     Array<FileInfo> FAT::ReadDirectory(const Sequence<char>& path) {
-        StartBenchmark
-        Array<FileInfo> ret;
         if (path.IsEmpty() && type != Type::FAT32) {
-            size_t size = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
+            const size_t size = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
             uint8_t buffer[size];
-            if (!disk.ReadPositionedBuffer(buffer, size, root * bootSector.bytesPerSector)) ReturnFromBenchmark(Array<FileInfo>());
+            if (!disk.ReadPositionedBuffer(buffer, size, root * bootSector.bytesPerSector)) return Array<FileInfo>();
+            Array<FileInfo> ret;
             for (size_t i = 0; i < size; i += sizeof(FATDirectoryEntry)) {
                 const FATDirectoryEntry* entry = (const FATDirectoryEntry*)&buffer[i];
                 if (!entry->name[0]) break;
-                else if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
-                if (!entry->IsLongFileName() && entry->name[0] != '.' && !entry->volumeID && !ret.Add(FileInfo(entry->directory ? FileInfo::Type::Directory : FileInfo::Type::File, entry->GetName()))) ReturnFromBenchmark(Array<FileInfo>());
+                if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
+                if (!entry->IsLongFileName() && entry->name[0] != '.' && !entry->volumeID && !ret.Add(FileInfo(entry->directory ? FileInfo::Type::Directory : FileInfo::Type::File, entry->GetName()))) return Array<FileInfo>();
+            }
+            return ret;
+        }
+        const Expected<FATDirectoryEntry> entry = GetDirectoryEntry(path);
+        if (!entry.HasValue()) return Array<FileInfo>();
+        const size_t size = bootSector.bytesPerSector * bootSector.sectorsPerCluster;
+        uint8_t buffer[size];
+        uint32_t cluster = entry.Get().GetCluster();
+        Array<FileInfo> ret;
+        while (cluster != UINT32_MAX) {
+            const size_t sector = ClusterToSector(cluster);
+            cluster = GetNextCluster(cluster, 0);
+            if (!disk.ReadPositionedBuffer(buffer, size, sector * bootSector.bytesPerSector)) return Array<FileInfo>();
+            for (size_t i = 0; i < size; i += sizeof(FATDirectoryEntry)) {
+                const FATDirectoryEntry* entry = (const FATDirectoryEntry*)&buffer[i];
+                if (!entry->name[0]) return ret;
+                if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
+                if (!entry->IsLongFileName() && entry->name[0] != '.' && !entry->volumeID && !ret.Add(FileInfo(entry->directory ? FileInfo::Type::Directory : FileInfo::Type::File, entry->GetName()))) return Array<FileInfo>();
             }
         }
-        else {
-            const Expected<FATDirectoryEntry> entry = GetDirectoryEntry(path);
-            if (!entry.HasValue()) ReturnFromBenchmark(Array<FileInfo>());
-            size_t size = bootSector.bytesPerSector * bootSector.sectorsPerCluster;
-            uint8_t buffer[size];
-            uint32_t cluster = entry.Get().GetCluster();
-            while (cluster != UINT32_MAX) {
-                const size_t sector = ClusterToSector(cluster);
-                cluster = GetNextCluster(cluster, 0);
-                if (!disk.ReadPositionedBuffer(buffer, size, sector * bootSector.bytesPerSector)) ReturnFromBenchmark(Array<FileInfo>());
-                for (size_t i = 0; i < size; i += sizeof(FATDirectoryEntry)) {
-                    const FATDirectoryEntry* entry = (const FATDirectoryEntry*)&buffer[i];
-                    if (!entry->name[0]) ReturnFromBenchmark(ret)
-                    else if (entry->name[0] == FATDirectoryEntry::unusedEntry) continue;
-                    if (!entry->IsLongFileName() && entry->name[0] != '.' && !entry->volumeID && !ret.Add(FileInfo(entry->directory ? FileInfo::Type::Directory : FileInfo::Type::File, entry->GetName()))) ReturnFromBenchmark(Array<FileInfo>());
-                }
-            }
-        }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
 }

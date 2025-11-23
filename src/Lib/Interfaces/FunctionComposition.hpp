@@ -3,18 +3,16 @@
 #include "Function.hpp"
 
 namespace MathLib {
-    template <typename Ret, typename Arg1, typename Arg2>
-    struct FunctionComposition : Function<Ret, Arg2> {
-        FunctionComposition(const Function<Ret, Arg1>& func1, const Function<Arg1, Arg2>& func2) : func1(func1), func2(func2) {
-            EmptyBenchmark
-        }
-        [[nodiscard]] virtual Ret Invoke(const void*, Arg2 arg) const override {
-            ReturnFromBenchmark(func1(func2(arg)));
+    template <typename Ret, typename Arg1, typename... Args2>
+    struct FunctionComposition : Function<Ret, Args2...> {
+        FunctionComposition(const Function<Ret, Arg1>& func1, const Function<Arg1, Args2...>& func2) : func1(func1), func2(func2) {}
+        [[nodiscard]] virtual Ret Invoke(Args2... args) const override {
+            return func1(func2(args...));
         }
 
         private:
         const Function<Ret, Arg1>& func1;
-        const Function<Arg1, Arg2>& func2;
+        const Function<Arg1, Args2...>& func2;
     };
 }
 

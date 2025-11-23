@@ -1,11 +1,12 @@
 #include "LambdaTerm.hpp"
+#include <Compiler/Parser/RightBinaryParserLayer.hpp>
+#include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
 #include <Compiler/Parser/IdentityParserLayer.hpp>
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Parser/KeywordParserLayer.hpp>
-#include <Compiler/Parser/BinaryParserLayer.hpp>
 #include <Compiler/Lexer/StringLexerRule.hpp>
 #include <Compiler/IdentityEvaluator.hpp>
 #include <Libc/HostFileSystem.hpp>
@@ -25,13 +26,6 @@ enum class TokenType : uint8_t {
     String,
     Pattern,
 };
-MathLib::Array<MathLib::String> NodeToArgs(const MathLib::ParserNode& node) {
-    if (node.GetType() == (size_t)TokenType::Variable) return MathLib::MakeArray<MathLib::String>(node.GetData());
-    if (node.GetType() != (size_t)TokenType::Abstraction) return MathLib::Array<MathLib::String>();
-    MathLib::Array<MathLib::String> l = NodeToArgs(node.At(0));
-    l += NodeToArgs(node.At(1));
-    return l;
-}
 MathLib::Array<MathLib::ParserNode> CommaToArray(const MathLib::ParserNode& node) {
     if (node.GetType() != (size_t)TokenType::Comma) return MathLib::MakeArray<MathLib::ParserNode>(node);
     MathLib::Array<MathLib::ParserNode> tmp = CommaToArray(node.At(0));
@@ -45,13 +39,7 @@ LambdaTerm FromNodeInternal(const MathLib::ParserNode& node) {
             const MathLib::String tmp = node.GetData();
             return LambdaTerm(MathLib::SubString(tmp, 1, tmp.GetSize() - 2), true);
         }
-        case TokenType::Abstraction: {
-            MathLib::Array<MathLib::String> args = NodeToArgs(node.At(0));
-            const size_t size = args.GetSize();
-            LambdaTerm ret = FromNodeInternal(node.At(1));
-            for (size_t i = size; i; i--) ret = LambdaTerm(ret, args.At(i - 1));
-            return ret;
-        }
+        case TokenType::Abstraction: return LambdaTerm(FromNodeInternal(node.At(1)), node.At(0).GetData());
         case TokenType::Application: return LambdaTerm(FromNodeInternal(node.At(0)), FromNodeInternal(node.At(1)));
         case TokenType::Definition: return LambdaTerm(node.At(0).GetData(), FromNodeInternal(node.At(1)));
         case TokenType::Pattern: {
@@ -137,10 +125,10 @@ int main(int argc, char** argv) {
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::BinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction, true),
-            new MathLib::BinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application, true),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
+            new MathLib::RightBinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction), // TODO:
+            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
             new PatternParserLayer(),

@@ -16,6 +16,7 @@ namespace MathLib {
         char signature[5];
         uint8_t version;
 
+        ISO9660VolumeDescriptor(void);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

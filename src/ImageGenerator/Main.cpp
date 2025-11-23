@@ -1,5 +1,5 @@
 #define SDL_MAIN_HANDLED
-#include <Interfaces/VariadicSequence.hpp>
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <NeuralNetwork.hpp>
@@ -104,8 +104,9 @@ int main(int argc, char** argv) {
         for (size_t y = 0; y < height; y++)
             for (size_t x = 0; x < width; x++)
                 image.pixels.At(x, y) = neuralNetwork.Run(MathLib::MakeArray<MathLib::num_t>((MathLib::num_t)x / (width - 1), (MathLib::num_t)y / (height - 1))).At(0, 0) * UINT32_MAX;
-        renderer.DrawImage<MathLib::num_t>(image, MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
-        while (renderer.GetEvent().type != MathLib::Event::Type::Quit) (void)renderer.Update();
+        if (!renderer.CopyFromBuffer(image)) MathLib::Panic("Failed to draw image");
+        while (renderer.GetEvent().type != MathLib::Event::Type::Quit)
+            if (!renderer.Update()) MathLib::Panic("Failed to update UI");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

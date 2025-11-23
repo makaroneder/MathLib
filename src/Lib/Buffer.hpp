@@ -1,71 +1,59 @@
 #ifndef MathLib_Buffer_H
 #define MathLib_Buffer_H
-#include "Interfaces/Collection.hpp"
+#include "Interfaces/Sequence/Collection.hpp"
 
 namespace MathLib {
     [[noreturn]] void Panic(const char*);
     template <typename T>
     struct Buffer : Collection<T> {
-        Buffer(void) : buffer(nullptr), size(0) {
-            EmptyBenchmark
-        }
-        Buffer(size_t size) : buffer(size ? new T[size] : nullptr), size(size) {
-            EmptyBenchmark
-        }
+        Buffer(void) : buffer(nullptr), size(0) {}
+        Buffer(size_t size) : buffer(size ? new T[size] : nullptr), size(size) {}
         Buffer(const T* arr, size_t size) : Buffer(size) {
-            StartBenchmark
-            for (size_t i = 0; i < size; i++) this->At(i) = arr[i];
-            EndBenchmark
+            for (size_t i = 0; i < size; i++) this->AtUnsafe(i) = arr[i];
         }
         Buffer(const Buffer<T>& other) : Buffer(other.size) {
-            StartBenchmark
             if (size) {
                 if (!buffer || !other.buffer) Panic("Buffer allocation failed");
                 for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
             }
-            EndBenchmark
         }
         virtual ~Buffer(void) override {
-            StartBenchmark
             if (buffer) delete [] buffer;
-            EndBenchmark
         }
         [[nodiscard]] virtual bool Add(const T& val) override {
-            StartBenchmark
             T* tmp = new T[size + 1];
-            if (!tmp) ReturnFromBenchmark(false);
+            if (!tmp) return false;
             for (size_t i = 0; i < size; i++) tmp[i] = buffer[i];
             tmp[size++] = val;
             if (buffer) delete [] buffer;
             buffer = tmp;
-            ReturnFromBenchmark(true);
+            return true;
         }
         [[nodiscard]] virtual bool Reset(void) override {
-            StartBenchmark
             if (buffer) delete [] buffer;
             size = 0;
-            ReturnFromBenchmark(true);
+            return true;
         }
         [[nodiscard]] virtual size_t GetSize(void) const override {
-            StartAndReturnFromBenchmark(size);
+            return size;
         }
         [[nodiscard]] virtual T* GetValue(void) override {
-            StartAndReturnFromBenchmark(buffer);
+            return buffer;
         }
         [[nodiscard]] virtual const T* GetValue(void) const override {
-            StartAndReturnFromBenchmark(buffer);
+            return buffer;
         }
         Buffer<T>& operator=(const Buffer<T>& other) {
-            StartBenchmark
             if (buffer) delete [] buffer;
             size = other.size;
-            if (size) {
-                buffer = new T[size];
-                if (!buffer || !other.buffer) Panic("Buffer allocation failed");
-                for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+            if (!size) {
+                buffer = nullptr;
+                return *this;
             }
-            else buffer = nullptr;
-            ReturnFromBenchmark(*this);
+            buffer = new T[size];
+            if (!buffer || !other.buffer) Panic("Buffer allocation failed");
+            for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+            return *this;
         }
 
         protected:

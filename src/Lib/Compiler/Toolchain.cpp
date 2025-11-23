@@ -1,23 +1,17 @@
 #include "Toolchain.hpp"
 
 namespace MathLib {
-    Toolchain::Toolchain(Lexer* lexer, Parser* parser, Evaluator<ParserNode>* optimizer) : lexer(lexer), parser(parser), optimizer(optimizer) {
-        EmptyBenchmark
-    }
+    Toolchain::Toolchain(Lexer* lexer, Parser* parser, Evaluator<ParserNode>* optimizer) : lexer(lexer), parser(parser), optimizer(optimizer) {}
     Toolchain::~Toolchain(void) {
-        StartBenchmark
         delete lexer;
         delete parser;
         delete optimizer;
-        EndBenchmark
     }
-    void Toolchain::LoadInput(const MathLib::Sequence<char>& input) {
-        StartBenchmark
+    void Toolchain::LoadInput(const Sequence<char>& input) {
         lexer->LoadInput(input);
         parser->LoadInput(lexer->Lex());
-        EndBenchmark
     }
     ParserNode Toolchain::GetNode(void) const {
-        StartAndReturnFromBenchmark(optimizer->Evaluate(parser->Parse()));
+        return optimizer->Evaluate(parser->Parse());
     }
 }

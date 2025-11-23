@@ -8,6 +8,8 @@ namespace MathLib {
         char bootIdentifier[32];
         uint32_t elToritoBootCatalog;
         uint8_t reserved[1973];
+
+        ISO9660BootRecord(void);
     } __attribute__((packed));
 }
 

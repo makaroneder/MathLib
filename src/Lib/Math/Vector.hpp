@@ -25,12 +25,11 @@ namespace MathLib {
     /// @return New 3D vector
     template <typename T>
     [[nodiscard]] Matrix<T> CreateVector(const T& x, const T& y, const T& z) {
-        StartBenchmark
         Array<T> arr = Array<T>((size_t)VectorAxis::AxisCount);
-        arr.At(0) = x;
-        arr.At(1) = y;
-        arr.At(2) = z;
-        ReturnFromBenchmark(Matrix<T>(arr.GetSize(), 1, arr));
+        arr.AtUnsafe(0) = x;
+        arr.AtUnsafe(1) = y;
+        arr.AtUnsafe(2) = z;
+        return Matrix<T>(arr.GetSize(), 1, arr);
     }
     /// @brief Converts N dimensional vector to N - 1 dimensional vector
     /// @tparam T Type of number
@@ -38,12 +37,11 @@ namespace MathLib {
     /// @param fov Distance on N axis between camera and origin
     /// @return N - 1 vector
     template <typename T>
-    [[nodiscard]] Matrix<T> ProjectVector(const Matrix<T>& point, const T& fov = -10) {
-        StartBenchmark
-        if (point.At(point.GetWidth() - 1, 0) <= (1 + fov)) ReturnFromBenchmark(CreateVector<T>(nan, nan, nan));
+    [[nodiscard]] Matrix<T> ProjectVector(const Matrix<T>& point, const T& fov = 10) {
+        if (point.At(point.GetWidth() - 1, 0) <= (1 - fov)) return CreateVector<T>(nan, nan, nan);
         Array<T> arr = Array<T>(point.GetWidth() - 1);
-        for (size_t i = 0; i < arr.GetSize(); i++) arr.At(i) = point.At(i, 0);
-        ReturnFromBenchmark(Matrix<T>(point.GetWidth() - 1, 1, arr) / (1 - point.At(point.GetWidth() - 1, 0) / fov));
+        for (size_t i = 0; i < arr.GetSize(); i++) arr.AtUnsafe(i) = point.AtUnsafe(i, 0);
+        return Matrix<T>(point.GetWidth() - 1, 1, arr) / (1 - point.AtUnsafe(point.GetWidth() - 1, 0) / -fov);
     }
     /// @brief Converts N dimensional vector to M dimensional vector
     /// @tparam T Type of number
@@ -51,22 +49,20 @@ namespace MathLib {
     /// @param fov Distance on N axis between camera and origin
     /// @return M vector
     template <typename T>
-    [[nodiscard]] Matrix<T> ConvertVectorDimension(const Matrix<T>& point, size_t dimension, const T& fov = -10) {
-        StartBenchmark
-        if (point.GetWidth() < dimension) ReturnFromBenchmark(CreateVector<T>(nan, nan, nan));
+    [[nodiscard]] Matrix<T> ConvertVectorDimension(const Matrix<T>& point, size_t dimension, const T& fov = 10) {
+        if (point.GetWidth() < dimension) return CreateVector<T>(nan, nan, nan);
         Matrix<T> pos = point;
         while (pos.GetWidth() != dimension) pos = ProjectVector<T>(pos, fov);
-        ReturnFromBenchmark(pos);
+        return pos;
     }
     template <typename T>
     [[nodiscard]] Matrix<T> Reflect(const Matrix<T>& v, const Matrix<T>& n) {
-        StartAndReturnFromBenchmark(v - n * v.Dot(n) * 2);
+        return v - n * v.Dot(n) * 2;
     }
     template <typename T>
     [[nodiscard]] Matrix<T> Refract(const Matrix<T>& uv, const Matrix<T>& n, const T& t) {
-        StartBenchmark
         const Matrix<T> tmp =  (uv + n * Min<T>((-uv).Dot(n), 1)) * t;
-        ReturnFromBenchmark(tmp + n * -Sqrt(Abs(1 - tmp.GetLengthSquared())));
+        return tmp + n * -Sqrt(Abs(1 - tmp.GetLengthSquared()));
     }
 }
 

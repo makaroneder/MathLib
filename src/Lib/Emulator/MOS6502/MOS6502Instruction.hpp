@@ -10,6 +10,9 @@ namespace MathLib {
             uint8_t addressingMode : 3;
             uint8_t opcode2 : 2;
         };
+
+        [[nodiscard]] bool operator==(const MOS6502Instruction& other) const;
+        [[nodiscard]] bool operator!=(const MOS6502Instruction& other) const;
     } __attribute__((packed));
 }
 

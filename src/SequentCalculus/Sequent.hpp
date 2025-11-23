@@ -18,5 +18,8 @@ struct Sequent : MathLib::Printable {
     private:
     [[nodiscard]] bool ProveInternal(MathLib::Tree<Sequent>& tree) const;
 };
+namespace MathLib {
+    MakeFormatter(Sequent, self, padding, { return self.ToString(padding); });
+}
 
 #endif

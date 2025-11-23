@@ -7,7 +7,7 @@
 namespace MathLib {
     struct X86 : StepEmulator, Printable {
         X86(const Sequence<uint8_t>& memory);
-        virtual void Reset(void) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual bool Step(void) override;
         [[nodiscard]] virtual Register GetPC(void) const override;
         /// @brief Converts struct to string
@@ -23,23 +23,20 @@ namespace MathLib {
         [[nodiscard]] uint64_t ToLinear(uint64_t segment, uint64_t offset);
         template <typename T>
         [[nodiscard]] Expected<T> Fetch(void) {
-            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(ToLinear(state.cs.value, state.ip.value));
             if (ret.HasValue()) state.ip.value += sizeof(T);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
         template <typename T>
         [[nodiscard]] bool Push(T value) {
-            StartBenchmark
             state.sp.value -= sizeof(T);
-            ReturnFromBenchmark(WritePositioned<T>(value, ToLinear(state.ss.value, state.sp.value)));
+            return WritePositioned<T>(value, ToLinear(state.ss.value, state.sp.value));
         }
         template <typename T>
         [[nodiscard]] Expected<T> Pop(void) {
-            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(ToLinear(state.ss.value, state.sp.value));
             if (ret.HasValue()) state.sp.value += sizeof(T);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
         [[nodiscard]] Register* GetRegister(uint8_t code);
     };

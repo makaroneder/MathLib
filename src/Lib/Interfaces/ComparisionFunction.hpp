@@ -1,6 +1,7 @@
 #ifndef MathLib_Interfaces_ComparisionFunction_H
 #define MathLib_Interfaces_ComparisionFunction_H
-#include "../Benchmark.hpp"
+#include "Function.hpp"
+#include <stdint.h>
 
 namespace MathLib {
     enum class ComparisionFunctionType : uint8_t {
@@ -13,19 +14,16 @@ namespace MathLib {
     };
     template <typename T>
     struct ComparisionFunction : Function<bool, T, T> {
-        ComparisionFunction(ComparisionFunctionType type) : type(type) {
-            EmptyBenchmark
-        }
-        [[nodiscard]] virtual bool Invoke(const void*, T x, T y) const override {
-            StartBenchmark
+        ComparisionFunction(ComparisionFunctionType type) : type(type) {}
+        [[nodiscard]] virtual bool Invoke(T x, T y) const override {
             switch (type) {
-                case ComparisionFunctionType::Equal: ReturnFromBenchmark(x == y);
-                case ComparisionFunctionType::NotEqual: ReturnFromBenchmark(x != y);
-                case ComparisionFunctionType::LessThan: ReturnFromBenchmark(x < y);
-                case ComparisionFunctionType::LessThanEqual: ReturnFromBenchmark(x <= y);
-                case ComparisionFunctionType::GreaterThan: ReturnFromBenchmark(x > y);
-                case ComparisionFunctionType::GreaterThanEqual: ReturnFromBenchmark(x >= y);
-                default: ReturnFromBenchmark(false);
+                case ComparisionFunctionType::Equal: return x == y;
+                case ComparisionFunctionType::NotEqual: return x != y;
+                case ComparisionFunctionType::LessThan: return x < y;
+                case ComparisionFunctionType::LessThanEqual: return x <= y;
+                case ComparisionFunctionType::GreaterThan: return x > y;
+                case ComparisionFunctionType::GreaterThanEqual: return x >= y;
+                default: return false;
             }
         }
     

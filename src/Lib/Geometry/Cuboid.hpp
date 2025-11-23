@@ -8,18 +8,14 @@ namespace MathLib {
     struct Cuboid : LineShape<T> {
         Matrix<T> sizes;
 
-        Cuboid(const Matrix<T>& pos = CreateVector<T>(0, 0, 0), const Matrix<T>& s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {
-            EmptyBenchmark
-        }
+        Cuboid(const Matrix<T>& pos = CreateVector<T>(0, 0, 0), const Matrix<T>& s = CreateVector<T>(0, 0, 0)) : LineShape<T>(pos), sizes(s) {}
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other_) const override {
-            StartBenchmark
             const Cuboid<T>& other = (const Cuboid<T>&)other_;
             for (size_t x = 0; x < this->position.GetWidth(); x++)
-                if (Abs(this->position.At(x, 0) - other.position.At(x, 0)) > (sizes.At(x, 0) + other.sizes.At(x, 0)) / 2) ReturnFromBenchmark(false);
-            ReturnFromBenchmark(true);
+                if (Abs(this->position.At(x, 0) - other.position.At(x, 0)) > (sizes.At(x, 0) + other.sizes.At(x, 0)) / 2) return false;
+            return true;
         }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
-            StartBenchmark
             const Array<Matrix<T>> points = GenerateVertices(sizes / 2);
             const Matrix<T> p1 = RotateVector<T>(this->position + points.At(0), this->position, rotation);
             const Matrix<T> p2 = RotateVector<T>(this->position + points.At(1), this->position, rotation);
@@ -42,20 +38,18 @@ namespace MathLib {
             ret.At(9) = Line<T>(p5, p7);
             ret.At(10) = Line<T>(p6, p8);
             ret.At(11) = Line<T>(p7, p8);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
         [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Matrix<T>& dimensions) {
-            StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(2);
             ret.At(0) = Matrix<T>(1, 1, MakeArray<T>(GetX(dimensions)));
             ret.At(1) = Matrix<T>(1, 1, MakeArray<T>(-GetX(dimensions)));
             for (size_t i = 1; i < dimensions.GetWidth(); i++) ret = GenerateVertices(ret, dimensions.At(i, 0));
-            ReturnFromBenchmark(ret);
+            return ret;
         }
 
         private:
         [[nodiscard]] static Array<Matrix<T>> GenerateVertices(const Sequence<Matrix<T>>& prev, const T& dimension) {
-            StartBenchmark
             Array<Matrix<T>> ret = Array<Matrix<T>>(prev.GetSize() * 2);
             for (size_t i = 0; i < prev.GetSize(); i++) {
                 Array<T> tmp = Array<T>(prev.At(i).GetWidth() + 1);
@@ -66,7 +60,7 @@ namespace MathLib {
                 point.At(prev.At(i).GetWidth(), 0) = -dimension;
                 ret.At(2 * i + 1) = point;
             }
-            ReturnFromBenchmark(ret);
+            return ret;
         }
     };
 }

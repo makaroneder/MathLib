@@ -15,7 +15,6 @@ namespace MathLib {
         Optimizer Recreate(void) const;
         void Destroy(void);
         [[nodiscard]] FunctionNode GetFunction(const Sequence<char>& name) const;
-        [[nodiscard]] bool SetBuiltinFunctionData(const Sequence<char>& name, void* data);
         /// @brief Optimizes given node based on the given variables and creates new variables
         /// @param node Node to optimize
         /// @return Optimized node

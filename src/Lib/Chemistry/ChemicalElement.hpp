@@ -23,9 +23,7 @@ namespace MathLib {
     #define CreateChemicalElement(name, symbolStr, metal)                       \
     struct name : ChemicalElement {                                             \
         static constexpr const char* symbol = #symbolStr;                       \
-        name(size_t count) : ChemicalElement(String(symbol), count, metal) {    \
-            EmptyBenchmark                                                      \
-        }                                                                       \
+        name(size_t count) : ChemicalElement(String(symbol), count, metal) {}   \
     }
     CreateChemicalElement(Hydrogen, H, false);
     CreateChemicalElement(Helium, He, false);

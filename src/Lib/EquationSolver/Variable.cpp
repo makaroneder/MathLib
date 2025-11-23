@@ -2,20 +2,14 @@
 #include "../Math/Constants.hpp"
 
 namespace MathLib {
-    Variable::Variable(void) {
-        EmptyBenchmark
-    }
-    Variable::Variable(const Sequence<char>& name, const Sequence<char>& dataType, Node* value, bool constant) : name(CollectionToString(name)), dataType(CollectionToString(dataType)), value(value), constant(constant) {
-        EmptyBenchmark
-    }
-    Variable::Variable(const Sequence<char>& name, const Sequence<char>& dataType, const Sequence<char>& value, bool constant) : name(CollectionToString(name)), dataType(CollectionToString(dataType)), value(new Node(Node::Type::Constant, value)), constant(constant) {
-        EmptyBenchmark
-    }
+    Variable::Variable(void) {}
+    Variable::Variable(const Sequence<char>& name, const Sequence<char>& dataType, Node* value, bool constant) : name(CollectionToString(name)), dataType(CollectionToString(dataType)), value(value), constant(constant) {}
+    Variable::Variable(const Sequence<char>& name, const Sequence<char>& dataType, const Sequence<char>& value, bool constant) : name(CollectionToString(name)), dataType(CollectionToString(dataType)), value(new Node(Node::Type::Constant, value)), constant(constant) {}
     bool Variable::operator==(const Variable& other) const {
-        StartAndReturnFromBenchmark(name == other.name && dataType == other.dataType && constant == other.constant);
+        return name == other.name && dataType == other.dataType && constant == other.constant;
     }
     bool Variable::operator!=(const Variable& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
     Array<Variable> CreateDefaultVariables(void) {
         const Variable defaultVariables[] = {
@@ -105,6 +99,6 @@ namespace MathLib {
             Variable("foiasConstant"_M, "R"_M, ToString(foiasConstant), true),
             Variable("taniguchiConstant"_M, "R"_M, ToString(taniguchiConstant), true),
         };
-        StartAndReturnFromBenchmark(Array<Variable>(defaultVariables, SizeOfArray(defaultVariables)));
+        return Array<Variable>(defaultVariables, SizeOfArray(defaultVariables));
     }
 }

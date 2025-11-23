@@ -1,37 +1,31 @@
 #include "ByteDevice.hpp"
 
 namespace MathLib {
-    ByteDevice::ByteDevice(void) : position(0) {
-        EmptyBenchmark
-    }
+    ByteDevice::ByteDevice(void) : position(0) {}
     size_t ByteDevice::ReadSizedBuffer(void* buffer, size_t size) {
-        StartBenchmark
         const size_t s = ReadPositionedSizedBuffer(buffer, size, position);
         position += s;
-        ReturnFromBenchmark(s);
+        return s;
     }
     size_t ByteDevice::WriteSizedBuffer(const void* buffer, size_t size) {
-        StartBenchmark
         const size_t s = WritePositionedSizedBuffer(buffer, size, position);
         position += s;
-        ReturnFromBenchmark(s);
+        return s;
     }
     bool ByteDevice::Skip(size_t size) {
-        StartBenchmark
         position += size;
-        ReturnFromBenchmark(true);
+        return true;
     }
     bool ByteDevice::ReadPositionedBuffer(void* buffer, size_t size, size_t position) {
-        StartAndReturnFromBenchmark(ReadPositionedSizedBuffer(buffer, size, position) == size);
+        return ReadPositionedSizedBuffer(buffer, size, position) == size;
     }
     bool ByteDevice::WritePositionedBuffer(const void* buffer, size_t size, size_t position) {
-        StartAndReturnFromBenchmark(WritePositionedSizedBuffer(buffer, size, position) == size);
+        return WritePositionedSizedBuffer(buffer, size, position) == size;
     }
     bool ByteDevice::Seek(ssize_t offset, SeekMode mode) {
-        StartBenchmark
         switch (mode) {
             case SeekMode::Set: {
-                if (offset < 0) ReturnFromBenchmark(false);
+                if (offset < 0) return false;
                 position = offset;
                 break;
             }
@@ -40,18 +34,19 @@ namespace MathLib {
                 break;
             }
             case SeekMode::End: {
-                if (offset < 0 || GetSize() < (size_t)offset) ReturnFromBenchmark(false);
-                position = GetSize() - offset;
+                const size_t size = GetSize();
+                if (offset < 0 || size < (size_t)offset) return false;
+                position = size - offset;
                 break;
             }
-            default: ReturnFromBenchmark(false);
+            default: return false;
         }
-        ReturnFromBenchmark(true);
+        return true;
     }
     size_t ByteDevice::Tell(void) const {
-        StartAndReturnFromBenchmark(position);
+        return position;
     }
     size_t ByteDevice::GetSizeLeft(void) const {
-        StartAndReturnFromBenchmark(GetSize() - Tell());
+        return GetSize() - position;
     }
 }

@@ -1,14 +1,11 @@
 #include "VFSFile.hpp"
-#include "../../Benchmark.hpp"
 
 namespace MathLib {
-    VFSFile::VFSFile(size_t fs, size_t index) : fs(fs), index(index), free(false) {
-        EmptyBenchmark
-    }
+    VFSFile::VFSFile(size_t fs, size_t index) : fs(fs), index(index), free(false) {}
     bool VFSFile::operator==(const VFSFile& other) const {
-        StartAndReturnFromBenchmark(fs == other.fs && index == other.index && free == other.free);
+        return fs == other.fs && index == other.index && free == other.free;
     }
     bool VFSFile::operator!=(const VFSFile& other) const {
-        StartAndReturnFromBenchmark(!(*this == other));
+        return !(*this == other);
     }
 }

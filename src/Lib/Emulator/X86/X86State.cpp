@@ -1,11 +1,8 @@
 #include "X86State.hpp"
 
 namespace MathLib {
-    X86State::X86State(X86Flags flags, Register ip) : flags(flags), ip(ip), a(0), b(0), c(0), d(0), si(0), di(0), sp(0), bp(0), r8(0), r9(0), r10(0), r11(0), r12(0), r13(0), r14(0), r15(0) {
-        EmptyBenchmark
-    }
+    X86State::X86State(X86Flags flags, Register ip) : flags(flags), ip(ip), a(0), b(0), c(0), d(0), si(0), di(0), sp(0), bp(0), r8(0), r9(0), r10(0), r11(0), r12(0), r13(0), r14(0), r15(0) {}
     String X86State::ToString(const Sequence<char>& padding) const {
-        StartBenchmark
         String ret = flags.carry ? "CF" : "";
         ret += flags.parity ? (String(ret.IsEmpty() ? "" : ", ") + "PF") : "";
         ret += flags.auxiliaryCarry ? (String(ret.IsEmpty() ? "" : ", ") + "AF") : "";
@@ -45,6 +42,6 @@ namespace MathLib {
         ret += CollectionToString(padding) + "\tR13 = " + r13.ToString() + '\n';
         ret += CollectionToString(padding) + "\tR14 = " + r14.ToString() + '\n';
         ret += CollectionToString(padding) + "\tR15 = " + r15.ToString() + '\n';
-        ReturnFromBenchmark(ret + padding + '}');
+        return ret + padding + '}';
     }
 }

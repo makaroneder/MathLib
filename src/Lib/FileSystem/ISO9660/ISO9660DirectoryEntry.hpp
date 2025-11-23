@@ -24,6 +24,7 @@ namespace MathLib {
         uint8_t nameLength;
         char name[1];
 
+        ISO9660DirectoryEntry(void);
         [[nodiscard]] bool IsValid(void) const;
         [[nodiscard]] String GetName(void) const;
         [[nodiscard]] bool operator==(const ISO9660DirectoryEntry& other) const;

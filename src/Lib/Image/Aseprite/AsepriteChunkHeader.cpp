@@ -1,8 +1,5 @@
 #include "AsepriteChunkHeader.hpp"
-#include "../../Benchmark.hpp"
 
 namespace MathLib {
-    AsepriteChunkHeader::AsepriteChunkHeader(uint32_t size, Type type) : size(size + sizeof(AsepriteChunkHeader)), type(type) {
-        EmptyBenchmark
-    }
+    AsepriteChunkHeader::AsepriteChunkHeader(uint32_t size, Type type) : size(size + sizeof(AsepriteChunkHeader)), type(type) {}
 }

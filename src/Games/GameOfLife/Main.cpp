@@ -22,17 +22,20 @@ void MakeGameOfLifeGlider(LifeAutomaton& game, const MathLib::Matrix<size_t>& po
 /// @return Status
 int main(int, char**) {
     try {
+        const size_t width = 50;
+        const size_t height = 50;
+        const size_t xMultiplier = 10;
+        const size_t yMultiplier = 10;
         MathLib::SDL2 sdl2;
-        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Game of life", 500, 500);
-        LifeAutomaton game = LifeAutomaton(50, 50, MathLib::String(LifeAutomaton::life));
+        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Game of life", width * xMultiplier, height * yMultiplier);
+        LifeAutomaton game = LifeAutomaton(width, height, MathLib::String(LifeAutomaton::life));
         std::cout << game << std::endl;
-        MakeGameOfLifeBlinker(game, MathLib::CreateVector<size_t>(game.GetWidth() / 2 + 11, game.GetHeight() / 2 - 15, 0));
-        MakeGameOfLifeGlider(game, MathLib::CreateVector<size_t>(game.GetWidth() / 2, game.GetHeight() / 2, 0));
+        MakeGameOfLifeBlinker(game, MathLib::CreateVector<size_t>(width / 2 + 11, height / 2 - 15, 0));
+        MakeGameOfLifeGlider(game, MathLib::CreateVector<size_t>(width / 2, height / 2, 0));
         bool pause = false;
         while (true) {
             if (!pause) {
-                renderer.Fill(0);
-                renderer.DrawImage<MathLib::num_t>(game.ToImage(0x000000ff, UINT32_MAX).Resize(10, 10), MathLib::CreateVector<MathLib::num_t>(0, 0, 0));
+                if (!renderer.CopyFromBuffer(game.ToImage(0x000000ff, UINT32_MAX).Resize(xMultiplier, yMultiplier))) MathLib::Panic("Failed to draw UI");
                 game = game.Update();
             }
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");

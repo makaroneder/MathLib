@@ -5,15 +5,11 @@
 namespace MathLib {
     template <typename Ret, typename Arg>
     struct ArgMinMaxData {
-        Ret ret;
         Array<Arg> args;
+        Ret ret;
 
-        ArgMinMaxData(void) : ret(), args() {
-            EmptyBenchmark
-        }
-        ArgMinMaxData(const Ret& ret, const Sequence<Arg>& args) : ret(ret), args(CollectionToArray<Arg>(args)) {
-            EmptyBenchmark
-        }
+        ArgMinMaxData(void) : args(), ret() {}
+        ArgMinMaxData(const Ret& ret, const Sequence<Arg>& args) : args(CollectionToArray<Arg>(args)), ret(ret) {}
     };
 }
 

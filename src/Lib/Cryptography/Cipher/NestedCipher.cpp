@@ -1,17 +1,12 @@
 #include "NestedCipher.hpp"
-#include "../../Interfaces/SubSequence.hpp"
+#include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    NestedCipher::NestedCipher(const Sequence<NestedCipherData*>& ciphers) : ciphers(CollectionToArray<NestedCipherData*>(ciphers)) {
-        EmptyBenchmark
-    }
+    NestedCipher::NestedCipher(const Sequence<NestedCipherData*>& ciphers) : ciphers(CollectionToArray<NestedCipherData*>(ciphers)) {}
     NestedCipher::~NestedCipher(void) {
-        StartBenchmark
         for (NestedCipherData*& cipher : ciphers) delete cipher;
-        EndBenchmark
     }
     Array<uint8_t> NestedCipher::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        StartBenchmark
         Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
         size_t i = 0;
         for (const NestedCipherData* const& cipher : ciphers) {
@@ -19,10 +14,9 @@ namespace MathLib {
             i += cipher->GetKeySize();
             ret = cipher->Encrypt(ret, SubSequence<uint64_t>(key, Interval<size_t>(save, i)));
         }
-        ReturnFromBenchmark(ret);
+        return ret;
     }
     Array<uint8_t> NestedCipher::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        StartBenchmark
         Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
         const size_t size = ciphers.GetSize();
         size_t i = key.GetSize();
@@ -33,6 +27,6 @@ namespace MathLib {
         }
         const size_t start = range.GetMin();
         const size_t end = Min<size_t>(ret.GetSize(), range.GetMax());
-        ReturnFromBenchmark(start < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(start, end))) : Array<uint8_t>());
+        return start < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(start, end))) : Array<uint8_t>();
     }
 }

@@ -7,7 +7,6 @@ namespace MathLib {
     struct StringRewritingSystem {
         StringRewritingSystem(const Array<StringRewritingSystemRule<T>>& rules) : rules(rules) {}
         Array<T> Rewrite(const Sequence<T>& sequence) {
-            StartBenchmark
             Array<T> ret = CollectionToArray<T>(sequence);
             while (true) {
                 bool found = false;
@@ -25,7 +24,7 @@ namespace MathLib {
                 }
                 if (!found) break;
             }
-            ReturnFromBenchmark(ret);
+            return ret;
         }
     
         private:

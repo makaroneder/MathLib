@@ -1,35 +1,33 @@
 #ifndef MathLib_Interfaces_DictionaryElement_H
 #define MathLib_Interfaces_DictionaryElement_H
-#include "../Benchmark.hpp"
+#include "Printable.hpp"
 
 namespace MathLib {
     template <typename Key, typename Value>
-    struct DictionaryElement {
+    struct DictionaryElement : Printable {
         Value value;
 
-        DictionaryElement(void) : value(), key() {
-            EmptyBenchmark
-        }
-        DictionaryElement(const Key& key, const Value& value) : value(value), key(key) {
-            EmptyBenchmark
+        DictionaryElement(void) : value(), key() {}
+        DictionaryElement(const Key& key, const Value& value) : value(value), key(key) {}
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
+            return Formatter<Key>::ToString(key, padding) + ": " + Formatter<Value>::ToString(value);
         }
         [[nodiscard]] bool IsValidKey(const Key& k) const {
-            StartAndReturnFromBenchmark(key == k);
+            return key == k;
         }
         [[nodiscard]] bool Replace(const DictionaryElement<Key, Value>& other) {
-            StartBenchmark
-            if (key != other.key) ReturnFromBenchmark(false);
+            if (key != other.key) return false;
             value = other.value;
-            ReturnFromBenchmark(true);
+            return true;
         }
         [[nodiscard]] Key GetKey(void) const {
-            StartAndReturnFromBenchmark(key);
+            return key;
         }
         [[nodiscard]] bool operator==(const DictionaryElement<Key, Value>& other) const {
-            StartAndReturnFromBenchmark(value == other.value);
+            return value == other.value;
         }
         [[nodiscard]] bool operator!=(const DictionaryElement<Key, Value>& other) const {
-            StartAndReturnFromBenchmark(!(*this == other));
+            return !(*this == other);
         }
 
         private:

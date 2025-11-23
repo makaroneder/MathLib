@@ -15,14 +15,12 @@ namespace MathLib {
         /// @brief Creates a new line
         /// @param s Starting point of line
         /// @param e Ending point of line
-        Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {
-            EmptyBenchmark
-        }
+        Line(const Matrix<T>& s = CreateVector<T>(0, 0, 0), const Matrix<T>& e = CreateVector<T>(0, 0, 0)) : start(s), end(e) {}
         [[nodiscard]] bool operator==(const Line<T>& other) const {
-            StartAndReturnFromBenchmark(start == other.start && end == other.end);
+            return start == other.start && end == other.end;
         }
         [[nodiscard]] bool operator!=(const Line<T>& other) const {
-            StartAndReturnFromBenchmark(!(*this == other));
+            return !(*this == other);
         }
     };
     /// @brief Converts a line from one type to another
@@ -32,7 +30,7 @@ namespace MathLib {
     /// @return Converted line
     template <typename T, typename F>
     [[nodiscard]] Line<F> ConvertLine(const Line<T>& line) {
-        StartAndReturnFromBenchmark(Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end)));
+        return Line<F>(ConvertMatrix<T, F>(line.start), ConvertMatrix<T, F>(line.end));
     }
 }
 

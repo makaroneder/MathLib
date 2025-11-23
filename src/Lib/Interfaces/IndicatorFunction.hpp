@@ -6,11 +6,9 @@
 namespace MathLib {
     template <typename T>
     struct IndicatorFunction : Function<bool, T> {
-        IndicatorFunction(const Container<T>& container) : container(container) {
-            EmptyBenchmark
-        }
-        [[nodiscard]] virtual bool Invoke(const void*, T x) const override {
-            StartAndReturnFromBenchmark(container.Contains(x));
+        IndicatorFunction(const Container<T>& container) : container(container) {}
+        [[nodiscard]] virtual bool Invoke(T x) const override {
+            return container.Contains(x);
         }
     
         private:

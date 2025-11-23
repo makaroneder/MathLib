@@ -6,10 +6,11 @@
 namespace MathLib {
     struct StringLexerRule : LexerRule {
         StringLexerRule(size_t type, const Sequence<char>& value);
+        StringLexerRule(size_t type, const Sequence<String>& value);
         virtual void Match(const Sequence<char>& str, size_t& i) const override;
 
         private:
-        String value;
+        Array<String> value;
     };
 }
 

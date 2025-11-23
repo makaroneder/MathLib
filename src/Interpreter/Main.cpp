@@ -7,7 +7,7 @@
 
 // TODO: logical and, logical or, for loops, structs, pointers
 
-[[nodiscard]] MathLib::Node* Print(const void*, const MathLib::Sequence<const MathLib::Node*>& args) {
+[[nodiscard]] MathLib::Node* Print(const MathLib::Sequence<const MathLib::Node*>& args) {
     if (args.GetSize() != 1) return nullptr;
     if (args.At(0)->type == MathLib::Node::Type::Constant) std::cout << args.At(0)->ToNumber().At(0) << std::flush;
     else if (args.At(0)->type == MathLib::Node::Type::String) std::cout << args.At(0)->value << std::flush;
@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
         MathLib::Optimizer optimizer = MathLib::Optimizer(MathLib::MakeArray<MathLib::BuiltinFunction>(
-            MathLib::BuiltinFunction("Print"_M, MathLib::BuiltinFunctionPointer(nullptr, &Print))
+            MathLib::BuiltinFunction("Print"_M, MathLib::BuiltinFunctionPointer(&Print))
         ), MathLib::Array<MathLib::FunctionNode>(), MathLib::MakeArray<MathLib::Variable>(
             MathLib::Variable("newLine"_M, "String"_M, new MathLib::Node(MathLib::Node::Type::String, '\n'_M), true)
         ));

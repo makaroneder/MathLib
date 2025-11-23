@@ -1,4 +1,4 @@
-#include <Interfaces/ByteDeviceSequence.hpp>
+#include <Interfaces/Sequence/ByteDeviceSequence.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Graph/Tree.hpp>
 #include <String.hpp>

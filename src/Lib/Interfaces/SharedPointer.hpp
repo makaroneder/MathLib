@@ -5,55 +5,43 @@
 namespace MathLib {
     template <typename T>
     struct SharedPointer : Allocatable {
-        SharedPointer(T* value = nullptr) : value(value), count(new size_t(1)) {
-            EmptyBenchmark
-        }
-        SharedPointer(T value) : SharedPointer(new T(value)) {
-            EmptyBenchmark
-        }
+        SharedPointer(T* value = nullptr) : value(value), count(new size_t(1)) {}
+        SharedPointer(T value) : SharedPointer(new T(value)) {}
         virtual ~SharedPointer(void) override {
-            StartBenchmark
-            if (!--(*count)) {
-                delete count;
-                if (value) delete value;
-            }
-            EndBenchmark
+            if (--(*count)) return;
+            delete count;
+            if (value) delete value;
         }
         SharedPointer<T>& operator=(const SharedPointer<T>& other) {
-            StartBenchmark
             value = other.value;
             count = other.count;
             (*count)++;
-            ReturnFromBenchmark(*this);
+            return *this;
         }
         [[nodiscard]] bool IsNull(void) const {
-            StartAndReturnFromBenchmark(!value);
+            return !value;
         }
         [[nodiscard]] T Get(const Sequence<char>& panicStr) const {
-            StartBenchmark
-            if (!value) Panic(panicStr);
-            ReturnFromBenchmark(*value);
+            if (value) return *value
+            Panic(panicStr);
         }
         [[nodiscard]] T Get(const char* panicStr = "Shared null pointer dereference detected") const {
-            StartBenchmark
-            if (!value) Panic(panicStr);
-            ReturnFromBenchmark(*value);
+            if (value) return *value
+            Panic(panicStr);
         }
         [[nodiscard]] T& Get(const Sequence<char>& panicStr) {
-            StartBenchmark
-            if (!value) Panic(panicStr);
-            ReturnFromBenchmark(*value);
+            if (value) return *value
+            Panic(panicStr);
         }
         [[nodiscard]] T& Get(const char* panicStr = "Shared null pointer dereference detected") {
-            StartBenchmark
-            if (!value) Panic(panicStr);
-            ReturnFromBenchmark(*value);
+            if (value) return *value
+            Panic(panicStr);
         }
         [[nodiscard]] T& operator*() {
-            StartAndReturnFromBenchmark(Get());
+            return Get();
         }
         [[nodiscard]] T* operator->() {
-            StartAndReturnFromBenchmark(value);
+            return value;
         }
 
         private:

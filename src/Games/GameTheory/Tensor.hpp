@@ -51,23 +51,18 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
         return data.end();
     }
     [[nodiscard]] bool operator==(const Tensor<T>& other) const {
-        StartBenchmark
         bool ret = dimensions == other.dimensions;
         for (size_t i = 0; i < data.GetSize() && ret; i++) ret = data.At(i) == other.data.At(i);
-        ReturnFromBenchmark(ret);
+        return ret;
     }
 
     private:
     void Add(const Tensor<T>& other) {
-        StartBenchmark
         if (dimensions != other.dimensions) MathLib::Panic("Invalid dimension of tensors for addition");
         for (size_t i = 0; i < data.GetSize(); i++) data.At(i) += other.data.At(i);
-        EndBenchmark
     }
     void Multiply(const T& scalar) {
-        StartBenchmark
         for (T& val : data) val *= scalar;
-        EndBenchmark
     }
     [[nodiscard]] size_t ToIndex(const MathLib::Sequence<size_t>& position) const {
         size_t ret = 0;
@@ -85,17 +80,15 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
                 pos += MathLib::ToString(position.At(i), 10) + (i + 1 == position.GetSize() ? ')' : ',');
             return MathLib::ToString(At(position)) + pos;
         }
-        else {
-            const size_t dim = dimensions.At(level - 1);
-            MathLib::String ret = "";
-            MathLib::Array<size_t> pos = MathLib::CollectionToArray<size_t>(position);
-            if (!pos.Add(0)) return "";
-            for (size_t i = 0; i < dim; i++) {
-                pos.At(position.GetSize()) = i;
-                ret += ToStringInternal(pos, level - 1) + (i + 1 == dim ? "" : " + ");
-            }
-            return ret;
+        const size_t dim = dimensions.At(level - 1);
+        MathLib::String ret = "";
+        MathLib::Array<size_t> pos = MathLib::CollectionToArray<size_t>(position);
+        if (!pos.Add(0)) return "";
+        for (size_t i = 0; i < dim; i++) {
+            pos.At(position.GetSize()) = i;
+            ret += ToStringInternal(pos, level - 1) + (i + 1 == dim ? "" : " + ");
         }
+        return ret;
     }
 
     MathLib::Array<size_t> dimensions;

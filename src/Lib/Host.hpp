@@ -2,26 +2,10 @@
 #define MathLib_Host_H
 #include "Thread.hpp"
 #include "Utils.hpp"
-#ifndef Freestanding
-#include <ostream>
-#endif
 
 namespace MathLib {
     extern const num_t nan;
     extern const num_t infinity;
-
-    #ifndef Freestanding
-    /// @brief Prints a string
-    /// @param stream Stream to print string into
-    /// @param string String to print
-    /// @return Stream
-    std::ostream& operator<<(std::ostream& stream, const Sequence<char>& string);
-    /// @brief Prints a string representation of printable structures
-    /// @param stream Stream to print data into
-    /// @param printable Data to print
-    /// @return Stream
-    std::ostream& operator<<(std::ostream& stream, const Printable& printable);
-    #endif
 
     [[noreturn]] void Panic(const char* str);
     [[nodiscard]] num_t StringToNumber(const Sequence<char>& str);

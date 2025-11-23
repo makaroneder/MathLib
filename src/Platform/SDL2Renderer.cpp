@@ -15,7 +15,7 @@ namespace MathLib {
         SDL_DestroyWindow(window);
     }
     bool SDL2Renderer::Update(void) {
-        if (SDL_UpdateTexture(texture, nullptr, pixels.GetValue().GetValue(), GetWidth() * sizeof(uint32_t)) || SDL_RenderClear(renderer) || SDL_RenderCopy(renderer, texture, nullptr, nullptr)) return false;
+        if (SDL_UpdateTexture(texture, nullptr, pixels.GetPointer(), GetWidth() * sizeof(uint32_t)) || SDL_RenderClear(renderer) || SDL_RenderCopy(renderer, texture, nullptr, nullptr)) return false;
         SDL_RenderPresent(renderer);
         return true;
     }

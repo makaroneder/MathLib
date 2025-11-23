@@ -6,13 +6,10 @@
 namespace MathLib {
     template <typename T>
     struct BlumBlumShub : PRNG<T> {
-        BlumBlumShub(const T& seed, const T& modulo) : PRNG<T>(seed), modulo(modulo) {
-            EmptyBenchmark
-        }
+        BlumBlumShub(const T& seed, const T& modulo) : PRNG<T>(seed), modulo(modulo) {}
         [[nodiscard]] virtual T Random(void) override {
-            StartBenchmark
             this->seed = Modulo<T>(this->seed * this->seed);
-            ReturnFromBenchmark(this->seed / modulo);
+            return this->seed / modulo;
         }
 
         private:

@@ -3,7 +3,8 @@
 #include <Interfaces/Printable.hpp>
 #include <Interfaces/Comparable.hpp>
 
-struct LambdaTerm : MathLib::Comparable, MathLib::Printable {
+struct LambdaTerm;
+struct LambdaTerm : MathLib::Comparable<LambdaTerm>, MathLib::Printable {
     enum class Type : uint8_t {
         None,
         Variable,
@@ -29,7 +30,7 @@ struct LambdaTerm : MathLib::Comparable, MathLib::Printable {
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
 
     protected:
-    [[nodiscard]] virtual bool Equals(const MathLib::Comparable& other_) const override;
+    [[nodiscard]] virtual bool Equals(const LambdaTerm& other) const override;
 
     private:
     [[nodiscard]] MathLib::String ToStringInternal(bool root) const;

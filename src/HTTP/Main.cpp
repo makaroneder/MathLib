@@ -18,7 +18,7 @@ MathLib::Array<HTTPHeader> resources = MathLib::MakeArray<HTTPHeader>(
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <port>");
-        MathLib::HostSocket server = MathLib::HostSocket();
+        MathLib::HostSocket server = MathLib::HostSocket(true);
         if (!server.Bind(atoi(argv[1]))) MathLib::Panic("Failed to bind socket to local address");
         std::cout << "Waiting for a client to connect on http://localhost:" << argv[1] << std::endl;
         MathLib::Socket* client = server.GetConnection();

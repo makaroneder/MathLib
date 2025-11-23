@@ -40,7 +40,7 @@ namespace MathLib {
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) override;
 
         private:
-        [[nodiscard]] Array<ISO9660DirectoryEntry*> ReadDirectoryEntry(const ISO9660DirectoryEntry& parent);
+        [[nodiscard]] bool ReadDirectoryEntry(const ISO9660DirectoryEntry& parent, const Function<bool, const ISO9660DirectoryEntry*>& function);
         [[nodiscard]] Expected<ISO9660DirectoryEntry> GetDirectoryEntry(const Sequence<char>& path);
 
         ISO9660PrimaryVolumeDescriptor pvd;

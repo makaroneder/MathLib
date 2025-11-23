@@ -1,5 +1,5 @@
-#ifndef MathLib_Image_P6_H
-#define MathLib_Image_P6_H
+#ifndef MathLib_Image_PPM_P6_H
+#define MathLib_Image_PPM_P6_H
 #include "../SaveableImage.hpp"
 
 namespace MathLib {

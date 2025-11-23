@@ -1,4 +1,5 @@
 #include "Path.hpp"
+#include "../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
     String RemoveLastPathElement(const Sequence<char>& path) {
@@ -38,5 +39,34 @@ namespace MathLib {
             else tmp += chr;
         }
         return ret;
+    }
+    SingleTypePair<String> PopFirstPathElement(const Sequence<char>& path) {
+        const size_t size = path.GetSize();
+        size_t i = 0;
+        if (path.At(i) == '/') i++;
+        String ret1 = "";
+        while (i < size) {
+            const char chr = path.At(i++);
+            if (chr == '/') break;
+            ret1 += chr;
+        }
+        String ret2 = "";
+        while (i < size) {
+            const char chr = path.At(i++);
+            if (i + 1 != size || chr != '/') ret2 += chr;
+        }
+        return SingleTypePair<String>(ret1, ret2);
+    }
+    SingleTypePair<String> RemoveBasePathAndPopFirstPathElement(const Sequence<char>& basePath, const Sequence<char>& path) {
+        String tmp = CollectionToString(path);
+        String bp = CollectionToString(basePath);
+        while (!bp.IsEmpty()) {
+            const SingleTypePair<String> tmpPair = PopFirstPathElement(tmp);
+            const SingleTypePair<String> bpPair = PopFirstPathElement(bp);
+            if (tmpPair.first != bpPair.first) return SingleTypePair<String>();
+            tmp = tmpPair.second;
+            bp = bpPair.second;
+        }
+        return PopFirstPathElement(tmp);
     }
 }

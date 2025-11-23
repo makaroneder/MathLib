@@ -2,6 +2,6 @@
 
 namespace MathLib {
     ParserNode IdentityEvaluator::Evaluate(const ParserNode& node) {
-        StartAndReturnFromBenchmark(node);
+        return node;
     }
 }

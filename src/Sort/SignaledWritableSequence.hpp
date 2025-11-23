@@ -1,6 +1,6 @@
 #ifndef SignaledWritableSequence_H
 #define SignaledWritableSequence_H
-#include <Interfaces/WritableSequence.hpp>
+#include <Interfaces/Sequence/WritableSequence.hpp>
 
 template <typename T>
 struct SignaledWritableSequence : MathLib::WritableSequence<T> {
@@ -8,11 +8,11 @@ struct SignaledWritableSequence : MathLib::WritableSequence<T> {
     [[nodiscard]] virtual size_t GetSize(void) const override {
         return base.GetSize();
     }
-    [[nodiscard]] virtual T At(size_t index) const override {
-        return base.At(index);
+    [[nodiscard]] virtual T AtUnsafe(size_t index) const override {
+        return base.AtUnsafe(index);
     }
-    [[nodiscard]] virtual bool Set(size_t index, const T& value) override {
-        return base.Set(index, value) && function(index, value);
+    [[nodiscard]] virtual bool SetUnsafe(size_t index, const T& value) override {
+        return base.SetUnsafe(index, value) && function(index, value);
     }
     [[nodiscard]] virtual bool Add(const T& value) override {
         return base.Add(value);

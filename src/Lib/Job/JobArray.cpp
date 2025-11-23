@@ -2,14 +2,12 @@
 
 namespace MathLib {
     JobArray::~JobArray(void) {
-        StartBenchmark
         for (Job*& job : jobs) delete job;
-        EndBenchmark
     }
     bool JobArray::IsEmpty(void) const {
-        StartAndReturnFromBenchmark(jobs.IsEmpty());
+        return jobs.IsEmpty();
     }
     bool JobArray::Add(Job* job) {
-        StartAndReturnFromBenchmark(job && jobs.Add(job));
+        return job && jobs.Add(job);
     }
 }

@@ -3,19 +3,14 @@
 #include "AMLFieldFlags.hpp"
 
 namespace MathLib {
-    AML::AML(const Sequence<uint8_t>& memory) : Emulator(memory), pc(0), root("Root"_M) {
-        EmptyBenchmark
-    }
-    AML::AML(const DSDT* dsdt) : Emulator(Array<uint8_t>(dsdt->aml, dsdt->length - sizeof(ACPITable))), root("Root"_M) {
-        StartBenchmark
+    AML::AML(const Sequence<uint8_t>& memory) : Emulator(memory), pc(0), root("Root"_M) {}
+    AML::AML(const DSDT* dsdt) : Emulator(Array<uint8_t>(dsdt->aml, dsdt->length - sizeof(ACPITable))), pc(0), root("Root"_M) {
         if (!dsdt->IsValid()) Panic("Invalid DSDT provided");
-        EndBenchmark
     }
-    void AML::Reset(void) {
-        StartBenchmark
+    bool AML::Reset(void) {
         pc = 0;
         root = AMLObject("Root"_M);
-        EndBenchmark
+        return true;
     }
     AMLObject AML::GetRoot(void) const {
         return root;
@@ -168,103 +163,102 @@ namespace MathLib {
         }
     }
     bool AML::Run(AMLObject& object) {
-        StartBenchmark
-        if (pc >= GetSize()) ReturnFromBenchmark(true);
+        if (pc >= GetSize()) return true;
         const Expected<AMLOpcode> opcode = ParseOpcode();
-        if (!opcode.HasValue()) ReturnFromBenchmark(false);
+        if (!opcode.HasValue()) return false;
         switch (opcode.Get()) {
             case AMLOpcode::Scope:
             case AMLOpcode::Device: {
                 const Expected<uint32_t> packageLength = ParsePackageLength();
-                if (!packageLength.HasValue()) ReturnFromBenchmark(false);
+                if (!packageLength.HasValue()) return false;
                 const size_t tmp = pc;
                 const Expected<String> name = ParseString();
-                if (!name.HasValue()) ReturnFromBenchmark(false);
+                if (!name.HasValue()) return false;
                 uint32_t length = packageLength.Get() - pc + tmp;
                 AMLObject curr = AMLObject(name.Get());
                 while (length) {
                     const size_t tmp = pc;
-                    if (!Run(curr)) ReturnFromBenchmark(false);
+                    if (!Run(curr)) return false;
                     const uint32_t size = pc - tmp;
-                    if (size > length) ReturnFromBenchmark(false);
+                    if (size > length) return false;
                     length -= size;
                 }
-                if (!object.AddChild(curr)) ReturnFromBenchmark(false);
+                if (!object.AddChild(curr)) return false;
                 break;
             }
             case AMLOpcode::Name: {
                 const Expected<String> name = ParseString();
-                if (!name.HasValue()) ReturnFromBenchmark(false);
+                if (!name.HasValue()) return false;
                 const Array<uint64_t> data = ParseComputetionalData();
-                if (data.IsEmpty() || !object.AddChild(AMLObject(name.Get(), data))) ReturnFromBenchmark(false);
+                if (data.IsEmpty() || !object.AddChild(AMLObject(name.Get(), data))) return false;
                 break;
             }
             case AMLOpcode::OperationRegion: {
                 const Expected<String> name = ParseString();
-                if (!name.HasValue()) ReturnFromBenchmark(false);
+                if (!name.HasValue()) return false;
                 const Expected<uint8_t> space = Fetch<uint8_t>();
-                if (!space.HasValue()) ReturnFromBenchmark(false);
+                if (!space.HasValue()) return false;
                 const Array<uint64_t> offset = ParseComputetionalData();
-                if (offset.GetSize() != 1) ReturnFromBenchmark(false);
+                if (offset.GetSize() != 1) return false;
                 const Array<uint64_t> length = ParseComputetionalData();
-                if (length.GetSize() != 1 || !object.AddChild(AMLObject(name.Get(), MakeArray<uint64_t>(space.Get(), offset.At(0), length.At(0)), AMLObject::Type::OperationRegion))) ReturnFromBenchmark(false);
+                if (length.GetSize() != 1 || !object.AddChild(AMLObject(name.Get(), MakeArray<uint64_t>(space.Get(), offset.At(0), length.At(0)), AMLObject::Type::OperationRegion))) return false;
                 break;
             }
             case AMLOpcode::Field: {
                 const Expected<uint32_t> packageLength = ParsePackageLength();
-                if (!packageLength.HasValue()) ReturnFromBenchmark(false);
+                if (!packageLength.HasValue()) return false;
                 const size_t tmp = pc;
                 const Expected<String> name = ParseString();
-                if (!name.HasValue()) ReturnFromBenchmark(false);
+                if (!name.HasValue()) return false;
                 const Expected<AMLFieldFlags> flags = Fetch<AMLFieldFlags>();
-                if (!flags.HasValue()) ReturnFromBenchmark(false);
+                if (!flags.HasValue()) return false;
                 AMLObject obj = AMLObject(name.Get(), MakeArray<uint64_t>(flags.Get().value), AMLObject::Type::Field);
                 uint32_t length = packageLength.Get() - pc + tmp;
                 while (length) {
                     const size_t tmp = pc;
                     const Expected<uint8_t> opcode = Fetch<uint8_t>();
-                    if (!opcode.HasValue()) ReturnFromBenchmark(false);
+                    if (!opcode.HasValue()) return false;
                     switch (opcode.Get()) {
                         case 0x00: {
                             const Expected<uint32_t> packageLength = ParsePackageLength();
-                            if (!packageLength.HasValue()) ReturnFromBenchmark(false);
+                            if (!packageLength.HasValue()) return false;
                             // TODO: Verify package length
                             break;
                         }
                         case 0x01: {
                             // TODO: AccessType AccessAttrib
-                            ReturnFromBenchmark(false);
+                            return false;
                         }
                         case 0x02: {
                             // TODO: NameString | BufferData
-                            ReturnFromBenchmark(false);
+                            return false;
                         }
                         case 0x03: {
                             // TODO: AccessType ExtendedAccessAttrib AccessLength
-                            ReturnFromBenchmark(false);
+                            return false;
                         }
                         default: {
                             pc--;
                             const Expected<String> name = ParseNameSegment();
-                            if (!name.HasValue() || !obj.AddChild(AMLObject(name.Get()))) ReturnFromBenchmark(false);
+                            if (!name.HasValue() || !obj.AddChild(AMLObject(name.Get()))) return false;
                             const Expected<uint32_t> packageLength = ParsePackageLength();
-                            if (!packageLength.HasValue()) ReturnFromBenchmark(false);
+                            if (!packageLength.HasValue()) return false;
                             // TODO: Verify package length
                             break;
                         }
                     }
                     const uint32_t size = pc - tmp;
-                    if (size > length) ReturnFromBenchmark(false);
+                    if (size > length) return false;
                     length -= size;
                 }
-                if (!object.AddChild(obj)) ReturnFromBenchmark(false);
+                if (!object.AddChild(obj)) return false;
                 break;
             }
-            default: ReturnFromBenchmark(false);
+            default: return false;
         }
-        ReturnFromBenchmark(true);
+        return true;
     }
     bool AML::Run(void) {
-        StartAndReturnFromBenchmark(Run(root));
+        return Run(root);
     }
 }

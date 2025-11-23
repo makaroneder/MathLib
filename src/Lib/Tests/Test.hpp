@@ -14,7 +14,7 @@ namespace MathLib {
         private:
         Array<Record> records;
     };
-    #define TestOperation(test, expr) if (!test.ReportRecord(MathLib::Record(String(#expr), expr))) MathLib::Panic("Failed to add test record")
+    #define TestOperation(test, expr) if (!test.ReportRecord(Record(String(#expr), expr))) Panic("Failed to add test record")
 
     [[nodiscard]] Test TestSelf(void);
 }

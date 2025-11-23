@@ -3,10 +3,14 @@ Not = pattern (
     "False" -> "True"
 ),
 And = pattern (
-    "True" -> (other -> other),
-    "False" -> (_ -> "False")
+    "True" -> other -> other,
+    "False" -> _ -> "False"
 ),
 Or = pattern (
-    "False" -> (other -> other),
-    "True" -> (_ -> "True")
+    "False" -> other -> other,
+    "True" -> _ -> "True"
+),
+Xor = pattern (
+    "True" -> Not,
+    "False" -> other -> other
 )

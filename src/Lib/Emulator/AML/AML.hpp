@@ -9,7 +9,7 @@ namespace MathLib {
     struct AML : Emulator {
         AML(const Sequence<uint8_t>& memory);
         AML(const DSDT* dsdt);
-        virtual void Reset(void) override;
+        [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual bool Run(void) override;
         [[nodiscard]] AMLObject GetRoot(void) const;
 
@@ -22,10 +22,9 @@ namespace MathLib {
         [[nodiscard]] Array<uint64_t> ParseComputetionalData(void);
         template <typename T>
         [[nodiscard]] Expected<T> Fetch(void) {
-            StartBenchmark
             const Expected<T> ret = ReadPositioned<T>(pc);
             if (ret.HasValue()) pc += sizeof(T);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
 
         size_t pc;

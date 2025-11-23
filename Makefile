@@ -5,17 +5,14 @@ BUILDTYPE ?= Debug
 
 CXX = g++
 AS = nasm
-AR = ar
-OBJCPY = objcopy
 VALGRIND = valgrind
 PYTHON = python3
 
 MKDIR = $(PYTHON) $(SCRIPTSDIR)/MakeDirectory.py
 rwildcard = $(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
-CXXFLAGS = -Wno-packed-bitfield-compat -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
+CXXFLAGS = -Wno-packed-bitfield-compat -Wno-unused-function -Wall -Wextra -Werror -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
 ASFLAGS = -Werror -f elf64 -I $(SRCDIR) -I $(SRCDIR)/Lib -I $(SRCDIR)/Platform
-ARFLAGS = -rcs
 VALGRINDFLAGS = -s --leak-check=full --show-leak-kinds=all
 ASLFLAGS = -oa
 
@@ -36,13 +33,13 @@ SRCPSF = $(call rwildcard,$(SRCDIR)/Lib,*.psf)
 SRCXX = $(call rwildcard,$(SRCDIR)/Lib,*.cpp)
 SRCXX += $(SRCDIR)/Lib/Font.cpp
 
-$(BUILDDIR)/libMath.a: $(BUILDDIR)/LibStub.o
+$(BUILDDIR)/libMath.so: $(BUILDDIR)/LibStub.o
 	@$(MKDIR) $(@D)
-	@$(AR) $(ARFLAGS) $@ $<
+	@$(CXX) $(CXXFLAGS) -shared -Wl,-soname,$@ $< -o $@
 	@echo "==> Created: $@"
 $(BUILDDIR)/LibStub.o: $(SRCDIR)/Lib/MathLib.hpp $(HEADERS)
 	@$(MKDIR) $(@D)
-	@$(CXX) $(CXXFLAGS) -x c++ -c $< -o $@
+	@$(CXX) $(CXXFLAGS) -fPIC -x c++ -c $< -o $@
 	@echo "==> Created: $@"
 $(SRCDIR)/Lib/Font.cpp: $(SRCPSF) $(SCRIPTSDIR)/PSFToCXX.py Makefile
 	@$(MKDIR) $(@D)
@@ -52,7 +49,7 @@ $(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX) Makefile
 	@$(MKDIR) $(@D)
 	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
 	@echo "==> Created: $@"
-$(BUILDDIR)/TmpBuild.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libMath.a
+$(BUILDDIR)/TmpBuild.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libMath.so
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CXXFLAGS) $(BUILDSYSDEPS) -o $@ -L $(BUILDDIR) -l Math
 	@echo "==> Created: $@"
@@ -84,6 +81,7 @@ IMGPROCINPUT ?= $(SRCDIR)/TestPrograms/Cards/Prototype.tga
 HEADERTREEINPUT ?= $(SRCDIR)/Lib/Host.hpp
 IMGGENMODEL ?= $(BUILDDIR)/ImageGenerator.bin
 IMGGENINPUT ?= $(SRCDIR)/TestPrograms/ImageGenerator/AI.aseprite
+FSCONVFS ?= GNUTAR
 FSCONVOUTPUT ?= $(BUILDDIR)/FS.tar
 FSCONVINPUT ?= Makefile Makefile TODO.md TODO.md
 BENCODEINPUT ?= $(SRCDIR)/TestPrograms/Bencode/ArchLinux.torrent
@@ -94,16 +92,17 @@ COMPILEROUTPUT ?= $(BUILDDIR)/Compiler.asm
 LAMBDAINPUT ?= $(SRCDIR)/TestPrograms/LambdaCalculus/Main.txt
 SCRAPERINPUT ?= $(SRCDIR)/TestPrograms/WebScraper/Wikipedia.json
 SEQUENTINPUT ?= $(SRCDIR)/TestPrograms/SequentCalculus/ModusPonens.txt
+PROVERINPUT ?= $(SRCDIR)/TestPrograms/Prover/Main.txt
+3DVIEWERINPUT ?= $(SRCDIR)/TestPrograms/SlotMachine/Machine.obj
+3DVIEWERINPUTTYPE ?= WavefrontObject
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
-OSOBJCPY = x86_64-elf-$(OBJCPY)
 OSCXX = x86_64-elf-$(CXX)
-OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
-OSLINKER = $(SRCDIR)/OS/Kernel/Linker.ld
-BOOTLINKER = $(SRCDIR)/OS/Bootloader/Linker.ld
+OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
+OSLINKER = $(SRCDIR)/OS/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -Bsymbolic -nostdlib
 OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -boot d \
--serial file:$(BUILDDIR)/OS.log -cdrom $(BUILDDIR)/OS.img -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
--drive file=$(BUILDDIR)/Bootloader.bin,format=raw,media=disk -device rtl8139,netdev=net0 \
+-serial file:$(BUILDDIR)/OS.log -device rtl8139,netdev=net0 -cdrom $(BUILDDIR)/OS.img \
+-drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
 -netdev user,id=net0,hostfwd=tcp::$(SERVERPORT)-:$(SERVERPORT)
 
 clean:

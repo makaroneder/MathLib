@@ -34,9 +34,7 @@ namespace MathLib {
         /// @param color Color of the pixel
         template <typename T>
         void SetPixel(const Matrix<T>& pixel, uint32_t color) {
-            StartBenchmark
             SetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier, color);
-            EndBenchmark
         }
         /// @brief Returns pixel
         /// @tparam T Type of number
@@ -44,9 +42,8 @@ namespace MathLib {
         /// @return Color of the pixel
         template <typename T>
         [[nodiscard]] uint32_t GetPixel(const Matrix<T>& pixel) {
-            StartBenchmark
             const uint32_t* color = GetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
-            ReturnFromBenchmark(color ? *color : 0);
+            return color ? *color : 0;
         }
         /// @brief Copies pixels from renderer to this renderer
         /// @tparam T Type of number
@@ -55,8 +52,7 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool DrawImage(Renderer& renderer, const Matrix<T>& rotation) {
-            StartBenchmark
-            if (pointMultiplier != renderer.pointMultiplier) ReturnFromBenchmark(false);
+            if (pointMultiplier != renderer.pointMultiplier) return false;
             const T div = 1 / pointMultiplier;
             const T w = renderer.GetWidth() * div / 2;
             const T h = renderer.GetHeight() * div / 2;
@@ -66,64 +62,88 @@ namespace MathLib {
                     SetPixel<T>(RotateVector<T>(pos, renderer.position, rotation), renderer.GetPixel<T>(pos));
                 }
             }
-            ReturnFromBenchmark(true);
+            return true;
         }
         template <typename T>
         void DrawImage(const Image& image, const Matrix<T>& pos) {
-            StartBenchmark
+            const size_t width = image.GetWidth();
+            const size_t height = image.GetHeight();
             Matrix<ssize_t> tmp = ConvertMatrix<T, ssize_t>(PositionToIndex<T>(pos - ConvertMatrix<num_t, T>(position)));
-            GetX(tmp) -= image.GetWidth() / 2;
-            GetY(tmp) -= image.GetHeight() / 2;
-            for (size_t y = 0; y < image.GetHeight(); y++) {
+            GetX(tmp) -= width / 2;
+            GetY(tmp) -= height / 2;
+            const ssize_t maxX = Min<ssize_t>(GetWidth() - GetX(tmp), width);
+            const ssize_t maxY = Min<ssize_t>(GetHeight() - GetY(tmp), height);
+            const size_t minX = Max<ssize_t>(-GetY(tmp), 0);
+            const size_t minY = Max<ssize_t>(-GetX(tmp), 0);
+            for (ssize_t y = minY; y < maxY; y++) {
                 const ssize_t wy = GetY(tmp) + y;
-                if (wy < 0) continue;
-                else if ((size_t)wy >= GetHeight()) break;
-                for (size_t x = 0; x < image.GetWidth(); x++) {
+                for (ssize_t x = minX; x < maxX; x++) {
                     const ssize_t wx = GetX(tmp) + x;
-                    if (wx < 0) continue;
-                    if ((size_t)wx >= GetWidth()) break;
-                    At(wx, wy) = BlendColor(At(wx, wy), image.At(x, y));
+                    AtUnsafe(wx, wy) = BlendColor(AtUnsafe(wx, wy), image.AtUnsafe(x, y), alphaPosition);
                 }
             }
-            EndBenchmark
         }
+        void DrawImage(const Image& image, ssize_t centerX, ssize_t centerY);
+        [[nodiscard]] bool DrawPartialImage(const Image& image, size_t startX, size_t endX, size_t startY, size_t endY, ssize_t centerX, ssize_t centerY);
+        void DrawRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
         /// @brief Draws a line
         /// @tparam T Type of number
         /// @param line Line to draw
         /// @param color Color of the line
         template <typename T>
         void DrawLine(const Line<T>& line, uint32_t color) {
-            StartBenchmark
-            Matrix<ssize_t> startVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.start - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
-            Matrix<ssize_t> endVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.end - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+            const size_t width = GetWidth();
+            const size_t height = GetHeight();
+            const size_t width2 = width / 2;
+            const size_t height2 = height / 2;
+            const Matrix<ssize_t> startVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.start - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+            const Matrix<ssize_t> endVector = ConvertMatrix<T, ssize_t>(ProjectVector<T>(line.end - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
             bool steep = false;
             ssize_t x0 = GetX(startVector);
             ssize_t x1 = GetX(endVector);
             ssize_t y0 = GetY(startVector);
             ssize_t y1 = GetY(endVector);
             if (Abs(x0 - x1) < Abs(y0 - y1)) {
-                Swap(x0, y0);
-                Swap(x1, y1);
+                Swap<ssize_t>(x0, y0);
+                Swap<ssize_t>(x1, y1);
                 steep = true;
             }
             if (x0 > x1) {
-                Swap(x0, x1);
-                Swap(y0, y1);
+                Swap<ssize_t>(x0, x1);
+                Swap<ssize_t>(y0, y1);
             }
-            const ssize_t dx = x1 - x0;
-            const ssize_t derr = Abs(y1 - y0) * 2;
+            const size_t dx = x1 - x0;
+            const size_t dx2 = dx * 2;
+            const size_t derr = Abs(y1 - y0) * 2;
             ssize_t err = 0;
             ssize_t y = y0;
-            for (ssize_t x = x0; x <= x1; x++) {
-                if (steep) SetPixelInternal<ssize_t>(CreateVector<ssize_t>(y, x, 0), color);
-                else SetPixelInternal<ssize_t>(CreateVector<ssize_t>(x, y, 0), color);
-                err += derr;
-                if (err > dx) {
-                    y += (y1 > y0 ? 1 : -1);
-                    err -= dx * 2;
+            if (steep) {
+                y += width2;
+                const int8_t dy = (y1 > y0) * 2 - 1;
+                const ssize_t max = Min<ssize_t>(x1, height2);
+                for (ssize_t x = x0; x <= max; ++x) {
+                    const ssize_t wy = height2 - x;
+                    if (y >= 0 && (size_t)y < width && (size_t)wy < height) AtUnsafe(y, wy) = BlendColor(AtUnsafe(y, wy), color, alphaPosition);
+                    err += derr;
+                    if (err > (ssize_t)dx) {
+                        y += dy;
+                        err -= dx2;
+                    }
                 }
             }
-            EndBenchmark
+            else {
+                y = height2 - y;
+                const int8_t dy = (y1 <= y0) * 2 - 1;
+                const ssize_t max = Min<ssize_t>(x1 + 1, width2) + width2;
+                for (ssize_t x = x0 + width2; x < max; ++x) {
+                    if (x >= 0 && y >= 0 && (size_t)y < height) AtUnsafe(x, y) = BlendColor(AtUnsafe(x, y), color, alphaPosition);
+                    err += derr;
+                    if (err > (ssize_t)dx) {
+                        y += dy;
+                        err -= dx2;
+                    }
+                }
+            }
         }
         /// @brief Renders specified shape
         /// @tparam T Type of number
@@ -132,10 +152,8 @@ namespace MathLib {
         /// @param color Color of the shape
         template <typename T>
         void DrawShape(const LineShape<T>& shape, const Matrix<T>& rotation, uint32_t color) {
-            StartBenchmark
             const Array<Line<T>> lines = shape.ToLines(rotation);
             for (size_t i = 0; i < lines.GetSize(); i++) DrawLine<T>(Line<T>(lines.At(i).start, lines.At(i).end), color);
-            EndBenchmark
         }
         /// @brief Renders 2D circle
         /// @tparam T Type of number
@@ -144,7 +162,6 @@ namespace MathLib {
         /// @param color Color of the circle
         template <typename T>
         void DrawCircle2D(const Matrix<T>& position, const T& radius, uint32_t color) {
-            StartBenchmark
             const T div = 1 / pointMultiplier;
             const T radiusSquared = radius * radius;
             for (T y = -radius; y <= radius; y += div) {
@@ -153,7 +170,6 @@ namespace MathLib {
                     if (FloatsEqual<T>(offset.GetLengthSquared(), radiusSquared, div)) SetPixel<T>(position + offset, color);
                 }
             }
-            EndBenchmark
         }
         /// @brief Renders filled 2D circle
         /// @tparam T Type of number
@@ -162,7 +178,6 @@ namespace MathLib {
         /// @param color Color of the circle
         template <typename T>
         void FillCircle2D(const Matrix<T>& position, const T& radius, uint32_t color) {
-            StartBenchmark
             const Matrix<ssize_t> pos = ConvertMatrix<T, ssize_t>(ProjectVector<T>(position - ConvertMatrix<num_t, T>(this->position)) * pointMultiplier);
             const ssize_t r = radius * pointMultiplier;
             const size_t radiusSquared = r * r;
@@ -175,7 +190,6 @@ namespace MathLib {
                     SetPixelInternal<ssize_t>(pos + offset, color);
                 }
             }
-            EndBenchmark
         }
         /// @brief Renders strings
         /// @tparam T Type of number
@@ -187,9 +201,8 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool Puts(const Sequence<char>& str, const PSF1* font, Matrix<T> pos, uint32_t fgColor, uint32_t bgColor) {
-            StartBenchmark
-            if (!font || !font->IsValid()) ReturnFromBenchmark(false);
-            const Array<String> strs = Split(str, "\n"_M, false);
+            if (!font || !font->IsValid()) return false;
+            const Array<String> strs = Split(str, '\n'_M, false);
             const T w = font->GetWidth() / 2;
             const T h = font->GetHeight() / 2;
             const size_t bytesPerGlyph = (size_t)(w * 2) / 8 + !!((size_t)(w * 2) % 8);
@@ -199,7 +212,7 @@ namespace MathLib {
             for (const Sequence<char>& s : strs) {
                 pos = tmp;
                 GetX(pos) -= s.GetSize() * w * div;
-                s.Foreach(MakeFunctionT<void, char>(nullptr, [this, font, &pos, fgColor, bgColor, div, w, h, bytesPerGlyph] (const void*, char chr) -> void {
+                s.Foreach(MakeFunctionT<void, char>([this, font, &pos, fgColor, bgColor, div, w, h, bytesPerGlyph](char chr) -> void {
                     const uint8_t* fontPtr = font->GetGlyph(chr);
                     for (T y = -h; y < h; y++) {
                         for (T x = -w; x < w; x++)
@@ -210,7 +223,7 @@ namespace MathLib {
                 }));
                 GetY(tmp) -= h * 2 * div;
             }
-            ReturnFromBenchmark(true);
+            return true;
         }
         /// @brief Renders strings
         /// @tparam T Type of number
@@ -224,9 +237,8 @@ namespace MathLib {
         /// @return Status
         template <typename T>
         [[nodiscard]] bool Puts(const String& str, const PSF1* font, Matrix<T> pos, const Matrix<T>& rotation, const Matrix<size_t>& scale, uint32_t fgColor, uint32_t bgColor) {
-            StartBenchmark
-            if (!font || !font->IsValid()) ReturnFromBenchmark(false);
-            const Array<String> strs = Split(str, "\n"_M, false);
+            if (!font || !font->IsValid()) return false;
+            const Array<String> strs = Split(str, '\n'_M, false);
             const T w = font->GetWidth() / 2;
             const T h = font->GetHeight() / 2;
             const size_t bytesPerGlyph = (size_t)(w * 2) / 8 + !!((size_t)(w * 2) % 8);
@@ -240,7 +252,7 @@ namespace MathLib {
                 pos = tmp;
                 GetX(pos) -= s.GetSize() * w * sx * div;
                 const Matrix<T> center = pos;
-                s.Foreach(MakeFunctionT<void, char>(nullptr, [this, font, &pos, fgColor, bgColor, div, w, h, sx, sy, sz, center, rotation, bytesPerGlyph] (const void*, char chr) -> void {
+                s.Foreach(MakeFunctionT<void, char>([this, font, &pos, fgColor, bgColor, div, w, h, sx, sy, sz, center, rotation, bytesPerGlyph](char chr) -> void {
                     const uint8_t* fontPtr = font->GetGlyph(chr);
                     for (T y = -h; y < h; y++) {
                         for (T x = -w; x < w; x++)
@@ -254,21 +266,21 @@ namespace MathLib {
                 }));
                 GetY(tmp) -= h * 2 * sy * div;
             }
-            ReturnFromBenchmark(true);
+            return true;
         }
         /// @brief Calculates start of the graph
         /// @tparam T Type of number
         /// @return Start of graph
         template <typename T>
         [[nodiscard]] Matrix<T> GetStart(void) const {
-            StartAndReturnFromBenchmark(-GetEnd<T>());
+            return -GetEnd<T>();
         }
         /// @brief Calculates end of the graph
         /// @tparam T Type of number
         /// @return End of graph
         template <typename T>
         [[nodiscard]] Matrix<T> GetEnd(void) const {
-            StartAndReturnFromBenchmark(CreateVector<T>(pixels.GetWidth() / (pointMultiplier * 2), pixels.GetHeight() / (pointMultiplier * 2), 0));
+            return CreateVector<T>(pixels.GetWidth() / (pointMultiplier * 2), pixels.GetHeight() / (pointMultiplier * 2), 0);
         }
         template <typename T>
         [[nodiscard]] Interval<T> GetXInterval(void) const {
@@ -285,9 +297,7 @@ namespace MathLib {
         /// @param cellColor Color of the cells
         template <typename T>
         void DrawAxis(uint32_t axisColor, uint32_t cellColor, const T& cellSize) {
-            StartBenchmark
             DrawAxis<T>(axisColor, cellColor, cellSize, GetXInterval<T>(), GetYInterval<T>());
-            EndBenchmark
         }
         /// @brief Draw x and y axis
         /// @param axisColor Color of the axis
@@ -296,27 +306,23 @@ namespace MathLib {
         /// @param y y Size
         template <typename T>
         void DrawAxis(uint32_t axisColor, uint32_t cellColor, const T& cellSize, const Interval<T>& x, const Interval<T>& y) {
-            StartBenchmark
             const Interval<T> newX = x.Expand(cellSize);
             const Interval<T> newY = y.Expand(cellSize);
             for (T i = newY.GetMin(); i <= newY.GetMax(); i += cellSize)
                 DrawLine<T>(Line<T>(CreateVector<T>(newX.GetMin(), i, 0) + position, CreateVector<T>(newX.GetMax(), i, 0) + position), cellColor);
             for (T i = newX.GetMin(); i <= newX.GetMax(); i += cellSize)
                 DrawLine<T>(Line<T>(CreateVector<T>(i, newY.GetMin(), 0) + position, CreateVector<T>(i, newY.GetMax(), 0) + position), cellColor);
-            DrawLine<T>(Line<T>(CreateVector<T>(x.GetMin() + GetX(position), 0, 0), CreateVector<T>(x.GetMax() + GetX(position), 0, 0)), axisColor);
-            DrawLine<T>(Line<T>(CreateVector<T>(0, y.GetMin() + GetY(position), 0), CreateVector<T>(0, y.GetMax() + GetY(position), 0)), axisColor);
-            EndBenchmark
+            DrawLine<T>(Line<T>(CreateVector<T>(x.GetMin() + GetX(position), 0, GetZ(position)), CreateVector<T>(x.GetMax() + GetX(position), 0, GetZ(position))), axisColor);
+            DrawLine<T>(Line<T>(CreateVector<T>(0, y.GetMin() + GetY(position), GetZ(position)), CreateVector<T>(0, y.GetMax() + GetY(position), GetZ(position))), axisColor);
         }
         /// @brief Draws complex function based on its values
         /// @tparam T Type of number
         /// @param values Values generated by function
         template <typename T>
         void DrawComplexFunction(const Sequence<ComplexPosition<T>>& values) {
-            StartBenchmark
-            values.Foreach(MakeFunctionT<void, ComplexPosition<T>>(nullptr, [this] (const void*, ComplexPosition<T> x) -> void {
+            values.Foreach(MakeFunctionT<void, ComplexPosition<T>>([this](ComplexPosition<T> x) -> void {
                 SetPixel<T>(x.GetPosition(), x.GetColor());
             }));
-            EndBenchmark
         }
         /// @brief Draws function based on its values
         /// @tparam T Type of number
@@ -324,12 +330,10 @@ namespace MathLib {
         /// @param color Color of function
         template <typename T>
         void DrawFunction(const Sequence<Line<T>>& values, uint32_t color) {
-            StartBenchmark
-            values.Foreach(MakeFunctionT<void, Line<T>>(nullptr, [this, color] (const void*, Line<T> x) -> void {
+            values.Foreach(MakeFunctionT<void, Line<T>>([this, color](Line<T> x) -> void {
                 if (!fillGapsInFunctions) SetPixel<T>(x.end, color);
                 else if (!IsNaN(GetX(x.start))) DrawLine<T>(Line<T>(x.start, x.end), color);
             }));
-            EndBenchmark
         }
         /// @brief Draws function based on its values
         /// @tparam T Type of number
@@ -340,15 +344,13 @@ namespace MathLib {
         /// @param z Z size
         template <typename T>
         void DrawFunction(const Sequence<Line<T>>& values, uint32_t color, const Interval<T>& x, const Interval<T>& y, const Interval<T>& z) {
-            StartBenchmark
-            const Matrix<Interval<T>> interval = MathLib::CreateVector<Interval<T>>(x, y, z);
-            values.Foreach(MakeFunctionT<void, Line<T>>(nullptr, [this, color, interval] (const void*, Line<T> x) -> void {
+            const Matrix<Interval<T>> interval = CreateVector<Interval<T>>(x, y, z);
+            values.Foreach(MakeFunctionT<void, Line<T>>([this, color, interval](Line<T> x) -> void {
                 if (x.end.IsInside(interval)) {
                     if (!fillGapsInFunctions) SetPixel<T>(x.end, color);
                     else if (x.start.IsInside(interval)) DrawLine<T>(Line<T>(x.start, x.end), color);
                 }
             }));
-            EndBenchmark
         }
         /// @brief f(x + y * i)
         /// @tparam T Type of number
@@ -357,7 +359,6 @@ namespace MathLib {
         template <typename T>
         [[nodiscard]] Array<ComplexPosition<T>> GenerateComplexFunction(const Function<Complex<T>, Complex<T>>& f) {
             // TODO: Make this multithreaded
-            StartBenchmark
             Array<ComplexPosition<T>> ret;
             const Matrix<ssize_t> start = ConvertMatrix<T, ssize_t>((GetStart<T>() + ConvertMatrix<num_t, T>(position)) * pointMultiplier);
             const Matrix<ssize_t> end = ConvertMatrix<T, ssize_t>((GetEnd<T>() + ConvertMatrix<num_t, T>(position)) * pointMultiplier);
@@ -367,10 +368,10 @@ namespace MathLib {
                     const Complex<T> pos = Complex<T>(r * div, i * div);
                     const Complex<T> val = f(pos);
                     if (!(IsNaN(val) || IsInf(val) || IsNaN(pos) || IsInf(pos)))
-                        if (!ret.Add(ComplexPosition<T>(pos, val))) ReturnFromBenchmark(Array<ComplexPosition<T>>());
+                        if (!ret.Add(ComplexPosition<T>(pos, val))) return Array<ComplexPosition<T>>();
                 }
             }
-            ReturnFromBenchmark(ret);
+            return ret;
         }
         /// @brief y = f(x)
         /// @tparam T Type of number
@@ -380,7 +381,6 @@ namespace MathLib {
         /// @return Result of function
         template <typename T>
         [[nodiscard]] Array<Line<T>> GenerateMultiFunction(const Function<Array<T>, T>& f, VectorAxis inAxis = VectorAxis::X, VectorAxis outAxis = VectorAxis::Y) {
-            StartBenchmark
             Array<Matrix<T>> prev;
             Array<Line<T>> ret;
             const T start = GetVectorAxis(GetStart<T>(), inAxis) + (T)GetX(position);
@@ -400,11 +400,11 @@ namespace MathLib {
                     }
                     GetVectorAxis(curr, inAxis) = i;
                     GetVectorAxis(curr, outAxis) = tmp;
-                    if (!ret.Add(Line<T>(prev.At(j), curr))) ReturnFromBenchmark(Array<Line<T>>());
+                    if (!ret.Add(Line<T>(prev.At(j), curr))) return Array<Line<T>>();
                     prev.At(j) = curr;
                 }
             }
-            ReturnFromBenchmark(ret);
+            return ret;
         }
         /// @brief Converts index to position
         /// @tparam T Type of number
@@ -412,7 +412,7 @@ namespace MathLib {
         /// @return Position
         template <typename T>
         [[nodiscard]] Matrix<T> IndexToPosition(const Matrix<T>& index) const {
-            StartAndReturnFromBenchmark(CreateVector<T>((GetX(index) - GetWidth() / 2) / pointMultiplier, (GetHeight() / 2 - GetY(index)) / pointMultiplier, 0));
+            return CreateVector<T>((GetX(index) - GetWidth() / 2) / pointMultiplier, (GetHeight() / 2 - GetY(index)) / pointMultiplier, 0);
         }
         /// @brief Converts position to index
         /// @tparam T Type of number
@@ -420,7 +420,7 @@ namespace MathLib {
         /// @return Index
         template <typename T>
         [[nodiscard]] Matrix<T> PositionToIndex(const Matrix<T>& pos) const {
-            StartAndReturnFromBenchmark(PositionToIndexInternal(pos * pointMultiplier));
+            return PositionToIndexInternal(pos * pointMultiplier);
         }
         /// @brief Sets image loading/saving interface
         /// @tparam T Type of image interface
@@ -429,12 +429,11 @@ namespace MathLib {
         /// @return Status
         template <typename T, typename... Args>
         [[nodiscard]] bool SetImage(Args... args) {
-            StartBenchmark
             T* tmp = new T(0, 0, args...);
-            if (!tmp) ReturnFromBenchmark(false);
+            if (!tmp) return false;
             if (image) delete image;
             image = tmp;
-            ReturnFromBenchmark(true);
+            return true;
         }
         /// @brief Saves data as image
         /// @param file File to save data into
@@ -450,18 +449,20 @@ namespace MathLib {
         /// @brief Scale
         num_t pointMultiplier;
         bool fillGapsInFunctions;
+        uint8_t alphaPosition;
 
         private:
         /// @brief Image for saving and loading
         SaveableImage* image;
 
+        void DrawImage(const Image& image, ssize_t centerX, ssize_t centerY, size_t width, size_t height, size_t startX, size_t startY);
         /// @brief Converts position to index (assumes pos is multiplied by pointMultiplier)
         /// @tparam T Type of number
         /// @param pos Position to convert
         /// @return Index
         template <typename T>
         [[nodiscard]] Matrix<T> PositionToIndexInternal(const Matrix<T>& pos) const {
-            StartAndReturnFromBenchmark(CreateVector<T>(GetWidth() / 2 + GetX(pos), GetHeight() / 2 - GetY(pos), 0));
+            return CreateVector<T>(GetWidth() / 2 + GetX(pos), GetHeight() / 2 - GetY(pos), 0);
         }
         /// @brief Returns pixel from index
         /// @tparam T Type of number
@@ -469,9 +470,8 @@ namespace MathLib {
         /// @return Pixel
         template <typename T>
         [[nodiscard]] uint32_t* GetPixelInternal(const Matrix<T>& pos) {
-            StartBenchmark
             const Matrix<T> tmp = PositionToIndexInternal<T>(pos);
-            ReturnFromBenchmark((IsBetween(GetX(tmp), 0, (ssize_t)GetWidth() - 1) && IsBetween(GetY(tmp), 0, (ssize_t)GetHeight() - 1)) ? &At(GetX(tmp), GetY(tmp)) : nullptr);
+            return IsBetween(GetX(tmp), 0, (ssize_t)GetWidth() - 1) && IsBetween(GetY(tmp), 0, (ssize_t)GetHeight() - 1) ? &AtUnsafe(GetX(tmp), GetY(tmp)) : nullptr;
         }
         /// @brief Sets pixel from index
         /// @tparam T Type of number
@@ -479,10 +479,8 @@ namespace MathLib {
         /// @param color Value to set
         template <typename T>
         void SetPixelInternal(const Matrix<T>& pos, uint32_t color) {
-            StartBenchmark
             uint32_t* pixel = GetPixelInternal<T>(pos);
-            if (pixel) *pixel = BlendColor(*pixel, color);
-            EndBenchmark
+            if (pixel) *pixel = BlendColor(*pixel, color, alphaPosition);
         }
     };
 }

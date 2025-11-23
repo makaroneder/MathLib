@@ -8,6 +8,9 @@ namespace MathLib {
         ParserNode(size_t type, const Sequence<char>& value, const Sequence<ParserNode>& children);
         [[nodiscard]] size_t GetType(void) const;
         [[nodiscard]] String GetData(void) const;
+        void Replace(const ParserNode& element, const ParserNode& replacement);
+        void ReplaceValue(const Sequence<char>& element, const Sequence<char>& replacement);
+        void ModifyValue(const Function<String, const Sequence<char>&>& func);
         [[nodiscard]] virtual bool Add(const ParserNode& val) override;
         [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual ParserNode* GetValue(void) override;

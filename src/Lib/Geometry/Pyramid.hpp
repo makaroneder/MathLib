@@ -8,16 +8,12 @@ namespace MathLib {
     struct Pyramid : LineShape<T> {
         Matrix<T> sizes;
 
-        Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {
-            EmptyBenchmark
-        }
+        Pyramid(const Matrix<T>& pos, const Matrix<T>& s) : LineShape<T>(pos), sizes(s) {}
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>&) const override {
             // TODO:
-            StartBenchmark
-            ReturnFromBenchmark(false);
+            return false;
         }
         [[nodiscard]] virtual Array<Line<T>> ToLines(const Matrix<T>& rotation) const override {
-            StartBenchmark
             const T sizeX = GetX(sizes) / 2;
             const T sizeY = GetY(sizes) / 2;
             const T sizeZ = GetZ(sizes) / 2;
@@ -35,7 +31,7 @@ namespace MathLib {
             ret.At(5) = Line<T>(p2, p5);
             ret.At(6) = Line<T>(p3, p5);
             ret.At(7) = Line<T>(p4, p5);
-            ReturnFromBenchmark(ret);
+            return ret;
         }
     };
 }

@@ -5,15 +5,13 @@
 namespace MathLib {
     template <typename T>
     struct Shape : Allocatable {
-        Shape(const Matrix<T>& pos) : position(pos) {
-            EmptyBenchmark
-        }
+        Shape(const Matrix<T>& pos) : position(pos) {}
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const = 0;
         [[nodiscard]] bool operator==(const Shape<T>& other) const {
-            StartAndReturnFromBenchmark(position == other.position);
+            return position == other.position;
         }
         [[nodiscard]] bool operator!=(const Shape<T>& other) const {
-            StartAndReturnFromBenchmark(!(*this == other));
+            return !(*this == other);
         }
 
         Matrix<T> position;

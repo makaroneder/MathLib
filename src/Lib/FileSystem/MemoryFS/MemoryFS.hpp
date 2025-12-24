@@ -35,6 +35,7 @@ namespace MathLib {
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) override;
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) override;
+        [[nodiscard]] virtual bool CreateDirectory(const Sequence<char>& path, bool overwrite) override;
 
         private:
         Array<MemoryFSResource> resources;

@@ -61,4 +61,10 @@ namespace MathLib {
         }
         return ret;
     }
+    bool QuakePak::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        // TODO:
+        (void)path;
+        (void)overwrite;
+        return false;
+    }
 }

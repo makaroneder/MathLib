@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
             new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
             new MathLib::LeftBinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
-            new MathLib::RightBinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction), // TODO:
+            new MathLib::RightBinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction),
             new MathLib::LeftBinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),

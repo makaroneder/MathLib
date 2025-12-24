@@ -39,6 +39,7 @@ namespace MathLib {
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) override;
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) override;
+        [[nodiscard]] virtual bool CreateDirectory(const Sequence<char>& path, bool overwrite) override;
 
         private:
         [[nodiscard]] size_t WriteInternal(size_t& newSize, ByteArray& data, const Sequence<char>& path, size_t prevSize, size_t writePosition, const void* buffer, size_t size, size_t position);

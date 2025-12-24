@@ -1,8 +1,10 @@
 #ifndef Formula_H
 #define Formula_H
 #include <Interfaces/Printable.hpp>
+#include <Interfaces/Comparable.hpp>
 
-struct Formula : MathLib::Printable {
+struct Formula;
+struct Formula : MathLib::Comparable<Formula>, MathLib::Printable {
     enum class Type : uint8_t {
         None,
         Variable,
@@ -19,8 +21,9 @@ struct Formula : MathLib::Printable {
     Formula(const MathLib::Sequence<char>& value);
     Formula(Type type, const MathLib::Sequence<Formula>& children);
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-    [[nodiscard]] bool operator==(const Formula& other) const;
-    [[nodiscard]] bool operator!=(const Formula& other) const;
+
+    protected:
+    [[nodiscard]] virtual bool Equals(const Formula& other) const override;
 
     private:
     [[nodiscard]] MathLib::String ToStringInternal(bool root) const;

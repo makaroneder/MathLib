@@ -57,6 +57,16 @@ namespace MathLib {
             if (entries.At(i).name == fs) return entries.At(i).fs->ReadDirectory(++off == path.GetSize() + 1 ? "" : SubString(path, off, path.GetSize() - off));
         return Array<FileInfo>();
     }
+    bool VFS::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        size_t off = 0;
+        if (!path.IsEmpty() && path.At(0) == '/') off++;
+        String fs;
+        for (; off < path.GetSize() && path.At(off) != '/'; off++) fs += path.At(off);
+        if (fs.IsEmpty()) return !overwrite;
+        for (size_t i = 0; i < entries.GetSize(); i++)
+            if (entries.At(i).name == fs) return entries.At(i).fs->CreateDirectory(++off == path.GetSize() + 1 ? "" : SubString(path, off, path.GetSize() - off), overwrite);
+        return false;
+    }
     bool VFS::IsValid(size_t file) const {
         return file < files.GetSize() && files.At(file).fs < entries.GetSize();
     }

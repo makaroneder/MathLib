@@ -63,7 +63,7 @@ namespace MathLib {
         return x;
     }
     uint32_t SwapEndian32(uint32_t x) {
-        return ((x >> 24) & UINT8_MAX <<  0) | ((x >>  8) & UINT8_MAX <<  8) | ((x <<  8) & UINT8_MAX << 16) | ((x << 24) & UINT8_MAX << 24);
+        return ((x >> 24) & UINT8_MAX <<  0) | ((x >> 8) & UINT8_MAX <<  8) | ((x << 8) & UINT8_MAX << 16) | ((x << 24) & UINT8_MAX << 24);
     }
     num_t Abs(num_t x) {
         return x < 0 ? -x : x;

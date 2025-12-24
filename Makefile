@@ -95,6 +95,7 @@ SEQUENTINPUT ?= $(SRCDIR)/TestPrograms/SequentCalculus/ModusPonens.txt
 PROVERINPUT ?= $(SRCDIR)/TestPrograms/Prover/Main.txt
 3DVIEWERINPUT ?= $(SRCDIR)/TestPrograms/SlotMachine/Machine.obj
 3DVIEWERINPUTTYPE ?= WavefrontObject
+TYPETHEORYINPUT ?= $(SRCDIR)/TestPrograms/TypeTheory/Main.txt
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSCXX = x86_64-elf-$(CXX)
 OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all

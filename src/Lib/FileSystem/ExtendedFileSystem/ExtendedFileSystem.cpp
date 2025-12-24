@@ -83,4 +83,10 @@ namespace MathLib {
         (void)path;
         return Array<FileInfo>();
     }
+    bool ExtendedFileSystem::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        // TODO:
+        (void)path;
+        (void)overwrite;
+        return false;
+    }
 }

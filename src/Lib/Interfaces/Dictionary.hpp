@@ -49,6 +49,9 @@ namespace MathLib {
                 if (element.IsValidKey(key)) return element.value;
             return Expected<Value>();
         }
+        [[nodiscard]] bool Add(const Key& key, const Value& value) {
+            return elements.Add(DictionaryElement<Key, Value>(key, value));
+        }
         [[nodiscard]] bool AddOrReplace(const DictionaryElement<Key, Value>& element) {
             for (DictionaryElement<Key, Value>& x : elements)
                 if (x.Replace(element)) return true;

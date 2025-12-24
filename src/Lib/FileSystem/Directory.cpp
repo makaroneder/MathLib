@@ -3,7 +3,7 @@
 namespace MathLib {
     Directory::Directory(FileSystem& base, const Sequence<char>& basePath) : basePath(CollectionToString(basePath)), base(base) {}
     size_t Directory::OpenInternal(const Sequence<char>& path, OpenMode mode) {
-        return base.OpenInternal(basePath + path, mode);
+        return base.OpenInternal(basePath + '/' + path, mode);
     }
     bool Directory::Close(size_t file) {
         return file != SIZE_MAX && base.Close(file);
@@ -18,6 +18,9 @@ namespace MathLib {
         return file == SIZE_MAX ? 0 : base.GetSize(file);
     }
     Array<FileInfo> Directory::ReadDirectory(const Sequence<char>& path) {
-        return base.ReadDirectory(basePath + path);
+        return base.ReadDirectory(basePath + '/' + path);
+    }
+    bool Directory::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        return base.CreateDirectory(basePath + '/' + path, overwrite);
     }
 }

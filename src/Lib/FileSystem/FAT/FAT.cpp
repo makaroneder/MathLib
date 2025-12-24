@@ -185,4 +185,10 @@ namespace MathLib {
         }
         return ret;
     }
+    bool FAT::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        // TODO:
+        (void)path;
+        (void)overwrite;
+        return false;
+    }
 }

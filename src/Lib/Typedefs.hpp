@@ -104,11 +104,15 @@ namespace MathLib {
     /// @param x Value to use
     /// @return Value with reversed bits
     template <typename T>
-    [[nodiscard]] constexpr T BitReverse(const T& x, const uint8_t& bits = sizeof(T) * 8) {
+    [[nodiscard]] constexpr T BitReverse(const T& x, uint8_t bits = sizeof(T) * 8) {
         T ret = 0;
         for (uint8_t i = 0; i < bits; i++)
             ret |= !!(x & 1 << i) << (bits - i - 1);
         return ret;
+    }
+    template <typename T>
+    T CircularLeftShift(const T& x, uint8_t n, uint8_t bits = sizeof(T) * 8) {
+        return (x << n) | (x >> (bits - n));
     }
     /// @brief Sorts specified array
     /// @tparam T Type of data in array

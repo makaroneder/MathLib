@@ -38,9 +38,10 @@ template <typename T>
         if (!(p % i) && (!ret.Add(i) || !ret.Add(-i))) return MathLib::Array<ssize_t>();
     return ret;
 }
-
 template <typename T>
-struct Polynomial : MathLib::Printable {
+struct Polynomial;
+template <typename T>
+struct Polynomial : MathLib::Comparable<Polynomial<T>>, MathLib::Printable {
     CreateOperators(Polynomial<T>, T)
     CreateExponential(Polynomial<T>, true, Polynomial<T>(MathLib::MakeArray<T>(1)))
     Polynomial(void) {}
@@ -161,12 +162,6 @@ struct Polynomial : MathLib::Printable {
     Polynomial<T>& operator%=(const Polynomial<T>& other) {
         return *this = *this % other;
     }
-    [[nodiscard]] bool operator==(const Polynomial<T>& other) const {
-        if (coefficients.GetSize() != other.coefficients.GetSize()) return false;
-        for (size_t i = 0; i < coefficients.GetSize(); i++)
-            if (!MathLib::FloatsEqual<T>(coefficients.At(i), other.coefficients.At(i))) return false;
-        return true;
-    }
     /// @brief Converts struct to string
     /// @param padding String to pad with
     /// @return String representation
@@ -177,6 +172,14 @@ struct Polynomial : MathLib::Printable {
             if (!tmp.IsEmpty()) ret += MathLib::CollectionToString(padding) + tmp + (i == 1 ? "" : ('^'_M + MathLib::ToString(i, 10))) + " + ";
         }
         return !ret.IsEmpty() && MathLib::FloatsEqual<T>(coefficients.At(0), 0) ? MathLib::SubString(ret, 0, ret.GetSize() - 3) : ret + padding + MathLib::ToString(coefficients.At(0));
+    }
+
+    protected:
+    [[nodiscard]] virtual bool Equals(const Polynomial<T>& other) const override {
+        if (coefficients.GetSize() != other.coefficients.GetSize()) return false;
+        for (size_t i = 0; i < coefficients.GetSize(); i++)
+            if (!MathLib::FloatsEqual<T>(coefficients.At(i), other.coefficients.At(i))) return false;
+        return true;
     }
 
     private:

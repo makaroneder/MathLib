@@ -6,11 +6,8 @@ Formula::Formula(Type type, const MathLib::Sequence<Formula>& children) : value(
 MathLib::String Formula::ToString(const MathLib::Sequence<char>& padding) const {
     return MathLib::CollectionToString(padding) + ToStringInternal(true);
 }
-bool Formula::operator==(const Formula& other) const {
+bool Formula::Equals(const Formula& other) const {
     return type == other.type && value == other.value && children == other.children;
-}
-bool Formula::operator!=(const Formula& other) const {
-    return !(*this == other);
 }
 MathLib::String Formula::ToStringInternal(bool root) const {
     switch (type) {

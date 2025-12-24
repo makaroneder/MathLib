@@ -1,20 +1,22 @@
 #include <Host.hpp>
 
-struct AtExitFunction : MathLib::Allocatable {
+struct AtExitFunction : MathLib::Comparable<void*> {
     using Function = void (*)(void*);
     Function function;
     void* arg;
     void* dso;
 
     AtExitFunction(Function function = nullptr, void* arg = nullptr, void* dso = nullptr);
-    [[nodiscard]] bool operator==(void* func) const;
     void operator()(void);
+
+    protected:
+    [[nodiscard]] virtual bool Equals(void* const& other) const override;
 };
 AtExitFunction atExitFunctions[128];
 size_t atExitFunctionCount = 0;
 
 AtExitFunction::AtExitFunction(Function function, void* arg, void* dso) : function(function), arg(arg), dso(dso) {}
-bool AtExitFunction::operator==(void* func) const {
+bool AtExitFunction::Equals(void* const& func) const {
     return function == func || !func;
 }
 void AtExitFunction::operator()(void) {

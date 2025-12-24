@@ -124,4 +124,8 @@ namespace MathLib {
             if (!disk.Seek(pos + data.size, SeekMode::Set)) return Array<FileInfo>();
         }
     }
+    bool CipherFileSystem::CreateDirectory(const Sequence<char>&, bool) {
+        // TODO:
+        return false;
+    }
 }

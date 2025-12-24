@@ -94,9 +94,6 @@ MathLib::String Bencode::ToString(const MathLib::Sequence<char>& padding) const 
         default: return "";
     }
 }
-bool Bencode::operator==(const Bencode& other) const {
+bool Bencode::Equals(const Bencode& other) const {
     return type == other.type && value == other.value && children == other.children;
-}
-bool Bencode::operator!=(const Bencode& other) const {
-    return !(*this == other);
 }

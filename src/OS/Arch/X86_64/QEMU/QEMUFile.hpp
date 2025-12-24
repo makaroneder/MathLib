@@ -2,16 +2,19 @@
 #ifndef QEMUFile_H
 #define QEMUFile_H
 #include "QEMUSelector.hpp"
+#include <Interfaces/Comparable.hpp>
 
-struct QEMUFile {
+struct QEMUFile;
+struct QEMUFile : MathLib::Comparable<QEMUFile> {
     uint32_t size;
     QEMUSelector selector;
     bool free;
 
     QEMUFile(void);
     QEMUFile(QEMUSelector selector, uint32_t size);
-    [[nodiscard]] bool operator==(const QEMUFile& other) const;
-    [[nodiscard]] bool operator!=(const QEMUFile& other) const;
+
+    protected:
+    [[nodiscard]] virtual bool Equals(const QEMUFile& other) const override;
 };
 
 #endif

@@ -30,34 +30,34 @@ namespace MathLib {
         const ISO9660File ret = ISO9660File(prev.Get(), mode);
         const size_t size = files.GetSize();
         for (size_t i = 0; i < size; i++) {
-            if (files.At(i).free) {
-                files.At(i) = ret;
+            if (files.AtUnsafe(i).free) {
+                files.AtUnsafe(i) = ret;
                 return i;
             }
         }
         return files.Add(ret) ? size : SIZE_MAX;
     }
     bool ISO9660::Close(size_t file) {
-        if (file >= files.GetSize() || files.At(file).free) return false;
-        files.At(file).free = true;
+        if (file >= files.GetSize() || files.AtUnsafe(file).free) return false;
+        files.AtUnsafe(file).free = true;
         return true;
     }
     size_t ISO9660::Read(size_t file, void* buffer, size_t size, size_t position) {
         if (file >= files.GetSize()) return 0;
-        const ISO9660DirectoryEntry& raw = files.At(file).entry;
+        const ISO9660DirectoryEntry& raw = files.AtUnsafe(file).entry;
         if (!disk.Seek(raw.extent.little * 2048 + position, SeekMode::Set)) return 0;
         return disk.ReadSizedBuffer(buffer, raw.bytesPerExtent.little < size + position ? raw.bytesPerExtent.little - position : size);
     }
     size_t ISO9660::Write(size_t file, const void* buffer, size_t size, size_t position) {
         if (file >= files.GetSize()) return 0;
-        const ISO9660File& raw = files.At(file);
+        const ISO9660File& raw = files.AtUnsafe(file);
         if (raw.mode != OpenMode::Write || raw.mode != OpenMode::ReadWrite) return 0;
         // TODO: Resize file
         if (raw.entry.bytesPerExtent.little < size + position || !disk.Seek(raw.entry.extent.little * 2048 + position, SeekMode::Set)) return 0;
         return disk.WriteSizedBuffer(buffer, size);
     }
     size_t ISO9660::GetSize(size_t file) {
-        return file < files.GetSize() ? files.At(file).entry.bytesPerExtent.little : 0;
+        return file < files.GetSize() ? files.AtUnsafe(file).entry.bytesPerExtent.little : 0;
     }
     Array<FileInfo> ISO9660::ReadDirectory(const Sequence<char>& path) {
         Expected<ISO9660DirectoryEntry> entry = GetDirectoryEntry(path);
@@ -99,5 +99,11 @@ namespace MathLib {
             })) || !found) return Expected<ISO9660DirectoryEntry>();
         }
         return prev;
+    }
+    bool ISO9660::CreateDirectory(const Sequence<char>& path, bool overwrite) {
+        // TODO:
+        (void)path;
+        (void)overwrite;
+        return false;
     }
 }

@@ -85,7 +85,11 @@ namespace MathLib {
         }
         void DrawImage(const Image& image, ssize_t centerX, ssize_t centerY);
         [[nodiscard]] bool DrawPartialImage(const Image& image, size_t startX, size_t endX, size_t startY, size_t endY, ssize_t centerX, ssize_t centerY);
+        void FillRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
         void DrawRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
+        void DrawLinePararellToOX(ssize_t startX, ssize_t endX, ssize_t y, uint32_t color);
+        void DrawLinePararellToOY(ssize_t startY, ssize_t endY, ssize_t x, uint32_t color);
+        void DrawGrid(ssize_t centerX, ssize_t centerY, size_t cellSize, size_t cellCount, uint32_t color);
         /// @brief Draws a line
         /// @tparam T Type of number
         /// @param line Line to draw

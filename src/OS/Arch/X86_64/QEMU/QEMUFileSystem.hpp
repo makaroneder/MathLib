@@ -41,6 +41,7 @@ struct QEMUFileSystem : MathLib::FileSystem {
     /// @return File size
     [[nodiscard]] virtual size_t GetSize(size_t file) override;
     [[nodiscard]] virtual MathLib::Array<MathLib::FileInfo> ReadDirectory(const MathLib::Sequence<char>& path) override;
+    [[nodiscard]] virtual bool CreateDirectory(const MathLib::Sequence<char>& path, bool overwrite) override;
 
     private:
     bool Foreach(const MathLib::Function<bool, QEMUFileEntry>& function);

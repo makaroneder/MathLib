@@ -97,9 +97,6 @@ MathLib::String Sequent::ToString(const MathLib::Sequence<char>& padding) const 
     }
     return ret;
 }
-bool Sequent::operator==(const Sequent& other) const {
+bool Sequent::Equals(const Sequent& other) const {
     return left == other.left && right == other.right;
-}
-bool Sequent::operator!=(const Sequent& other) const {
-    return !(*this == other);
 }

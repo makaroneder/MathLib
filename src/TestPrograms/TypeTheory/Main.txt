@@ -1,0 +1,18 @@
+VoidType : Type,
+UnitType : Type,
+unit : UnitType,
+
+SumType : A => B => Type,
+left : A => B => A -> (SumType ^ A ^ B),
+right : A => B => B -> (SumType ^ A ^ B),
+
+id : UnitType -> UnitType = (x : UnitType) -> x,
+test1 : UnitType = id . unit,
+
+pid : T => T -> T = T => (x : T) -> x,
+test2 : UnitType = pid ^ UnitType . unit,
+
+first : A => B => A -> B -> A = A => B => (a : A) -> (b : B) -> a,
+
+swap : A => B => C => (A -> B -> C) -> B -> A -> C = A => B => C => (f : A -> B -> C) -> (b : B) -> (a : A) -> f . a . b,
+test3 : UnitType -> UnitType = swap ^ UnitType ^ UnitType ^ UnitType . (first ^ UnitType ^ UnitType) . unit

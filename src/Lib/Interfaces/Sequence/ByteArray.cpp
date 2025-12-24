@@ -18,13 +18,13 @@ namespace MathLib {
         const ssize_t maxSize = array.GetSize() - position;
         if (maxSize <= 0) return 0;
         const size_t s = size < (size_t)maxSize ? size : maxSize;
-        for (size_t i = 0; i < s; i++) buff[i] = array.At(position + i);
+        for (size_t i = 0; i < s; i++) buff[i] = array.AtUnsafe(position + i);
         return s;
     }
     size_t ByteArray::WritePositionedSizedBuffer(const void* buffer, size_t size, size_t position) {
         const uint8_t* buff = (const uint8_t*)buffer;
         const size_t min = Min<size_t>(size, array.GetSize() - position);
-        for (size_t i = 0; i < min; i++) array.At(i + position) = buff[i];
+        for (size_t i = 0; i < min; i++) array.AtUnsafe(i + position) = buff[i];
         for (size_t i = min; i < size; i++)
             if (!array.Add(buff[i])) return i;
         return size;

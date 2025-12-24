@@ -80,5 +80,11 @@ MathLib::Array<MathLib::FileInfo> QEMUFileSystem::ReadDirectory(const MathLib::S
         return !(ret.Contains(info) || ret.Add(info));
     })) ? MathLib::Array<MathLib::FileInfo>() : ret;
 }
+bool QEMUFileSystem::CreateDirectory(const MathLib::Sequence<char>& path, bool overwrite) {
+    // TODO:
+    (void)path;
+    (void)overwrite;
+    return false;
+}
 
 #endif

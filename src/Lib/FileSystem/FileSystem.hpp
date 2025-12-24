@@ -41,6 +41,7 @@ namespace MathLib {
         /// @return File size
         [[nodiscard]] virtual size_t GetSize(size_t file) = 0;
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) = 0;
+        [[nodiscard]] virtual bool CreateDirectory(const Sequence<char>& path, bool overwrite) = 0;
         [[nodiscard]] String ListFiles(const Sequence<char>& path, size_t maxDepth, const Sequence<char>& padding = ""_M);
     };
 }

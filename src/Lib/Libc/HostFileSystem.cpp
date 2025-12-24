@@ -84,6 +84,16 @@ namespace MathLib {
         return Array<FileInfo>();
         #endif
     }
+    bool HostFileSystem::CreateDirectory(const Sequence<char>& path_, bool overwrite) {
+        const String path = String(fs::current_path().c_str()) + '/' + path_;
+        if (fs::exists(path.GetValue())) {
+            if (!fs::is_directory(path.GetValue())) return false;
+            if (overwrite) for (const fs::directory_entry& entry : std::filesystem::directory_iterator(path.GetValue()))
+                std::filesystem::remove_all(entry.path());
+            return true;
+        }
+        return fs::create_directory(path.GetValue());
+    }
     FILE* HostFileSystem::GetFile(size_t file) {
         return file < files.GetSize() ? files[file] : nullptr;
     }

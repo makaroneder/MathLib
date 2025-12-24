@@ -4,17 +4,18 @@
 
 namespace MathLib {
     template <typename T>
-    struct Shape : Allocatable {
+    struct Shape;
+    template <typename T>
+    struct Shape : Comparable<Shape<T>> {
+        Matrix<T> position;
+
         Shape(const Matrix<T>& pos) : position(pos) {}
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const = 0;
-        [[nodiscard]] bool operator==(const Shape<T>& other) const {
+
+        protected:
+        [[nodiscard]] virtual bool Equals(const Shape<T>& other) const override {
             return position == other.position;
         }
-        [[nodiscard]] bool operator!=(const Shape<T>& other) const {
-            return !(*this == other);
-        }
-
-        Matrix<T> position;
     };
 }
 

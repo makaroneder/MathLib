@@ -54,4 +54,8 @@ namespace MathLib {
         for (size_t i = 0; i < ret.GetSize(); i++) ret.At(i) = FileInfo(FileInfo::Type::File, resources.At(i).name);
         return ret;
     }
+    bool MemoryFS::CreateDirectory(const Sequence<char>&, bool) {
+        // TODO:
+        return false;
+    }
 }

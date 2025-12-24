@@ -5,7 +5,11 @@
 
 namespace MathLib {
     template <typename T>
-    struct Particle : LineShape<T> {
+    struct Particle;
+    template <typename T>
+    struct Particle : Comparable<Particle<T>>, LineShape<T> {
+        using Comparable<Particle<T>>::operator==;
+        using Comparable<Particle<T>>::operator!=;
         Particle(const Matrix<T>& position = CreateVector<T>(0, 0, 0), bool fixed = false) : LineShape<T>(position), prevPosition(position), acceleration(CreateVector<T>(0, 0, 0)), fixed(fixed) {}
         [[nodiscard]] Matrix<T> GetPreviousPosition(void) const {
             return prevPosition;
@@ -33,14 +37,13 @@ namespace MathLib {
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const override {
             return this->position == ((const Particle<T>&)other).position;
         }
-        [[nodiscard]] bool operator==(const Particle<T>& other) const {
-            return Shape<T>::operator==(other) && fixed == other.fixed && prevPosition == other.prevPosition && acceleration == other.acceleration;
-        }
-        [[nodiscard]] bool operator!=(const Particle<T>& other) const {
-            return !(*this == other);
-        }
 
         Matrix<T> prevPosition;
+
+        protected:
+        [[nodiscard]] virtual bool Equals(const Particle<T>& other) const override {
+            return Shape<T>::operator==(other) && fixed == other.fixed && prevPosition == other.prevPosition && acceleration == other.acceleration;
+        }
 
         private:
         Matrix<T> acceleration;

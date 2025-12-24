@@ -24,8 +24,7 @@ namespace MathLib {
             return true;
         }
         [[nodiscard]] virtual bool Reset(void) override {
-            if (!sequence.Reset()) return false;
-            interval = Interval<size_t>(0, 0);
+            interval.max = interval.min;
             return true;
         }
 

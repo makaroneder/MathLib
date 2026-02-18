@@ -75,8 +75,8 @@ int main(int, char**) {
         const MathLib::String data = "The original BPE algorithm operates by iteratively replacing the most common contiguous sequences of characters in a target text with unused 'placeholder' bytes. The iteration ends when no sequences can be found, leaving the target text effectively compressed. Decompression can be performed by reversing this process, querying known placeholder terms against their corresponding denoted sequence, using a lookup table. In the original paper, this lookup table is encoded and stored alongside the compressed text.";
         MathLib::num_t start = MathLib::GetTime();
         MathLib::BytePairEncoding bpe;
-        std::cout << bpe.CheckEncryption<char>(data, MathLib::Array<uint64_t>()) << std::endl;
-        std::cout << bpe.TestEncryption<char>(data, MathLib::Array<uint64_t>()) << std::endl;
+        std::cout << bpe.CheckEncryption<char>(data, MathLib::CipherKey()) << std::endl;
+        std::cout << bpe.TestEncryption<char>(data, MathLib::CipherKey()) << std::endl;
         std::cout << MathLib::GetTime() - start << std::endl;
         // TODO: Train LLN on byte pair encoded data
         return EXIT_SUCCESS;

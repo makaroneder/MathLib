@@ -1,4 +1,0 @@
-Main(argc : USize, argv : Strings) : Bool = [!
-    Print("Hello World!" + newLine),
-    return(true),
-]

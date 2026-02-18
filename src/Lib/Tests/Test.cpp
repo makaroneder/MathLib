@@ -261,27 +261,27 @@ namespace MathLib {
         TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::GreaterThan);
         TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::GreaterThanEqual);
 
-        TestOperation(test, IdentityCipher().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, CaesarCipher().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(3)));
-        TestOperation(test, ROT13().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, NullCipher().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(5, 2)));
-        TestOperation(test, AtbashCipher().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(1)));
-        TestOperation(test, PolyalphabeticCipher().TestEncryption<uint8_t>(identitySequence, IdentitySequence<uint64_t>(7)));
-        TestOperation(test, Deflate().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, ZLib().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, GZIP().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, PackBits().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, BytePairEncoding().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(false)));
-        TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(true)));
-        TestOperation(test, RepetitionCode().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(3)));
-        TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(false)));
-        TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, MakeArray<uint64_t>(true)));
-        TestOperation(test, DeltaEncoding().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, TAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, GNUTAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, UnixStandardTAR().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
-        TestOperation(test, Ar().TestEncryption<uint8_t>(identitySequence, Array<uint64_t>()));
+        TestOperation(test, IdentityCipher().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, CaesarCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(MakeArray<ssize_t>(3)))));
+        TestOperation(test, ROT13().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, NullCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(5, 2)))));
+        TestOperation(test, AtbashCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(MakeArray<ssize_t>(1)))));
+        TestOperation(test, PolyalphabeticCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(IdentitySequence<uint8_t>(7))));
+        TestOperation(test, Deflate().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, ZLib().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, GZIP().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, PackBits().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, BytePairEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(false))));
+        TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(true))));
+        TestOperation(test, RepetitionCode().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(3)))));
+        TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(false))));
+        TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(true))));
+        TestOperation(test, DeltaEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, TAR().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, GNUTAR().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, UnixStandardTAR().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, Ar().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         return test;
     }
 }

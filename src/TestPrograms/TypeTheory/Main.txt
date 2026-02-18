@@ -2,17 +2,65 @@ VoidType : Type,
 UnitType : Type,
 unit : UnitType,
 
-SumType : A => B => Type,
-left : A => B => A -> (SumType ^ A ^ B),
-right : A => B => B -> (SumType ^ A ^ B),
+EqualityType : (T : Type) => T -> T -> Type,
+refl : (T : Type) => (a : T) => EqualityType ^ T . a . a,
+symm : (T : Type) => (a : T) => (b : T) => EqualityType ^ T . a . b -> EqualityType ^ T . b . a,
+trans : (T : Type) => (a : T) => (b : T) => (c : T) =>
+    EqualityType ^ T . a . b -> EqualityType ^ T . b . c -> EqualityType ^ T . a . c,
+applyFunctionToEquality : (A : Type) => (B : Type) => (f : A -> B) => (a : A) => (b : A) =>
+    EqualityType ^ A ^ a ^ b -> EqualityType ^ B ^ (f . a) ^ (f . b),
 
-id : UnitType -> UnitType = (x : UnitType) -> x,
-test1 : UnitType = id . unit,
+Associativity : (T : Type) => (T -> T -> T) -> T -> T -> T -> Type =
+    (T : Type) => (f : T -> T -> T) -> (a : T) -> (b : T) -> (c : T) ->
+    EqualityType ^ T . (f . (f . a . b) . c) . (f . a . (f . b . c)),
+LeftAlternativity : (T : Type) => (T -> T -> T) -> T -> T -> Type =
+    (T : Type) => (f : T -> T -> T) -> (a : T) -> (b : T) ->
+    Associativity ^ T . f . a . a . b,
+RightAlternativity : (T : Type) => (T -> T -> T) -> T -> T -> Type =
+    (T : Type) => (f : T -> T -> T) -> (a : T) -> (b : T) ->
+    Associativity ^ T . f . a . b . b,
+Flexibility : (T : Type) => (T -> T -> T) -> T -> T -> Type =
+    (T : Type) => (f : T -> T -> T) -> (a : T) -> (b : T) ->
+    Associativity ^ T . f . a . b . a,
+Commutativity : (T : Type) => (T -> T -> T) -> T -> T -> Type =
+    (T : Type) => (f : T -> T -> T) -> (a : T) -> (b : T) ->
+    EqualityType ^ T . (f . a . b) . (f . b . a),
 
-pid : T => T -> T = T => (x : T) -> x,
-test2 : UnitType = pid ^ UnitType . unit,
+reverseCommutativity : (T : Type) => (f : T -> T -> T) => (a1 : T) => (b1 : T) =>
+    Commutativity ^ T . f . a1 . b1 -> Commutativity ^ T . f . b1 . a1 =
+    (T : Type) => (f : T -> T -> T) => (a1 : T) => (b1 : T) =>
+    (comm : Commutativity ^ T . f . a1 . b1) -> symm ^ T ^ (f . a1 . b1) ^ (f . b1 . a1) . comm,
+applyCommutativity : (T : Type) => (f : T -> T -> T) => (a2 : T) => (b2 : T) => (x : T) =>
+    Commutativity ^ T . f . a2 . b2 -> EqualityType ^ T . (f . a2 . b2) . x ->
+    EqualityType ^ T . (f . b2 . a2) . x =
+    (T : Type) => (f : T -> T -> T) => (a2 : T) => (b2 : T) => (x : T) =>
+    (comm : Commutativity ^ T . f . a2 . b2) -> (eq : EqualityType ^ T . (f . a2 . b2) . x) ->
+    trans ^ T ^ (f . b2 . a2) ^ (f . a2 . b2) ^ x . (reverseCommutativity ^ T ^ f ^ a2 ^ b2 . comm) . eq,
 
-first : A => B => A -> B -> A = A => B => (a : A) -> (b : B) -> a,
+SumType : Type -> Type -> Type,
+left : (A : Type) => (B : Type) => A -> (SumType . A . B),
+right : (A : Type) => (B : Type) => B -> (SumType . A . B),
+match : (A : Type) => (B : Type) => (C : Type) -> (A -> C) -> (B -> C) -> (SumType . A . B) -> C,
 
-swap : A => B => C => (A -> B -> C) -> B -> A -> C = A => B => C => (f : A -> B -> C) -> (b : B) -> (a : A) -> f . a . b,
-test3 : UnitType -> UnitType = swap ^ UnitType ^ UnitType ^ UnitType . (first ^ UnitType ^ UnitType) . unit
+ProductType : Type -> Type -> Type,
+product : (A : Type) => (B : Type) => A -> B -> (ProductType . A . B),
+first : (A : Type) => (B : Type) -> (ProductType . A . B) -> A,
+second : (A : Type) => (B : Type) -> (ProductType . A . B) -> B,
+
+Nat : Type = SumType . UnitType . Nat,
+0 : Nat = left ^ UnitType ^ Nat . unit,
+succ : Nat -> Nat = (n : Nat) -> right ^ UnitType ^ Nat . n,
+1 : Nat = succ . 0,
+
+List : (T : Type) => Type = (T : Type) => SumType . UnitType . (ProductType . T . (List ^ T)),
+emptyList : (T : Type) => List ^ T =
+    (T : Type) => left ^ UnitType ^ (ProductType . T . (List ^ T)) . unit,
+
+id : (T : Type) => T -> T = (T : Type) => (x : T) -> x,
+
+firstArg : (A : Type) => (B : Type) => A -> B -> A = (A : Type) => (B : Type) => (a : A) -> (_ : B) -> a,
+secondArg : (A : Type) => (B : Type) => A -> B -> B = (A : Type) => (B : Type) => (_ : A) -> (b : B) -> b,
+
+swap : (A : Type) => (B : Type) => (C : Type) => (A -> B -> C) -> B -> A -> C =
+    (A : Type) => (B : Type) => (C : Type) =>
+    (f : A -> B -> C) -> (b : B) -> (a : A) -> f . a . b

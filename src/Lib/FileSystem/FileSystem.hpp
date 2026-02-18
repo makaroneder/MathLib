@@ -43,6 +43,7 @@ namespace MathLib {
         [[nodiscard]] virtual Array<FileInfo> ReadDirectory(const Sequence<char>& path) = 0;
         [[nodiscard]] virtual bool CreateDirectory(const Sequence<char>& path, bool overwrite) = 0;
         [[nodiscard]] String ListFiles(const Sequence<char>& path, size_t maxDepth, const Sequence<char>& padding = ""_M);
+        [[nodiscard]] Array<FileInfo> GetContentsOfDirectory(const Sequence<char>& path);
     };
 }
 

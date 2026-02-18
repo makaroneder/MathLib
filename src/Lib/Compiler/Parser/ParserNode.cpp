@@ -3,6 +3,8 @@
 
 namespace MathLib {
     ParserNode::ParserNode(void) : value(), children(), type(SIZE_MAX) {}
+    ParserNode::ParserNode(size_t type) : value(), children(), type(type) {}
+    ParserNode::ParserNode(size_t type, const Sequence<char>& value) : value(MathLib::CollectionToString(value)), children(), type(type) {}
     ParserNode::ParserNode(size_t type, const Sequence<char>& value, const Sequence<ParserNode>& children) : value(CollectionToString(value)), children(CollectionToArray<ParserNode>(children)), type(type) {}
     size_t ParserNode::GetType(void) const {
         return type;

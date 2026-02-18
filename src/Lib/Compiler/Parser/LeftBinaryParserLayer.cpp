@@ -6,7 +6,7 @@ namespace MathLib {
         const size_t size = tokens.GetSize();
         ParserNode ret = next();
         while (i < size) {
-            const Token token = tokens.At(i);
+            const Token token = tokens.AtUnsafe(i);
             if (!token.CheckType(tokenType)) break;
             i++;
             ret = ParserNode(nodeType, token.GetValue(), MakeArray<ParserNode>(ret, next()));

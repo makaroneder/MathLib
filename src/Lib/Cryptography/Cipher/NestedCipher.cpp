@@ -2,29 +2,22 @@
 #include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    NestedCipher::NestedCipher(const Sequence<NestedCipherData*>& ciphers) : ciphers(CollectionToArray<NestedCipherData*>(ciphers)) {}
+    NestedCipher::NestedCipher(const Sequence<Cipher*>& ciphers) : ciphers(CollectionToArray<Cipher*>(ciphers)) {}
     NestedCipher::~NestedCipher(void) {
-        for (NestedCipherData*& cipher : ciphers) delete cipher;
+        for (Cipher*& cipher : ciphers) delete cipher;
     }
-    Array<uint8_t> NestedCipher::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> NestedCipher::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        const size_t size = ciphers.GetSize();
+        if (key.type != CipherKey::Type::MultiKey || key.children.GetSize() != size) return Array<uint8_t>();
         Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
-        size_t i = 0;
-        for (const NestedCipherData* const& cipher : ciphers) {
-            const size_t save = i;
-            i += cipher->GetKeySize();
-            ret = cipher->Encrypt(ret, SubSequence<uint64_t>(key, Interval<size_t>(save, i)));
-        }
+        for (size_t i = 0; i < size; i++) ret = ciphers.AtUnsafe(i)->Encrypt(ret, key.children.AtUnsafe(i));
         return ret;
     }
-    Array<uint8_t> NestedCipher::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
+    Array<uint8_t> NestedCipher::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
         const size_t size = ciphers.GetSize();
-        size_t i = key.GetSize();
-        for (size_t j = size; j; j--) {
-            const size_t save = i;
-            i -= ciphers.At(j - 1)->GetKeySize();
-            ret = ciphers.At(j - 1)->Decrypt(ret, SubSequence<uint64_t>(key, Interval<size_t>(i, save)));
-        }
+        if (key.type != CipherKey::Type::MultiKey || key.children.GetSize() != size) return Array<uint8_t>();
+        Array<uint8_t> ret = CollectionToArray<uint8_t>(data);
+        for (size_t i = size; i; i--) ret = ciphers.AtUnsafe(i - 1)->Decrypt(ret, key.children.AtUnsafe(i - 1));
         const size_t start = range.GetMin();
         const size_t end = Min<size_t>(ret.GetSize(), range.GetMax());
         return start < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(start, end))) : Array<uint8_t>();

@@ -4,6 +4,7 @@
 #include <Emulator/X86/X86State.hpp>
 
 struct Registers {
+    uintptr_t sp;
     uintptr_t ds;
     uintptr_t es;
     uintptr_t fs;
@@ -15,7 +16,6 @@ struct Registers {
     uintptr_t d;
     uintptr_t si;
     uintptr_t di;
-    uintptr_t sp;
     uintptr_t bp;
     uintptr_t r8;
     uintptr_t r9;
@@ -31,6 +31,7 @@ struct Registers {
     uintptr_t ksp;
     uintptr_t kss;
 
+    Registers(void);
     [[nodiscard]] MathLib::X86State ToX86State(void) const;
 } __attribute__((packed));
 

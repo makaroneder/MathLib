@@ -31,6 +31,12 @@ namespace MathLib {
             for (const DictionaryElement<Key, Value>& element : elements) ret += element.ToString(padd2) + '\n';
             return ret + padd + '}';
         }
+        [[nodiscard]] size_t FindKey(const Key& key) const {
+            const size_t size = elements.GetSize();
+            for (size_t i = 0; i < size; i++)
+                if (elements.AtUnsafe(i).IsValidKey(key)) return i;
+            return SIZE_MAX;
+        }
         [[nodiscard]] bool ContainsKey(const Key& key) const {
             for (const DictionaryElement<Key, Value>& element : elements)
                 if (element.IsValidKey(key)) return true;

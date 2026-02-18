@@ -5,7 +5,7 @@
 
 namespace MathLib {
     struct AtbashCipher : SpecialCaseCipher<AffineCipher> {
-        [[nodiscard]] virtual Expected<Array<uint64_t>> GetKey(const Sequence<uint64_t>& baseKey) const override;
+        [[nodiscard]] virtual Expected<CipherKey> GetKey(const CipherKey& baseKey) const override;
     };
 }
 

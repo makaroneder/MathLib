@@ -86,7 +86,7 @@ namespace MathLib {
         if (x > 0) return 1;
         return 0;
     }
-    /// @brief Random number in range [min, max)
+    /// @brief Random number in range [min, max]
     /// @tparam T Type of number
     /// @param min Minimal value
     /// @param max Maximal value
@@ -129,6 +129,8 @@ namespace MathLib {
         }
         return ret;
     }
+    [[nodiscard]] uint8_t StringToU4(char chr);
+    [[nodiscard]] uint8_t StringToU8(char a, char b);
 }
 MathLib::String operator""_M(const char* str, size_t size);
 MathLib::String operator""_M(char chr);

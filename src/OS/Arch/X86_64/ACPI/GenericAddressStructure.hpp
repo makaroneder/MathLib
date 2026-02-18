@@ -2,7 +2,6 @@
 #ifndef GenericAddressStructure_H
 #define GenericAddressStructure_H
 #include <Expected.hpp>
-#include <stdint.h>
 
 struct GenericAddressStructure {
     enum class AddressSpace : uint8_t {

@@ -6,9 +6,9 @@ NaturalNumber Add(const NaturalNumber& a, const NaturalNumber& b, bool& positive
     positive1 = !positive1;
     return (b - a).Get();
 }
-RationalNumber::RationalNumber(void) : a(), b(NaturalNumber::FromT<uint8_t>(1)), positive(true) {}
-RationalNumber::RationalNumber(NaturalNumber nat) : a(nat), b(NaturalNumber::FromT<uint8_t>(1)), positive(true) {}
-RationalNumber::RationalNumber(NaturalNumber a, NaturalNumber b, bool positive) : a(a), b(b), positive(positive) {}
+RationalNumber::RationalNumber(void) : a(), b(NaturalNumber::FromT<uint8_t>(1)) {}
+RationalNumber::RationalNumber(Integer nat) : a(nat), b(NaturalNumber::FromT<uint8_t>(1)) {}
+RationalNumber::RationalNumber(Integer a, NaturalNumber b) : a(a), b(b) {}
 RationalNumber RationalNumber::FromFloatingPointString(const MathLib::Sequence<char>& str) {
     const size_t size = str.GetSize();
     MathLib::String parsed;
@@ -31,13 +31,13 @@ RationalNumber RationalNumber::FromFloatingPointString(const MathLib::Sequence<c
         parsed += chr;
         div *= NaturalNumber::FromT<uint8_t>(10);
     }
-    return RationalNumber(NaturalNumber(parsed), div.IsZero() ? NaturalNumber::FromT<uint8_t>(1) : div, positive).Simplify();
+    return RationalNumber(Integer(NaturalNumber(parsed), positive), div.IsZero() ? NaturalNumber::FromT<uint8_t>(1) : div).Simplify();
 }
 size_t RationalNumber::GetSize(void) const {
     return a.GetSize() + b.GetSize();
 }
 RationalNumber RationalNumber::Invert(void) const {
-    return RationalNumber(b, a, positive);
+    return RationalNumber(Integer(b, a.positive), a.natural);
 }
 RationalNumber RationalNumber::Simplify(void) const {
     if (a.IsZero()) return RationalNumber();
@@ -50,7 +50,7 @@ RationalNumber RationalNumber::Simplify(void) const {
     for (uint8_t i = 0; i < SizeOfArray(primes); i++) {
         uint8_t mod = 0;
         while (true) {
-            const NaturalNumber tmp1 = ret.a.DivMod(primes[i], mod);
+            const Integer tmp1 = ret.a.DivMod(primes[i], mod);
             if (mod) break;
             const NaturalNumber tmp2 = ret.b.DivMod(primes[i], mod);
             if (mod) break;
@@ -61,29 +61,24 @@ RationalNumber RationalNumber::Simplify(void) const {
     return ret;
 }
 bool RationalNumber::Save(MathLib::Writable& file) const {
-    return a.Save(file) && b.Save(file) && file.Write<bool>(positive);
+    return a.Save(file) && b.Save(file);
 }
 bool RationalNumber::Load(MathLib::Readable& file) {
-    return a.Load(file) && b.Load(file) && file.Read<bool>(positive);
+    return a.Load(file) && b.Load(file);
 }
 MathLib::String RationalNumber::ToString(const MathLib::Sequence<char>& padding) const {
-    MathLib::String ret = MathLib::CollectionToString(padding);
-    if (!positive) ret += '-';
-    if (b == NaturalNumber::FromT<uint8_t>(1)) return ret + a.ToString();
-    return ret + a.ToString() + '/' + b.ToString();
+    const MathLib::String padd = MathLib::CollectionToString(padding);
+    if (b == NaturalNumber::FromT<uint8_t>(1)) return padd + a.ToString();
+    return padd + a.ToString() + '/' + b.ToString();
 }
 RationalNumber& RationalNumber::operator+=(const RationalNumber& other) {
     return *this = (*this + other).Simplify();
 }
 RationalNumber RationalNumber::operator+(const RationalNumber& other) const {
-    bool pos = positive;
-    const NaturalNumber tmp = Add(a * other.b, other.a * b, pos, other.positive);
-    return RationalNumber(tmp, b * other.b, pos).Simplify();
+    return RationalNumber(a * other.b + other.a * b, b * other.b).Simplify();
 }
 RationalNumber RationalNumber::operator-(void) const {
-    RationalNumber ret = *this;
-    ret.positive = !ret.positive;
-    return ret;
+    return RationalNumber(-a, b);
 }
 RationalNumber& RationalNumber::operator-=(const RationalNumber& other) {
     return *this += -other;
@@ -94,7 +89,6 @@ RationalNumber RationalNumber::operator-(const RationalNumber& other) const {
 RationalNumber& RationalNumber::operator*=(const RationalNumber& other) {
     a *= other.a;
     b *= other.b;
-    positive = positive == other.positive;
     *this = Simplify();
     return *this;
 }
@@ -112,7 +106,6 @@ RationalNumber RationalNumber::operator/(const RationalNumber& other) const {
 RationalNumber& RationalNumber::operator^=(const NaturalNumber& other) {
     a ^= other;
     b ^= other;
-    positive |= other.IsEven();
     return *this = Simplify();
 }
 RationalNumber RationalNumber::operator^(const NaturalNumber& other) const {
@@ -122,7 +115,5 @@ RationalNumber RationalNumber::operator^(const NaturalNumber& other) const {
 }
 bool RationalNumber::LessThanEqual(const MathLib::Orderable& other_) const {
     const RationalNumber& other = (const RationalNumber&)other_;
-    if (!positive && other.positive) return true;
-    if (positive && !other.positive) return (a * other.b).IsZero() && (other.a * b).IsZero();
     return a * other.b <= other.a * b;
 }

@@ -11,7 +11,7 @@ namespace MathLib {
         }
         return (b << 16) | a;
     }
-    Array<uint8_t> Adler32::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> Adler32::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const uint32_t ret = Get(data);
         return Array<uint8_t>((const uint8_t*)&ret, sizeof(uint32_t));

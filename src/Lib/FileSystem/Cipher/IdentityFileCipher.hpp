@@ -4,9 +4,9 @@
 
 namespace MathLib {
     struct IdentityFileCipher : FileCipher {
-        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const Sequence<uint64_t>& key, size_t& unpaddedSize) const = 0;
-        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const Sequence<uint64_t>& key) const override;
-        [[nodiscard]] virtual Array<uint8_t> DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const override;
+        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const CipherKey& key, size_t& unpaddedSize) const = 0;
+        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const CipherKey& key) const override;
+        [[nodiscard]] virtual Array<uint8_t> DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const override;
     };
 }
 

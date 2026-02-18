@@ -1,5 +1,8 @@
 # TODO
 
+[Project Euler](https://projecteuler.net/problem=4)
+[6502](https://www.masswerk.at/6502/6502_instruction_set.html)
+
 [Ext2](https://wiki.osdev.org/Ext2)
 [Ext4](https://wiki.osdev.org/Ext4)
 

@@ -4,8 +4,8 @@
 
 namespace MathLib {
     struct GNUTAR : TAR {
-        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const Sequence<uint64_t>& key, size_t& unpaddedSize) const override;
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
+        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const CipherKey& key, size_t& unpaddedSize) const override;
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
     };
 }
 

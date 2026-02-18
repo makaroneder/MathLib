@@ -81,6 +81,7 @@ namespace MathLib {
             T ret;
             return ReadPositioned<T>(ret, position) ? Expected<T>(ret) : Expected<T>();
         }
+        [[nodiscard]] bool CopyTo(Writable& dst);
 
         private:
         size_t position;

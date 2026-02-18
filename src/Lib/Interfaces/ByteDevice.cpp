@@ -49,4 +49,9 @@ namespace MathLib {
     size_t ByteDevice::GetSizeLeft(void) const {
         return GetSize() - position;
     }
+    bool ByteDevice::CopyTo(Writable& dst) {
+        const size_t size = GetSize();
+        uint8_t buffer[size];
+        return ReadBuffer(buffer, size) && dst.WriteBuffer(buffer, size);
+    }
 }

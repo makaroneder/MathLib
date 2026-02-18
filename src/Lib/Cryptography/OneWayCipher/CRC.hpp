@@ -65,7 +65,7 @@ namespace MathLib {
             CRC32Q = 0x814141ab,
             CRC64ECMA = 0x42f0e1eba9ea3693,
         };
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
     };
 }
 

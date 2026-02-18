@@ -10,6 +10,10 @@ namespace MathLib {
     [[nodiscard]] String BoolToString(bool x);
     [[nodiscard]] size_t StringToNumber(const Sequence<char>& str, size_t base);
     [[nodiscard]] String DumpMemory(uintptr_t addr, size_t size, size_t lineSize);
+    template <typename T>
+    [[nodiscard]] String DumpMemory(const Collection<T>& array, size_t lineSize) {
+        return DumpMemory((uintptr_t)array.GetValue(), array.GetSize() * sizeof(T), lineSize);
+    }
     [[nodiscard]] bool Match(const Sequence<char>& str, const Sequence<char>& pattern);
 }
 

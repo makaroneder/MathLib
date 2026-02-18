@@ -15,4 +15,18 @@ namespace MathLib {
         }
         return ret;
     }
+    Array<FileInfo> FileSystem::GetContentsOfDirectory(const Sequence<char>& path_) {
+        const String path = (path_.GetSize() && path_.At(path_.GetSize() - 1) == '/') ? SubString(path_, 0, path_.GetSize() - 1) : CollectionToString(path_);
+        const Array<FileInfo> infos = ReadDirectory(path);
+        Array<FileInfo> ret;
+        for (const FileInfo& info : infos) {
+            if (!ret.Add(info)) return Array<FileInfo>();
+            if (info.type == FileInfo::Type::Directory) {
+                const Array<FileInfo> tmp = GetContentsOfDirectory(path + '/' + info.path);
+                for (const FileInfo& str : tmp)
+                    if (!ret.Add(FileInfo(str.type, info.path + '/' + str.path))) return Array<FileInfo>();
+            }
+        }
+        return ret;
+    }
 }

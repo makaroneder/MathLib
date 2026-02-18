@@ -5,6 +5,8 @@
 namespace MathLib {
     struct ParserNode : Collection<ParserNode>, Printable {
         ParserNode(void);
+        ParserNode(size_t type);
+        ParserNode(size_t type, const Sequence<char>& value);
         ParserNode(size_t type, const Sequence<char>& value, const Sequence<ParserNode>& children);
         [[nodiscard]] size_t GetType(void) const;
         [[nodiscard]] String GetData(void) const;

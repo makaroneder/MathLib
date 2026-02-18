@@ -27,7 +27,7 @@ namespace MathLib {
         header.size = sizeof(AsepriteHeader) + header.frames * frame.size;
         if (!file.Write<AsepriteHeader>(header)) return false;
         for (uint32_t i = 0; i < header.frames; i++) {
-            frame.duration = Millisecond<num_t>(Second<num_t>(frames.AtUnsafe(i).GetDuration())).GetValue();
+            frame.duration = Millisecond<num_t>(Second<num_t>(frames.AtUnsafe(i).duration)).GetValue();
             if (!file.Write<AsepriteFrameHeader>(frame) || !file.Write<AsepriteLayerChunk>(layer) || !file.Write<AsepriteImageCelChunk>(celChunk)) return false;
             for (uint32_t y = 0; y < header.height; y++) {
                 for (uint32_t x = 0; x < header.width; x++) {
@@ -60,7 +60,7 @@ namespace MathLib {
                             const AsepriteImageCelChunk* img = (const AsepriteImageCelChunk*)cel;
                             frames.AtUnsafe(i) = Frame(img->width, img->height, Millisecond<num_t>(frame.duration > 0 ? frame.duration : header.speed).ToBaseUnit().GetValue());
                             if (cel->type == AsepriteCelChunk::Type::CompressedImage) {
-                                const Array<uint32_t> pixels = ZLib().DecryptT<uint32_t>(Array<uint8_t>((const uint8_t*)img->pixels, img->size - sizeof(AsepriteCelChunk)), MakeArray<uint64_t>(true));
+                                const Array<uint32_t> pixels = ZLib().DecryptT<uint32_t>(Array<uint8_t>((const uint8_t*)img->pixels, img->size - sizeof(AsepriteCelChunk)), CipherKey(MakeArray<uint8_t>(true)));
                                 for (size_t y = 0; y < img->height; y++) {
                                     for (size_t x = 0; x < img->width; x++) {
                                         const uint32_t pixel = pixels.AtUnsafe(y * img->width + x);

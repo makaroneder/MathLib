@@ -18,6 +18,9 @@ namespace MathLib {
                 if (!Add(other.AtUnsafe(i))) return false;
             return true;
         }
+        [[nodiscard]] bool AddUnique(const T& value) {
+            return this->Contains(value) || Add(value);
+        }
         [[nodiscard]] bool SwapUnsafe(size_t x, size_t y) {
             const T tmp = this->AtUnsafe(x);
             return SetUnsafe(x, this->AtUnsafe(y)) && SetUnsafe(y, tmp);

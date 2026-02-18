@@ -1,37 +1,35 @@
-#include "Curl.hpp"
+#include "Action.hpp"
 #include <JSON.hpp>
 #include <String.hpp>
 #include <FunctionT.hpp>
 #include <Libc/HostFileSystem.hpp>
+#include <FileSystem/Directory.hpp>
 #include <Interfaces/Dictionary.hpp>
-#include <Interfaces/Sequence/SubSequence.hpp>
 #include <Interfaces/ComparisionFunction.hpp>
+#include <Interfaces/Sequence/SubSequence.hpp>
+#include <Curl.cpp>
 #include <iostream>
 
-struct Action : MathLib::Orderable {
-    enum class Type : uint8_t {
-        Ignore,
-        Scrape,
-        Save,
-    };
-    MathLib::String prefix;
-    Type type;
-
-    Action(void) : prefix(), type(Type::Ignore) {}
-    Action(Type type, const MathLib::Sequence<char>& prefix) : prefix(MathLib::CollectionToString(prefix)), type(type) {}
-
-    protected:
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other_) const override {
-        return prefix.GetSize() <= ((const Action&)other_).prefix.GetSize();
+MathLib::String ToProtocol(const MathLib::Sequence<char>& url) {
+    const size_t size = url.GetSize();
+    MathLib::String ret;
+    for (size_t i = 0; i < size; i++) {
+        const char chr = url.AtUnsafe(i);
+        if (chr == '/') {
+            if (++i == size || url.AtUnsafe(i) == '/') break;
+            ret += '/';
+        }
+        ret += chr;
     }
-};
+    return ret;
+}
 MathLib::String ToBaseURL(const MathLib::Sequence<char>& url) {
     const size_t size = url.GetSize();
     MathLib::String ret;
     for (size_t i = 0; i < size; i++) {
-        char chr = url.At(i);
+        const char chr = url.AtUnsafe(i);
         if (chr == '/') {
-            if (++i == size || url.At(i) != '/') break;
+            if (++i == size || url.AtUnsafe(i) != '/') break;
             ret += '/';
         }
         ret += chr;
@@ -70,38 +68,57 @@ Arr Replace(const MathLib::Sequence<T>& str, const MathLib::Sequence<T>& replace
     }
     return ret;
 }
-size_t ScrapeInternal(MathLib::FileSystem& fs, const MathLib::Sequence<char>& base, Curl& curl, const MathLib::Sequence<Action>& actions, const MathLib::Sequence<char>& url_, size_t maxDepth, MathLib::WritableSequence<MathLib::String>& cache, Action::Type action) {
+size_t ScrapeInternal(MathLib::FileSystem& fs, MathLib::Curl& curl, const MathLib::Sequence<Action>& actions, const MathLib::Sequence<char>& url_, size_t maxDepth, MathLib::Dictionary<MathLib::String, size_t>& cache, Action::Type action) {
     if (action == Action::Type::Ignore) return SIZE_MAX;
     const MathLib::String url = ConvertURL(url_);
-    size_t ret = cache.Find(url);
-    if (ret != SIZE_MAX) return ret;
-    if (!cache.Add(url)) return SIZE_MAX;
+    size_t ret = cache.FindKey(url);
+    if (ret == SIZE_MAX) ret = cache.GetSize();
+    else if (maxDepth <= cache.AtUnsafe(ret).value) return ret;
+    if (!cache.AddOrReplace(MathLib::DictionaryElement<MathLib::String, size_t>(url, maxDepth))) return SIZE_MAX;
     std::cout << url << std::endl;
-    ret = cache.GetSize() - 1;
     MathLib::String html = MathLib::CollectionToString(curl.Get<char>(url));
-    if (action == Action::Type::Scrape) html = Replace<char, MathLib::String>(html, "href=\""_M, '"'_M, MathLib::MakeFunctionT<MathLib::String, const MathLib::Sequence<char>&>([&fs, &base, &curl, &cache, &url, &actions, maxDepth, action](const MathLib::Sequence<char>& old) -> MathLib::String {
-        MathLib::String absoluteURL = MathLib::CollectionToString(old);
-        absoluteURL = absoluteURL.At(0) == '/' ? ToBaseURL(url) + absoluteURL : absoluteURL;
-        const size_t size = actions.GetSize();
-        Action::Type type = Action::Type::Ignore;
+    if (action == Action::Type::Scrape) {
+        const MathLib::String fileAttributtes[] = {
+            "href", "src",
+        };
+        const size_t size = SizeOfArray(fileAttributtes);
         for (size_t i = 0; i < size; i++) {
-            const Action action = actions.At(i);
-            if (absoluteURL.StartsWith(action.prefix)) {
-                type = action.type;
-                break;
-            }
+            const MathLib::String attr = fileAttributtes[i];
+            const MathLib::Function<MathLib::String, const MathLib::Sequence<char>&>& func = MathLib::MakeFunctionT<MathLib::String, const MathLib::Sequence<char>&>([&fs, &curl, &cache, &url, &actions, &attr, maxDepth, action](const MathLib::Sequence<char>& old) -> MathLib::String {
+                MathLib::String absoluteURL = MathLib::CollectionToString(old);
+                if (absoluteURL.AtUnsafe(0) == '/') {
+                    if (absoluteURL.AtUnsafe(1) == '/') absoluteURL = ToProtocol(url) + absoluteURL;
+                    else absoluteURL = ToBaseURL(url) + absoluteURL;
+                }
+                const size_t size = actions.GetSize();
+                Action::Type type = Action::Type::Ignore;
+                bool exception = false;
+                for (size_t i = 0; i < size; i++) {
+                    const Action action = actions.At(i);
+                    if (absoluteURL.StartsWith(action.prefix)) {
+                        if (action.type == Action::Type::IgnoreException) {
+                            exception = true;
+                            continue;
+                        }
+                        if (action.type == Action::Type::Ignore && exception) continue;
+                        type = action.type;
+                        break;
+                    }
+                }
+                if (!maxDepth || type == Action::Type::Ignore) return attr + "=\"" + absoluteURL + '"';
+                const size_t file = ScrapeInternal(fs, curl, actions, absoluteURL, maxDepth - 1, cache, type);
+                if (file == SIZE_MAX) return "";
+                return attr + "=\"" + MathLib::ToString(file, 10) + ".html\"";
+            });
+            html = Replace<char, MathLib::String>(html, attr + "=\"", '"'_M, func);
         }
-        if (!maxDepth || type == Action::Type::Ignore) return "href=\""_M + absoluteURL + '"';
-        const size_t file = ScrapeInternal(fs, base, curl, actions, absoluteURL, maxDepth - 1, cache, action);
-        if (file == SIZE_MAX) return "";
-        return "href=\""_M + MathLib::ToString(file, 10) + ".html\"";
-    }));
-    MathLib::File file = fs.Open(MathLib::CollectionToString(base) + MathLib::ToString(ret, 10) + ".html", MathLib::OpenMode::Write);
+    }
+    MathLib::File file = fs.Open(MathLib::ToString(ret, 10) + ".html", MathLib::OpenMode::Write);
     return file.Puts(html) ? ret : SIZE_MAX;
 }
-bool Scrape(MathLib::FileSystem& fs, const MathLib::Sequence<char>& base, Curl& curl, const MathLib::Sequence<Action>& actions, const MathLib::Sequence<char>& url, size_t maxDepth) {
-    MathLib::Array<MathLib::String> cache;
-    return ScrapeInternal(fs, base, curl, actions, url, maxDepth, cache, Action::Type::Scrape) != SIZE_MAX;
+bool Scrape(MathLib::FileSystem& fs, MathLib::Curl& curl, const MathLib::Sequence<Action>& actions, const MathLib::Sequence<char>& url, size_t maxDepth) {
+    MathLib::Dictionary<MathLib::String, size_t> cache;
+    return ScrapeInternal(fs, curl, actions, url, maxDepth, cache, Action::Type::Scrape) != SIZE_MAX;
 }
 bool AddActions(MathLib::JSON& pattern, MathLib::WritableSequence<Action>& actions, const MathLib::String& name, Action::Type type) {
     const MathLib::JSON list = pattern.Find(name).GetOr(MathLib::JSON());
@@ -109,13 +126,70 @@ bool AddActions(MathLib::JSON& pattern, MathLib::WritableSequence<Action>& actio
         if (!actions.Add(Action(type, url.GetValue()))) return false;
     return true;
 }
+bool ParseRobotsLine(const MathLib::Sequence<char>& line, size_t& i, const MathLib::Sequence<char>& expected) {
+    const size_t size = expected.GetSize();
+    if (line.GetSize() - i < size) return false;
+    for (size_t j = 0; j < size; j++)
+        if (MathLib::ToUpper(line.AtUnsafe(i + j)) != expected[j]) return false;
+    i += size;
+    return true;
+}
+enum class RobotsState : uint8_t {
+    None,
+    FoundDefaultRules,
+    FoundSpecificRules,
+};
+MathLib::Array<Action> ParseRobotsFile(MathLib::Curl& curl, const MathLib::String& url) {
+    const MathLib::String baseURL = ToBaseURL(ConvertURL(url));
+    const MathLib::Array<char> str = curl.Get<char>(baseURL + "/robots.txt");
+    if (str.IsEmpty()) return MathLib::Array<Action>();
+    const MathLib::Array<MathLib::String> split = MathLib::Split(str, '\n'_M, false);
+    const size_t size = split.GetSize();
+    MathLib::Array<Action> ret;
+    MathLib::Array<Action> exceptions;
+    RobotsState state = RobotsState::None;
+    for (size_t i = 0; i < size; i++) {
+        const MathLib::String curr = split.AtUnsafe(i);
+        size_t j = 0;
+        MathLib::SkipWhiteSpace(curr, j);
+        const size_t currSize = curr.GetSize();
+        if (j == currSize || curr.AtUnsafe(j) == '#') continue;
+        if (ParseRobotsLine(curr, j, "USER-AGENT:"_M)) {
+            if (state == RobotsState::FoundSpecificRules) break;
+            MathLib::SkipWhiteSpace(curr, j);
+            MathLib::String userAgent;
+            while (j < size) {
+                const char tmp = curr.AtUnsafe(j++);
+                if (!tmp) break;
+                userAgent += tmp;
+            }
+            if (userAgent == MathLib::Curl::userAgent) {
+                if (!ret.Reset() || !exceptions.Reset()) return MathLib::Array<Action>();
+                state = RobotsState::FoundSpecificRules;
+            }
+            if (userAgent == "*") state = RobotsState::FoundDefaultRules;
+            continue;
+        }
+        if (state == RobotsState::None) continue;
+        const bool allow = ParseRobotsLine(curr, j, "ALLOW:"_M);
+        if (!allow && !ParseRobotsLine(curr, j, "DISALLOW:"_M)) continue;
+        MathLib::SkipWhiteSpace(curr, j);
+        MathLib::String url = baseURL;
+        while (j < size) url += curr.AtUnsafe(j++);
+        if (allow) {
+            if (!exceptions.Add(Action(Action::Type::IgnoreException, url))) return MathLib::Array<Action>();
+        }
+        else if (!ret.Add(Action(Action::Type::Ignore, url))) return ret;
+    }
+    return exceptions.AddSequence(ret) ? exceptions : MathLib::Array<Action>();
+}
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
 /// @param argv Array of command line arguments
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <pattern file>");
+        if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <pattern file> <output directory>");
         MathLib::HostFileSystem fs;
         MathLib::JSON pattern;
         if (!pattern.LoadFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to load pattern file");
@@ -124,8 +198,16 @@ int main(int argc, char** argv) {
         if (!AddActions(pattern, actions, "scrape"_M, Action::Type::Scrape)) MathLib::Panic("Failed to load scrape list");
         if (!AddActions(pattern, actions, "save"_M, Action::Type::Save)) MathLib::Panic("Failed to load save list");
         if (!actions.CocktailShakerSort(MathLib::ComparisionFunction<Action>(MathLib::ComparisionFunctionType::LessThan))) MathLib::Panic("Failed to sort actions");
-        Curl curl;
-        if (!Scrape(fs, "t/"_M, curl, actions, pattern.Find("url"_M).Get("No URL specified").GetValue(), MathLib::StringToNumber(pattern.Find("maxDepth"_M).Get("No max depth specified").GetValue()))) MathLib::Panic("Failed to scrape URL");
+        const MathLib::String url = pattern.Find("url"_M).Get("No URL specified").GetValue();
+        MathLib::Curl curl;
+        if (pattern.Find("parseRobots"_M).Get("No action for parsing robots.txt specified").GetValue() == "true") {
+            MathLib::Array<Action> tmp = ParseRobotsFile(curl, url);
+            if (!tmp.AddSequence(actions)) MathLib::Panic("Failed to add data generated from robots.txt");
+            actions = tmp;
+        }
+        MathLib::Directory directory = MathLib::Directory(fs, MathLib::String(argv[2]));
+        if (!directory.CreateDirectory(""_M, false)) MathLib::Panic("Failed to create output directory");
+        if (!Scrape(directory, curl, actions, url, MathLib::StringToNumber(pattern.Find("maxDepth"_M).Get("No max depth specified").GetValue()))) MathLib::Panic("Failed to scrape URL");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

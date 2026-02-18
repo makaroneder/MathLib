@@ -2,6 +2,8 @@
 #include "../String.hpp"
 
 namespace MathLib {
+    Path::Path(void) : vertices() {}
+    Path::Path(const Sequence<size_t>& vertices) : vertices(CollectionToArray<size_t>(vertices)) {}
     size_t Path::GetSize(void) const {
         return vertices.GetSize();
     }
@@ -31,14 +33,8 @@ namespace MathLib {
         String ret = CollectionToString(padding);
         for (size_t i = 0; i < size; i++) {
             if (i) ret += " -> ";
-            ret += Formatter<size_t>::ToString(vertices.At(i));
+            ret += Formatter<size_t>::ToString(vertices.AtUnsafe(i));
         }
         return ret + ';';
-    }
-    bool Path::operator==(const Path& other) const {
-        return vertices == other.vertices;
-    }
-    bool Path::operator!=(const Path& other) const {
-        return !(*this == other);
     }
 }

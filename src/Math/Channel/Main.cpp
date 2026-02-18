@@ -16,15 +16,25 @@ int main(int, char**) {
         #ifndef Debug
         srand(time(nullptr));
         #endif
+        MathLib::FlipChannel<MathLib::num_t, MathLib::UniformDiscreteMeasure<MathLib::num_t>> flip;
+        MathLib::NestedCipher cipher = MathLib::NestedCipher(MathLib::MakeArray<MathLib::Cipher*>(
+            new MathLib::RepetitionCode(),
+            new MathLib::ROT13()
+        ));
         const MathLib::Channel channel = MathLib::Channel(
-            new MathLib::FlipChannel<MathLib::num_t, MathLib::UniformDiscreteMeasure<MathLib::num_t>>(),
-            new MathLib::NestedCipherData(new MathLib::NestedCipher(MathLib::MakeArray<MathLib::NestedCipherData*>(
-                new MathLib::NestedCipherData(new MathLib::RepetitionCode(), 1),
-                new MathLib::NestedCipherData(new MathLib::ROT13(), 0)
-            )), 1)
+            flip, cipher
         );
         const MathLib::String message = "Hello";
-        const MathLib::String tmp = channel.SendString(message, MathLib::VariadicSequence<uint64_t, 3>());
+        // const MathLib::String tmp = channel.SendString(message, MathLib::VariadicSequence<uint64_t, 3>());
+        const MathLib::String tmp = channel.SendString(message,
+            MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
+                MathLib::CipherKey(),
+                MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
+                    MathLib::CipherKey(MathLib::ByteArray::ToByteArray<uint64_t>(MathLib::VariadicSequence<uint64_t, 3>())),
+                    MathLib::CipherKey()
+                ))
+            ))
+        );
         std::cout << "Sent: " << message << std::endl;
         std::cout << "Recieved: " << tmp << std::endl;
         const size_t diff = message.GetSize() - tmp.GetSize();

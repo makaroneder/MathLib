@@ -4,7 +4,7 @@
 
 void ApproxEBySequenceUnit(NaturalNumber start, NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret) {
     for (NaturalNumber i = start; i < end;) {
-        ret->ret += RationalNumber(NaturalNumber::FromT<uint8_t>(1), ret->factorial, true);
+        ret->ret += RationalNumber(NaturalNumber::FromT<uint8_t>(1), ret->factorial);
         ret->factorial *= ++i;
     }
 }
@@ -22,7 +22,7 @@ void ApproxEBySequenceMultiUnit(NaturalNumber start, NaturalNumber end, ApproxEB
     }
     for (size_t thread = 0; thread < threadCount; thread++) {
         threads[thread].Join();
-        ret->ret += values[thread].ret * RationalNumber(NaturalNumber::FromT<uint8_t>(1), ret->factorial, true);
+        ret->ret += values[thread].ret * RationalNumber(NaturalNumber::FromT<uint8_t>(1), ret->factorial);
         ret->factorial *= values[thread].factorial;
     }
 }

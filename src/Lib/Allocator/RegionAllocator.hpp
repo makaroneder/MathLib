@@ -1,7 +1,6 @@
 #ifndef MathLib_Allocator_Region_H
 #define MathLib_Allocator_Region_H
 #include "BufferAllocator.hpp"
-#include <stdint.h>
 
 namespace MathLib {
     struct RegionAllocator : BufferAllocator {

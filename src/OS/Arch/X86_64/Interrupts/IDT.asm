@@ -20,7 +20,6 @@ extern InterruptHandler
     push r9
     push r8
     push rbp
-    push rsp
     push rdi
     push rsi
     push rdx
@@ -37,25 +36,26 @@ extern InterruptHandler
     push rax
     mov rax, ds
     push rax
+    push rsp
 %endmacro
 %macro PopAll 0
+    pop rsp
     pop rax
-    mov ss, rax
-    pop rax
-    mov gs, rax
-    pop rax
-    mov fs, rax
+    mov ds, rax
     pop rax
     mov es, rax
     pop rax
-    mov ds, rax
+    mov fs, rax
+    pop rax
+    mov gs, rax
+    pop rax
+    mov ss, rax
     pop rax
     pop rbx
     pop rcx
     pop rdx
     pop rsi
     pop rdi
-    pop rsp
     pop rbp
     pop r8
     pop r9

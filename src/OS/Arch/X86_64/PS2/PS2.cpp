@@ -5,7 +5,6 @@
 #include "PS2Keyboard.hpp"
 #include <String.hpp>
 #include <Logger.hpp>
-#include <stddef.h>
 
 bool Await8042(bool write) {
     size_t timeout = 10000;

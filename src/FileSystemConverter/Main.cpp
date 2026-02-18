@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
         if (argc < 3 || !(argc % 2)) MathLib::Panic("Usage: "_M + argv[0] + "<file system> <output file> (<input file> <input file name>)*");
         MathLib::HostFileSystem fs;
         MathLib::File file = fs.Open(MathLib::String(argv[2]), MathLib::OpenMode::Write);
-        MathLib::CipherFileSystem cipher = MathLib::CipherFileSystem(file, GetFileCipher(MathLib::String(argv[1])), MathLib::Array<uint64_t>());
+        MathLib::CipherFileSystem cipher = MathLib::CipherFileSystem(file, GetFileCipher(MathLib::String(argv[1])), MathLib::CipherKey());
         if (!cipher.Create()) MathLib::Panic("Failed to create file system");
         for (int i = 3; i < argc; i += 2) {
             std::cout << argv[i] << " => " << argv[i + 1] << std::endl;

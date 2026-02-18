@@ -1,3 +1,4 @@
+#include "Context.hpp"
 #include <Compiler/Parser/RightBinaryParserLayer.hpp>
 #include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
@@ -13,144 +14,6 @@
 #include <Compiler/Toolchain.hpp>
 #include <iostream>
 
-[[nodiscard]] MathLib::String WrapInParentheses(const MathLib::String& value, bool wrap) {
-    return wrap ? '('_M + value + ')' : value;
-}
-struct Term;
-struct Term : MathLib::Comparable<Term>, MathLib::Printable {
-    enum class Type : uint8_t {
-        None,
-        Variable,
-        Comma,
-        Assignment,
-        TypeDeclaration,
-        TypeAbstraction,
-        TypeApplication,
-        Abstraction,
-        Application,
-    };
-    MathLib::Array<Term> children;
-    MathLib::String name;
-    Type type;
-
-    Term(void) : children(), name(), type(Type::None) {}
-    Term(const MathLib::String& name) : children(), name(name), type(Type::Variable) {}
-    Term(Type type, const MathLib::Array<Term>& children) : children(children), name(), type(type) {}
-    Term(Type type, const Term& a, const Term& b) : children(MathLib::MakeArray<Term>(a, b)), name(), type(type) {}
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
-        return MathLib::CollectionToString(padding) + ToStringInternal(true);
-    }
-    [[nodiscard]] Term Replace(const Term& old, const Term& replacement) const {
-        if (Equals(old)) return replacement;
-        Term ret = *this;
-        for (Term& child : ret.children) child = child.Replace(old, replacement);
-        return ret;
-    }
-
-    protected:
-    [[nodiscard]] virtual bool Equals(const Term& other) const override {
-        return type == other.type && name == other.name && children == other.children;
-    }
-
-    private:
-    [[nodiscard]] MathLib::String ToStringInternal(bool root) const {
-        switch (type) {
-            case Type::Variable: return name;
-            case Type::Comma: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type >= type) + ", " + children.At(1).ToStringInternal(children.At(1).type > type), !root);
-            case Type::Assignment: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type >= type) + " = " + children.At(1).ToStringInternal(children.At(1).type > type), !root);
-            case Type::TypeDeclaration: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type >= type) + " : " + children.At(1).ToStringInternal(children.At(1).type > type), !root);
-            case Type::TypeAbstraction: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type > type) + " => " + children.At(1).ToStringInternal(children.At(1).type >= type), !root);
-            case Type::TypeApplication: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type >= type) + " ^ " + children.At(1).ToStringInternal(children.At(1).type > type), !root);
-            case Type::Abstraction: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type > type) + " -> " + children.At(1).ToStringInternal(children.At(1).type >= type), !root);
-            case Type::Application: return WrapInParentheses(children.At(0).ToStringInternal(children.At(0).type >= type) + " . " + children.At(1).ToStringInternal(children.At(1).type > type), !root);
-            default: return "";
-        }
-    }
-};
-struct Context : MathLib::Printable {
-    Context(void) : theorems(), parent(nullptr) {}
-    Context(const MathLib::Array<Term>& theorems) : theorems(theorems), parent(nullptr) {}
-
-    [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
-        const MathLib::String padd = MathLib::CollectionToString(padding);
-        const MathLib::String padd2 = padd + '\t';
-        return "{\n"_M + ToStringInternal(padd2) + padd + '}';
-    }
-    [[nodiscard]] Term GetTrivialTypeOf(const Term& term) const {
-        if (parent) {
-            const Term tmp = parent->GetTrivialTypeOf(term);
-            if (tmp.type != Term::Type::None) return tmp;
-        }
-        for (const Term& theorem : theorems) {
-            switch (theorem.type) {
-                case Term::Type::TypeDeclaration: {
-                    // TODO: A => b : A => B <=> b : B
-                    // TODO: a ^ b : B <=> a : A => B && b : Typeof(A)
-                    // TODO: a -> b : A -> B <=> a : A && b : B
-                    // TODO: a . b : B <=> a : A -> B && b : A
-                    if (theorem.children.At(0) == term) return theorem.children.At(1);
-                    break;
-                }
-                case Term::Type::Assignment: {
-                    const Term typeDeclaration = theorem.children.At(0);
-                    if (theorem.children.At(1) == term || typeDeclaration.children.At(0) == term) return typeDeclaration.children.At(1);
-                    break;
-                }
-                default: break;
-            }
-        }
-        return Term();
-    }
-    [[nodiscard]] Term GetTypeOf(const Term& term) const {
-        const Term tmp = GetTrivialTypeOf(term);
-        if (tmp.type != Term::Type::None) return tmp;
-        switch (term.type) {
-            case Term::Type::TypeAbstraction: return Term(Term::Type::TypeAbstraction, term.children.At(0), GetTypeOf(term.children.At(1)));
-            case Term::Type::TypeApplication: {
-                const Term a = GetTypeOf(term.children.At(0));
-                if (a.type != Term::Type::TypeAbstraction) return Term();
-                return a.children.At(1).Replace(a.children.At(0), term.children.At(1));
-            }
-            case Term::Type::Abstraction: {
-                if (term.children.At(0).type != Term::Type::TypeDeclaration) return Term();
-                return Term(Term::Type::Abstraction, term.children.At(0).children.At(1), Context(MathLib::MakeArray<Term>(
-                    term.children.At(0)
-                ), this).GetTypeOf(term.children.At(1)));
-            }
-            case Term::Type::Application: {
-                const Term a = GetTypeOf(term.children.At(0));
-                if (a.type != Term::Type::Abstraction) return Term();
-                const Term b = GetTypeOf(term.children.At(1));
-                if (a.children.At(0) != b) return Term();
-                return a.children.At(1);
-            }
-            default: return Term();
-        }
-    }
-    [[nodiscard]] bool CanBeTypeOf(const Term& term, const Term& type) const {
-        return GetTypeOf(term) == type;
-    }
-    [[nodiscard]] bool TypeCheck(const Term& term) {
-        switch (term.type) {
-            case Term::Type::Comma: return TypeCheck(term.children.At(0)) && TypeCheck(term.children.At(1));
-            case Term::Type::Assignment: return CanBeTypeOf(term.children.At(1), term.children.At(0).children.At(1)) && theorems.Add(term);
-            case Term::Type::TypeDeclaration: return theorems.Add(term);
-            default: return false;
-        }
-    }
-
-    private:
-    Context(const MathLib::Array<Term>& theorems, const Context* const parent) : theorems(theorems), parent(parent) {}
-    [[nodiscard]] MathLib::String ToStringInternal(const MathLib::String& padding) const {
-        MathLib::String ret;
-        for (const Term& theorem : theorems) ret += theorem.ToString(padding) + '\n';
-        if (parent) ret += parent->ToStringInternal(padding);
-        return ret;
-    }
-
-    MathLib::Array<Term> theorems;
-    const Context* const parent;
-};
 enum class TokenType : uint8_t {
     ParenthesesStart,
     ParenthesesEnd,
@@ -229,6 +92,13 @@ int main(int argc, char** argv) {
         Context context;
         if (!context.TypeCheck(NodeToTerm(toolchain.GetNode()))) MathLib::Panic("Failed to type check the program");
         std::cout << context << std::endl;
+        // TODO: Pattern matching
+        /*
+        add : Nat -> Nat -> Nat = (a : Nat) -> {
+            0 -> a,
+            (b : Nat, succ . b) -> succ . (add . a . b)
+        }
+        */
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

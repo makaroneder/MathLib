@@ -3,11 +3,11 @@
 #include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    FileCipherData IdentityFileCipher::Identify(Readable& device, const Sequence<uint64_t>& key) const {
+    FileCipherData IdentityFileCipher::Identify(Readable& device, const CipherKey& key) const {
         size_t unpaddedSize = 0;
         return Identify(device, key, unpaddedSize);
     }
-    Array<uint8_t> IdentityFileCipher::DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> IdentityFileCipher::DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const {
         size_t unpaddedSize = 0;
         const FileCipherData header = Identify(readable, key, unpaddedSize);
         const size_t start = range.GetMin();

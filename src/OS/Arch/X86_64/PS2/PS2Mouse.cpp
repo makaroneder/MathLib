@@ -1,6 +1,7 @@
 #ifdef __x86_64__
 #include "../../../KernelRenderer.hpp"
 #include "PS2Mouse.hpp"
+#include <Logger.hpp>
 
 PS2Mouse::PS2Mouse(bool second) : PS2Device(second), position(MathLib::CreateVector<size_t>(0, 0, 0)), packet(0) {
     for (uint8_t i = 0; i < SizeOfArray(packets); i++) packets[i] = 0;
@@ -28,19 +29,20 @@ void PS2Mouse::OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error
     packet = packet % (type == Type::Normal ? 3 : 4);
     if (!packet) {
         const PS2MousePacket1 packet1 = *(const PS2MousePacket1*)&packets[0];
-        if (!packet1.alwaysOne) MathLib::Panic("Invalid main packet");
+        // if (!packet1.alwaysOne) MathLib::Panic("Invalid main packet");
         position += MathLib::CreateVector<size_t>(packet1.xSign ? -packets[1] : packets[1], packet1.ySign ? -packets[2] : packets[2], 0);
         if (type == Type::ZAxis) GetZ(position) += (int8_t)packets[3];
         else if (type == Type::MoreButtons) {
             const PS2Mouse5ButtonsPacket packet4 = *(const PS2Mouse5ButtonsPacket*)&packets[3];
             if (packet4.alwaysZero) MathLib::Panic("Invalid 5 buttons packet");
             GetZ(position) += (int8_t)packet4.z;
-            if (packet4.button4 && !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button4, true))) MathLib::Panic("Failed to send event to renderer");
-            if (packet4.button5 && !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Button5, true))) MathLib::Panic("Failed to send event to renderer");
+            // if (packet4.button4 && !renderer->AddEvent(MathLib::Event(GetX(position), GetY(position), MathLib::Event::MouseButton::Button4, true))) MathLib::Panic("Failed to send event to renderer");
+            // if (packet4.button5 && !renderer->AddEvent(MathLib::Event(GetX(position), GetY(position), MathLib::Event::MouseButton::Button5, true))) MathLib::Panic("Failed to send event to renderer");
         }
-        if (packet1.leftButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Left, true))) MathLib::Panic("Failed to send event to renderer");
-        if (packet1.middleButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Middle, true))) MathLib::Panic("Failed to send event to renderer");
-        if (packet1.rightButton &&  !renderer->AddEvent(MathLib::Event(position, MathLib::Event::MouseButton::Right, true))) MathLib::Panic("Failed to send event to renderer");
+        LogString(position.ToString() + '\n');
+        // if (packet1.leftButton &&  !renderer->AddEvent(MathLib::Event(GetX(position), GetY(position), MathLib::Event::MouseButton::Left, true))) MathLib::Panic("Failed to send event to renderer");
+        // if (packet1.middleButton &&  !renderer->AddEvent(MathLib::Event(GetX(position), GetY(position), MathLib::Event::MouseButton::Middle, true))) MathLib::Panic("Failed to send event to renderer");
+        // if (packet1.rightButton &&  !renderer->AddEvent(MathLib::Event(GetX(position), GetY(position), MathLib::Event::MouseButton::Right, true))) MathLib::Panic("Failed to send event to renderer");
     }
 }
 bool PS2Mouse::SetSampleRate(uint8_t sampleRate) {

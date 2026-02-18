@@ -1,11 +1,11 @@
 #ifndef RationalNumber_H
 #define RationalNumber_H
-#include "NaturalNumber.hpp"
+#include "Integer.hpp"
 
 struct RationalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable {
     RationalNumber(void);
-    RationalNumber(NaturalNumber nat);
-    RationalNumber(NaturalNumber a, NaturalNumber b, bool positive);
+    RationalNumber(Integer nat);
+    RationalNumber(Integer a, NaturalNumber b);
     [[nodiscard]] static RationalNumber FromFloatingPointString(const MathLib::Sequence<char>& str);
     [[nodiscard]] size_t GetSize(void) const;
     [[nodiscard]] RationalNumber Invert(void) const;
@@ -29,9 +29,8 @@ struct RationalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printabl
     [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
 
     private:
-    NaturalNumber a;
+    Integer a;
     NaturalNumber b;
-    bool positive;
 };
 
 #endif

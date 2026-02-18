@@ -2,9 +2,9 @@
 #include "../../Bitmap.hpp"
 
 namespace MathLib {
-    Array<uint8_t> RepetitionCode::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        if (key.GetSize() != 1) return Array<uint8_t>();
-        const size_t n = key.AtUnsafe(0);
+    Array<uint8_t> RepetitionCode::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        if (key.type != CipherKey::Type::Normal || key.data.GetSize() != sizeof(size_t)) return Array<uint8_t>();
+        const size_t n = key.data.AsT<size_t>().Get();
         const Bitmap tmp = Bitmap(data);
         const size_t size = tmp.GetSize();
         Bitmap ret = Bitmap(size * n);
@@ -16,9 +16,9 @@ namespace MathLib {
         }
         return ret.GetArray();
     }
-    Array<uint8_t> RepetitionCode::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        if (key.GetSize() != 1) return Array<uint8_t>();
-        const size_t n = key.AtUnsafe(0);
+    Array<uint8_t> RepetitionCode::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
+        if (key.type != CipherKey::Type::Normal || key.data.GetSize() != sizeof(size_t)) return Array<uint8_t>();
+        const size_t n = key.data.AsT<size_t>().Get();
         const Bitmap tmp = Bitmap(data);
         const size_t start = range.GetMin() * 8;
         const size_t end = Min<size_t>(tmp.GetSize() / n, range.GetMax() * 8);

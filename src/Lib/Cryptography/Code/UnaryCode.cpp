@@ -3,10 +3,10 @@
 #include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    Array<uint8_t> UnaryCode::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> UnaryCode::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         const size_t size = data.GetSize();
-        if (key.GetSize() != 1 || !size) return Array<uint8_t>();
-        const bool symbol = key.AtUnsafe(0);
+        if (key.type != CipherKey::Type::Normal || key.data.GetSize() != sizeof(bool) || !size) return Array<uint8_t>();
+        const bool symbol = key.data.AsT<bool>().Get();
         Bitmap ret;
         for (size_t i = 0; i < size; i++) {
             const uint8_t x = data.AtUnsafe(i);
@@ -17,10 +17,10 @@ namespace MathLib {
         Array<uint8_t> tmp = ret.GetArray();
         return tmp.Add(ret.GetLastByteSize()) ? tmp : Array<uint8_t>();
     }
-    Array<uint8_t> UnaryCode::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> UnaryCode::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
         const size_t size = data.GetSize();
-        if (key.GetSize() != 1 || !size) return Array<uint8_t>();
-        const bool symbol = key.AtUnsafe(0);
+        if (key.type != CipherKey::Type::Normal || key.data.GetSize() != sizeof(bool) || !size) return Array<uint8_t>();
+        const bool symbol = key.data.AsT<bool>().Get();
         Bitmap bitmap = Bitmap(SubSequence<uint8_t>(data, Interval<size_t>(0, size - 1)), data.AtUnsafe(size - 1));
         const size_t bitmapSize = bitmap.GetSize();
         Array<uint8_t> ret;

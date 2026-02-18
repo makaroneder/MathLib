@@ -7,7 +7,7 @@
 
 namespace MathLib {
     struct CipherFileSystem : PhysicalFileSystem {
-        CipherFileSystem(ByteDevice& disk, FileCipher* cipher, const Sequence<uint64_t>& key);
+        CipherFileSystem(ByteDevice& disk, FileCipher* cipher, const CipherKey& key);
         virtual ~CipherFileSystem(void) override;
         [[nodiscard]] virtual bool IsValid(void) const override;
         [[nodiscard]] virtual bool Create(void) override;
@@ -44,8 +44,8 @@ namespace MathLib {
         private:
         [[nodiscard]] size_t WriteInternal(size_t& newSize, ByteArray& data, const Sequence<char>& path, size_t prevSize, size_t writePosition, const void* buffer, size_t size, size_t position);
 
+        CipherKey key;
         Array<CipherFile> files;
-        Array<uint64_t> key;
         FileCipher* cipher;
     };
 }

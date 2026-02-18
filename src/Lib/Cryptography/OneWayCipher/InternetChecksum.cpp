@@ -14,7 +14,7 @@ namespace MathLib {
         while (ret >> 16) ret = (uint16_t)ret + (ret >> 16);
         return ~ret;
     }
-    Array<uint8_t> InternetChecksum::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> InternetChecksum::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const uint16_t ret = Get(data);
         return Array<uint8_t>((const uint8_t*)&ret, sizeof(uint16_t));

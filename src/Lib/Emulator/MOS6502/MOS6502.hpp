@@ -16,21 +16,21 @@ namespace MathLib {
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:
-        [[nodiscard]] bool OrA(uint16_t addr);
+        [[nodiscard]] MathLib::Expected<uint16_t> GetInstructionOperandAddress(uint8_t addressingMode);
 
         template <typename T>
         [[nodiscard]] Expected<T> Fetch(void) {
-            const Expected<T> ret = ReadPositioned<T>(pc.value);
-            if (ret.HasValue()) pc.value += sizeof(T);
+            const Expected<T> ret = ReadPositioned<T>(pc);
+            if (ret.HasValue()) pc += sizeof(T);
             return ret;
         }
 
+        uint16_t pc;
+        uint8_t sp;
+        uint8_t a;
+        uint8_t x;
+        uint8_t y;
         MOS6502Flags flags;
-        Register pc;
-        Register sp;
-        Register a;
-        Register x;
-        Register y;
     };
 }
 

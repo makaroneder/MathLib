@@ -1,5 +1,12 @@
 #include "NaturalNumber.hpp"
 
+MathLib::Array<MathLib::SingleTypePair<NaturalNumber>> GetNextCoprimePair(const MathLib::SingleTypePair<NaturalNumber>& pair) {
+    return MathLib::MakeArray<MathLib::SingleTypePair<NaturalNumber>>(
+        MathLib::SingleTypePair<NaturalNumber>((pair.first + pair.first - pair.second).Get(), pair.first),
+        MathLib::SingleTypePair<NaturalNumber>(pair.first + pair.first + pair.second, pair.first),
+        MathLib::SingleTypePair<NaturalNumber>(pair.first + pair.second + pair.second, pair.second)
+    );
+}
 NaturalNumber::NaturalNumber(void) : data() {}
 NaturalNumber::NaturalNumber(size_t size) : data(size) {}
 NaturalNumber::NaturalNumber(const MathLib::Sequence<uint8_t>& data) : data(MathLib::CollectionToArray<uint8_t>(data)) {}
@@ -138,6 +145,24 @@ NaturalNumber NaturalNumber::GreatestCommonDivisor(const NaturalNumber& other) c
 NaturalNumber NaturalNumber::LeastCommonMultiple(const NaturalNumber& other) const {
     NaturalNumber mod;
     return (*this * other).LongDivMod(GreatestCommonDivisor(other), mod);
+}
+NaturalNumber NaturalNumber::GenerateCoprime(void) const {
+    if (*this == NaturalNumber::FromT<uint8_t>(2) || *this == NaturalNumber::FromT<uint8_t>(3)) return NaturalNumber::FromT<uint8_t>(1);
+    MathLib::Array<MathLib::SingleTypePair<NaturalNumber>> current = MathLib::MakeArray<MathLib::SingleTypePair<NaturalNumber>>(MathLib::SingleTypePair<NaturalNumber>(NaturalNumber::FromT<uint8_t>(2), NaturalNumber::FromT<uint8_t>(1)));
+    if (!IsEven() && !current.Add(MathLib::SingleTypePair<NaturalNumber>(NaturalNumber::FromT<uint8_t>(3), NaturalNumber::FromT<uint8_t>(1)))) return NaturalNumber();
+    MathLib::Array<MathLib::SingleTypePair<NaturalNumber>> next;
+    while (true) {
+        for (const MathLib::SingleTypePair<NaturalNumber>& x : current) {
+            const MathLib::Array<MathLib::SingleTypePair<NaturalNumber>> tmp = GetNextCoprimePair(x);
+            for (const MathLib::SingleTypePair<NaturalNumber>& y : tmp) {
+                if (!y.first.LessThanEqual(*this)) continue;
+                if (LessThanEqual(y.first)) return y.second;
+                if (!next.Add(y)) return NaturalNumber();
+            }
+        }
+        current = next;
+        if (!next.Reset()) return NaturalNumber();
+    }
 }
 void NaturalNumber::MultiplyBy256(uint8_t last) {
     const size_t size = data.GetSize();

@@ -19,6 +19,20 @@ namespace MathLib {
             }
             return ret;
         }
+        template <typename T>
+        [[nodiscard]] Expected<T> AsT(void) const {
+            if (array.GetSize() != sizeof(T)) return Expected<T>();
+            uint8_t buff[sizeof(T)];
+            for (size_t i = 0; i < sizeof(T); i++) buff[i] = array.AtUnsafe(i);
+            return *(const T*)buff;
+        }
+        template <typename T>
+        [[nodiscard]] Expected<T> AsT(size_t position) const {
+            if (array.GetSize() < position + sizeof(T)) return Expected<T>();
+            uint8_t buff[sizeof(T)];
+            for (size_t i = 0; i < sizeof(T); i++) buff[i] = array.AtUnsafe(position + i);
+            return *(const T*)buff;
+        }
         [[nodiscard]] Array<uint8_t> GetArray(void) const;
         [[nodiscard]] virtual size_t GetSize(void) const override;
         [[nodiscard]] virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) override;

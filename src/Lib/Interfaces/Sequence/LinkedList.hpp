@@ -14,10 +14,10 @@ namespace MathLib {
             return next ? next->GetSize() + 1 : 0;
         }
         [[nodiscard]] virtual T AtUnsafe(size_t index) const override {
-            return index ? next->At(index - 1) : next->data;
+            return index ? next->AtUnsafe(index - 1) : next->data;
         }
         [[nodiscard]] virtual T& AtUnsafe(size_t index) override {
-            return index ? next->At(index - 1) : next->data;
+            return index ? next->AtUnsafe(index - 1) : next->data;
         }
         [[nodiscard]] virtual bool Add(const T& value) override {
             if (next) return next->Add(value);

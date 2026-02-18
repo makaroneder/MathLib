@@ -1,21 +1,18 @@
 #ifndef MathLib_Graph_NetworkElement_H
 #define MathLib_Graph_NetworkElement_H
-#include <stddef.h>
-#include <stdint.h>
+#include "../Interfaces/Comparable.hpp"
 
 namespace MathLib {
-    struct NetworkElement {
+    struct NetworkElement;
+    struct NetworkElement : MathLib::Comparable<NetworkElement> {
         size_t node;
         size_t link;
-    
-        NetworkElement(void) : node(SIZE_MAX), link(SIZE_MAX) {}
-        NetworkElement(size_t node, size_t link) : node(node), link(link) {}
-        [[nodiscard]] bool operator==(const NetworkElement& other) const {
-            return node == other.node && link == other.link;
-        }
-        [[nodiscard]] bool operator!=(const NetworkElement& other) const {
-            return !(*this == other);
-        }
+
+        NetworkElement(void);
+        NetworkElement(size_t node, size_t link);
+
+        protected:
+        [[nodiscard]] virtual bool Equals(const NetworkElement& other) const override;
     };
 }
 

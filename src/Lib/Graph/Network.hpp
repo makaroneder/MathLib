@@ -45,13 +45,13 @@ namespace MathLib {
             const size_t size = tmp.GetSize();
             Array<NetworkElement> ret = Array<NetworkElement>(size);
             for (size_t i = 0; i < size; i++) {
-                const size_t link = tmp.At(i);
+                const size_t link = tmp.AtUnsafe(i);
                 const Edge edge = At(link);
-                ret.At(i) = NetworkElement(to ? edge.from : edge.to, link);
+                ret.AtUnsafe(i) = NetworkElement(to ? edge.from : edge.to, link);
             }
             return ret;
         }
-    
+
         private:
         Array<Node> nodes;
         Array<Link> links;

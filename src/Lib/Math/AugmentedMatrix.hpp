@@ -12,8 +12,8 @@ namespace MathLib {
         AugmentedMatrix(size_t width, size_t height, const Sequence<T>& data, size_t secondStart) : Matrix<T>(width, height, data), secondStart(secondStart) {}
         AugmentedMatrix(const Matrix<T>& a, const Matrix<T>& b) : Matrix<T>(a.GetWidth() + b.GetWidth(), a.GetHeight()), secondStart(a.GetWidth()) {
             for (size_t y = 0; y < a.GetHeight(); y++) {
-                for (size_t x = 0; x < a.GetWidth(); x++) this->At(x, y) = a.At(x, y);
-                for (size_t x = 0; x < b.GetWidth(); x++) this->At(x + a.GetWidth(), y) = b.At(x, y);
+                for (size_t x = 0; x < a.GetWidth(); x++) this->AtUnsafe(x, y) = a.AtUnsafe(x, y);
+                for (size_t x = 0; x < b.GetWidth(); x++) this->AtUnsafe(x + a.GetWidth(), y) = b.AtUnsafe(x, y);
             }
         }
         AugmentedMatrix(const Matrix<T>& data, size_t secondStart) : Matrix<T>(data), secondStart(secondStart) {}

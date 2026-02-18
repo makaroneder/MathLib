@@ -1,6 +1,7 @@
 #define SDL_MAIN_HANDLED
 #include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
+#include <Collision.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -19,12 +20,6 @@ struct Map {
     uint16_t data[13 * 13];
 };
 
-bool CheckPartialBoxCollision(size_t x1, size_t x2, size_t radius) {
-    return (x1 < x2 + radius) && (x2 < x1 + radius);
-}
-bool CheckBoxCollision(size_t x1, size_t y1, size_t x2, size_t y2, size_t width1, size_t height1, size_t width2, size_t height2) {
-    return CheckPartialBoxCollision(x1 * 2, x2 * 2, width1 + width2) && CheckPartialBoxCollision(y1 * 2, y2 * 2, height1 + height2);
-}
 /// @brief Entry point for this program
 /// @param argc Number of command line arguments
 /// @param argv Array of command line arguments
@@ -86,21 +81,21 @@ int main(int, char**) {
             const MathLib::Event event = renderer.GetEvent();
             if (event.type == MathLib::Event::Type::Quit) break;
             else if (event.type == MathLib::Event::Type::MousePressed && event.pressed) {
-                const size_t x = GetX(event.mousePosition);
-                const size_t y = GetY(event.mousePosition);
-                if (backgroundY && CheckBoxCollision(upperArrowX, upperArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
+                const size_t x = event.mouseX;
+                const size_t y = event.mouseY;
+                if (backgroundY && MathLib::CheckBoxCollision(upperArrowX, upperArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
                     backgroundY--;
                     update = true;
                 }
-                if (backgroundY != 2 && CheckBoxCollision(lowerArrowX, lowerArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
+                if (backgroundY != 2 && MathLib::CheckBoxCollision(lowerArrowX, lowerArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
                     backgroundY++;
                     update = true;
                 }
-                if (backgroundX && CheckBoxCollision(leftArrowX, leftArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
+                if (backgroundX && MathLib::CheckBoxCollision(leftArrowX, leftArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
                     backgroundX--;
                     update = true;
                 }
-                if (backgroundX != 2 && CheckBoxCollision(rightArrowX, rightArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
+                if (backgroundX != 2 && MathLib::CheckBoxCollision(rightArrowX, rightArrowY, x, y, arrowWidth, arrowHeight, 1, 1)) {
                     backgroundX++;
                     update = true;
                 }

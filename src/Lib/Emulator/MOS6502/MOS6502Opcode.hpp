@@ -4,12 +4,24 @@
 
 namespace MathLib {
     enum class MOS6502Opcode : uint8_t {
-        Brk = 0x00,
+        Break = 0x00, // TODO:
         OrAIndirectX,
         OrAZeroPage = 0x05,
-        ASLZeroPage,
-        PHP = 0x08,
+        ArithmeticShiftLeftZeroPage,
+        PushFlags = 0x08, // TODO:
         OrAImmediate,
+        ArithmeticShiftLeftImplied,
+        OrAAbsolute = 0x0d,
+        ArithmeticShiftLeftAbsolute,
+        BranchOnPlus = 0x10, // TODO:
+        OrAIndirectY,
+        OrAZeroPageX = 0x15,
+        ArithmeticShiftLeftZeroPageX,
+        ClearCarry = 0x18,
+        OrAAbsoluteY,
+        OrAAbsoluteX = 0x1d,
+        ArithmeticShiftLeftAbsoluteX,
+        // TODO: 0x20+
     };
 }
 

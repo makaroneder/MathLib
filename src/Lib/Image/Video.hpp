@@ -12,6 +12,8 @@ namespace MathLib {
         [[nodiscard]] virtual const Frame* GetValue(void) const override;
         [[nodiscard]] size_t GetWidth(void) const;
         [[nodiscard]] size_t GetHeight(void) const;
+        [[nodiscard]] Array<num_t> GetDurations(void) const;
+        void SetDurations(const Function<num_t, size_t>& durations);
         void Resize(size_t xMultiplier, size_t yMultiplier);
         void RotateUpsideDown(void);
 

@@ -4,6 +4,8 @@
 
 namespace MathLib {
     struct Path : Collection<size_t>, Printable {
+        Path(void);
+        Path(const Sequence<size_t>& vertices);
         [[nodiscard]] virtual size_t GetSize(void) const override;
         [[nodiscard]] virtual bool Add(const size_t& value) override;
         [[nodiscard]] virtual bool Reset(void) override;
@@ -13,8 +15,6 @@ namespace MathLib {
         [[nodiscard]] Edge GetEdge(void) const;
         [[nodiscard]] bool IsCyclic(void) const;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
-        [[nodiscard]] bool operator==(const Path& other) const;
-        [[nodiscard]] bool operator!=(const Path& other) const;
 
         private:
         Array<size_t> vertices;

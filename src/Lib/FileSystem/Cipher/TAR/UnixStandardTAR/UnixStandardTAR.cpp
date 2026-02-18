@@ -3,7 +3,7 @@
 #include "../../../../Interfaces/Sequence/ByteArray.hpp"
 
 namespace MathLib {
-    FileCipherData UnixStandardTAR::Identify(Readable& device, const Sequence<uint64_t>& key, size_t& unpaddedSize) const {
+    FileCipherData UnixStandardTAR::Identify(Readable& device, const CipherKey& key, size_t& unpaddedSize) const {
         if (!key.IsEmpty()) return FileCipherData();
         uint8_t buff[512];
         if (!device.ReadBuffer(buff, SizeOfArray(buff))) return FileCipherData();
@@ -12,11 +12,11 @@ namespace MathLib {
         unpaddedSize = header->GetSize();
         return FileCipherData(header->type == TARHeader::Type::Normal ? FileCipherData::Type::Normal : FileCipherData::Type::Skip, header->GetName(), UnixStandardTARHeader::PaddSize(unpaddedSize));
     }
-    Array<uint8_t> UnixStandardTAR::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        if (key.GetSize() > 1) return Array<uint8_t>();
+    Array<uint8_t> UnixStandardTAR::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t dataSize = data.GetSize();
         UnixStandardTARHeader header;
-        if (!header.Create(key.IsEmpty() ? "" : String((const char*)key.At(0)), dataSize)) return Array<uint8_t>();
+        if (!header.Create(path, dataSize)) return Array<uint8_t>();
         size_t size = dataSize;
         const size_t rem = size % 512;
         if (rem) size += 512 - rem;

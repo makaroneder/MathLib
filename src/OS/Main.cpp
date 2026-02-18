@@ -72,7 +72,6 @@ bool constructorsCalled = false;
 [[gnu::constructor]] void TestConstructors(void) {
     constructorsCalled = true;
 }
-uint8_t  stack[4096] __attribute__((aligned(16)));
 extern "C" void _init(void);
 extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
     _init();

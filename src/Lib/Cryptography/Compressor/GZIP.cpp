@@ -7,21 +7,28 @@
 #include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    Array<uint8_t> GZIP::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        if (key.GetSize() > 1) return Array<uint8_t>();
+    Array<uint8_t> GZIP::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        if (!key.IsEmpty()) return Array<uint8_t>();
         const GZIPHeader header = GZIPHeader(false, false, false, false, false, GZIPHeader::ExtraFlags::FastestCompression, GZIPHeader::OperatingSystem::Unix);
         ByteArray byteArray;
         if (!byteArray.Write<GZIPHeader>(header)) return Array<uint8_t>();
-        if (header.extraData && (!byteArray.Write<uint16_t>(2) || !byteArray.Write<uint16_t>(0x2137))) return Array<uint8_t>();
-        const Array<uint64_t> crcKey = MakeArray<uint64_t>(32, (uint64_t)CRC::Polynomial::CRC32, true, true, UINT32_MAX, true);
+        const CipherKey crcKey = CipherKey(MakeArray<CipherKey>(
+            CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(32))),
+            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(MakeArray<CRC::Polynomial>(CRC::Polynomial::CRC32))),
+            CipherKey(MakeArray<uint8_t>(true)),
+            CipherKey(MakeArray<uint8_t>(true)),
+            CipherKey(ByteArray::ToByteArray<uint64_t>(MakeArray<uint64_t>(UINT32_MAX))),
+            CipherKey(MakeArray<uint8_t>(true))
+        ));
         if (header.crc16 && !byteArray.Write<uint16_t>(*(const uint16_t*)CRC().Encrypt(byteArray, crcKey).GetValue())) return Array<uint8_t>();
-        if (!byteArray.AddSequence(Deflate().Encrypt(data, Array<uint64_t>())) || !byteArray.AddSequence(CRC().Encrypt(data, crcKey))) return Array<uint8_t>();
+        if (!byteArray.AddSequence(Deflate().Encrypt(data, CipherKey())) || !byteArray.AddSequence(CRC().Encrypt(data, crcKey))) return Array<uint8_t>();
         const uint32_t size = data.GetSize();
         if (!byteArray.AddSequence(ExternArray<uint8_t>((uint8_t*)&size, sizeof(uint32_t)))) return Array<uint8_t>();
         return byteArray.GetArray();
     }
-    Array<uint8_t> GZIP::DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
-        if (key.GetSize() > 1) return Array<uint8_t>();
+    Array<uint8_t> GZIP::DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const {
+        if (!(key.IsEmpty() || (key.type == CipherKey::Type::Normal && key.data.GetSize() == sizeof(bool)))) return Array<uint8_t>();
+        const bool noSignatureCheck = !key.IsEmpty() && key.data.AsT<bool>().Get();
         GZIPHeader header;
         if (!readable.Read<GZIPHeader>(header) || !header.IsValid() || header.compressionMethod != GZIPHeader::CompressionMethod::Deflate) return Array<uint8_t>();
         Array<uint8_t> headerData = Array<uint8_t>((const uint8_t*)&header, sizeof(GZIPHeader));
@@ -42,14 +49,21 @@ namespace MathLib {
                 if (!tmp) break;
             }
         }
-        const Array<uint64_t> crcKey = MakeArray<uint64_t>(32, (uint64_t)CRC::Polynomial::CRC32, true, true, UINT32_MAX, true);
+        const CipherKey crcKey = CipherKey(MakeArray<CipherKey>(
+            CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(32))),
+            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(MakeArray<CRC::Polynomial>(CRC::Polynomial::CRC32))),
+            CipherKey(MakeArray<uint8_t>(true)),
+            CipherKey(MakeArray<uint8_t>(true)),
+            CipherKey(ByteArray::ToByteArray<uint64_t>(MakeArray<uint64_t>(UINT32_MAX))),
+            CipherKey(MakeArray<uint8_t>(true))
+        ));
         if (header.crc16) {
             uint16_t crc16;
             if (!readable.Read<uint16_t>(crc16)) return Array<uint8_t>();
             if (*(const uint16_t*)CRC().Encrypt(headerData, crcKey).GetValue() != crc16) return Array<uint8_t>();
         }
-        if (!key.IsEmpty() && key.At(0)) return Deflate().DecryptReadablePartial(readable, Array<uint64_t>(), range);
-        const Array<uint8_t> ret = Deflate().DecryptReadable(readable, Array<uint64_t>());
+        if (noSignatureCheck) return Deflate().DecryptReadablePartial(readable, CipherKey(), range);
+        const Array<uint8_t> ret = Deflate().DecryptReadable(readable, CipherKey());
         uint32_t crc;
         if (!readable.Read<uint32_t>(crc)) return Array<uint8_t>();
         uint32_t expectedSize;

@@ -118,7 +118,7 @@ int main(int, char**) {
             const MathLib::Event event = renderer.GetEvent();
             if (event.type == MathLib::Event::Type::Quit) break;
             else if (event.type == MathLib::Event::Type::MousePressed && event.pressed && event.mouseButton == MathLib::Event::MouseButton::Left)
-                update = hand.Select(renderer.IndexToPosition(MathLib::ConvertMatrix<size_t, MathLib::num_t>(event.mousePosition)));
+                update = hand.Select(renderer.IndexToPosition<MathLib::num_t>(event.mouseX, event.mouseY));
             else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
                 switch (event.key) {
                     case 'e': {

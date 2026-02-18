@@ -21,8 +21,8 @@ namespace MathLib {
             Button4,
             Button5,
         };
-        /// @brief Mouse position
-        Matrix<size_t> mousePosition;
+        size_t mouseX;
+        size_t mouseY;
         Type type;
         MouseButton mouseButton;
         bool pressed;
@@ -40,10 +40,10 @@ namespace MathLib {
         /// @param position Mouse position
         /// @param button Mouse button pressed or released
         /// @param pressed Mouse button status
-        Event(const Matrix<size_t>& position, MouseButton button, bool pressed);
+        Event(size_t mouseX, size_t mouseY, MouseButton button, bool pressed);
         /// @brief Creates a new event
         /// @param position Mouse position
-        Event(const Matrix<size_t>& position);
+        Event(size_t mouseX, size_t mouseY);
         /// @brief Converts struct to string
         /// @param padding String to pad with
         /// @return String representation

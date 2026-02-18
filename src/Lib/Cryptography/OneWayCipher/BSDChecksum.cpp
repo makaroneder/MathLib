@@ -1,7 +1,7 @@
 #include "BSDChecksum.hpp"
 
 namespace MathLib {
-    Array<uint8_t> BSDChecksum::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> BSDChecksum::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         uint16_t ret = 0;

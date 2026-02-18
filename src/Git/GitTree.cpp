@@ -3,17 +3,6 @@
 #include <Cryptography/Compressor/ZLib.hpp>
 #include <ExternArray.hpp>
 
-[[nodiscard]] uint8_t StringToU4(char chr) {
-    switch (chr) {
-        case '0' ... '9': return chr - '0';
-        case 'a' ... 'f': return chr - 'a' + 0xa;
-        case 'A' ... 'F': return chr - 'A' + 0xa;
-        default: return UINT8_MAX;
-    }
-}
-[[nodiscard]] uint8_t StringToU8(char a, char b) {
-    return (StringToU4(a) << 4) | StringToU4(b);
-}
 bool GitTree::Save(MathLib::Writable& file) const {
     const size_t elementCount = elements.GetSize();
     size_t size = elementCount * (7 + 1 + 20);
@@ -27,13 +16,13 @@ bool GitTree::Save(MathLib::Writable& file) const {
         if (!buffer.WriteBuffer(fileMode, 7) || !buffer.Puts(element.GetKey()) || !buffer.Write<char>('\0')) return false;
         const size_t size = element.value.GetSize();
         for (size_t i = 0; i < size; i += 2)
-            if (!buffer.Write<uint8_t>(StringToU8(element.value.AtUnsafe(i), element.value.AtUnsafe(i + 1)))) return false;
+            if (!buffer.Write<uint8_t>(MathLib::StringToU8(element.value.AtUnsafe(i), element.value.AtUnsafe(i + 1)))) return false;
     }
-    const MathLib::Array<uint8_t> data = MathLib::ZLib().Encrypt(buffer, MathLib::Array<uint64_t>());
+    const MathLib::Array<uint8_t> data = MathLib::ZLib().Encrypt(buffer, MathLib::CipherKey());
     return file.WriteBuffer(data.GetValue(), data.GetSize());
 }
 bool GitTree::Load(MathLib::Readable& file) {
-    const MathLib::Array<uint8_t> data = MathLib::ZLib().DecryptReadable(file, MathLib::Array<uint64_t>());
+    const MathLib::Array<uint8_t> data = MathLib::ZLib().DecryptReadable(file, MathLib::CipherKey());
     size_t i = 5;
     if (!data.StartsWith(MathLib::ExternArray<uint8_t>((uint8_t*)treeStart, i))) return false;
     const size_t size = data.GetSize();

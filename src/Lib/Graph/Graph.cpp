@@ -1,5 +1,4 @@
 #include "Graph.hpp"
-#include "../String.hpp"
 
 namespace MathLib {
     Graph::Graph(void) : edges() {}
@@ -17,7 +16,7 @@ namespace MathLib {
         const size_t size = path.GetSize();
         if (size <= 1) return false;
         for (size_t i = 1; i < size; i++)
-            if (!edges.Add(Edge(path.At(i - 1), path.At(i)))) return false;
+            if (!edges.Add(Edge(path.AtUnsafe(i - 1), path.AtUnsafe(i)))) return false;
         return true;
     }
     EdgeDegree Graph::GetDegree(size_t edge) const {
@@ -29,8 +28,7 @@ namespace MathLib {
         return ret;
     }
     Array<Path> Graph::GetPaths(const Edge& edge) const {
-        Array<Path> ret = MakeArray<Path>(Path());
-        if (!ret.At(0).Add(edge.from)) return Array<Path>();
+        Array<Path> ret = MakeArray<Path>(Path(MakeArray<size_t>(edge.from)));
         Array<Path> buffer;
         while (true) {
             bool exit = true;
@@ -70,9 +68,9 @@ namespace MathLib {
         const size_t size = edges.GetSize();
         for (size_t i = 0; i < size; i++) {
             if (to) {
-                if (edges.At(i).to == edge && !ret.Add(i)) return Array<size_t>();
+                if (edges.AtUnsafe(i).to == edge && !ret.Add(i)) return Array<size_t>();
             }
-            else if (edges.At(i).from == edge && !ret.Add(i)) return Array<size_t>();
+            else if (edges.AtUnsafe(i).from == edge && !ret.Add(i)) return Array<size_t>();
         }
         return ret;
     }

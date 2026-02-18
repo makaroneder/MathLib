@@ -19,7 +19,7 @@ int main(int, char**) {
         Git git = Git(gitDirectory, "a4f3d240edb511e8f6ef25ac66c5265cfcd94240");
         std::cout << git.ListFiles(""_M, 3) << std::endl;
         MathLib::File file = gitDirectory.Open("objects/99/add09dbbf1fe25cfdc091c8359a0c327c32a2f"_M, MathLib::OpenMode::Read);
-        const MathLib::Array<uint8_t> buff = MathLib::ZLib().DecryptReadable(file, MathLib::Array<uint64_t>());
+        const MathLib::Array<uint8_t> buff = MathLib::ZLib().DecryptReadable(file, MathLib::CipherKey());
         std::cout << MathLib::DumpMemory((uintptr_t)buff.GetValue(), buff.GetSize(), 8) << std::endl;
         return EXIT_SUCCESS;
     }

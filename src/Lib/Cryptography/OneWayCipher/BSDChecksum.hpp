@@ -4,7 +4,7 @@
 
 namespace MathLib {
     struct BSDChecksum : OneWayCipher {
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override;
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
     };
 }
 

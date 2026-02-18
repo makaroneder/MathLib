@@ -8,8 +8,8 @@
 }
 Git::Git(MathLib::FileSystem& fs, const MathLib::String& rootHash) : rootHash(rootHash), fs(fs) {}
 MathLib::String Git::CreateBlob(const MathLib::Array<uint8_t>& data) {
-    const MathLib::Array<uint8_t> blobData = GitBlob().Encrypt(data, MathLib::Array<uint64_t>());
-    const MathLib::Array<uint8_t> hash = MathLib::SHA1().Encrypt(blobData, MathLib::Array<uint64_t>());
+    const MathLib::Array<uint8_t> blobData = GitBlob().Encrypt(data, MathLib::CipherKey());
+    const MathLib::Array<uint8_t> hash = MathLib::SHA1().Encrypt(blobData, MathLib::CipherKey());
     const size_t size = hash.GetSize();
     MathLib::String ret = MathLib::ToString(hash.At(0), 16, 2);
     MathLib::String path = "objects/"_M + ret + '/';
@@ -18,7 +18,7 @@ MathLib::String Git::CreateBlob(const MathLib::Array<uint8_t>& data) {
         ret += MathLib::ToString(hash.AtUnsafe(i), 16, 2);
         path += MathLib::ToString(hash.AtUnsafe(i), 16, 2);
     }
-    const MathLib::Array<uint8_t> compressed = MathLib::ZLib().Encrypt(blobData, MathLib::Array<uint64_t>());
+    const MathLib::Array<uint8_t> compressed = MathLib::ZLib().Encrypt(blobData, MathLib::CipherKey());
     MathLib::File file = fs.Open(path, MathLib::OpenMode::Write);
     if (!file.WriteBuffer(compressed.GetValue(), compressed.GetSize())) return "";
     return ret;
@@ -59,7 +59,7 @@ bool Git::Close(size_t file) {
 size_t Git::Read(size_t file, void* buffer, size_t size, size_t position) {
     if (file >= files.GetSize() || files.AtUnsafe(file).IsEmpty()) return false;
     MathLib::File tmp = fs.Open(HashToPath(files.AtUnsafe(file)), MathLib::OpenMode::Read);
-    const MathLib::Array<uint8_t> ret = GitBlob().DecryptPartial(MathLib::ZLib().DecryptReadable(tmp, MathLib::Array<uint64_t>()), MathLib::Array<uint64_t>(), MathLib::Interval<size_t>(position, position + size));
+    const MathLib::Array<uint8_t> ret = GitBlob().DecryptPartial(MathLib::ZLib().DecryptReadable(tmp, MathLib::CipherKey()), MathLib::CipherKey(), MathLib::Interval<size_t>(position, position + size));
     const size_t retSize = ret.GetSize();
     MathLib::MemoryCopy(ret.GetValue(), buffer, retSize);
     return retSize;
@@ -75,7 +75,7 @@ size_t Git::Write(size_t file, const void* buffer, size_t size, size_t position)
 size_t Git::GetSize(size_t file) {
     if (file >= files.GetSize() || files.AtUnsafe(file).IsEmpty()) return false;
     MathLib::File tmp = fs.Open(HashToPath(files.AtUnsafe(file)), MathLib::OpenMode::Read);
-    return GitBlob().Decrypt(MathLib::ZLib().DecryptReadable(tmp, MathLib::Array<uint64_t>()), MathLib::Array<uint64_t>()).GetSize();
+    return GitBlob().Decrypt(MathLib::ZLib().DecryptReadable(tmp, MathLib::CipherKey()), MathLib::CipherKey()).GetSize();
 }
 MathLib::Array<MathLib::FileInfo> Git::ReadDirectory(const MathLib::Sequence<char>& path) {
     MathLib::String prev = rootHash;
@@ -100,7 +100,7 @@ MathLib::Array<MathLib::FileInfo> Git::ReadDirectory(const MathLib::Sequence<cha
     MathLib::Array<MathLib::FileInfo> ret = MathLib::Array<MathLib::FileInfo>(size);
     for (size_t i = 0; i < size; i++) {
         MathLib::File file = fs.Open(HashToPath(tree.elements.AtUnsafe(i).value), MathLib::OpenMode::Read);
-        const MathLib::Array<uint8_t> id = MathLib::ZLib().DecryptReadablePartial(file, MathLib::Array<uint64_t>(), MathLib::Interval<size_t>(0, 5));
+        const MathLib::Array<uint8_t> id = MathLib::ZLib().DecryptReadablePartial(file, MathLib::CipherKey(), MathLib::Interval<size_t>(0, 5));
         MathLib::FileInfo::Type type = MathLib::FileInfo::Type::Unknown;
         if (id == MathLib::MakeArray<uint8_t>('b', 'l', 'o', 'b', ' ')) type = MathLib::FileInfo::Type::File;
         if (id == MathLib::MakeArray<uint8_t>('t', 'r', 'e', 'e', ' ')) type = MathLib::FileInfo::Type::Directory;

@@ -6,6 +6,7 @@
 #include "String.hpp"
 #include "Threads.hpp"
 #include "FunctionT.hpp"
+#include "Image/Video.hpp"
 #include "Math/Quaternion.hpp"
 #include "Geometry/LineShape.hpp"
 #include "Image/SaveableImage.hpp"
@@ -34,7 +35,8 @@ namespace MathLib {
         /// @param color Color of the pixel
         template <typename T>
         void SetPixel(const Matrix<T>& pixel, uint32_t color) {
-            SetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier, color);
+            const Matrix<T> tmp = ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position));
+            SetPixelInternal(GetX(tmp) * pointMultiplier, GetY(tmp) * pointMultiplier, color);
         }
         /// @brief Returns pixel
         /// @tparam T Type of number
@@ -42,7 +44,8 @@ namespace MathLib {
         /// @return Color of the pixel
         template <typename T>
         [[nodiscard]] uint32_t GetPixel(const Matrix<T>& pixel) {
-            const uint32_t* color = GetPixelInternal<T>(ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position)) * pointMultiplier);
+            const Matrix<T> tmp = ProjectVector<T>(pixel - ConvertMatrix<num_t, T>(position));
+            const uint32_t* color = GetPixelInternal(GetX(tmp) * pointMultiplier, GetY(tmp) * pointMultiplier);
             return color ? *color : 0;
         }
         /// @brief Copies pixels from renderer to this renderer
@@ -68,28 +71,30 @@ namespace MathLib {
         void DrawImage(const Image& image, const Matrix<T>& pos) {
             const size_t width = image.GetWidth();
             const size_t height = image.GetHeight();
-            Matrix<ssize_t> tmp = ConvertMatrix<T, ssize_t>(PositionToIndex<T>(pos - ConvertMatrix<num_t, T>(position)));
-            GetX(tmp) -= width / 2;
-            GetY(tmp) -= height / 2;
-            const ssize_t maxX = Min<ssize_t>(GetWidth() - GetX(tmp), width);
-            const ssize_t maxY = Min<ssize_t>(GetHeight() - GetY(tmp), height);
-            const size_t minX = Max<ssize_t>(-GetY(tmp), 0);
-            const size_t minY = Max<ssize_t>(-GetX(tmp), 0);
+            const Matrix<T> tmp1 = pos - ConvertMatrix<num_t, T>(position);
+            const Matrix<ssize_t> tmp2 = PositionToIndexInternal(GetX(tmp1) * pointMultiplier, GetY(tmp1) * pointMultiplier);
+            const ssize_t tmpX = GetX(tmp2) - width / 2;
+            const ssize_t tmpY = GetY(tmp2) - height / 2;
+            const ssize_t maxX = Min<ssize_t>(GetWidth() - tmpX, width);
+            const ssize_t maxY = Min<ssize_t>(GetHeight() - tmpY, height);
+            const size_t minX = Max<ssize_t>(-tmpY, 0);
+            const size_t minY = Max<ssize_t>(-tmpX, 0);
             for (ssize_t y = minY; y < maxY; y++) {
-                const ssize_t wy = GetY(tmp) + y;
+                const ssize_t wy = tmpY + y;
                 for (ssize_t x = minX; x < maxX; x++) {
-                    const ssize_t wx = GetX(tmp) + x;
+                    const ssize_t wx = tmpX + x;
                     AtUnsafe(wx, wy) = BlendColor(AtUnsafe(wx, wy), image.AtUnsafe(x, y), alphaPosition);
                 }
             }
         }
         void DrawImage(const Image& image, ssize_t centerX, ssize_t centerY);
         [[nodiscard]] bool DrawPartialImage(const Image& image, size_t startX, size_t endX, size_t startY, size_t endY, ssize_t centerX, ssize_t centerY);
+        void DrawStackedImage(const Video& images, ssize_t centerX, ssize_t centerY, ssize_t diff);
         void FillRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
         void DrawRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
         void DrawLinePararellToOX(ssize_t startX, ssize_t endX, ssize_t y, uint32_t color);
         void DrawLinePararellToOY(ssize_t startY, ssize_t endY, ssize_t x, uint32_t color);
-        void DrawGrid(ssize_t centerX, ssize_t centerY, size_t cellSize, size_t cellCount, uint32_t color);
+        void DrawGrid(ssize_t centerX, ssize_t centerY, size_t width, size_t height, size_t cellsX, size_t cellsY, uint32_t color);
         /// @brief Draws a line
         /// @tparam T Type of number
         /// @param line Line to draw
@@ -182,17 +187,14 @@ namespace MathLib {
         /// @param color Color of the circle
         template <typename T>
         void FillCircle2D(const Matrix<T>& position, const T& radius, uint32_t color) {
-            const Matrix<ssize_t> pos = ConvertMatrix<T, ssize_t>(ProjectVector<T>(position - ConvertMatrix<num_t, T>(this->position)) * pointMultiplier);
+            const Matrix<T> tmp = ProjectVector<T>(position - ConvertMatrix<num_t, T>(this->position));
+            const ssize_t posX = GetX(tmp) * pointMultiplier;
+            const ssize_t posY = GetY(tmp) * pointMultiplier;
             const ssize_t r = radius * pointMultiplier;
             const size_t radiusSquared = r * r;
-            Matrix<ssize_t> offset = Matrix<ssize_t>(2, 1);
             for (ssize_t y = -r; y <= r; y++) {
                 const ssize_t absX = Sqrt(radiusSquared - y * y);
-                for (ssize_t x = -absX; x <= absX; x++) {
-                    GetX(offset) = x;
-                    GetY(offset) = y;
-                    SetPixelInternal<ssize_t>(pos + offset, color);
-                }
+                for (ssize_t x = -absX; x <= absX; x++) SetPixelInternal(posX + x, posY + y, color);
             }
         }
         /// @brief Renders strings
@@ -415,16 +417,8 @@ namespace MathLib {
         /// @param index Index to convert
         /// @return Position
         template <typename T>
-        [[nodiscard]] Matrix<T> IndexToPosition(const Matrix<T>& index) const {
-            return CreateVector<T>((GetX(index) - GetWidth() / 2) / pointMultiplier, (GetHeight() / 2 - GetY(index)) / pointMultiplier, 0);
-        }
-        /// @brief Converts position to index
-        /// @tparam T Type of number
-        /// @param pos Position to convert
-        /// @return Index
-        template <typename T>
-        [[nodiscard]] Matrix<T> PositionToIndex(const Matrix<T>& pos) const {
-            return PositionToIndexInternal(pos * pointMultiplier);
+        [[nodiscard]] Matrix<T> IndexToPosition(ssize_t x, ssize_t y) const {
+            return CreateVector<T>(((T)x - GetWidth() / 2) / pointMultiplier, (GetHeight() / 2 - (T)y) / pointMultiplier, 0);
         }
         /// @brief Sets image loading/saving interface
         /// @tparam T Type of image interface
@@ -464,26 +458,23 @@ namespace MathLib {
         /// @tparam T Type of number
         /// @param pos Position to convert
         /// @return Index
-        template <typename T>
-        [[nodiscard]] Matrix<T> PositionToIndexInternal(const Matrix<T>& pos) const {
-            return CreateVector<T>(GetWidth() / 2 + GetX(pos), GetHeight() / 2 - GetY(pos), 0);
+        [[nodiscard]] Matrix<ssize_t> PositionToIndexInternal(ssize_t x, ssize_t y) const {
+            return CreateVector<ssize_t>(GetWidth() / 2 + x, GetHeight() / 2 - y, 0);
         }
         /// @brief Returns pixel from index
         /// @tparam T Type of number
         /// @param pos Index of pixel
         /// @return Pixel
-        template <typename T>
-        [[nodiscard]] uint32_t* GetPixelInternal(const Matrix<T>& pos) {
-            const Matrix<T> tmp = PositionToIndexInternal<T>(pos);
+        [[nodiscard]] uint32_t* GetPixelInternal(ssize_t x, ssize_t y) {
+            const Matrix<ssize_t> tmp = PositionToIndexInternal(x, y);
             return IsBetween(GetX(tmp), 0, (ssize_t)GetWidth() - 1) && IsBetween(GetY(tmp), 0, (ssize_t)GetHeight() - 1) ? &AtUnsafe(GetX(tmp), GetY(tmp)) : nullptr;
         }
         /// @brief Sets pixel from index
         /// @tparam T Type of number
         /// @param pos Index of pixel
         /// @param color Value to set
-        template <typename T>
-        void SetPixelInternal(const Matrix<T>& pos, uint32_t color) {
-            uint32_t* pixel = GetPixelInternal<T>(pos);
+        void SetPixelInternal(ssize_t x, ssize_t y, uint32_t color) {
+            uint32_t* pixel = GetPixelInternal(x, y);
             if (pixel) *pixel = BlendColor(*pixel, color, alphaPosition);
         }
     };

@@ -2,9 +2,9 @@
 #include "../../Bitmap.hpp"
 
 namespace MathLib {
-    Array<uint8_t> SumComplement::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        if (key.GetSize() != 1) return Array<uint8_t>();
-        const uint64_t bits = key.At(0);
+    Array<uint8_t> SumComplement::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        if (key.type != CipherKey::Type::Normal || key.data.GetSize() != sizeof(uint64_t)) return Array<uint8_t>();
+        const uint64_t bits = key.data.AsT<uint64_t>().Get();
         Bitmap ret = Bitmap(bits);
         ret.Fill(false);
         Bitmap mask = ret;

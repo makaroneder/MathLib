@@ -1,6 +1,7 @@
 {
     "url" : "https://en.wikipedia.org/wiki/URL",
-    "maxDepth": 2,
+    "maxDepth": 1,
+    "parseRobots": true,
     "ignore": [
         "https://en.wikipedia.org/wiki/Main_Page",
         "https://en.wikipedia.org/wiki/Talk:",
@@ -36,5 +37,8 @@
     "scrape": [
         "https://en.wikipedia.org/wiki"
     ],
-    "save": []
+    "save": [
+        "https://upload.wikimedia.org/wikipedia",
+        "https://en.wikipedia.org/static"
+    ]
 }

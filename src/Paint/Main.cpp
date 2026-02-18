@@ -28,11 +28,17 @@ int main(int, char**) {
             else if (event.type == MathLib::Event::Type::MousePressed) {
                 switch (event.mouseButton) {
                     case MathLib::Event::MouseButton::None: {
-                        if (position != MathLib::CreateVector<size_t>(SIZE_MAX, SIZE_MAX, SIZE_MAX)) position = event.mousePosition;
+                        if (position != MathLib::CreateVector<size_t>(SIZE_MAX, SIZE_MAX, SIZE_MAX)) {
+                            GetX(position) = event.mouseX;
+                            GetY(position) = event.mouseY;
+                        }
                         break;
                     }
                     case MathLib::Event::MouseButton::Left: {
-                        if (event.pressed) position = event.mousePosition;
+                        if (event.pressed) {
+                            GetX(position) = event.mouseX;
+                            GetY(position) = event.mouseY;
+                        }
                         else position = MathLib::CreateVector<size_t>(SIZE_MAX, SIZE_MAX, SIZE_MAX);
                         break;
                     }
@@ -44,7 +50,7 @@ int main(int, char**) {
                 }
             }
             if (position != MathLib::CreateVector<size_t>(SIZE_MAX, SIZE_MAX, SIZE_MAX))
-                renderer.FillCircle2D<MathLib::num_t>(renderer.IndexToPosition<MathLib::num_t>(MathLib::ConvertMatrix<size_t, MathLib::num_t>(position)), radius, colors[color]);
+                renderer.FillCircle2D<MathLib::num_t>(renderer.IndexToPosition<MathLib::num_t>(GetX(position), GetY(position)), radius, colors[color]);
         }
         delete MathLib::allocator;
         return EXIT_SUCCESS;

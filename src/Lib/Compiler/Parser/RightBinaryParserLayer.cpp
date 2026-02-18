@@ -7,11 +7,11 @@ namespace MathLib {
         ParserNode ret = next();
         ParserNode* curr = &ret;
         while (i < size) {
-            const Token token = tokens.At(i);
+            const Token token = tokens.AtUnsafe(i);
             if (!token.CheckType(tokenType)) break;
             i++;
             *curr = ParserNode(nodeType, token.GetValue(), MakeArray<ParserNode>(*curr, next()));
-            curr = &curr->At(1);
+            curr = &curr->AtUnsafe(1);
         }
         return ret;
     }

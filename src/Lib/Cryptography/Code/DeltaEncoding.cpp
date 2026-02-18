@@ -1,7 +1,7 @@
 #include "DeltaEncoding.hpp"
 
 namespace MathLib {
-    Array<uint8_t> DeltaEncoding::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> DeltaEncoding::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         uint8_t prev = 0;
@@ -13,7 +13,7 @@ namespace MathLib {
         }
         return ret;
     }
-    Array<uint8_t> DeltaEncoding::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> DeltaEncoding::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         const size_t start = range.GetMin();

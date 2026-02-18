@@ -1,6 +1,7 @@
 #ifndef NaturalNumber_H
 #define NaturalNumber_H
 #include <Expected.hpp>
+#include <SingleTypePair.hpp>
 #include <Interfaces/Saveable.hpp>
 #include <Interfaces/Printable.hpp>
 #include <Interfaces/Orderable.hpp>
@@ -30,6 +31,7 @@ struct NaturalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable
     [[nodiscard]] NaturalNumber Factorial(const NaturalNumber& level) const;
     [[nodiscard]] NaturalNumber GreatestCommonDivisor(const NaturalNumber& other) const;
     [[nodiscard]] NaturalNumber LeastCommonMultiple(const NaturalNumber& other) const;
+    [[nodiscard]] NaturalNumber GenerateCoprime(void) const;
     void MultiplyBy256(uint8_t last);
 
     NaturalNumber& operator+=(const MathLib::Sequence<uint8_t>& other);

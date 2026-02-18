@@ -16,6 +16,9 @@ Formula Formula::MakeAdd(Formula a, Formula b) {
     if (a.type == Type::Constant) {
         if (a.value == RationalNumber()) return b;
         if (b.type == Type::Constant) return Formula(a.value + b.value);
+        if (b.type == Type::Add) for (uint8_t i = 0; i < 2; i++)
+            if (b.children.AtUnsafe(i).type == Type::Constant)
+                return MakeAdd(b.children.AtUnsafe(!i), Formula(a.value + b.children.AtUnsafe(i).value));
     }
     if (b.type == Type::Sub) MathLib::Swap<Formula>(a, b);
     if (a.type == Type::Sub && a.children.At(1) == b) return a.children.At(0);
@@ -29,6 +32,9 @@ Formula Formula::MakeSub(Formula a, Formula b) {
     if (b.type == Type::Constant) {
         if (b.value == RationalNumber()) return a;
         if (a.type == Type::Constant) return Formula(a.value - b.value);
+        if (a.type == Type::Add) for (uint8_t i = 0; i < 2; i++)
+            if (a.children.AtUnsafe(i).type == Type::Constant)
+                return MakeAdd(a.children.AtUnsafe(!i), Formula(a.children.AtUnsafe(i).value - b.value));
     }
     return Formula(Type::Sub, a, b);
 }
@@ -42,6 +48,9 @@ Formula Formula::MakeMul(Formula a, Formula b) {
         if (a.value == RationalNumber()) return a;
         if (a.value == RationalNumber(NaturalNumber::FromT<uint8_t>(1))) return b;
         if (b.type == Type::Constant) return Formula(a.value * b.value);
+        if (b.type == Type::Mul) for (uint8_t i = 0; i < 2; i++)
+            if (b.children.AtUnsafe(i).type == Type::Constant)
+                return MakeMul(b.children.AtUnsafe(!i), Formula(a.value * b.children.AtUnsafe(i).value));
     }
     if (b.type == Type::Div) MathLib::Swap<Formula>(a, b);
     if (a.type == Type::Div && a.children.At(1) == b) return a.children.At(0);

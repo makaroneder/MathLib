@@ -40,7 +40,7 @@ namespace MathLib {
         sum += curr;
         return tree.translationTable[sum];
     }
-    Array<uint8_t> Deflate::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> Deflate::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         Array<uint8_t> ret;
         size_t size = data.GetSize();
@@ -79,7 +79,7 @@ namespace MathLib {
         }
         return ret;
     }
-    Array<uint8_t> Deflate::DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> Deflate::DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         Array<uint8_t> ret;
         Bitmap bitmap;

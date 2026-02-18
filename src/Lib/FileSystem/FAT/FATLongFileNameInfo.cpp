@@ -8,7 +8,7 @@ namespace MathLib {
         for (size_t i = 0; i < SizeOfArray(lfn.name2); i++) name[i + SizeOfArray(lfn.name1)] = lfn.name2[i];
         for (size_t i = 0; i < SizeOfArray(lfn.name3); i++) name[i + SizeOfArray(lfn.name1) + SizeOfArray(lfn.name2)] = lfn.name3[i];
     }
-    bool FATLongFileNameInfo::operator<(const FATLongFileNameInfo& other) const {
-        return order < other.order;
+    bool FATLongFileNameInfo::LessThanEqual(const Orderable& other) const {
+        return order <= ((const FATLongFileNameInfo&)other).order;
     }
 }

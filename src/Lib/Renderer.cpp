@@ -10,8 +10,8 @@ namespace MathLib {
         const ssize_t topY = centerY - height / 2;
         const ssize_t maxX = Min<ssize_t>(GetWidth() - leftX, width);
         const ssize_t maxY = Min<ssize_t>(GetHeight() - topY, height);
-        const size_t minX = Max<ssize_t>(-topY, 0);
-        const size_t minY = Max<ssize_t>(-leftX, 0);
+        const size_t minX = Max<ssize_t>(-leftX, 0);
+        const size_t minY = Max<ssize_t>(-topY, 0);
         for (ssize_t y = minY; y < maxY; y++) {
             const ssize_t wy = topY + y;
             for (ssize_t x = minX; x < maxX; x++) {
@@ -44,16 +44,15 @@ namespace MathLib {
         const ssize_t max = Min<ssize_t>(endY, GetHeight());
         for (ssize_t y = min; y < max; y++) AtUnsafe(x, y) = BlendColor(AtUnsafe(x, y), color, alphaPosition);
     }
-    void Renderer::DrawGrid(ssize_t centerX, ssize_t centerY, size_t cellSize, size_t cellCount, uint32_t color) {
-        const size_t size = cellSize * cellCount;
-        const ssize_t leftX = centerX - size / 2;
-        const ssize_t topY = centerY - size / 2;
-        for (size_t y = 0; y < cellCount; y++) {
-            const ssize_t startY = topY + y * cellSize;
-            const ssize_t endY = startY + cellSize;
-            for (size_t x = 0; x < cellCount; x++) {
-                const ssize_t startX = leftX + x * cellSize;
-                const ssize_t endX = startX + cellSize;
+    void Renderer::DrawGrid(ssize_t centerX, ssize_t centerY, size_t width, size_t height, size_t cellsX, size_t cellsY, uint32_t color) {
+        const ssize_t leftX = centerX - width * cellsX / 2;
+        const ssize_t topY = centerY - height * cellsY / 2;
+        for (size_t y = 0; y < cellsY; y++) {
+            const ssize_t startY = topY + y * height;
+            const ssize_t endY = startY + height;
+            for (size_t x = 0; x < cellsX; x++) {
+                const ssize_t startX = leftX + x * width;
+                const ssize_t endX = startX + width;
                 DrawLinePararellToOX(startX, endX, startY, color);
                 DrawLinePararellToOX(startX, endX, endY, color);
                 DrawLinePararellToOY(startY, endY, startX, color);
@@ -66,8 +65,8 @@ namespace MathLib {
         const ssize_t topY = centerY - height / 2;
         const ssize_t maxX = Min<ssize_t>(GetWidth() - leftX, width);
         const ssize_t maxY = Min<ssize_t>(GetHeight() - topY, height);
-        const size_t minX = Max<ssize_t>(-topY, 0);
-        const size_t minY = Max<ssize_t>(-leftX, 0);
+        const size_t minX = Max<ssize_t>(-leftX, 0);
+        const size_t minY = Max<ssize_t>(-topY, 0);
         for (ssize_t y = minY; y < maxY; y++) {
             const ssize_t wy = topY + y;
             for (ssize_t x = minX; x < maxX; x++) {
@@ -83,6 +82,11 @@ namespace MathLib {
         if (endX < startX || endY < startY || endX >= image.GetWidth() || endY >= image.GetHeight()) return false;
         DrawImage(image, centerX, centerY, endX - startX, endY - startY, startX, startY);
         return true;
+    }
+    void Renderer::DrawStackedImage(const Video& images, ssize_t centerX, ssize_t centerY, ssize_t diff) {
+        const size_t size = images.GetSize();
+        centerY -= size * diff;
+        for (size_t i = size; i; i--) DrawImage(images.AtUnsafe(i - 1), centerX, centerY + i * diff);
     }
     Event Renderer::WaitForEvent(void) {
         Event ret;

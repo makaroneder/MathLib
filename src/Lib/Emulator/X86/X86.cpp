@@ -335,9 +335,9 @@ namespace MathLib {
                 const X86ModRM modrm = tmp.Get();
                 ModRMOperation({
                     Register* src = GetRegister(modrm.reg);
-                    const uint8_t tmp = reg->Get8(false);
-                    reg->Set8(src->Get8(false), false);
-                    src->Set8(tmp, false);
+                    const uint16_t tmp = reg->Get16(false);
+                    reg->Set16(src->Get16(false), false);
+                    src->Set16(tmp, false);
                     return true;
                 }, {
                     Register* reg = GetRegister(modrm.reg);

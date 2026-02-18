@@ -1,6 +1,5 @@
 #define SDL_MAIN_HANDLED
 #include "Body.hpp"
-#include <Physics/SIUnits.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -12,29 +11,29 @@ int main(int, char**) {
     try {
         MathLib::SDL2 sdl2;
         MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Gravity simulation", 800, 800);
-        MathLib::Second<MathLib::num_t> prevTime = MathLib::Second<MathLib::num_t>(MathLib::GetTime());
-        bool pause = false;
-        Body<MathLib::num_t> bodies[] = {
-            Body<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(-1, -1, 0), false, 10),
-            Body<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(-3, 1, 0), false, 10),
-            Body<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, 0, 0), true, 10),
+        MathLib::num_t prevTime = MathLib::GetTime();
+        Body bodies[] = {
+            Body(Vector2(0, 1), Vector2(1, 0), 1),
+            Body(Vector2(-1, 0), Vector2(0, 1), 2),
         };
+        const size_t bodyCount = SizeOfArray(bodies);
+        bool run = true;
         while (true) {
-            const MathLib::Second<MathLib::num_t> currTime = MathLib::Second<MathLib::num_t>(MathLib::GetTime());
-            const MathLib::Second<MathLib::num_t> dt = currTime - prevTime;
+            const MathLib::num_t currTime = MathLib::GetTime();
+            const MathLib::num_t dt = currTime - prevTime;
             prevTime = currTime;
-            if (!pause) {
-                for (size_t i = 0; i < SizeOfArray(bodies) - 1; i++)
-                    for (size_t j = i + 1; j < SizeOfArray(bodies); j++)
-                        bodies[i].UpdateGravity(bodies[j]);
-                for (size_t i = 0; i < SizeOfArray(bodies); i++) bodies[i].Update(dt);
+            std::cout << 1 / dt << std::endl;
+            if (run) {
+                for (size_t i = 0; i < bodyCount; i++) bodies[i].Move(dt);
+                for (size_t i = 0; i < bodyCount - 1; i++)
+                for (size_t j = i + 1; j < bodyCount; j++) bodies[i].Update(bodies[j], dt);
+                renderer.Fill(0);
+                for (size_t i = 0; i < bodyCount; i++) bodies[i].Draw(renderer, 0xff0000ff);
             }
-            renderer.Fill(0);
-            for (size_t i = 0; i < SizeOfArray(bodies); i++) bodies[i].Draw(renderer, 0xff0000ff);
             if (!renderer.Update()) MathLib::Panic("Failed to update UI");
             const MathLib::Event event = renderer.GetEvent();
             if (event.type == MathLib::Event::Type::Quit) break;
-            else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed && event.key == ' ') pause = !pause;
+            if (event.type == MathLib::Event::Type::KeyPressed && event.key == ' ' && event.pressed) run = !run;
         }
         return EXIT_SUCCESS;
     }

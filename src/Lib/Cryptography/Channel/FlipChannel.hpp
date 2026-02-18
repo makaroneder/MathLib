@@ -7,7 +7,7 @@
 namespace MathLib {
     template <typename Number, typename Measure>
     struct FlipChannel : OneWayCipher {
-        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const override {
+        [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override {
             if (!key.IsEmpty()) return Array<uint8_t>();
             Bitmap ret = Bitmap(data);
             const Measure measure = Measure(IdentitySequence<Number>(ret.GetSize()));

@@ -6,11 +6,13 @@
 
 namespace MathLib {
     struct FileCipher : ReadableCipher {
-        [[nodiscard]] virtual bool IsValidHeader(Readable& device, const Sequence<uint64_t>& key) const = 0;
-        [[nodiscard]] virtual bool IsValidFooter(Readable& device, const Sequence<uint64_t>& key) const = 0;
-        [[nodiscard]] virtual bool Create(Writable& device, const Sequence<uint64_t>& key) const = 0;
-        [[nodiscard]] virtual bool UpdateHeaderAndFooter(ByteDevice& device, const Sequence<uint64_t>& key) const = 0;
-        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const Sequence<uint64_t>& key) const = 0;
+        MathLib::String path;
+
+        [[nodiscard]] virtual bool IsValidHeader(Readable& device, const CipherKey& key) const = 0;
+        [[nodiscard]] virtual bool IsValidFooter(Readable& device, const CipherKey& key) const = 0;
+        [[nodiscard]] virtual bool Create(Writable& device, const CipherKey& key) const = 0;
+        [[nodiscard]] virtual bool UpdateHeaderAndFooter(ByteDevice& device, const CipherKey& key) const = 0;
+        [[nodiscard]] virtual FileCipherData Identify(Readable& device, const CipherKey& key) const = 0;
     };
 }
 

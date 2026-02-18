@@ -12,6 +12,7 @@ namespace MathLib {
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] Array<size_t> GetContinuations(size_t x) const;
     };
 }
 

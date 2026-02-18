@@ -1,6 +1,6 @@
 #include "GitBlob.hpp"
 
-MathLib::Array<uint8_t> GitBlob::Encrypt(const MathLib::Sequence<uint8_t>& data, const MathLib::Sequence<uint64_t>& key) const {
+MathLib::Array<uint8_t> GitBlob::Encrypt(const MathLib::Sequence<uint8_t>& data, const MathLib::CipherKey& key) const {
     if (!key.IsEmpty()) return MathLib::Array<uint8_t>();
     const size_t size = data.GetSize();
     const MathLib::String str = MathLib::String(blobStart) + MathLib::ToString(size, 10);
@@ -8,7 +8,7 @@ MathLib::Array<uint8_t> GitBlob::Encrypt(const MathLib::Sequence<uint8_t>& data,
     if (!ret.AddSequence(data)) return MathLib::Array<uint8_t>();
     return ret;
 }
-MathLib::Array<uint8_t> GitBlob::DecryptReadablePartial(MathLib::Readable& readable, const MathLib::Sequence<uint64_t>& key, const MathLib::Interval<size_t>& range) const {
+MathLib::Array<uint8_t> GitBlob::DecryptReadablePartial(MathLib::Readable& readable, const MathLib::CipherKey& key, const MathLib::Interval<size_t>& range) const {
     if (!key.IsEmpty()) return MathLib::Array<uint8_t>();
     char startStr[6];
     if (!readable.ReadBuffer(startStr, SizeOfArray(startStr) - 1)) return MathLib::Array<uint8_t>();

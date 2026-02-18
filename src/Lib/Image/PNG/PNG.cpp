@@ -13,45 +13,9 @@
 namespace MathLib {
     PNG::PNG(size_t width, size_t height) : SaveableImage(width, height) {}
     bool PNG::Save(Writable& file) const {
-        const size_t width = GetWidth();
-        const size_t height = GetHeight();
-        const Array<uint64_t> crcKey = MakeArray<uint64_t>(32, (uint64_t)CRC::Polynomial::CRC32, true, true, UINT32_MAX, true);
-        const CRC crc;
-        PNGHeader header;
-        if (!file.Write<PNGHeader>(header)) return false;
-        const IHDRChunk ihdr = IHDRChunk(width, height, 8, IHDRChunk::ColorType::RGBA, IHDRChunk::CompressionMethod::Deflate, IHDRChunk::FilterMethod::None, IHDRChunk::InterlaceMethod::None);
-        if (!file.Write<IHDRChunk>(ihdr)) return false;
-        if (!file.Write<uint32_t>(SwapEndian32(*(const uint32_t*)crc.Encrypt(ExternArray<uint8_t>((uint8_t*)&ihdr, sizeof(IHDRChunk)), crcKey).GetValue()))) return false;
-        const size_t size = height * (width * sizeof(uint32_t) + 1);
-        const IDATChunk idat = IDATChunk(size);
-        if (!file.Write<IDATChunk>(idat)) return false;
-        Array<uint8_t> data = Array<uint8_t>(size);
-        for (uint32_t y = 0; y < height; y++) {
-            const size_t baseY = y * (width * sizeof(uint32_t) + 1);
-            data.AtUnsafe(baseY) = (uint8_t)PNGFilterMethod::None;
-            for (uint32_t x = 0; x < width; x++) {
-                const uint32_t baseX = baseY + x * sizeof(uint32_t) + 1;
-                const uint32_t pixel = At(x, y);
-                const uint8_t* buff = (const uint8_t*)&pixel;
-                for (uint8_t i = 0; i < sizeof(uint32_t); i++) data.AtUnsafe(baseX + i) = buff[i];
-            }
-        }
-        switch (ihdr.compressionMethod) {
-            case IHDRChunk::CompressionMethod::Deflate: {
-                data = ZLib().Encrypt(data, Array<uint64_t>());
-                break;
-            }
-            default: return false;
-        }
-        if (!file.WriteBuffer(data.GetValue(), data.GetSize())) return false;
-        Array<uint8_t> tmp = Array<uint8_t>((uint8_t*)&idat, sizeof(IDATChunk));
-        if (!tmp.AddSequence(data)) return false;
-        if (!file.Write<uint32_t>(UINT32_MAX)) return false;
-        // if (!file.Write<uint32_t>(SwapEndian32(*(const uint32_t*)crc.Encrypt(tmp, crcKey).GetValue()))) return false;
-        const IENDChunk iend;
-        if (!file.Write<IENDChunk>(iend)) return false;
-        if (!file.Write<uint32_t>(SwapEndian32(*(const uint32_t*)crc.Encrypt(ExternArray<uint8_t>((uint8_t*)&iend, sizeof(IENDChunk)), crcKey).GetValue()))) return false;
-        return true;
+        // TODO:
+        (void)file;
+        return false;
     }
     bool PNG::Load(Readable& file) {
         PNGHeader header;
@@ -90,7 +54,7 @@ namespace MathLib {
             }
             else if (chunk->IsCritical()) return false;
         }
-        const Array<uint8_t> tmp = ZLib().Decrypt(data, Array<uint64_t>());
+        const Array<uint8_t> tmp = ZLib().Decrypt(data, CipherKey());
         Array<PNGFilterMethod> filters = Array<PNGFilterMethod>(GetHeight());
         Matrix<uint32_t> raw = Matrix<uint32_t>(GetWidth(), GetHeight());
         for (size_t y = 0; y < GetHeight(); y++) {

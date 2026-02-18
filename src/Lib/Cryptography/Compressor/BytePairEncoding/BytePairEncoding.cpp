@@ -5,7 +5,7 @@
 #include "../../../Interfaces/Sequence/ByteArray.hpp"
 
 namespace MathLib {
-    BytePairEncodingGrammar BytePairEncoding::GenerateGrammar(const Sequence<uint8_t>& input) const {
+    BytePairEncodingGrammar BytePairEncoding::GenerateGrammar(const Sequence<uint8_t>& input) {
         size_t uniqueName = UINT8_MAX + 1;
         const Function<size_t, size_t>& successorFunction = MakeFunctionT<size_t, size_t>([](size_t count) -> size_t {
             return count + 1;
@@ -16,7 +16,7 @@ namespace MathLib {
         BytePairEncodingGrammar ret = BytePairEncodingGrammar(input);
         while (true) {
             for (size_t i = 0; i < size - 1; i++)
-                if (!dictionary.AddOrModify(SingleTypePair<size_t>(ret.string.At(i), ret.string.At(i + 1)), successorFunction, 1)) return BytePairEncodingGrammar();
+                if (!dictionary.AddOrModify(SingleTypePair<size_t>(ret.string.AtUnsafe(i), ret.string.AtUnsafe(i + 1)), successorFunction, 1)) return BytePairEncodingGrammar();
             DictionaryElement<SingleTypePair<size_t>, size_t> tmp;
             for (DictionaryElement<SingleTypePair<size_t>, size_t>& x : dictionary)
                 if (x.value > tmp.value) tmp = x;
@@ -24,11 +24,11 @@ namespace MathLib {
             const SingleTypePair<size_t> pair = tmp.GetKey();
             if (!ret.substitutes.Add(BytePairEncodingSubstitute(uniqueName, pair.first, pair.second))) return BytePairEncodingGrammar();
             for (size_t j = 0; j < size; j++) {
-                if (j + 1 != size && ret.string.At(j) == pair.first && ret.string.At(j + 1) == pair.second) {
+                if (j + 1 != size && ret.string.AtUnsafe(j) == pair.first && ret.string.AtUnsafe(j + 1) == pair.second) {
                     if (!buff.Add(uniqueName)) return BytePairEncodingGrammar();
                     j++;
                 }
-                else if (!buff.Add(ret.string.At(j))) return BytePairEncodingGrammar();
+                else if (!buff.Add(ret.string.AtUnsafe(j))) return BytePairEncodingGrammar();
             }
             uniqueName++;
             ret.string = buff;
@@ -37,7 +37,7 @@ namespace MathLib {
         }
         return ret;
     }
-    Array<uint8_t> BytePairEncoding::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> BytePairEncoding::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         ByteArray device = ByteArray();
         return GenerateGrammar(data).Save(device) ? device.GetArray() : Array<uint8_t>();
@@ -46,7 +46,7 @@ namespace MathLib {
         if (name <= UINT8_MAX) return MakeArray<uint8_t>(name);
         const size_t size = substitutes.GetSize();
         for (size_t i = 0; i < size; i++) {
-            const BytePairEncodingSubstitute substitute = substitutes.At(i);
+            const BytePairEncodingSubstitute substitute = substitutes.AtUnsafe(i);
             if (substitute.name == name) {
                 Array<uint8_t> ret = DecryptSingle(substitute.a, substitutes);
                 ret += DecryptSingle(substitute.b, substitutes);
@@ -55,7 +55,7 @@ namespace MathLib {
         }
         return Array<uint8_t>();
     }
-    Array<uint8_t> BytePairEncoding::DecryptReadablePartial(Readable& readable, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> BytePairEncoding::DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         size_t size = 0;
         if (!readable.Read<size_t>(size)) return Array<uint8_t>();
@@ -72,7 +72,7 @@ namespace MathLib {
             const size_t size = add.GetSize();
             bool end = false;
             for (size_t j = 0; j < size; j++) {
-                if (range.Contains(pos++) && !ret.Add(add.At(j))) return Array<uint8_t>();
+                if (range.Contains(pos++) && !ret.Add(add.AtUnsafe(j))) return Array<uint8_t>();
                 if (pos >= range.GetMax()) {
                     end = true;
                     break;

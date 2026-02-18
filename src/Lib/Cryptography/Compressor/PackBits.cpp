@@ -1,7 +1,7 @@
 #include "PackBits.hpp"
 
 namespace MathLib {
-    Array<uint8_t> PackBits::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
+    Array<uint8_t> PackBits::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         Array<uint8_t> ret;
@@ -36,7 +36,7 @@ namespace MathLib {
         }
         return ret;
     }
-    Array<uint8_t> PackBits::DecryptPartial(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key, const Interval<size_t>& range) const {
+    Array<uint8_t> PackBits::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         Array<uint8_t> ret;

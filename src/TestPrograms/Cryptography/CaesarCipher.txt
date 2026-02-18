@@ -1,9 +1,0 @@
-msg : String = "Tljcjej ebq ebq ebq zft zft"
-key : String = "-25"
-protocol : String = "CaesarCipher"
-
-Print("Message: ", msg)
-Print("Key: ", key)
-Print("Protocol: ", protocol)
-Print("Encrypted message: ", Encrypt(protocol, msg, key))
-Print("Decrypted message: ", Decrypt(protocol, msg, key))

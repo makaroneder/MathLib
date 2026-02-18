@@ -4,7 +4,7 @@
 #include "../Path.hpp"
 
 namespace MathLib {
-    CipherFileSystem::CipherFileSystem(ByteDevice& disk, FileCipher* cipher, const Sequence<uint64_t>& key) : PhysicalFileSystem(disk), files(), key(CollectionToArray<uint64_t>(key)), cipher(cipher) {}
+    CipherFileSystem::CipherFileSystem(ByteDevice& disk, FileCipher* cipher, const CipherKey& key) : PhysicalFileSystem(disk), key(key), files(), cipher(cipher) {}
     CipherFileSystem::~CipherFileSystem(void) {
         delete cipher;
     }
@@ -70,13 +70,8 @@ namespace MathLib {
     }
     size_t CipherFileSystem::WriteInternal(size_t& newSize, ByteArray& data, const Sequence<char>& path, size_t prevSize, size_t writePosition, const void* buffer, size_t size, size_t position) {
         const size_t ret = data.WritePositionedSizedBuffer(buffer, size, position);
-        Array<uint64_t> tmpKey = key;
-        const size_t pathSize = path.GetSize();
-        char pathBuffer[pathSize + 1];
-        for (size_t i = 0; i < pathSize; i++) pathBuffer[i] = path.At(i);
-        pathBuffer[pathSize] = '\0';
-        tmpKey += (uintptr_t)pathBuffer;
-        const Array<uint8_t> newData = cipher->Encrypt(data, tmpKey);
+        cipher->path = CollectionToString(path);
+        const Array<uint8_t> newData = cipher->Encrypt(data, key);
         if (newData.IsEmpty()) return 0;
         newSize = newData.GetSize();
         const size_t move = newSize - prevSize;

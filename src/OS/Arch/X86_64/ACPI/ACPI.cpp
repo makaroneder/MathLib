@@ -13,7 +13,6 @@
 #include <Logger.hpp>
 #include <String.hpp>
 #include <Host.hpp>
-#include <stddef.h>
 
 SCI sci;
 [[nodiscard]] bool InitRTC(bool nmi, CMOS::Register centuryRegister) {

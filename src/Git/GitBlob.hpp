@@ -5,8 +5,8 @@
 struct GitBlob : MathLib::ReadableCipher {
     static constexpr const char* blobStart = "blob ";
 
-    [[nodiscard]] virtual MathLib::Array<uint8_t> Encrypt(const MathLib::Sequence<uint8_t>& data, const MathLib::Sequence<uint64_t>& key) const override;
-    [[nodiscard]] virtual MathLib::Array<uint8_t> DecryptReadablePartial(MathLib::Readable& readable, const MathLib::Sequence<uint64_t>& key, const MathLib::Interval<size_t>& range) const override;
+    [[nodiscard]] virtual MathLib::Array<uint8_t> Encrypt(const MathLib::Sequence<uint8_t>& data, const MathLib::CipherKey& key) const override;
+    [[nodiscard]] virtual MathLib::Array<uint8_t> DecryptReadablePartial(MathLib::Readable& readable, const MathLib::CipherKey& key, const MathLib::Interval<size_t>& range) const override;
 };
 
 #endif

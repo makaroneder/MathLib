@@ -1,7 +1,0 @@
-img : Image = LoadImage("TGA", "../Cards/Prototype.tga")
-
-Update(deltaTime : Float) : Bool = [!
-    Log(deltaTime),
-    DrawImage(img, 0, 0, 0),
-    return(true),
-]

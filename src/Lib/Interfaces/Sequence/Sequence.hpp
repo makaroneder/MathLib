@@ -3,12 +3,15 @@
 #include "../Function.hpp"
 #include "../Container.hpp"
 #include "../../MinMax.hpp"
+#include "../Comparable.hpp"
 #include <stdint.h>
 
 namespace MathLib {
     [[noreturn]] void Panic(const char* str);
     template <typename T>
-    struct Sequence : Container<T>, Function<T, size_t> {
+    struct Sequence;
+    template <typename T>
+    struct Sequence : Container<T>, Function<T, size_t>, Comparable<Sequence<T>> {
         [[nodiscard]] virtual size_t GetSize(void) const = 0;
         [[nodiscard]] virtual T AtUnsafe(size_t index) const = 0;
         [[nodiscard]] T At(size_t index) const {
@@ -205,15 +208,14 @@ namespace MathLib {
             for (size_t i = 0; i < size; i++) ret = function(ret, AtUnsafe(i));
             return ret;
         }
-        [[nodiscard]] bool operator==(const Sequence<T>& other) const {
+
+        protected:
+        [[nodiscard]] virtual bool Equals(const Sequence<T>& other) const override {
             const size_t size = GetSize();
             if (size != other.GetSize()) return false;
             for (size_t i = 0; i < size; i++)
                 if (AtUnsafe(i) != other.AtUnsafe(i)) return false;
             return true;
-        }
-        [[nodiscard]] bool operator!=(const Sequence<T>& other) const {
-            return !(*this == other);
         }
     };
 }

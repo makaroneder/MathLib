@@ -7,9 +7,6 @@ namespace MathLib {
     bool Frame::IsValid(void) const {
         return duration >= 0;
     }
-    num_t Frame::GetDuration(void) const {
-        return duration;
-    }
     bool Frame::operator==(const Frame& other) const {
         return FloatsEqual<num_t>(duration, other.duration) && Image::operator==(other);
     }

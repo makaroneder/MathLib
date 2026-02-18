@@ -4,10 +4,9 @@
 #include "../../Interfaces/Sequence/FixedSizeCollection.hpp"
 
 namespace MathLib {
-    Array<uint8_t> SHA1::Encrypt(const Sequence<uint8_t>& data, const Sequence<uint64_t>& key) const {
-        const size_t keySize = key.GetSize();
-        if (keySize > 1) return Array<uint8_t>();
-        const bool sha0 = keySize && key.AtUnsafe(0);
+    Array<uint8_t> SHA1::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
+        if (!(key.IsEmpty() || (key.type == CipherKey::Type::Normal && key.data.GetSize() == sizeof(bool)))) return Array<uint8_t>();
+        const bool sha0 = !key.IsEmpty() && key.data.AsT<bool>().Get();
         const ExtendedSequence<uint8_t> tmp1 = ExtendedSequence<uint8_t>(data, 0x80, 1);
         const size_t padLen = (56 - (tmp1.GetSize() % 64) + 64) % 64;
         const ExtendedSequence<uint8_t> tmp2 = ExtendedSequence<uint8_t>(tmp1, 0x00, padLen);

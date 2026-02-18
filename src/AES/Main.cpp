@@ -10,7 +10,6 @@
 /// @return Status
 int main(int argc, char** argv) {
     try {
-        // TODO: Change Cipher* to Cipher&
         // TODO: CFB1 CFB8 CFB128
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <test directory>");
         MathLib::HostFileSystem fs;

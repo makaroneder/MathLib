@@ -5,9 +5,6 @@
 
 namespace MathLib {
     struct SaveableImageFromVideo : SaveableImage {
-        /// @brief Creates a new image
-        /// @param width Width of the image
-        /// @param height Height of the image
         SaveableImageFromVideo(size_t width, size_t height, SaveableVideo* video, size_t frame);
         virtual ~SaveableImageFromVideo(void) override;
         void SwitchFrame(size_t newFrame, bool saveFrame, bool loadFrame);

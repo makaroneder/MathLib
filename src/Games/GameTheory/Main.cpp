@@ -38,11 +38,6 @@ struct TriggerStrategy : Player {
     const MathLib::Function<bool, bool, ssize_t, size_t>& switchCondition;
     bool strategy;
 };
-
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         const size_t turns = 5;

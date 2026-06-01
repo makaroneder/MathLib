@@ -1,10 +1,6 @@
 #include <Math/SystemOfLinearEquations.hpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         const MathLib::SingleTypePair<MathLib::num_t> data[] = {

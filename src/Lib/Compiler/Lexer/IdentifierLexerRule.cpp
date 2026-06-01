@@ -7,12 +7,12 @@ namespace MathLib {
         const size_t size = str.GetSize();
         if (i >= size) return;
         if (!startWithDigit) {
-            const char chr = str.At(i);
+            const char chr = str.AtUnsafe(i);
             if (chr != '_' && !IsAlpha(chr)) return;
             i++;
         }
         for (; i < size; i++) {
-            const char chr = str.At(i);
+            const char chr = str.AtUnsafe(i);
             if (chr != '_' && !IsAlphaDigit(chr)) return;
         }
     }

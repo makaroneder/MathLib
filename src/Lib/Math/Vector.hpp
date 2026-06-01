@@ -4,7 +4,6 @@
 #include "../MinMax.hpp"
 
 namespace MathLib {
-    /// @brief Representation of axis position in matrix
     enum class VectorAxis {
         X = 0,
         Y,
@@ -17,12 +16,6 @@ namespace MathLib {
     #define GetY(vector) GetVectorAxis(vector, MathLib::VectorAxis::Y)
     #define GetZ(vector) GetVectorAxis(vector, MathLib::VectorAxis::Z)
 
-    /// @brief Creates new 3D vector
-    /// @tparam T Type of number
-    /// @param x X coordinate
-    /// @param y Y coordinate
-    /// @param z Z coordinate
-    /// @return New 3D vector
     template <typename T>
     [[nodiscard]] Matrix<T> CreateVector(const T& x, const T& y, const T& z) {
         Array<T> arr = Array<T>((size_t)VectorAxis::AxisCount);
@@ -31,11 +24,6 @@ namespace MathLib {
         arr.AtUnsafe(2) = z;
         return Matrix<T>(arr.GetSize(), 1, arr);
     }
-    /// @brief Converts N dimensional vector to N - 1 dimensional vector
-    /// @tparam T Type of number
-    /// @param point N vector
-    /// @param fov Distance on N axis between camera and origin
-    /// @return N - 1 vector
     template <typename T>
     [[nodiscard]] Matrix<T> ProjectVector(const Matrix<T>& point, const T& fov = 10) {
         if (point.At(point.GetWidth() - 1, 0) <= (1 - fov)) return CreateVector<T>(nan, nan, nan);
@@ -43,11 +31,6 @@ namespace MathLib {
         for (size_t i = 0; i < arr.GetSize(); i++) arr.AtUnsafe(i) = point.AtUnsafe(i, 0);
         return Matrix<T>(point.GetWidth() - 1, 1, arr) / (1 - point.AtUnsafe(point.GetWidth() - 1, 0) / -fov);
     }
-    /// @brief Converts N dimensional vector to M dimensional vector
-    /// @tparam T Type of number
-    /// @param point N vector
-    /// @param fov Distance on N axis between camera and origin
-    /// @return M vector
     template <typename T>
     [[nodiscard]] Matrix<T> ConvertVectorDimension(const Matrix<T>& point, size_t dimension, const T& fov = 10) {
         if (point.GetWidth() < dimension) return CreateVector<T>(nan, nan, nan);

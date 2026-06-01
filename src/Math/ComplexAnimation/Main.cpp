@@ -8,10 +8,6 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 4) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output image directory> <output file>");

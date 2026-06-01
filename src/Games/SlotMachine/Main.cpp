@@ -3,19 +3,19 @@
 #include "Consumable.hpp"
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Libc/HostFileSystem.hpp>
+#include <Font/PSF1.hpp>
+#include <Fonts.hpp>
 #include <Pair.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         #ifndef Debug
         srand(time(nullptr));
         #endif
+        MathLib::PSF1 font;
+        if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
         MathLib::SDL2 sdl2;
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/SlotMachine/";
@@ -57,10 +57,10 @@ int main(int, char**) {
                     Consumable tmp = consumables[i];
                     const MathLib::num_t y = ((ssize_t)i - 1) * 1.3;
                     tmp.position = MathLib::CreateVector<MathLib::num_t>(-3, y, 0);
-                    if (!renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+                    renderer.Puts<MathLib::num_t>(MathLib::ToString(SizeOfArray(consumables) - i) + ")", font, MathLib::CreateVector<MathLib::num_t>(-3.5, y, 0), 0xff0000ff, 0);
                     renderer.DrawShape<MathLib::num_t>(tmp, MathLib::CreateVector<MathLib::num_t>(0, 0, 0), 0xff0000ff);
                 }
-                if (!renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0)) MathLib::Panic("Failed to print text");
+                renderer.Puts<MathLib::num_t>("Score: "_M + MathLib::ToString(score) + "\nBet: " + MathLib::ToString(bet), font, MathLib::CreateVector<MathLib::num_t>(0, -0.6, 0), 0xff0000ff, 0);
                 for (size_t i = 0; i < symbolIndexes.GetSize(); i++) {
                     Symbol tmp = symbols[symbolIndexes.At(i)];
                     tmp.position = MathLib::CreateVector<MathLib::num_t>(((ssize_t)i - 1) * 0.6, 0.55, 0);

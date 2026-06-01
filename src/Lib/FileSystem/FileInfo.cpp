@@ -5,10 +5,7 @@ namespace MathLib {
     String FileInfo::ToString(const Sequence<char>& padding) const {
         return CollectionToString(padding) + path + " [" + typeStr[(size_t)type] + ']';
     }
-    bool FileInfo::operator==(const FileInfo& other) const {
-        return type == other.type && path == other.path;
-    }
-    bool FileInfo::operator!=(const FileInfo& other) const {
-        return !(*this == other);
+    bool FileInfo::Equals(const FileInfo& other) const {
+        return path == other.path;
     }
 }

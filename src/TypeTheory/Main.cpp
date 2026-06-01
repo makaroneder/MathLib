@@ -3,12 +3,11 @@
 #include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
 #include <Compiler/Parser/IdentityParserLayer.hpp>
+#include <Compiler/Lexer/StringMatchLexerRule.hpp>
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
-#include <Compiler/Lexer/StringLexerRule.hpp>
-#include <Compiler/IdentityEvaluator.hpp>
-#include <Interfaces/Comparable.hpp>
+#include <Interfaces/IdentityFunction.hpp>
 #include <Interfaces/Printable.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
@@ -61,20 +60,17 @@ enum class TokenType : uint8_t {
         default: return Term();
     }
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
         MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
             new MathLib::WhitespaceLexerRule(SIZE_MAX),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
             new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
-            new MathLib::StringLexerRule((size_t)TokenType::Abstraction, MathLib::MakeArray<MathLib::String>("->", "=>")),
-            new MathLib::StringLexerRule((size_t)TokenType::Application, MathLib::MakeArray<MathLib::String>('.', '^')),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Abstraction, MathLib::MakeArray<MathLib::String>("->", "=>")),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Application, MathLib::MakeArray<MathLib::String>('.', '^')),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::TypeDeclaration, ':'_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Assignment, '='_M)
@@ -86,7 +82,7 @@ int main(int argc, char** argv) {
             new MathLib::LeftBinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
-        )), new MathLib::IdentityEvaluator());
+        )), optimizer);
         MathLib::HostFileSystem fs;
         toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
         Context context;

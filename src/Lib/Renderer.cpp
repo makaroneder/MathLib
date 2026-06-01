@@ -88,6 +88,26 @@ namespace MathLib {
         centerY -= size * diff;
         for (size_t i = size; i; i--) DrawImage(images.AtUnsafe(i - 1), centerX, centerY + i * diff);
     }
+    void Renderer::Putc(char chr, const Font& font, ssize_t centerX, ssize_t centerY, uint32_t fgColor, uint32_t bgColor) {
+        const size_t width = font.GetWidth();
+        const size_t height = font.GetHeight();
+        const size_t bytesPerGlyph = (width + 7) / 8;
+        const ssize_t leftX = centerX - width / 2;
+        const ssize_t topY = centerY - height / 2;
+        const ssize_t maxX = Min<ssize_t>(GetWidth() - leftX, width);
+        const ssize_t maxY = Min<ssize_t>(GetHeight() - topY, height);
+        const size_t minX = Max<ssize_t>(-leftX, 0);
+        const size_t minY = Max<ssize_t>(-topY, 0);
+        const uint8_t* const fontPtr = font.GetGlyph(chr);
+        for (ssize_t y = minY; y < maxY; y++) {
+            const ssize_t wy = topY + y;
+            const uint8_t* const curr = fontPtr + bytesPerGlyph * y;
+            for (ssize_t x = minX; x < maxX; x++) {
+                const ssize_t wx = leftX + x;
+                AtUnsafe(wx, wy) = BlendColor(AtUnsafe(wx, wy), (curr[x / 8] & (1 << (7 - x % 8))) ? fgColor : bgColor, alphaPosition);
+            }
+        }
+    }
     Event Renderer::WaitForEvent(void) {
         Event ret;
         while (ret.type == Event::Type::None) ret = GetEvent();

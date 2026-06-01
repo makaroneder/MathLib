@@ -5,10 +5,12 @@
 
 namespace MathLib {
     struct AsepriteSliceChunk : AsepriteChunkHeader {
+        enum class Flag : uint8_t {
+            Is9PatchSlice = 0,
+            HasPivotInformation,
+        };
         uint32_t sliceKeyCount;
-        bool is9PatchSlice : 1;
-        bool hasPivotInformation : 1;
-        uint64_t reserved : 62;
+        uint64_t flags;
         AsepriteString name;
     } __attribute__((packed));
 }

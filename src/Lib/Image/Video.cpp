@@ -1,7 +1,9 @@
 #include "Video.hpp"
+#include "../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
     Video::Video(void) : frames() {}
+    Video::Video(const Array<Frame>& frames) : frames(frames) {}
     bool Video::Add(const Frame& value) {
         return value.IsValid() && frames.Add(value);
     }
@@ -36,7 +38,27 @@ namespace MathLib {
     void Video::Resize(size_t xMultiplier, size_t yMultiplier) {
         for (Frame& frame : frames) frame.pixels = frame.Resize(xMultiplier, yMultiplier).pixels;
     }
-    void Video::RotateUpsideDown(void) {
-        for (Frame& frame : frames) frame.pixels = frame.RotateUpsideDown().pixels;
+    Video Video::Mirror(void) const {
+        Video ret = *this;
+        for (Frame& frame : ret.frames) frame.pixels = frame.Mirror().pixels;
+        return ret;
+    }
+    Video Video::RotateUpsideDown(void) const {
+        Video ret = *this;
+        for (Frame& frame : ret.frames) frame.pixels = frame.RotateUpsideDown().pixels;
+        return ret;
+    }
+    Video Video::SwapXY(void) const {
+        Video ret = *this;
+        for (Frame& frame : ret.frames) frame.pixels = frame.SwapXY().pixels;
+        return ret;
+    }
+    Video Video::SwapXYAndRotateUpsideDown(void) const {
+        Video ret = *this;
+        for (Frame& frame : ret.frames) frame.pixels = frame.SwapXYAndRotateUpsideDown().pixels;
+        return ret;
+    }
+    Video Video::Sub(const Interval<size_t>& interval) const {
+        return Video(CollectionToArray<Frame>(SubSequence<Frame>(frames, interval)));
     }
 }

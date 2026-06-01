@@ -13,7 +13,7 @@ namespace MathLib {
                 if (add) ret += '/';
                 add = true;
                 ret += tmp;
-                if (!tmp.Reset()) return "";
+                tmp = "";
             }
             else tmp += chr;
         }
@@ -34,7 +34,7 @@ namespace MathLib {
                     ret += tmp;
                 }
                 add = true;
-                if (!tmp.Reset()) return "";
+                tmp = "";
             }
             else tmp += chr;
         }
@@ -42,31 +42,36 @@ namespace MathLib {
     }
     SingleTypePair<String> PopFirstPathElement(const Sequence<char>& path) {
         const size_t size = path.GetSize();
+        if (!size) return SingleTypePair<String>();
         size_t i = 0;
-        if (path.At(i) == '/') i++;
+        if (path.AtUnsafe(i) == '/') i++;
         String ret1 = "";
         while (i < size) {
-            const char chr = path.At(i++);
+            const char chr = path.AtUnsafe(i++);
             if (chr == '/') break;
             ret1 += chr;
         }
         String ret2 = "";
         while (i < size) {
-            const char chr = path.At(i++);
+            const char chr = path.AtUnsafe(i++);
             if (i + 1 != size || chr != '/') ret2 += chr;
         }
         return SingleTypePair<String>(ret1, ret2);
     }
-    SingleTypePair<String> RemoveBasePathAndPopFirstPathElement(const Sequence<char>& basePath, const Sequence<char>& path) {
+    String RemoveBasePath(const Sequence<char>& basePath, const Sequence<char>& path) {
         String tmp = CollectionToString(path);
         String bp = CollectionToString(basePath);
         while (!bp.IsEmpty()) {
+            if (tmp.IsEmpty()) return "";
             const SingleTypePair<String> tmpPair = PopFirstPathElement(tmp);
             const SingleTypePair<String> bpPair = PopFirstPathElement(bp);
-            if (tmpPair.first != bpPair.first) return SingleTypePair<String>();
+            if (tmpPair.first != bpPair.first) return "";
             tmp = tmpPair.second;
             bp = bpPair.second;
         }
-        return PopFirstPathElement(tmp);
+        return tmp;
+    }
+    SingleTypePair<String> RemoveBasePathAndPopFirstPathElement(const Sequence<char>& basePath, const Sequence<char>& path) {
+        return PopFirstPathElement(RemoveBasePath(basePath, path));
     }
 }

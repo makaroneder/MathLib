@@ -13,9 +13,6 @@ namespace MathLib {
         void Set16(uint16_t val, bool upper);
         void Set8(uint8_t val, bool upper);
         void Clear4(bool upper);
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         [[nodiscard]] bool operator==(const Register& other) const;
         [[nodiscard]] bool operator!=(const Register& other) const;

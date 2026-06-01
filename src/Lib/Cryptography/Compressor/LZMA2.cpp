@@ -16,7 +16,7 @@ namespace MathLib {
         size_t size = data.GetSize();
         size_t i = 0;
         while (true) {
-            if (!ret.Write<uint8_t>(0x02)) return Array<uint8_t>();
+            if (!ret.Write<uint8_t>(0x01)) return Array<uint8_t>();
             uint16_t writeSize = UINT16_MAX;
             bool last = false;
             if (size <= UINT16_MAX) {
@@ -24,8 +24,8 @@ namespace MathLib {
                 writeSize = size;
             }
             size -= writeSize;
-            if (!ret.Write<uint16_t>(SwapEndian16(size - 1))) return Array<uint8_t>();
-            for (uint32_t j = 0; j < size; j++)
+            if (!ret.Write<uint16_t>(SwapEndian16(writeSize - 1))) return Array<uint8_t>();
+            for (uint32_t j = 0; j < writeSize; j++)
                 if (!ret.Write<uint8_t>(data.AtUnsafe(i++))) return Array<uint8_t>();
             if (!last) continue;
             if (!ret.Write<uint8_t>(0x00)) return Array<uint8_t>();

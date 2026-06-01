@@ -6,14 +6,6 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Main loop of this program
-/// @tparam T Type of number
-/// @param renderer Renderer we are using
-/// @param func Function which will be called when the user sends input
-/// @param inputSet Set of every input value we allow
-/// @param state Current state of the program
-/// @param lastState Last state of the program
-/// @return Status
 template <typename T>
 [[nodiscard]] bool HandleEvents(MathLib::Renderer& renderer, const MathLib::Function<bool>& func, size_t& state, const size_t& lastState) {
     bool running = true;
@@ -66,10 +58,6 @@ template <typename T>
     }
     return true;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");

@@ -5,6 +5,7 @@
 namespace MathLib {
     struct CachedFileSystem : FileSystem {
         CachedFileSystem(FileSystem& cache, FileSystem& target);
+        [[nodiscard]] virtual bool IsValid(void) const override;
         [[nodiscard]] virtual size_t OpenInternal(const Sequence<char>& path, OpenMode mode) override;
         [[nodiscard]] virtual bool Close(size_t file) override;
         [[nodiscard]] virtual size_t Read(size_t file, void* buffer, size_t size, size_t position) override;

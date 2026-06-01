@@ -7,15 +7,7 @@ namespace MathLib {
     struct HostSocket : Socket {
         HostSocket(bool tcp);
         virtual ~HostSocket(void) override;
-        /// @brief Reads data from the buffer
-        /// @param buffer Buffer to read data from
-        /// @param size Size of the buffer
-        /// @return Size of bytes read
         [[nodiscard]] virtual size_t ReadSizedBuffer(void* buffer, size_t size) override;
-        /// @brief Writes data to the buffer
-        /// @param buffer Buffer to write data to
-        /// @param size Size of the buffer
-        /// @return Size of written bytes
         [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
         [[nodiscard]] virtual bool Skip(size_t size) override;
         [[nodiscard]] virtual bool Bind(size_t port) override;

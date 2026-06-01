@@ -67,7 +67,7 @@ MathLib::CipherKey TestCase::MakeKey(size_t i) const {
     return valid && i < results.GetSize() ? MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
         MathLib::CipherKey(results.AtUnsafe(i).initializationVector),
         MathLib::AES().GenerateKey(MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
-            MathLib::CipherKey(MathLib::ByteArray::ToByteArray<MathLib::AES::Rounds>(MathLib::MakeArray<MathLib::AES::Rounds>(rounds))),
+            MathLib::CipherKey(MathLib::ByteArray::ToByteArray<MathLib::AES::Rounds>(rounds)),
             MathLib::CipherKey(results.AtUnsafe(i).key)
         )))
     )) : MathLib::CipherKey();

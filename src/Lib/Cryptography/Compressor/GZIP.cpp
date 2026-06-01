@@ -13,11 +13,11 @@ namespace MathLib {
         ByteArray byteArray;
         if (!byteArray.Write<GZIPHeader>(header)) return Array<uint8_t>();
         const CipherKey crcKey = CipherKey(MakeArray<CipherKey>(
-            CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(32))),
-            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(MakeArray<CRC::Polynomial>(CRC::Polynomial::CRC32))),
+            CipherKey(ByteArray::ToByteArray<size_t>(32)),
+            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(CRC::Polynomial::CRC32)),
             CipherKey(MakeArray<uint8_t>(true)),
             CipherKey(MakeArray<uint8_t>(true)),
-            CipherKey(ByteArray::ToByteArray<uint64_t>(MakeArray<uint64_t>(UINT32_MAX))),
+            CipherKey(ByteArray::ToByteArray<uint64_t>(UINT32_MAX)),
             CipherKey(MakeArray<uint8_t>(true))
         ));
         if (header.crc16 && !byteArray.Write<uint16_t>(*(const uint16_t*)CRC().Encrypt(byteArray, crcKey).GetValue())) return Array<uint8_t>();
@@ -50,11 +50,11 @@ namespace MathLib {
             }
         }
         const CipherKey crcKey = CipherKey(MakeArray<CipherKey>(
-            CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(32))),
-            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(MakeArray<CRC::Polynomial>(CRC::Polynomial::CRC32))),
+            CipherKey(ByteArray::ToByteArray<size_t>(32)),
+            CipherKey(ByteArray::ToByteArray<CRC::Polynomial>(CRC::Polynomial::CRC32)),
             CipherKey(MakeArray<uint8_t>(true)),
             CipherKey(MakeArray<uint8_t>(true)),
-            CipherKey(ByteArray::ToByteArray<uint64_t>(MakeArray<uint64_t>(UINT32_MAX))),
+            CipherKey(ByteArray::ToByteArray<uint64_t>(UINT32_MAX)),
             CipherKey(MakeArray<uint8_t>(true))
         ));
         if (header.crc16) {

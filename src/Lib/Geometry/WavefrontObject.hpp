@@ -47,9 +47,6 @@ namespace MathLib {
             }
             return ret;
         }
-        /// @brief Saves data
-        /// @param file File to save data into
-        /// @return Status
         [[nodiscard]] virtual bool Save(Writable& file) const override {
             for (const Matrix<T>& v : verticies) {
                 if (!file.Write<char>('v')) return false;
@@ -68,9 +65,6 @@ namespace MathLib {
                 if (!file.Puts("l "_M + ToString(lines.At(i)) + ' ' + ToString(lines.At(i + 1)) + '\n')) return false;
             return true;
         }
-        /// @brief Loads data
-        /// @param file File to load data from
-        /// @return Status
         [[nodiscard]] virtual bool Load(Readable& file) override {
             const Array<String> split = Split(file.ReadUntil('\0'), "\n"_M, true);
             for (const Sequence<char>& line : split) {

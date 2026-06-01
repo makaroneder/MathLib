@@ -2,9 +2,6 @@
 #define Adder_H
 #include "NeuralNetworkState.hpp"
 
-/// @brief Creates default state for this neural network
-/// @tparam T Type of number
-/// @return State
 [[nodiscard]] NeuralNetworkState<MathLib::num_t> GetDefaultState(void) {
     const size_t bits = 3;
     const size_t n = (1 << bits);

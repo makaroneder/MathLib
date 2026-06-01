@@ -30,6 +30,7 @@ namespace MathLib {
         Array<uint8_t> ret;
         for (size_t i = 0; i < size; i += blockSize)
             if (!ret.AddSequence(cipher.Decrypt(MathLib::SubSequence<uint8_t>(data, MathLib::Interval<size_t>(i, i + blockSize)), key2))) return Array<uint8_t>();
-        return min < size ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(min, size))) : Array<uint8_t>();
+        const size_t end = Min<size_t>(max, ret.GetSize());
+        return min < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(min, end))) : Array<uint8_t>();
     }
 }

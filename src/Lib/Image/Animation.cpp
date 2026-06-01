@@ -9,18 +9,25 @@ namespace MathLib {
     void Animation::Draw(Renderer& renderer, ssize_t centerX, ssize_t centerY) const {
         if (video) renderer.DrawImage(video->AtUnsafe(frame), centerX, centerY);
     }
+    bool Animation::CopyTo(Renderer& renderer) const {
+        return !video || renderer.CopyFromBuffer(video->AtUnsafe(frame));
+    }
     void Animation::Reset(void) {
         frame = 0;
         if (video) timeLeft = video->AtUnsafe(0).duration;
     }
-    void Animation::Update(const num_t& value) {
-        if (!video) return;
+    bool Animation::Update(const num_t& value) {
+        if (!video) return true;
         const size_t frames = video->GetSize();
         timeLeft -= value;
+        bool ret = false;
         while (timeLeft <= 0) {
+            const size_t tmp = frame;
             frame = (frame + 1) % frames;
+            ret |= frame <= tmp;
             timeLeft += video->AtUnsafe(frame).duration;
         }
+        return ret;
     }
     void Animation::Reverse(const num_t& value) {
         if (!video) return;

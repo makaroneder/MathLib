@@ -32,9 +32,6 @@ struct Tensor : MathLib::Printable, MathLib::Iteratable<T> {
     [[nodiscard]] size_t GetDimension(size_t dimension) const {
         return dimensions.At(dimension);
     }
-    /// @brief Converts struct to string
-    /// @param padding String to pad with
-    /// @return String representation
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         return MathLib::CollectionToString(padding) + ToStringInternal(MathLib::Array<size_t>(), dimensions.GetSize());
     }

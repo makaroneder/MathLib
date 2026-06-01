@@ -2,10 +2,10 @@
 #define MathLib_Cryptography_Cipher_AES_H
 #include "../../Math/ByteFiniteField.hpp"
 #include "../../Math/Matrix.hpp"
-#include "../Cipher.hpp"
+#include "../ReadableCipher.hpp"
 
 namespace MathLib {
-    struct AES : Cipher {
+    struct AES : ReadableCipher {
         enum class Rounds : size_t {
             AES128 = 10,
             AES192 = 12,
@@ -13,7 +13,7 @@ namespace MathLib {
         };
         [[nodiscard]] static CipherKey GenerateKey(const CipherKey& key);
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
-        [[nodiscard]] virtual Array<uint8_t> DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const override;
+        [[nodiscard]] virtual Array<uint8_t> DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const override;
 
         private:
         [[nodiscard]] static Matrix<ByteFiniteField> KeyToMatrix(const Sequence<uint8_t>& data, size_t& i, bool add);

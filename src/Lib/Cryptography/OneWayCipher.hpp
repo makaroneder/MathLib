@@ -6,6 +6,7 @@
 namespace MathLib {
     struct OneWayCipher : Allocatable {
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const = 0;
+        [[nodiscard]] bool EncryptWritable(Writable& writable, const Sequence<uint8_t>& data, const CipherKey& key) const;
         template <typename T>
         [[nodiscard]] Array<uint8_t> EncryptT(const Sequence<T>& data, const CipherKey& key) const {
             const size_t size = data.GetSize();

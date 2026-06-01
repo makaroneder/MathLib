@@ -1,0 +1,89 @@
+diff -ruN gcc-13.2.0/config.sub GCC/config.sub
+--- gcc-13.2.0/config.sub	2023-07-27 10:13:03.000000000 +0200
++++ GCC/config.sub	2026-04-07 12:34:30.756892029 +0200
+@@ -1749,7 +1749,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* )
++	     | fiwix* | makaron* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -ruN gcc-13.2.0/fixincludes/mkfixinc.sh GCC/fixincludes/mkfixinc.sh
+--- gcc-13.2.0/fixincludes/mkfixinc.sh	2023-07-27 10:13:03.000000000 +0200
++++ GCC/fixincludes/mkfixinc.sh	2026-04-07 12:38:51.167450525 +0200
+@@ -11,6 +11,8 @@
+ 
+ # Check for special fix rules for particular targets
+ case $machine in
++    *-makaron* | \
++    *-*-makaron* | \
+     i?86-*-cygwin* | \
+     i?86-*-mingw32* | \
+     x86_64-*-mingw32* | \
+diff -ruN gcc-13.2.0/gcc/config.gcc GCC/gcc/config.gcc
+--- gcc-13.2.0/gcc/config.gcc	2023-07-27 10:13:04.000000000 +0200
++++ GCC/gcc/config.gcc	2026-04-07 12:40:47.948842112 +0200
+@@ -690,6 +690,14 @@
+ 
+ # Common parts for widely ported systems.
+ case ${target} in
++*-*-makaron*)
++  extra_options="$extra_options gnu-user.opt"
++  gas=yes
++  gnu_ld=yes
++  default_use_cxa_atexit=yes
++  use_gcc_stdint=provide
++  native_system_header_dir=/include
++  ;;
+ *-*-darwin*)
+   tmake_file="t-darwin "
+   tm_file="${tm_file} darwin.h"
+@@ -1126,6 +1134,12 @@
+ esac
+ 
+ case ${target} in
++i[34567]86-*-makaron*)
++    tm_file="${tm_file} i386/unix.h i386/att.h elfos.h glibc-stdint.h i386/i386elf.h makaron.h gnu-user.h"
++    ;;
++x86_64-*-makaron*)
++    tm_file="${tm_file} i386/unix.h i386/att.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h makaron.h gnu-user.h"
++    ;;
+ aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
+ 	tm_file="${tm_file} elfos.h newlib-stdint.h"
+ 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-elf-raw.h"
+diff -ruN gcc-13.2.0/libgcc/config.host GCC/libgcc/config.host
+--- gcc-13.2.0/libgcc/config.host	2023-07-27 10:13:07.000000000 +0200
++++ GCC/libgcc/config.host	2026-04-07 12:38:09.093999741 +0200
+@@ -386,6 +386,14 @@
+ esac
+ 
+ case ${host} in
++i[34567]86-*-makaron*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o crtbeginS.o crtendS.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
++x86_64-*-makaron*)
++	extra_parts="$extra_parts crti.o crtbegin.o crtend.o crtn.o crtbeginS.o crtendS.o"
++	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
++	;;
+ aarch64*-*-elf | aarch64*-*-rtems*)
+ 	extra_parts="$extra_parts crtbegin.o crtend.o crti.o crtn.o"
+ 	extra_parts="$extra_parts crtfastmath.o"
+diff -ruN gcc-13.2.0/libstdc++-v3/crossconfig.m4 GCC/libstdc++-v3/crossconfig.m4
+--- gcc-13.2.0/libstdc++-v3/crossconfig.m4	2023-07-27 10:13:08.000000000 +0200
++++ GCC/libstdc++-v3/crossconfig.m4	2026-04-07 12:37:33.064853870 +0200
+@@ -8,6 +8,12 @@
+   arm*-*-symbianelf*)
+     # This is a freestanding configuration; there is nothing to do here.
+     ;;
++  *-makaron*)
++    GLIBCXX_CHECK_COMPILER_FEATURES
++    GLIBCXX_CHECK_LINKER_FEATURES
++    GLIBCXX_CHECK_MATH_SUPPORT
++    GLIBCXX_CHECK_STDLIB_SUPPORT
++    ;;
+ 
+   avr*-*-*)
+     AC_DEFINE(HAVE_ACOSF)

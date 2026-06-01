@@ -15,9 +15,6 @@ namespace MathLib {
         AMLObject(const Sequence<char>& name, const Sequence<uint64_t>& data, Type type);
         [[nodiscard]] Array<uint64_t> GetData(void) const;
         [[nodiscard]] bool AddChild(const AMLObject& child);
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         [[nodiscard]] bool operator==(const AMLObject& other) const;
         [[nodiscard]] bool operator!=(const AMLObject& other) const;

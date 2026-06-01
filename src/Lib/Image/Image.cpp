@@ -62,6 +62,14 @@ namespace MathLib {
                         ret.AtUnsafe(x1 * xMultiplier + x2, y1 * yMultiplier + y2) = AtUnsafe(x1, y1);
         return ret;
     }
+    Image Image::Mirror(void) const {
+        const size_t width = GetWidth();
+        const size_t height = GetHeight();
+        Image ret = Image(width, height);
+        for (size_t y = 0; y < height; y++)
+            for (size_t x = 0; x < width; x++) ret.AtUnsafe(x, y) = AtUnsafe(width - x - 1, y);
+        return ret;
+    }
     Image Image::RotateUpsideDown(void) const {
         const size_t width = GetWidth();
         const size_t height = GetHeight();
@@ -85,6 +93,17 @@ namespace MathLib {
         for (size_t y = 0; y < width; y++)
             for (size_t x = 0; x < height; x++) ret.AtUnsafe(x, y) = AtUnsafe(y, height - 1 - x);
         return ret;
+    }
+    void Image::SetRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color) {
+        const ssize_t leftX = centerX - width / 2;
+        const ssize_t topY = centerY - height / 2;
+        const ssize_t maxX = Min<ssize_t>(GetWidth() - leftX, width);
+        const ssize_t maxY = Min<ssize_t>(GetHeight() - topY, height);
+        const size_t minX = Max<ssize_t>(-leftX, 0);
+        const size_t minY = Max<ssize_t>(-topY, 0);
+        uint32_t* const buffer = pixels.GetPointer();
+        const size_t imageHeight = pixels.GetHeight();
+        for (ssize_t y = minY; y < maxY; y++) MemorySet32(buffer + (topY + y) * imageHeight + minX + leftX, maxX - minX, color);
     }
     bool Image::Equals(const Image& other) const {
         return pixels == other.pixels;

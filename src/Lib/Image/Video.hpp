@@ -5,6 +5,7 @@
 namespace MathLib {
     struct Video : Collection<Frame> {
         Video(void);
+        Video(const Array<Frame>& frames);
         [[nodiscard]] virtual bool Add(const Frame& value) override;
         [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual size_t GetSize(void) const override;
@@ -15,7 +16,11 @@ namespace MathLib {
         [[nodiscard]] Array<num_t> GetDurations(void) const;
         void SetDurations(const Function<num_t, size_t>& durations);
         void Resize(size_t xMultiplier, size_t yMultiplier);
-        void RotateUpsideDown(void);
+        [[nodiscard]] Video Mirror(void) const;
+        [[nodiscard]] Video RotateUpsideDown(void) const;
+        [[nodiscard]] Video SwapXY(void) const;
+        [[nodiscard]] Video SwapXYAndRotateUpsideDown(void) const;
+        [[nodiscard]] Video Sub(const Interval<size_t>& interval) const;
 
         protected:
         Array<Frame> frames;

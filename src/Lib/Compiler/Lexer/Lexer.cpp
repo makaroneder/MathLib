@@ -17,7 +17,7 @@ namespace MathLib {
             rule->Match(input, i);
             if (save != i) {
                 const size_t type = rule->GetType();
-                if (type != SIZE_MAX) return Token(type, SubSequence<char>(input, Interval<size_t>(save, i)));
+                return Token(type, SubSequence<char>(input, Interval<size_t>(save, i)));
             }
         }
         return Expected<Token>();
@@ -27,7 +27,7 @@ namespace MathLib {
         Array<Token> ret;
         while (i < size) {
             const Expected<Token> tmp = LexSingle();
-            if (!tmp.HasValue() || !ret.Add(tmp.Get())) return Array<Token>();
+            if (!tmp.HasValue() || (!tmp.Get().CheckType(SIZE_MAX) && !ret.Add(tmp.Get()))) return Array<Token>();
         }
         return ret;
     }

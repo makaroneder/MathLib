@@ -9,6 +9,8 @@ namespace MathLib {
         XZFlags flags;
         uint32_t crc32;
 
+        XZHeader(void);
+        XZHeader(const XZFlags& flags);
         [[nodiscard]] bool IsValid(void) const;
     } __attribute__((packed));
 }

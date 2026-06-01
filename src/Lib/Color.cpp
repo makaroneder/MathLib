@@ -22,12 +22,13 @@ namespace MathLib {
         const uint8_t* color2 = (const uint8_t*)&c2;
         const num_t alpha = color2[alphaPosition] / UINT8_MAX;
         const num_t invAlpha = 1 - alpha;
-        uint8_t ret[sizeof(uint32_t)];
+        uint32_t ret;
+        uint8_t* ret8 = (uint8_t*)&ret;
         for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
             if (i == alphaPosition) continue;
-            ret[i] = color2[i] * alpha + color1[i] * invAlpha;
+            ret8[i] = color2[i] * alpha + color1[i] * invAlpha;
         }
-        ret[alphaPosition] = color2[alphaPosition] + color1[alphaPosition] * invAlpha;
-        return *(const uint32_t*)ret;
+        ret8[alphaPosition] = color2[alphaPosition] + color1[alphaPosition] * invAlpha;
+        return ret;
     }
 }

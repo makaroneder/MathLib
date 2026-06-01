@@ -5,6 +5,15 @@
 
 namespace MathLib {
     struct AsepriteLayerChunk : AsepriteChunkHeader {
+        enum class Flag : uint8_t {
+            Visible = 0,
+            Editable,
+            LockMovement,
+            Background,
+            PreferLinkedCels,
+            DisplayCollapsed,
+            ReferenceLayer,
+        };
         enum class Type : uint16_t {
             Normal = 0,
             Group,
@@ -31,14 +40,7 @@ namespace MathLib {
             Subtract,
             Divide,
         };
-        bool visible : 1;
-        bool editable : 1;
-        bool lockMovement : 1;
-        bool background : 1;
-        bool preferLinkedCels : 1;
-        bool displayCollapsed : 1;
-        bool referenceLayer : 1;
-        uint16_t reserved1 : 9;
+        uint16_t flags;
         Type type;
         uint16_t childLevel;
         uint16_t defaultWidth;

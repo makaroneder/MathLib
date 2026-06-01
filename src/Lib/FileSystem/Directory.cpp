@@ -2,6 +2,9 @@
 
 namespace MathLib {
     Directory::Directory(FileSystem& base, const Sequence<char>& basePath) : basePath(CollectionToString(basePath)), base(base) {}
+    bool Directory::IsValid(void) const {
+        return base.IsValid();
+    }
     size_t Directory::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         return base.OpenInternal(basePath + '/' + path, mode);
     }

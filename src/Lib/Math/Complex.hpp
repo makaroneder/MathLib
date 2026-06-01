@@ -42,9 +42,6 @@ namespace MathLib {
         [[nodiscard]] T ToReal(void) const {
             return FloatsEqual<T>(imaginary, 0) ? real : nan;
         }
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             if (FloatsEqual<T>(real, 0)) return CollectionToString(padding) + (FloatsEqual<T>(imaginary, 0) ? "0" : CoefficientToString(imaginary, 'i'_M));
             if (FloatsEqual<T>(imaginary, 0)) return CollectionToString(padding) + Formatter<T>::ToString(real);
@@ -91,14 +88,10 @@ namespace MathLib {
         T real;
         T imaginary;
 
-        /// @brief a + b = re(a) + re(b) + (im(a) + im(b))i
-        /// @param other Complex number to add
         void Add(const Complex<T>& other) {
             real += other.real;
             imaginary += other.imaginary;
         }
-        /// @brief a * s = (re(a) + im(a)i) * s
-        /// @param scalar Scalar value to multiply by
         void Multiply(const T& scalar) {
             real *= scalar;
             imaginary *= scalar;
@@ -112,7 +105,6 @@ namespace MathLib {
     [[nodiscard]] bool operator<(const T& scalar, const Complex<T>& complex) {
         return Complex<T>(scalar, 0) < complex;
     }
-    /// @brief Default type for complex numbers
     using complex_t = Complex<num_t>;
 }
 

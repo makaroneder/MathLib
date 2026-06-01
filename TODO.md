@@ -3,12 +3,7 @@
 [Project Euler](https://projecteuler.net/problem=4)
 [6502](https://www.masswerk.at/6502/6502_instruction_set.html)
 
-[Ext2](https://wiki.osdev.org/Ext2)
 [Ext4](https://wiki.osdev.org/Ext4)
-
-[List of algebraic structures](https://en.wikipedia.org/wiki/Outline_of_algebraic_structures)
-[List of lattices](https://en.wikipedia.org/wiki/Map_of_lattices)
-[Topological space](https://en.wikipedia.org/wiki/Topological_space)
 
 [Parallel port](https://wiki.osdev.org/Parallel_port)
 [RTL8139](https://wiki.osdev.org/RTL8139)

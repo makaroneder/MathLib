@@ -1,12 +1,36 @@
 #include "Git.hpp"
 #include "GitTree.hpp"
+#include "GitCommit.hpp"
 #include <Cryptography/OneWayCipher/SHA1.hpp>
 #include <Cryptography/Compressor/ZLib.hpp>
 
-[[nodiscard]] MathLib::String HashToPath(const MathLib::String& hash) {
+MathLib::String Git::HashToPath(const MathLib::String& hash) {
     return "objects/"_M + hash.AtUnsafe(0) + hash.AtUnsafe(1) + '/' + MathLib::SubString(hash, 2, hash.GetSize() - 2);
 }
+MathLib::String Git::GetDefaultReference(MathLib::FileSystem& fs) {
+    MathLib::File file = fs.Open("HEAD"_M, MathLib::OpenMode::Read);
+    MathLib::String str = file.ReadUntil('\n');
+    if (!str.StartsWith("ref: refs/heads/"_M)) return "";
+    return MathLib::SubString(str, 16, str.GetSize() - 16);
+}
+MathLib::String Git::ReferenceToCommit(MathLib::FileSystem& fs, const MathLib::String& ref) {
+    MathLib::File file = fs.Open("refs/heads/"_M + ref, MathLib::OpenMode::Read);
+    const size_t size = file.GetSize();
+    size_t i = 0;
+    MathLib::String ret;
+    while (i < size) {
+        char chr;
+        if (!file.Read<char>(chr)) return "";
+        if (chr == '\n') break;
+        ret += chr;
+    }
+    return ret;
+}
 Git::Git(MathLib::FileSystem& fs, const MathLib::String& rootHash) : rootHash(rootHash), fs(fs) {}
+MathLib::String Git::GetRootHash(void) {
+    GitCommit commit;
+    return commit.LoadFromPath(fs, HashToPath(rootHash)) ? commit.treeHash : "";
+}
 MathLib::String Git::CreateBlob(const MathLib::Array<uint8_t>& data) {
     const MathLib::Array<uint8_t> blobData = GitBlob().Encrypt(data, MathLib::CipherKey());
     const MathLib::Array<uint8_t> hash = MathLib::SHA1().Encrypt(blobData, MathLib::CipherKey());
@@ -23,10 +47,14 @@ MathLib::String Git::CreateBlob(const MathLib::Array<uint8_t>& data) {
     if (!file.WriteBuffer(compressed.GetValue(), compressed.GetSize())) return "";
     return ret;
 }
+bool Git::IsValid(void) const {
+    // TODO:
+    return true;
+}
 size_t Git::OpenInternal(const MathLib::Sequence<char>& path, MathLib::OpenMode mode) {
     // TODO: Create if needed
     (void)mode;
-    MathLib::String prev = rootHash;
+    MathLib::String prev = GetRootHash();
     const MathLib::Array<MathLib::String> split = Split(path, '/'_M, false);
     for (const MathLib::Sequence<char>& name : split) {
         if (name.IsEmpty()) continue;
@@ -78,7 +106,7 @@ size_t Git::GetSize(size_t file) {
     return GitBlob().Decrypt(MathLib::ZLib().DecryptReadable(tmp, MathLib::CipherKey()), MathLib::CipherKey()).GetSize();
 }
 MathLib::Array<MathLib::FileInfo> Git::ReadDirectory(const MathLib::Sequence<char>& path) {
-    MathLib::String prev = rootHash;
+    MathLib::String prev = GetRootHash();
     const MathLib::Array<MathLib::String> split = Split(path, '/'_M, false);
     for (const MathLib::Sequence<char>& name : split) {
         if (name.IsEmpty()) continue;

@@ -1,5 +1,5 @@
+from sys import argv, exit
 from pathlib import Path
-from sys import argv
 
 if __name__ == "__main__":
     if len(argv) < 2:

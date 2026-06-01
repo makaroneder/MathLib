@@ -7,12 +7,13 @@ namespace MathLib {
     [[nodiscard]] String SubString(const Sequence<char>& str, size_t pos, size_t len);
     [[nodiscard]] Array<String> Split(const Sequence<char>& str, const Sequence<char>& delim, bool preserveDelim);
     [[nodiscard]] String ToString(size_t x, size_t base, size_t size = 0);
+    [[nodiscard]] String SignedToString(ssize_t x, size_t base, size_t size = 0);
     [[nodiscard]] String BoolToString(bool x);
     [[nodiscard]] size_t StringToNumber(const Sequence<char>& str, size_t base);
-    [[nodiscard]] String DumpMemory(uintptr_t addr, size_t size, size_t lineSize);
+    [[nodiscard]] String DumpMemory(uintptr_t addr, size_t size, size_t lineSize, const String& padding = "");
     template <typename T>
-    [[nodiscard]] String DumpMemory(const Collection<T>& array, size_t lineSize) {
-        return DumpMemory((uintptr_t)array.GetValue(), array.GetSize() * sizeof(T), lineSize);
+    [[nodiscard]] String DumpMemory(const Collection<T>& array, size_t lineSize, const String& padding = "") {
+        return DumpMemory((uintptr_t)array.GetValue(), array.GetSize() * sizeof(T), lineSize, padding);
     }
     [[nodiscard]] bool Match(const Sequence<char>& str, const Sequence<char>& pattern);
 }

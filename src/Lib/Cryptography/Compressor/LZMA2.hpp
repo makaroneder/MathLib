@@ -1,5 +1,5 @@
-#ifndef MathLib_Cryptography_CompressorLZMA2_H
-#define MathLib_Cryptography_CompressorLZMA2_H
+#ifndef MathLib_Cryptography_Compressor_LZMA2_H
+#define MathLib_Cryptography_Compressor_LZMA2_H
 #include "../ReadableCipher.hpp"
 
 namespace MathLib {

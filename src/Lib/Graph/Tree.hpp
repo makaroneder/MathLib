@@ -152,9 +152,6 @@ namespace MathLib {
             }
             return true;
         }
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             String ret = CollectionToString(padding) + name + " (" + Formatter<T>::ToString(data) + ')';
             if (children.IsEmpty()) return ret;

@@ -1,8 +1,11 @@
 MakeObjects(dir : String, ext : String, cmd : String, sources : String) : String = DeclareTarget("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext + " $(HEADERS)", cmd, false) + CreateObjects("$(BUILDDIR)/" + dir + "/%." + ext + ".o", "$(SRCDIR)/" + dir + "/%." + ext, sources)
-LDTarget(out : String, objs : String, libs : String, ld : String, ldFlags : String, deps : String) : String = DeclareTarget("$(BUILDDIR)/" + out, objs + deps, ld + " " + ldFlags + " " + objs + " -o $@ " + libs, false)
+LDTarget(out : String, objs : String, libs : String, ld : String, ldFlags : String, deps : String) : String = DeclareTarget(out, objs + deps, ld + " " + ldFlags + " " + objs + " -o $@ " + libs, false)
+ARTarget(out : String, objs : String, ar : String) : String  = DeclareTarget(out, objs, ar + " -rcs $@ $^", false)
+CPTarget(out : String, in : String) : String = DeclareTarget(out, in, "cp $< $@", false)
+
 DefaultRunTargets(name : String, app : String, args : String) : Void = DeclareTarget("run" + name, app, "./$< " + args, true) + DeclareTarget("debug" + name, app, "$(VALGRIND) $(VALGRINDFLAGS) ./$< " + args, true)
 DefaultTarget(out : String, dir : String, libs : String, run : String, args : String, runDeps : String) : Void = {
-    LDTarget(out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs + " -L $(BUILDDIR) -l Math", "$(CXX)", "$(CXXFLAGS)", "$(BUILDDIR)/libMath.so"),
+    LDTarget("$(BUILDDIR)/" + out, MakeObjects(dir, "cpp", "$(CXX) $(CXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/" + dir, ".cpp")), libs + " -L $(BUILDDIR) -l Math", "$(CXX)", "$(CXXFLAGS)", "$(BUILDDIR)/libMath.so"),
     DefaultRunTargets(run, "$(BUILDDIR)/" + out + " " + runDeps, args)
 }
 DefaultTarget("Tests.out", "Tests", "", "Test", "", "")
@@ -59,20 +62,74 @@ DefaultTarget("FactorySimulator.out", "Games/FactorySimulator", "-l SDL2", "Fact
 DefaultTarget("Chomp.out", "Games/Chomp", "-l SDL2", "Chomp", "", "")
 DefaultTarget("ProjectEuler.out", "Math/ProjectEuler", "", "ProjectEuler", "", "")
 DefaultTarget("AES.out", "AES", "", "AES", "$(AESTESTSPATH)", "")
+DefaultTarget("ASL.out", "ASL", "", "ASL", "$(ASLPATH)", "")
+DefaultTarget("Electricity.out", "Electricity", "", "Electricity", "", "")
+DefaultTarget("BlockFiller.out", "Games/BlockFiller", "-l SDL2", "BlockFiller", "", "")
+DefaultTarget("Sine.out", "Math/Sine", "", "Sine", "", "")
+DefaultTarget("AI.out", "AI", "", "AI", "", "")
+DefaultTarget("TerrainGenerator.out", "TerrainGenerator", "-l SDL2", "TerrainGen", "", "")
 
 DeclareTarget("$(BUILDDIR)/Main.aml", "$(SRCDIR)/TestPrograms/ACPI/Main.asl $(SCRIPTSDIR)/CompileASL.py", "$(PYTHON) Scripts/CompileASL.py $< $@ $(ASLFLAGS)", false)
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)
-DeclareTarget("$(BUILDDIR)/FAT.img", "$(OSROOT)/HDD/*", "dd if=/dev/zero of=$@ bs=512 count=93750 && mformat -i $@ :: && mcopy -i $@ -s $< ::", false)
-DeclareTarget("$(BUILDDIR)/OS.img", "$(BUILDDIR)/Kernel.elf $(OSROOT)/CD/*", "cp $< $(OSROOT)/CD/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT)/CD && rm $(OSROOT)/CD/boot/Kernel.elf", false)
-DeclareTarget("$(BUILDDIR)/OS.gdb", "$(SCRIPTSDIR)/MakeGDB.py", "$(PYTHON) $< $@ $(BUILDDIR)/Kernel.elf Entry '$(OSQEMUCMD)'", false)
+DeclareTarget("$(BUILDDIR)/FAT.img", "$(OSROOT)/FAT/*", "dd if=/dev/zero of=$@ bs=512 count=93750 && mkfs.vfat -F 16 $@ && mcopy -s -i $@ $^ ::", false)
+DeclareTarget("$(BUILDDIR)/EXT.img", "$(OSSYSROOT)/boot/Kernel.elf libc $(OSROOT)/EXT/*", "cp -r $(OSROOT)/EXT/* $(OSSYSROOT)/ && genext2fs -b 100000 -d $(OSSYSROOT) $@", false)
+DeclareTarget("$(BUILDDIR)/OS.img", "$(OSSYSROOT)/boot/Kernel.elf $(OSROOT)/ISO9660/*", "cp $< $(OSROOT)/ISO9660/boot/Kernel.elf && grub-mkrescue -quiet -l -J -R -o $@ $(OSROOT)/ISO9660 && rm $(OSROOT)/ISO9660/boot/Kernel.elf", false)
+DeclareTarget("$(BUILDDIR)/OS.gdb", "$(SCRIPTSDIR)/MakeGDB.py", "$(PYTHON) $< $@ $(OSSYSROOT)/boot/Kernel.elf Entry '$(OSQEMUCMD)'", false)
 
-MakeObjects("OS", "s", "$(AS) $(ASFLAGS) $< -o $@", "$(BUILDDIR)/OS/crti.s $(BUILDDIR)/OS/crtn.s")
+MakeObjects("OS/Shared", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Shared", ".cpp"))
+MakeObjects("OS/Shared", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Shared", ".asm"))
 kernelObjs : String =
-    "$(BUILDDIR)/OS/crti.s.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o) " +
-    MakeObjects("OS", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS", ".cpp")) +
-    MakeObjects("OS", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS", ".asm")) +
-    "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/crtn.s.o "
-LDTarget("Kernel.elf", kernelObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS) -T $(OSLINKER) -Xlinker -Map=$(BUILDDIR)/Kernel.map", "$(OSLINKER)")
+    "$(BUILDDIR)/OS/Shared/crti.asm.o $(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtbegin.o) " +
+    MakeObjects("OS/Kernel", "cpp", "$(OSCXX) $(OSCXXFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Kernel", ".cpp")) +
+    MakeObjects("OS/Kernel", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Kernel", ".asm")) +
+    "$(shell $(OSCXX) $(OSCXXFLAGS) -print-file-name=crtend.o) $(BUILDDIR)/OS/Shared/crtn.asm.o "
+LDTarget("$(OSSYSROOT)/boot/Kernel.elf", kernelObjs, "-l gcc", "$(OSCXX)", "$(OSLDFLAGS) -T $(OSLINKER) -Xlinker -Map=$(BUILDDIR)/Kernel.map", "$(OSLINKER)")
 
-DeclareTarget("runOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "$(OSQEMUCMD) -debugcon stdio", true)
-DeclareTarget("debugOS", "$(BUILDDIR)/OS.gdb $(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img", "gdb -x $<", true)
+CPTarget("$(OSSYSROOT)/lib/crt1.o", "$(BUILDDIR)/OS/Shared/crt1.cpp.o")
+CPTarget("$(OSSYSROOT)/lib/Scrt1.o", "$(OSSYSROOT)/lib/crt1.o")
+CPTarget("$(OSSYSROOT)/lib/crti.o", "$(BUILDDIR)/OS/Shared/crti.asm.o")
+CPTarget("$(OSSYSROOT)/lib/crtn.o", "$(BUILDDIR)/OS/Shared/crtn.asm.o")
+CPTarget("$(OSSYSROOT)/lib/crtbegin.o", "$(shell $(OSCXX) $(OSCXXUSERFLAGS) -print-file-name=crtbegin.o)")
+CPTarget("$(OSSYSROOT)/lib/crtend.o", "$(shell $(OSCXX) $(OSCXXUSERFLAGS) -print-file-name=crtend.o)")
+CPTarget("$(OSSYSROOT)/lib/libgcc.a", "$(shell $(OSCXX) $(OSCXXUSERFLAGS) -print-libgcc-file-name)")
+
+ARTarget("$(OSSYSROOT)/lib/libc.a",
+    MakeObjects("OS/Libc", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libc", ".cpp")) +
+    MakeObjects("OS/Libc", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libc", ".c")) +
+    MakeObjects("OS/Libc", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Libc", ".asm")),
+"$(OSAR)")
+ARTarget("$(OSSYSROOT)/lib/libm.a",
+    MakeObjects("OS/Libm", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libm", ".cpp")) +
+    MakeObjects("OS/Libm", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libm", ".c")) +
+    MakeObjects("OS/Libm", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Libm", ".asm")),
+"$(OSAR)")
+ARTarget("$(OSSYSROOT)/lib/libstdc++.a",
+    MakeObjects("OS/Libstdcxx", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libstdcxx", ".cpp")) +
+    MakeObjects("OS/Libstdcxx", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libstdcxx", ".c")) +
+    MakeObjects("OS/Libstdcxx", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Libstdcxx", ".asm")),
+"$(OSAR)")
+ARTarget("$(OSSYSROOT)/lib/libssp.a",
+    MakeObjects("OS/Libssp", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libssp", ".cpp")) +
+    MakeObjects("OS/Libssp", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libssp", ".c")) +
+    MakeObjects("OS/Libssp", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Libssp", ".asm")),
+"$(OSAR)")
+ARTarget("$(OSSYSROOT)/lib/libssp_nonshared.a",
+    MakeObjects("OS/Libsspnonshared", "cpp", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libsspnonshared", ".cpp")) +
+    MakeObjects("OS/Libsspnonshared", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Libsspnonshared", ".c")) +
+    MakeObjects("OS/Libsspnonshared", "asm", "$(AS) $(ASFLAGS) $< -o $@", FindFiles("$(SRCDIR)/OS/Libsspnonshared", ".asm")),
+"$(OSAR)")
+
+DeclareTarget("copyOSHeaders",
+    FindFiles("$(SRCDIR)/OS/Shared", ".hpp") +
+    FindFiles("$(SRCDIR)/OS/Shared", ".h") +
+    FindFiles("$(SRCDIR)/OS/Libc", ".hpp") +
+    FindFiles("$(SRCDIR)/OS/Libc", ".h"),
+"$(PYTHON) $(SCRIPTSDIR)/CopyFiles.py $^ $(OSSYSROOT)/include 3", true)
+DeclareTarget("libc", "copyOSHeaders $(OSSYSROOT)/lib/libc.a $(OSSYSROOT)/lib/libm.a $(OSSYSROOT)/lib/libstdc++.a $(OSSYSROOT)/lib/libssp.a $(OSSYSROOT)/lib/libssp_nonshared.a $(OSSYSROOT)/lib/Scrt1.o $(OSSYSROOT)/lib/crti.o $(OSSYSROOT)/lib/crtn.o $(OSSYSROOT)/lib/crtbegin.o $(OSSYSROOT)/lib/crtend.o $(OSSYSROOT)/lib/libgcc.a", "", true)
+
+LDTarget("$(OSSYSROOT)/bin/Test.elf",
+    MakeObjects("OS/Test", "c", "$(OSCXX) $(OSCXXUSERFLAGS) -c $< -o $@", FindFiles("$(SRCDIR)/OS/Test", ".c")),
+"", "$(OSCXX)", "$(OSCXXUSERFLAGS)", "libc")
+
+DeclareTarget("runOS", "$(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img $(BUILDDIR)/EXT.img", "$(OSQEMUCMD) -debugcon stdio", true)
+DeclareTarget("debugOS", "$(BUILDDIR)/OS.gdb $(BUILDDIR)/OS.img $(BUILDDIR)/FAT.img $(BUILDDIR)/EXT.img", "gdb -x $<", true)

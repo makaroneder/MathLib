@@ -63,6 +63,9 @@ namespace MathLib {
                 if (x.Replace(element)) return true;
             return elements.Add(element);
         }
+        [[nodiscard]] bool AddOrReplace(const Key& key, const Value& value) {
+            return AddOrReplace(DictionaryElement<Key, Value>(key, value));
+        }
         [[nodiscard]] bool AddOrModify(const Key& key, const Function<Value, Value>& function, const Value& defaultValue) {
             for (DictionaryElement<Key, Value>& element : elements) {
                 if (!element.IsValidKey(key)) continue;
@@ -87,6 +90,13 @@ namespace MathLib {
                 }
                 if (!found && !elements.Add(DictionaryElement<Key, Value>(key, function(defaultValue, b.value)))) return false;
             }
+            return true;
+        }
+        template <typename T>
+        [[nodiscard]] bool CombineSequence(const Sequence<Dictionary<Key, T>>& others, const Function<Value, Value, T>& function, const Value& defaultValue) {
+            const size_t size = others.GetSize();
+            for (size_t i = 0; i < size; i++)
+                if (!Combine<T>(others.AtUnsafe(i), function, defaultValue)) return false;
             return true;
         }
 

@@ -64,6 +64,11 @@ namespace MathLib {
     bool JSON::AddChild(const JSON& child) {
         return children.Add(child);
     }
+    Expected<JSON> JSON::GetChild(const Sequence<char>& name) const {
+        for (const JSON& child : children)
+            if (child.name == name) return child;
+        return Expected<JSON>();
+    }
     Expected<JSON> JSON::Find(const Sequence<char>& path) const {
         const Array<String> split = Split(path, "/"_M, false);
         JSON prev = *this;

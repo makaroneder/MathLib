@@ -1,6 +1,5 @@
 #ifndef MathLib_Interfaces_Sequence_ByteDevice_H
 #define MathLib_Interfaces_Sequence_ByteDevice_H
-#include "WritableSequence.hpp"
 #include "../ByteDevice.hpp"
 
 namespace MathLib {

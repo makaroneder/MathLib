@@ -5,17 +5,12 @@
 namespace MathLib {
     [[noreturn]] void Panic(const Sequence<char>& str);
     [[nodiscard]] char ToUpper(char chr);
+    [[nodiscard]] char ToLower(char chr);
     [[nodiscard]] bool IsUpper(char chr);
     [[nodiscard]] bool IsLower(char chr);
     [[nodiscard]] bool IsAlpha(char chr);
     [[nodiscard]] bool IsDigit(char chr);
-    /// @brief Checks if character is white space
-    /// @param chr Character to check
-    /// @return Is character white space
     [[nodiscard]] bool IsWhiteSpace(char chr);
-    /// @brief Skips whitespace characters
-    /// @param str String to skip
-    /// @param i Current position in the string
     void SkipWhiteSpace(const Sequence<char>& str, size_t& i);
     [[nodiscard]] bool IsHexDigit(char chr);
     [[nodiscard]] bool IsAlphaDigit(char chr);

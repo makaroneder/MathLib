@@ -12,10 +12,6 @@ MathLib::FileCipher* GetFileCipher(const MathLib::Sequence<char>& type) {
     if (type == "Ar"_M) return new MathLib::Ar();
     return nullptr;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 3 || !(argc % 2)) MathLib::Panic("Usage: "_M + argv[0] + "<file system> <output file> (<input file> <input file name>)*");

@@ -33,10 +33,6 @@ template <typename T>
     }
 #define FunctionToArray(name) const MathLib::Array<MathLib::num_t> name##Arr = GetArray<MathLib::num_t>(optimizer, name, name##Variable, time)
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         MathLib::SDL2 sdl2;

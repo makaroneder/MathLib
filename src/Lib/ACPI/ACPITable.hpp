@@ -14,7 +14,9 @@ namespace MathLib {
         uint32_t creatorID;
         uint32_t creatorRevision;
 
+        [[nodiscard]] bool CheckSignature(const char* expectedSignature) const;
         [[nodiscard]] bool IsValid(void) const;
+        [[nodiscard]] uint32_t GetSize(void) const;
     } __attribute__((packed));
 }
 

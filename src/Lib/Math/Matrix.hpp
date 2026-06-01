@@ -10,30 +10,17 @@
 namespace MathLib {
     template <typename T>
     struct Matrix;
-    /// @brief Structure representing mathematic matrixes
-    /// @tparam T Type of number
     template <typename T>
     struct Matrix : Iteratable<T>, Comparable<Matrix<T>>, Printable, Saveable {
         CreateOperators(Matrix<T>, T)
         CreateExponential(Matrix<T>, IsSquare(), Identity(width))
-        /// @brief Creates a new matrix
-        /// @param width Width of matrix
-        /// @param height Height of matrix
         Matrix(size_t width = 0, size_t height = 0) : width(width), height(height), ptr(width * height) {
             Fill(T());
         }
-        /// @brief Creates a new matrix
-        /// @param width Width of matrix
-        /// @param height Height of matrix
-        /// @param func Function representing the matrix
         Matrix(size_t width, size_t height, const Function<T, size_t, size_t>& func) : width(width), height(height), ptr(width * height) {
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) AtUnsafe(x, y) = func(x, y);
         }
-        /// @brief Creates a new matrix
-        /// @param width Width of matrix
-        /// @param height Height of matrix
-        /// @param arr Values for the matrix
         Matrix(size_t width, size_t height, const Sequence<T>& arr) : width(width), height(height), ptr(CollectionToArray<T>(arr)) {}
         [[nodiscard]] static Matrix<T> Identity(size_t n) {
             Matrix<T> ret = Matrix<T>(n, n);
@@ -114,9 +101,6 @@ namespace MathLib {
                     if (!FloatsEqual<T>(At(x, y), value)) return false;
             return true;
         }
-        /// @brief Checks whether the matrix is multiple of another matrix
-        /// @param other Another matrix
-        /// @return Check status
         [[nodiscard]] bool IsMultipleOf(const Matrix<T>& other, const Interval<size_t>& xInterval1, const Interval<size_t>& yInterval1, const Interval<size_t>& xInterval2, const Interval<size_t>& yInterval2) const {
             if (xInterval1.GetSize() != xInterval2.GetSize() || yInterval1.GetSize() != yInterval2.GetSize()) return false;
             T prev = 0;
@@ -162,32 +146,16 @@ namespace MathLib {
         void Random(const T& min, const T& max) {
             for (T& val : ptr) val = RandomNumber(min, max);
         }
-        /// @brief Returns data at specified position
-        /// @param x X position
-        /// @param y Y position
-        /// @return Data at specified position
         [[nodiscard]] T& AtUnsafe(size_t x, size_t y) {
             return ptr.AtUnsafe(y * width + x);
         }
-        /// @brief Returns data at specified position
-        /// @param x X position
-        /// @param y Y position
-        /// @return Data at specified position
         [[nodiscard]] T AtUnsafe(size_t x, size_t y) const {
             return ptr.AtUnsafe(y * width + x);
         }
-        /// @brief Returns data at specified position
-        /// @param x X position
-        /// @param y Y position
-        /// @return Data at specified position
         [[nodiscard]] T& At(size_t x, size_t y) {
             if (x < width && y < height) return AtUnsafe(x, y);
             Panic("Index out of bounds");
         }
-        /// @brief Returns data at specified position
-        /// @param x X position
-        /// @param y Y position
-        /// @return Data at specified position
         [[nodiscard]] T At(size_t x, size_t y) const {
             if (x < width && y < height) return AtUnsafe(x, y);
             Panic("Index out of bounds");
@@ -202,31 +170,19 @@ namespace MathLib {
                 for (size_t x = 0; x < width; x++) ret.AtUnsafe(x, y) *= other.AtUnsafe(x, y);
             return ret;
         }
-        /// @brief a = (a . b) / (|a| * |b|)
-        /// @param other Other matrix
-        /// @return Angle between 2 matrices
         [[nodiscard]] T GetAngle(const Matrix<T>& other) const {
             return Dot(other) / (GetLength() * other.GetLength());
         }
-        /// @brief |a|^2 = a . a
-        /// @return Squared length of the vector
         [[nodiscard]] T GetLengthSquared(void) const {
             return Dot(*this);
         }
-        /// @brief |a| = sqrt(a . a)
-        /// @return Length of the vector
         [[nodiscard]] T GetLength(void) const {
             return Sqrt(GetLengthSquared());
         }
-        /// @brief ^a = a / |a|
-        /// @return Normalized matrix
         [[nodiscard]] Matrix<T> Normalize(void) const {
             const T len = GetLength();
             return FloatsEqual<T>(len, 0) ? *this : (*this / len);
         }
-        /// @brief a . b = a_0 * b_0 + ... + a_n * b_n
-        /// @param other Other matrix
-        /// @return Dot product of 2 vectors
         [[nodiscard]] T Dot(const Matrix<T>& other) const {
             if (other.width != width || other.height != height) return nan;
             T ret = 0;
@@ -234,8 +190,6 @@ namespace MathLib {
                 for (size_t x = 0; x < width; x++) ret += AtUnsafe(x, y) * other.AtUnsafe(x, y);
             return ret;
         }
-        /// @brief ln(A) = (-1)^(1 + 1) * ((A - I)^1 / 1) + ... + (-1)^(1 + ∞) * ((A - I)^∞ / ∞)
-        /// @return Logarithm of matrix
         [[nodiscard]] Expected<Matrix<T>> Log(void) const {
             const Matrix<T> identity = Identity(width);
             Matrix<T> ret = Matrix<T>(width, height);
@@ -246,8 +200,6 @@ namespace MathLib {
             }
             return Expected<Matrix<T>>(ret);
         }
-        /// @brief e^X = X^0 / 0! + ... + X^∞ / ∞!
-        /// @return Exponential of matrix
         [[nodiscard]] Expected<Matrix<T>> Exponential(void) const {
             Matrix<T> ret = Matrix<T>(width, height);
             for (size_t k = 0; k < 100; k++) {
@@ -257,9 +209,6 @@ namespace MathLib {
             }
             return Expected<Matrix<T>>(ret);
         }
-        /// @brief X^n = exp(ln(X) * n)
-        /// @param n Exponent
-        /// @return Power of matrix
         [[nodiscard]] Expected<Matrix<T>> Pow(T n) const {
             if (n < 0) {
                 const Expected<Matrix<T>> tmp = GetInverse();
@@ -268,15 +217,10 @@ namespace MathLib {
             const Expected<Matrix<T>> tmp = Log();
             return tmp.HasValue() ? (tmp.Get() * n).Exponential() : Expected<Matrix<T>>();
         }
-        /// @brief X^n = exp(ln(X) * n)
-        /// @param n Exponent matrix
-        /// @return Power of matrix
         [[nodiscard]] Expected<Matrix<T>> Pow(Matrix<T> n) const {
             const Expected<Matrix<T>> tmp = Log();
             return tmp.HasValue() ? (tmp.Get() * n).Exponential() : Expected<Matrix<T>>();
         }
-        /// @brief Returns determinant of the matrix
-        /// @return Determinant of the matrix
         [[nodiscard]] T GetDeterminant(void) const {
             if (!IsSquare()) return nan;
             if (!width) return 1;
@@ -296,16 +240,12 @@ namespace MathLib {
             }
             return ret;
         }
-        /// @brief Returns transpose of the matrix
-        /// @return Transpose of the matrix
         [[nodiscard]] Matrix<T> GetTranspose(void) const {
             Matrix<T> ret = Matrix<T>(height, width);
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) ret.AtUnsafe(y, x) = AtUnsafe(x, y);
             return ret;
         }
-        /// @brief Returns cofactor of the matrix
-        /// @return Cofactor of the matrix
         [[nodiscard]] Expected<Matrix<T>> GetCofactor(void) const {
             if (!IsSquare()) return Expected<Matrix<T>>();
             Matrix<T> ret = Matrix<T>(width, width);
@@ -328,16 +268,11 @@ namespace MathLib {
             }
             return Expected<Matrix<T>>(ret);
         }
-        /// @brief Returns inverse of the matrix
-        /// @return Inverse of the matrix
         [[nodiscard]] Expected<Matrix<T>> GetInverse(void) const {
             const Expected<Matrix<T>> tmp = GetCofactor();
             const T determinant = GetDeterminant();
             return !FloatsEqual<T>(determinant, 0) && tmp.HasValue() ? Expected<Matrix<T>>(tmp.Get().GetTranspose() / determinant) : Expected<Matrix<T>>();
         }
-        /// @brief Converts matrix to string
-        /// @param padding String to pad with
-        /// @return String representation of matrix
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             if (height == 1) {
                 String ret = CollectionToString(padding) + '[';
@@ -364,9 +299,6 @@ namespace MathLib {
             }
             return ret;
         }
-        /// @brief Multiplies 2 matrices
-        /// @param other Another matrix
-        /// @return Result of multiplication
         [[nodiscard]] Expected<Matrix<T>> operator*(const Matrix<T>& other) const {
             if (width != other.height) return Expected<Matrix<T>>();
             Matrix<T> ret = Matrix<T>(other.width, height);
@@ -375,9 +307,6 @@ namespace MathLib {
                     for (size_t x2 = 0; x2 < width; x2++) ret.AtUnsafe(x, y) += AtUnsafe(x2, y) * other.AtUnsafe(x, x2);
             return ret;
         }
-        /// @brief Saves matrix data
-        /// @param file File to save matrix data into
-        /// @return Status
         [[nodiscard]] virtual bool Save(Writable& file) const override {
             if (!file.Write<size_t>(width) || !file.Write<size_t>(height)) return false;
             const size_t size = ptr.GetSize();
@@ -385,9 +314,6 @@ namespace MathLib {
                 if (!file.Write<T>(ptr.AtUnsafe(i))) return false;
             return true;
         }
-        /// @brief Loads matrix data
-        /// @param file File to load matrix data from
-        /// @return Status
         [[nodiscard]] virtual bool Load(Readable& file) override {
             if (!file.Read<size_t>(width) || !file.Read<size_t>(height)) return false;
             ptr = Array<T>(width * height);
@@ -413,9 +339,6 @@ namespace MathLib {
         }
 
         protected:
-        /// @brief Compares current matrix with another matrix
-        /// @param other Other matrix
-        /// @return Data equality
         [[nodiscard]] virtual bool Equals(const Matrix<T>& other) const override {
             if (width != other.width || height != other.height) return false;
             for (size_t y = 0; y < height; y++)
@@ -425,34 +348,20 @@ namespace MathLib {
         }
 
         private:
-        /// @brief a + b = [a_0 + b_0, ..., a_n + b_n]
-        /// @param other Matrix to add
         void Add(const Matrix<T>& other) {
             if (other.width != width || other.height != height) Panic("Invalid width or height of matrixes for addition");
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) AtUnsafe(x, y) += other.AtUnsafe(x, y);
         }
-        /// @brief a * s = [a_0 * s, ..., a_n * s]
-        /// @param scalar Scalar value to multiply by
         void Multiply(const T& scalar) {
             for (size_t y = 0; y < height; y++)
                 for (size_t x = 0; x < width; x++) AtUnsafe(x, y) *= scalar;
         }
 
-        /// @brief Width of matrix
         size_t width;
-        /// @brief Height of matrix
         size_t height;
-        /// @brief Raw data
         Array<T> ptr;
     };
-    /// @brief Converts matrix from one type to another
-    /// @tparam T Old type of number
-    /// @tparam F New type of number
-    /// @tparam width Width of matrix
-    /// @tparam height Height of matrix
-    /// @param matrix Matrix to convert
-    /// @return Converted matrix
     template <typename T, typename F>
     [[nodiscard]] Matrix<F> ConvertMatrix(const Matrix<T>& matrix) {
         Matrix<F> ret = Matrix<F>(matrix.GetWidth(), matrix.GetHeight());
@@ -460,7 +369,6 @@ namespace MathLib {
             for (size_t x = 0; x < matrix.GetWidth(); x++) ret.AtUnsafe(x, y) = (F)matrix.AtUnsafe(x, y);
         return ret;
     }
-    /// @brief Default type for matrices
     using matrix_t = Matrix<num_t>;
 }
 

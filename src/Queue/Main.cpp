@@ -22,10 +22,6 @@ struct Counting : MathLib::Job {
     size_t count;
     size_t id;
 };
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         MathLib::QueueSystem system = MathLib::QueueSystem(MathLib::Graph(MathLib::MakeArray<MathLib::Edge>(

@@ -27,6 +27,12 @@ bool NaturalNumber::IsZero(void) const {
 bool NaturalNumber::IsEven(void) const {
     return data.IsEmpty() || !(data.At(0) & 1);
 }
+size_t NaturalNumber::GetDegree(void) const {
+    const size_t size = data.GetSize();
+    for (size_t i = size; i; i--)
+        if (data.AtUnsafe(i - 1)) return i - 1;
+    return 0;
+}
 size_t NaturalNumber::GetSize(void) const {
     return data.GetSize();
 }
@@ -100,28 +106,21 @@ NaturalNumber NaturalNumber::DivModBySubtraction(const NaturalNumber& other, Nat
 }
 NaturalNumber NaturalNumber::LongDivMod(const NaturalNumber& other, NaturalNumber& mod) const {
     if (other.IsZero()) return NaturalNumber();
-    if (*this < other) {
-        mod = *this;
-        return NaturalNumber();
-    }
-    size_t i = data.GetSize();
-    while (!data.At(i - 1)) i--;
-    if (i == 1) {
-        mod = NaturalNumber::FromT<uint8_t>(data.At(--i) % other.data.At(0));
-        return NaturalNumber::FromT<uint8_t>(data.At(i) / other.data.At(0));
-    }
-    NaturalNumber curr;
-    while (curr < other) curr.MultiplyBy256(data.At(--i));
-    if (!i) return DivModBySubtraction(other, mod);
     NaturalNumber ret;
-    while (true) {
-        const NaturalNumber tmp = curr.LongDivMod(other, mod);
-        ret.MultiplyBy256(0);
+    mod = *this;
+    const size_t otherDegree = other.GetDegree();
+    const uint8_t otherLeadingByte = other.At(otherDegree);
+    while (!mod.IsZero()) {
+        const size_t modDegree = mod.GetDegree();
+        if (modDegree < otherDegree) break;
+        const uint8_t modLeadingByte = mod.At(modDegree);
+        if (modLeadingByte % otherLeadingByte) break;
+        NaturalNumber tmp = FromT<uint8_t>(modLeadingByte / otherLeadingByte);
+        for (size_t i = otherDegree; i < modDegree; i++) tmp.MultiplyBy256(0);
         ret += tmp;
-        curr = mod;
-        if (!i) return ret;
-        curr.MultiplyBy256(data.At(--i));
+        mod -= other * tmp;
     }
+    return ret;
 }
 NaturalNumber NaturalNumber::Factorial(const NaturalNumber& level) const {
     if (level.IsZero()) return NaturalNumber();
@@ -146,6 +145,17 @@ NaturalNumber NaturalNumber::LeastCommonMultiple(const NaturalNumber& other) con
     NaturalNumber mod;
     return (*this * other).LongDivMod(GreatestCommonDivisor(other), mod);
 }
+NaturalNumber NaturalNumber::GreatestCommonDivisorBySubtraction(const NaturalNumber& other) const {
+    if (IsZero()) return other;
+    if (other.IsZero()) return *this;
+    NaturalNumber mod;
+    (void)DivModBySubtraction(other, mod);
+    return other.GreatestCommonDivisorBySubtraction(mod);
+}
+NaturalNumber NaturalNumber::LeastCommonMultipleBySubtraction(const NaturalNumber& other) const {
+    NaturalNumber mod;
+    return (*this * other).DivModBySubtraction(GreatestCommonDivisorBySubtraction(other), mod);
+}
 NaturalNumber NaturalNumber::GenerateCoprime(void) const {
     if (*this == NaturalNumber::FromT<uint8_t>(2) || *this == NaturalNumber::FromT<uint8_t>(3)) return NaturalNumber::FromT<uint8_t>(1);
     MathLib::Array<MathLib::SingleTypePair<NaturalNumber>> current = MathLib::MakeArray<MathLib::SingleTypePair<NaturalNumber>>(MathLib::SingleTypePair<NaturalNumber>(NaturalNumber::FromT<uint8_t>(2), NaturalNumber::FromT<uint8_t>(1)));
@@ -162,6 +172,17 @@ NaturalNumber NaturalNumber::GenerateCoprime(void) const {
         }
         current = next;
         if (!next.Reset()) return NaturalNumber();
+    }
+}
+NaturalNumber NaturalNumber::GetModularInverse(const NaturalNumber& mod) const {
+    NaturalNumber ret;
+    NaturalNumber curr;
+    while (true) {
+        NaturalNumber tmp;
+        (void)curr.DivModBySubtraction(mod, tmp);
+        if (tmp == NaturalNumber::FromT<uint8_t>(1)) return ret;
+        ++ret;
+        curr += *this;
     }
 }
 void NaturalNumber::MultiplyBy256(uint8_t last) {
@@ -268,5 +289,5 @@ bool NaturalNumber::LessThanEqual(const MathLib::Orderable& other_) const {
     return true;
 }
 uint8_t NaturalNumber::At(size_t i) const {
-    return i < data.GetSize() ? data.At(i) : 0;
+    return i < data.GetSize() ? data.AtUnsafe(i) : 0;
 }

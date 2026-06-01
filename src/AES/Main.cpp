@@ -4,10 +4,6 @@
 #include <Tests/Test.hpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         // TODO: CFB1 CFB8 CFB128

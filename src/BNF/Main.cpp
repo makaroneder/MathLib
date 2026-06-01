@@ -21,10 +21,6 @@ T Evaluate(const MathLib::Tree<MathLib::String>& tree) {
     }
     return MathLib::nan;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         const BNF bnf = BNF(MathLib::MakeArray<BNFVariable>(

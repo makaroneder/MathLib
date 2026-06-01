@@ -10,7 +10,7 @@ bool GitTree::Save(MathLib::Writable& file) const {
         size += element.GetKey().GetSize();
     const MathLib::String sizeStr = MathLib::ToString(size, 10);
     MathLib::ByteArray buffer = MathLib::ByteArray(5 + sizeStr.GetSize() + 1 + size);
-    if (!buffer.WriteBuffer(treeStart, 5)) return false;
+    if (!buffer.Puts(treeStart)) return false;
     if (!buffer.Puts(sizeStr) || !buffer.Write<char>('\0')) return false;
     for (const MathLib::DictionaryElement<MathLib::String, MathLib::String>& element : elements) {
         if (!buffer.WriteBuffer(fileMode, 7) || !buffer.Puts(element.GetKey()) || !buffer.Write<char>('\0')) return false;

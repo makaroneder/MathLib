@@ -8,6 +8,9 @@ namespace MathLib {
         uint8_t reserved : 4;
         bool hasCompressedSize : 1;
         bool hasUncompressedSize : 1;
+
+        XZBlockFlags(void);
+        XZBlockFlags(uint8_t filters, bool hasCompressedSize, bool hasUncompressedSize);
     } __attribute__((packed));
 }
 

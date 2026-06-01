@@ -2,6 +2,9 @@
 
 namespace MathLib {
     CachedFileSystem::CachedFileSystem(FileSystem& cache, FileSystem& target) : cache(cache), target(target) {}
+    bool CachedFileSystem::IsValid(void) const {
+        return cache.IsValid() && target.IsValid();
+    }
     size_t CachedFileSystem::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         if (mode == OpenMode::Write) return cache.OpenInternal(path, mode);
         const size_t tmp = cache.OpenInternal(path, mode);

@@ -1,0 +1,21 @@
+{
+    "name": "ext",
+    "mounts": [
+        {
+            "name": "ramfs",
+            "path": "fs/ramfs"
+        },
+        {
+            "name": "extfs0",
+            "path": ""
+        },
+        {
+            "name": "fatfs0",
+            "path": "fs/fatfs0"
+        },
+        {
+            "name": "iso9660fs0",
+            "path": "fs/iso9660fs0"
+        }
+    ]
+}

@@ -3,10 +3,6 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);

@@ -1,8 +1,10 @@
 #include "XZFlags.hpp"
 
 namespace MathLib {
-    uint8_t XZFlags::GetSizeOfCheck(void) const {
-        switch (checkType) {
+    XZFlags::XZFlags(void) : flags1(0), checkType((uint8_t)CheckType::None), flags2(0) {}
+    XZFlags::XZFlags(CheckType type) : flags1(0), checkType((uint8_t)type), flags2(0) {}
+    uint8_t XZFlags::GetSizeOfCheck(CheckType type) {
+        switch ((uint8_t)type) {
             case 0: return 0;
             case 1 ... 3: return 4;
             case 4 ... 6: return 8;

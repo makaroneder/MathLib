@@ -5,14 +5,17 @@
 namespace MathLib {
     struct AsepriteHeader {
         static constexpr uint16_t expectedSignature = 0xa5e0;
+        enum class Flag : uint8_t {
+            HasOpacityLayer = 0,
+        };
+
         uint32_t size;
         uint16_t signature;
         uint16_t frames;
         uint16_t width;
         uint16_t height;
         uint16_t bpp;
-        bool hasOpacityLayer : 1;
-        uint32_t reserved1 : 31;
+        uint32_t flags;
         uint16_t speed;
         uint64_t reserved2;
         uint8_t paletteEntry;

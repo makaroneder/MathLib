@@ -3,8 +3,6 @@
 #include "Swap.hpp"
 #ifdef Freestanding
 #include "CharBuffer.hpp"
-
-/// @brief Signed version of size_t
 using ssize_t = intptr_t;
 #else
 #include "Libc/HostString.hpp"
@@ -15,24 +13,16 @@ using ssize_t = intptr_t;
 
 namespace MathLib {
     #ifdef Freestanding
-    /// @brief Default collection implementation
-    /// @tparam T Type of data stored in the collection
     template <typename T>
     using Array = Buffer<T>;
-    /// @brief Default char collection implementation
     using String = CharBuffer;
     #else
-    /// @brief Default collection implementation
-    /// @tparam T Type of data stored in the collection
     template <typename T>
     using Array = HostCollection<T>;
-    /// @brief Default char collection implementation
     using String = HostString;
     #endif
 
-    /// @brief Default type for real numbers
     using num_t = long double;
-    /// @brief Default error tolerance
     extern num_t eps;
 
     [[nodiscard]] num_t Abs(num_t x);
@@ -66,43 +56,28 @@ namespace MathLib {
             if (!ret.Add(x)) return Array<T>();
         return ret;
     }
-    /// @brief |a - b| < eps
-    /// @tparam T Type of number
-    /// @param a a
-    /// @param b b
-    /// @param eps_ Maximum error tolerance
-    /// @return Equality
     template <typename T>
     [[nodiscard]] bool FloatsEqual(const T& a, const T& b, const T& eps_ = eps) {
         return Abs(a - b) < eps_;
     }
-    /// @brief Returns sign of specified number
-    /// @tparam T Type of number
-    /// @param x Number to return sign of
-    /// @return Sign of specified number
     template <typename T>
     [[nodiscard]] constexpr T Sign(const T& x) {
         if (x < 0) return -1;
         if (x > 0) return 1;
         return 0;
     }
-    /// @brief Random number in range [min, max]
-    /// @tparam T Type of number
-    /// @param min Minimal value
-    /// @param max Maximal value
-    /// @return Random number
     template <typename T>
     [[nodiscard]] T RandomNumber(const T& min, const T& max) {
         return RandomFloat() * (max - min) + min;
     }
     template <typename T>
+    [[nodiscard]] T AtRandom(const Sequence<T>& sequence) {
+        return sequence.AtUnsafe(RandomNumber<size_t>(0, sequence.GetSize()));
+    }
+    template <typename T>
     [[nodiscard]] T RelativeError(const T& x, const T& expected) {
         return FloatsEqual<T>(expected, 0) ? !FloatsEqual<T>(x, 0) : Abs(1 - x / expected);
     }
-    /// @brief Reverses bits of x
-    /// @tparam T Type of number
-    /// @param x Value to use
-    /// @return Value with reversed bits
     template <typename T>
     [[nodiscard]] constexpr T BitReverse(const T& x, uint8_t bits = sizeof(T) * 8) {
         T ret = 0;
@@ -111,13 +86,9 @@ namespace MathLib {
         return ret;
     }
     template <typename T>
-    T CircularLeftShift(const T& x, uint8_t n, uint8_t bits = sizeof(T) * 8) {
+    [[nodiscard]] constexpr T CircularLeftShift(const T& x, uint8_t n, uint8_t bits = sizeof(T) * 8) {
         return (x << n) | (x >> (bits - n));
     }
-    /// @brief Sorts specified array
-    /// @tparam T Type of data in array
-    /// @param array Array to be sorted
-    /// @return Sorted array
     template <typename T>
     [[nodiscard]] Array<T> StalinSort(const Sequence<T>& array, const Function<bool, T, T>& compare) {
         const size_t size = array.GetSize();
@@ -131,6 +102,13 @@ namespace MathLib {
     }
     [[nodiscard]] uint8_t StringToU4(char chr);
     [[nodiscard]] uint8_t StringToU8(char a, char b);
+    [[nodiscard]] uint64_t StringToU64(const Sequence<char>& str);
+    template <typename T>
+    [[nodiscard]] T UnsignedPow(const T& a, size_t b) {
+        T ret = 1;
+        for (size_t i = 0; i < b; i++) ret *= a;
+        return ret;
+    }
 }
 MathLib::String operator""_M(const char* str, size_t size);
 MathLib::String operator""_M(char chr);

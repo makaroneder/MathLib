@@ -4,8 +4,10 @@
 
 namespace MathLib {
     struct AsepriteExtraCelChunk : AsepriteChunkHeader {
-        bool preciseBounds : 1;
-        uint32_t reserved1 : 31;
+        enum class Flag : uint8_t {
+            PreciseBounds = 0,
+        };
+        uint32_t flags;
         uint32_t x;
         uint32_t y;
         uint32_t width;

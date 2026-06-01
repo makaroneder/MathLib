@@ -7,6 +7,7 @@ namespace MathLib {
     [[nodiscard]] String RemoveLastPathElement(const Sequence<char>& path);
     [[nodiscard]] String AppendPath(const Sequence<char>& path1, const Sequence<char>& path2);
     [[nodiscard]] SingleTypePair<String> PopFirstPathElement(const Sequence<char>& path);
+    [[nodiscard]] String RemoveBasePath(const Sequence<char>& basePath, const Sequence<char>& path);
     [[nodiscard]] SingleTypePair<String> RemoveBasePathAndPopFirstPathElement(const Sequence<char>& basePath, const Sequence<char>& path);
 }
 

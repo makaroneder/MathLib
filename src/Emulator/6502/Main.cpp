@@ -3,10 +3,6 @@
 #include <Emulator/MOS6502/MOS6502Opcode.hpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         MathLib::MOS6502 mos6502 = MathLib::MOS6502(MathLib::VariadicSequence<uint8_t,

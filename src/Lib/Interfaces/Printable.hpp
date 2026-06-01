@@ -3,19 +3,12 @@
 #include "Formatter.hpp"
 
 namespace MathLib {
-    /// @brief Interface for printable structures
     struct Printable : Allocatable {
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const = 0;
     };
     MakeFormatter(Printable, self, padding, {
         return self.ToString(padding);
     });
-    /// @brief Converts struct to string
-    /// @param printable Struct to convert
-    /// @return String representation
     [[nodiscard]] String ToString(const Printable& printable);
     [[nodiscard]] String ToString(const Sequence<char>& string);
     template <typename T>

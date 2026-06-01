@@ -6,8 +6,8 @@
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Parser/KeywordParserLayer.hpp>
-#include <Compiler/Lexer/StringLexerRule.hpp>
-#include <Compiler/IdentityEvaluator.hpp>
+#include <Compiler/Lexer/StringMatchLexerRule.hpp>
+#include <Interfaces/IdentityFunction.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <FunctionT.hpp>
@@ -203,10 +203,6 @@ bool Prove(const MathLib::ParserNode& node) {
     MathLib::Array<MathLib::ParserNode> bindings;
     return ProveInternal(node, bindings).GetType() != SIZE_MAX;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         // TODO: leftAlternativity + flexibility => rightAlternativity (replace leftAlternativityAndCommutativityImpliesRightAlternativity)
@@ -225,11 +221,12 @@ int main(int argc, char** argv) {
         // TODO: leibnizIdentity (a * b) * c == (a * (b * c)) + ((a * c) * b)
         // TODO: jacobiIdentity (a * (b * c)) + (b * (c * a)) + (c * (a * b)) == 0
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
         MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
             new MathLib::WhitespaceLexerRule(SIZE_MAX),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Equality, "=="_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Implication, "=>"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Equality, "=="_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Implication, "=>"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Bind, '='_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
@@ -242,7 +239,7 @@ int main(int argc, char** argv) {
             new MathLib::FunctionParserLayer((size_t)TokenType::Function, (size_t)TokenType::Identifier, (size_t)TokenType::ParenthesesStart),
             new MathLib::IdentityParserLayer((size_t)TokenType::Identifier, (size_t)TokenType::Identifier),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd)
-        )), new MathLib::IdentityEvaluator());
+        )), optimizer);
         MathLib::HostFileSystem fs;
         toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
         std::cout << Prove(toolchain.GetNode()) << std::endl;

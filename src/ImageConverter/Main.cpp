@@ -17,10 +17,6 @@
     else if (type == "Aseprite"_M) return renderer.SetImage<MathLib::SaveableImageFromVideo>(new MathLib::Aseprite(), 0);
     else return false;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         MathLib::SDL2 sdl2;

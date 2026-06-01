@@ -56,6 +56,10 @@ namespace MathLib {
                 if (Contains(AtUnsafe(i - 1), i)) return true;
             return false;
         }
+        [[nodiscard]] size_t GetCountOfSubSequences(size_t subSequenceSize) const {
+            const size_t size = GetSize();
+            return size < subSequenceSize ? 0 : size - subSequenceSize + 1;
+        }
         [[nodiscard]] bool Contains(const T& value, size_t start) const {
             const size_t size = GetSize();
             for (size_t i = start; i < size; i++)
@@ -69,10 +73,13 @@ namespace MathLib {
             return GetSize() && AtUnsafe(0) == value;
         }
         [[nodiscard]] bool StartsWith(const Sequence<T>& other) const {
+            return StartsWith(other, 0);
+        }
+        [[nodiscard]] bool StartsWith(const Sequence<T>& other, size_t start) const {
             const size_t size = other.GetSize();
-            if (GetSize() < size) return false;
+            if (GetSize() < size + start) return false;
             for (size_t i = 0; i < size; i++)
-                if (AtUnsafe(i) != other.AtUnsafe(i)) return false;
+                if (AtUnsafe(i + start) != other.AtUnsafe(i)) return false;
             return true;
         }
         [[nodiscard]] size_t Find(const T& value, size_t start = 0) const {
@@ -86,7 +93,7 @@ namespace MathLib {
             const size_t size2 = other.GetSize();
             if (size1 < size2) return SIZE_MAX;
             if (!start && size1 == size2) return *this == other ? 0 : SIZE_MAX;
-            for (size_t i = start; i < size1 - size2; i++) {
+            for (size_t i = start; i < size1 - size2 + 1; i++) {
                 bool found = true;
                 for (size_t j = 0; j < size2; j++) {
                     if (AtUnsafe(i + j) == other.AtUnsafe(j)) continue;
@@ -109,11 +116,59 @@ namespace MathLib {
             for (size_t i = 0; i < size; i++) ret += AtUnsafe(i) == x;
             return ret;
         }
+        [[nodiscard]] size_t GetCountOf(const Sequence<T>& other) const {
+            const size_t size = other.GetSize();
+            size_t i = 0;
+            for (size_t ret = 0; true; ++ret) {
+                const size_t tmp = Find(other, i);
+                if (tmp == SIZE_MAX) return ret;
+                i = tmp + size;
+            }
+        }
         [[nodiscard]] size_t GetHammingDistance(const Sequence<T>& other) const {
             const size_t size = GetSize();
             if (size != other.GetSize()) return SIZE_MAX;
             size_t ret = 0;
             for (size_t i = 0; i < size; i++) ret += AtUnsafe(i) != other.AtUnsafe(i);
+            return ret;
+        }
+        [[nodiscard]] size_t GetIndexOf(const Function<bool, T, T>& compare) const {
+            const size_t size = GetSize();
+            if (!size) return SIZE_MAX;
+            T val = AtUnsafe(0);
+            size_t ret = 0;
+            for (size_t i = 1; i < size; i++) {
+                const T tmp = AtUnsafe(i);
+                if (!compare(val, tmp)) continue;
+                val = tmp;
+                ret = i;
+            }
+            return ret;
+        }
+        [[nodiscard]] T GetIndexOfMin(void) const {
+            const size_t size = GetSize();
+            if (!size) return T();
+            T val = AtUnsafe(0);
+            size_t ret = 0;
+            for (size_t i = 1; i < size; i++) {
+                const T tmp = AtUnsafe(i);
+                if (tmp >= val) continue;
+                val = tmp;
+                ret = i;
+            }
+            return ret;
+        }
+        [[nodiscard]] T GetIndexOfMax(void) const {
+            const size_t size = GetSize();
+            if (!size) return T();
+            T val = AtUnsafe(0);
+            size_t ret = 0;
+            for (size_t i = 1; i < size; i++) {
+                const T tmp = AtUnsafe(i);
+                if (tmp <= val) continue;
+                val = tmp;
+                ret = i;
+            }
             return ret;
         }
         [[nodiscard]] T GetMin(void) const {

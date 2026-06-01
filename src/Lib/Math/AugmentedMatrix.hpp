@@ -4,8 +4,6 @@
 #include "Matrix.hpp"
 
 namespace MathLib {
-    /// @brief Structure representing mathematic matrixes
-    /// @tparam T Type of number
     template <typename T>
     struct AugmentedMatrix : Matrix<T> {
         AugmentedMatrix(size_t width, size_t height, size_t secondStart) : Matrix<T>(width, height), secondStart(secondStart) {}

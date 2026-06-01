@@ -10,6 +10,8 @@ namespace MathLib {
         XZFlags flags;
         uint16_t signature;
 
+        XZFooter(void);
+        XZFooter(uint32_t indexSize, const XZFlags& flags);
         [[nodiscard]] bool IsValid(void) const;
         [[nodiscard]] uint64_t GetIndexSize(void) const;
     } __attribute__((packed));

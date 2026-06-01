@@ -6,8 +6,7 @@ namespace MathLib {
     struct RegionAllocator : BufferAllocator {
         struct Region {
             size_t size;
-            bool free : 1;
-            uint8_t reserved : 7;
+            bool free;
 
             Region(size_t size, bool free);
         } __attribute__((packed));

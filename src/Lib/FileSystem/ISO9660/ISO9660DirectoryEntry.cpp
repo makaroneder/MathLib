@@ -6,6 +6,10 @@ namespace MathLib {
         return length && date.IsValid();
     }
     String ISO9660DirectoryEntry::GetName(void) const {
+        if (nameLength == 1) {
+            if (!name[0]) return ".";
+            if (name[0] == 0x01) return "..";
+        }
         String ret;
         for (uint8_t i = 0; i < nameLength && name[i] != ';'; i++) ret += name[i];
         return ret;

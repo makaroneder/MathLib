@@ -88,11 +88,6 @@ MathLib::String StackEmulator::ToString(const MathLib::Sequence<char>& padding) 
         ret += MathLib::CollectionToString(padding) + "\t\t0x" + MathLib::ToString(x, 16, 2) + '\n';
     return ret + padding + "\t}\n" +  padding + "}";
 }
-
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         StackEmulator emulator = StackEmulator(MathLib::VariadicSequence<uint8_t,

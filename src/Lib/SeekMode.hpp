@@ -3,7 +3,6 @@
 #include <stdint.h>
 
 namespace MathLib {
-    /// @brief Mode to use when setting position
     enum class SeekMode : uint8_t {
         Set,
         Current,

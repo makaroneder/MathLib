@@ -4,7 +4,6 @@
 
 namespace MathLib {
     struct Allocatable {
-        /// @brief Virtual destructor
         virtual ~Allocatable(void);
         [[nodiscard]] static void* operator new(size_t size);
         [[nodiscard]] static void* operator new[](size_t size);

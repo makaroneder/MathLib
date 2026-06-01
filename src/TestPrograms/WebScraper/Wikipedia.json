@@ -1,5 +1,5 @@
 {
-    "url" : "https://en.wikipedia.org/wiki/URL",
+    "url": "https://en.wikipedia.org/wiki/URL",
     "maxDepth": 1,
     "parseRobots": true,
     "ignore": [

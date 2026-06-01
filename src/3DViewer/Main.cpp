@@ -18,10 +18,6 @@ Model3D<T> WavefrontObjectToModel3D(const MathLib::WavefrontObject<T>& object) {
         if (!ret.AddSequence(MathLib::TransformSequence<MathLib::Vector3<T>, size_t>(MathLib::PolygonToTriangles<T, size_t>(face, func), func))) return Model3D<T>();
     return ret;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         MathLib::SDL2 sdl2;

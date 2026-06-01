@@ -1,13 +1,13 @@
 #include "Sequent.hpp"
 #include <Compiler/Parser/LeftBinaryParserLayer.hpp>
 #include <Compiler/Parser/UnwrapperParserLayer.hpp>
+#include <Compiler/Lexer/StringMatchLexerRule.hpp>
 #include <Compiler/Parser/IdentityParserLayer.hpp>
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Parser/UnaryParserLayer.hpp>
-#include <Compiler/Lexer/StringLexerRule.hpp>
-#include <Compiler/IdentityEvaluator.hpp>
+#include <Interfaces/IdentityFunction.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <iostream>
@@ -42,23 +42,20 @@ enum class TokenType : uint8_t {
 [[nodiscard]] Sequent FromNode(const MathLib::ParserNode& node) {
     return node.GetType() == (size_t)TokenType::Turnstile ? Sequent(FromCommaNode(node.At(0)), FromCommaNode(node.At(1))) : Sequent(MathLib::Array<Formula>(), FromCommaNode(node));
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
         MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
             new MathLib::WhitespaceLexerRule(SIZE_MAX),
             new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Turnstile, "|-"_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Conjunction, "&&"_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Disjunction, "||"_M),
-            new MathLib::StringLexerRule((size_t)TokenType::Implication, "->"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Turnstile, "|-"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Conjunction, "&&"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Disjunction, "||"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Implication, "->"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Negation, '!'_M)
         )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
             new MathLib::LeftBinaryParserLayer((size_t)TokenType::Turnstile, (size_t)TokenType::Turnstile),
@@ -69,7 +66,7 @@ int main(int argc, char** argv) {
             new MathLib::UnaryParserLayer((size_t)TokenType::Negation, (size_t)TokenType::Negation),
             new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
             new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
-        )), new MathLib::IdentityEvaluator());
+        )), optimizer);
         MathLib::HostFileSystem fs;
         toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
         const Sequent sequent = FromNode(toolchain.GetNode());

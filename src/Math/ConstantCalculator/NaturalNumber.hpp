@@ -19,6 +19,7 @@ struct NaturalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable
     }
     [[nodiscard]] bool IsZero(void) const;
     [[nodiscard]] bool IsEven(void) const;
+    [[nodiscard]] size_t GetDegree(void) const;
     [[nodiscard]] size_t GetSize(void) const;
     [[nodiscard]] MathLib::String ToHexString(void) const;
     [[nodiscard]] virtual bool Save(MathLib::Writable& file) const override;
@@ -31,7 +32,10 @@ struct NaturalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable
     [[nodiscard]] NaturalNumber Factorial(const NaturalNumber& level) const;
     [[nodiscard]] NaturalNumber GreatestCommonDivisor(const NaturalNumber& other) const;
     [[nodiscard]] NaturalNumber LeastCommonMultiple(const NaturalNumber& other) const;
+    [[nodiscard]] NaturalNumber GreatestCommonDivisorBySubtraction(const NaturalNumber& other) const;
+    [[nodiscard]] NaturalNumber LeastCommonMultipleBySubtraction(const NaturalNumber& other) const;
     [[nodiscard]] NaturalNumber GenerateCoprime(void) const;
+    [[nodiscard]] NaturalNumber GetModularInverse(const NaturalNumber& mod) const;
     void MultiplyBy256(uint8_t last);
 
     NaturalNumber& operator+=(const MathLib::Sequence<uint8_t>& other);

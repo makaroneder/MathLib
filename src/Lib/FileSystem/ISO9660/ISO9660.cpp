@@ -68,19 +68,32 @@ namespace MathLib {
         })) ? ret : Array<FileInfo>();
     }
     bool ISO9660::ReadDirectoryEntry(const ISO9660DirectoryEntry& parent, const Function<bool, const ISO9660DirectoryEntry*>& function) {
-        uint8_t buff[parent.bytesPerExtent.little];
-        if (!disk.ReadPositionedBuffer(buff, parent.bytesPerExtent.little, parent.extent.little * 2048)) return false;
-        size_t off = 0;
-        while (off != parent.bytesPerExtent.little) {
-            ISO9660DirectoryEntry* entry = (ISO9660DirectoryEntry*)&buff[off];
-            if (!entry->IsValid()) break;
-            if (entry->nameLength && (IsAlphaDigit(entry->name[0]) || IsWhiteSpace(entry->name[0]) || entry->name[0] == '_')) {
-                uint8_t tmp[entry->length];
-                MemoryCopy(buff + off, tmp, entry->length);
-                if (!function((const ISO9660DirectoryEntry*)tmp)) return false;
-            }
-            off += entry->length;
+        const size_t size = parent.bytesPerExtent.little;
+        uint8_t* buff = new uint8_t[size];
+        if (!buff) return false;
+        if (!disk.ReadPositionedBuffer(buff, size, parent.extent.little * 2048)) {
+            delete [] buff;
+            return false;
         }
+        size_t off = 0;
+        while (off < size) {
+            const uint8_t length = buff[off];
+            if (!length) {
+                break;
+                off = ((off / 2048) + 1) * 2048;
+                continue;
+            }
+            if (length < sizeof(ISO9660DirectoryEntry)) break;
+            if (off + length > size) break;
+            const ISO9660DirectoryEntry* const entry = (const ISO9660DirectoryEntry*)&buff[off];
+            if (!entry->nameLength || entry->nameLength + sizeof(ISO9660DirectoryEntry) > length) break;
+            if (!(entry->nameLength == 1 && entry->name[0] <= 0x01) && !function(entry)) {
+                delete [] buff;
+                return false;
+            }
+            off += length;
+        }
+        delete [] buff;
         return true;
     }
     Expected<ISO9660DirectoryEntry> ISO9660::GetDirectoryEntry(const Sequence<char>& path) {
@@ -90,11 +103,10 @@ namespace MathLib {
             if (name.IsEmpty()) continue;
             bool found = false;
             if (!ReadDirectoryEntry(prev, MakeFunctionT<bool, const ISO9660DirectoryEntry*>([&name, &prev, &found](const ISO9660DirectoryEntry* entry) -> bool {
-                if (name == entry->GetName()) {
-                    if (found) return false;
-                    found = true;
-                    prev = *entry;
-                }
+                if (name != entry->GetName()) return true;
+                if (found) return false;
+                found = true;
+                prev = *entry;
                 return true;
             })) || !found) return Expected<ISO9660DirectoryEntry>();
         }

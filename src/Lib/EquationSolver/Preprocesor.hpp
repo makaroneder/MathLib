@@ -3,9 +3,6 @@
 #include "../FileSystem/FileSystem.hpp"
 
 namespace MathLib {
-    /// @brief Reads file from given path
-    /// @param path Path to the file to read
-    /// @return Contents of the specified file
     [[nodiscard]] String Preproces(FileSystem& fileSystem, const Sequence<char>& path);
 }
 

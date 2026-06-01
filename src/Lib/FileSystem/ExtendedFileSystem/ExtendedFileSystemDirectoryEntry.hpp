@@ -24,6 +24,8 @@ namespace MathLib {
             } __attribute__((packed));
         };
         char name[];
+
+        [[nodiscard]] uint16_t GetNameLength(bool directoriesWithTypes) const;
     } __attribute__((packed));
 }
 

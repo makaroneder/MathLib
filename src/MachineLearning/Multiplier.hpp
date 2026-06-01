@@ -3,9 +3,6 @@
 #include "NeuralNetworkState.hpp"
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 
-/// @brief Creates default state for this neural network
-/// @tparam T Type of number
-/// @return State
 [[nodiscard]] NeuralNetworkState<MathLib::num_t> GetDefaultState(void) {
     constexpr size_t inputSize = 4;
     const MathLib::num_t multiplier = MathLib::RandomNumber<MathLib::num_t>(-50, 50);

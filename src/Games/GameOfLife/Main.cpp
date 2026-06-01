@@ -16,10 +16,6 @@ void MakeGameOfLifeGlider(LifeAutomaton& game, const MathLib::Matrix<size_t>& po
     game.Set(GetX(position) + 1, GetY(position) + 1, true);
     game.Set(GetX(position) + 2, GetY(position) + 1, true);
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         const size_t width = 50;

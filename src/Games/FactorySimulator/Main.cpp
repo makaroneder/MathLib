@@ -5,10 +5,6 @@
 #include <SDL2.cpp>
 #include <iostream>
 
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         MathLib::HostFileSystem fs;
@@ -16,7 +12,7 @@ int main(int, char**) {
         MathLib::Aseprite background;
         if (!background.LoadFromPath(fs, path + "Background.aseprite")) MathLib::Panic("Failed to load background image");
         MathLib::Aseprite miner;
-        if (!miner.LoadFromPath(fs, path + "Miner.aseprite")) MathLib::Panic("Failed to load machines");
+        if (!miner.LoadFromPath(fs, path + "1/Miner.aseprite")) MathLib::Panic("Failed to load machines");
 
         const size_t width = background.GetWidth();
         const size_t height = background.GetHeight();

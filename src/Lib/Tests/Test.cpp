@@ -4,6 +4,7 @@
 #include "../Physics/SIUnits.hpp"
 #include "../Math/Trigonometry.hpp"
 #include "../FileSystem/Cipher/Ar/Ar.hpp"
+#include "../Cryptography/Cipher/PKCS7.hpp"
 #include "../Cryptography/Cipher/ROT13.hpp"
 #include "../Cryptography/Code/UnaryCode.hpp"
 #include "../Cryptography/Compressor/ZLib.hpp"
@@ -262,10 +263,10 @@ namespace MathLib {
         TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::GreaterThanEqual);
 
         TestOperation(test, IdentityCipher().TestEncryption<uint8_t>(identitySequence, CipherKey()));
-        TestOperation(test, CaesarCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(MakeArray<ssize_t>(3)))));
+        TestOperation(test, CaesarCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(3))));
         TestOperation(test, ROT13().TestEncryption<uint8_t>(identitySequence, CipherKey()));
-        TestOperation(test, NullCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(5, 2)))));
-        TestOperation(test, AtbashCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(MakeArray<ssize_t>(1)))));
+        TestOperation(test, NullCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<size_t>(5)), CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(2)))))));
+        TestOperation(test, AtbashCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(1))));
         TestOperation(test, PolyalphabeticCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(IdentitySequence<uint8_t>(7))));
         TestOperation(test, Deflate().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, ZLib().TestEncryption<uint8_t>(identitySequence, CipherKey()));
@@ -274,7 +275,7 @@ namespace MathLib {
         TestOperation(test, BytePairEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(false))));
         TestOperation(test, UnaryCode().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(true))));
-        TestOperation(test, RepetitionCode().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<size_t>(MakeArray<size_t>(3)))));
+        TestOperation(test, RepetitionCode().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<size_t>(3))));
         TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(false))));
         TestOperation(test, RunLengthEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(true))));
         TestOperation(test, DeltaEncoding().TestEncryption<uint8_t>(identitySequence, CipherKey()));
@@ -282,6 +283,7 @@ namespace MathLib {
         TestOperation(test, GNUTAR().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, UnixStandardTAR().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, Ar().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, PKCS7().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(64))));
         return test;
     }
 }

@@ -201,10 +201,6 @@ MathLib::Array<Move> ParsePGN(MathLib::Readable& file, const MathLib::Matrix<uin
     }
     return MathLib::Array<Move>();
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         MathLib::HostFileSystem fs;

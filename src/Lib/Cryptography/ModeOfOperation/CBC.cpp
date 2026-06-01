@@ -41,6 +41,7 @@ namespace MathLib {
             for (size_t j = 0; j < blockSize; j++) decrypted.AtUnsafe(j) ^= tmp.AtUnsafe(j);
             if (!ret.AddSequence(decrypted)) return Array<uint8_t>();
         }
-        return min < size ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(min, size))) : Array<uint8_t>();
+        const size_t end = Min<size_t>(max, size);
+        return min < end ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(ret, Interval<size_t>(min, end))) : Array<uint8_t>();
     }
 }

@@ -34,10 +34,6 @@ MathLib::String nonPhonyTargets = "";
         if (args.At(i)->type != MathLib::Node::Type::String) return nullptr;
     return fileSearchs.Add(FileSearch(args.At(0)->value, args.At(1)->value)) ? new MathLib::Node(MathLib::Node::Type::String, "$(FILESEARCH"_M + MathLib::ToString(fileSearchs.GetSize()) + ") ") : nullptr;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output file>");

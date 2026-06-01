@@ -18,7 +18,14 @@ namespace MathLib {
         }
     }
     uint8_t StringToU8(char a, char b) {
-        return (StringToU4(a) << 4) | StringToU4(b);
+        return b ? (StringToU4(a) << 4) | StringToU4(b) : StringToU4(a);
+    }
+    uint64_t StringToU64(const Sequence<char>& str) {
+        const size_t size = str.GetSize();
+        uint64_t ret = 0;
+        for (size_t i = 0; i < size; i++)
+            ret = (ret << 4) | StringToU4(str.AtUnsafe(i));
+        return ret;
     }
 }
 MathLib::String operator""_M(const char* str, size_t size) {

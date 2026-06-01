@@ -11,6 +11,9 @@
 #endif
 
 namespace MathLib {
+    bool HostFileSystem::IsValid(void) const {
+        return true;
+    }
     size_t HostFileSystem::OpenInternal(const Sequence<char>& path, OpenMode mode) {
         const char* modeStr = "";
         switch (mode) {
@@ -85,6 +88,7 @@ namespace MathLib {
         #endif
     }
     bool HostFileSystem::CreateDirectory(const Sequence<char>& path_, bool overwrite) {
+        #ifndef __MINGW32__
         const String path = String(fs::current_path().c_str()) + '/' + path_;
         if (fs::exists(path.GetValue())) {
             if (!fs::is_directory(path.GetValue())) return false;
@@ -93,6 +97,11 @@ namespace MathLib {
             return true;
         }
         return fs::create_directory(path.GetValue());
+        #else
+        (void)path_;
+        (void)overwrite;
+        return false;
+        #endif
     }
     FILE* HostFileSystem::GetFile(size_t file) {
         return file < files.GetSize() ? files[file] : nullptr;

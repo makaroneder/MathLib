@@ -1,7 +1,6 @@
 #ifndef LambdaTerm_H
 #define LambdaTerm_H
 #include <Interfaces/Printable.hpp>
-#include <Interfaces/Comparable.hpp>
 
 struct LambdaTerm;
 struct LambdaTerm : MathLib::Comparable<LambdaTerm>, MathLib::Printable {

@@ -1,5 +1,13 @@
 src/Lib/MathLib.hpp
-src/Lib/Font.hpp
-src/Lib/Font.cpp
+src/Lib/Fonts.hpp
+src/Lib/Fonts.cpp
 .vscode/
 bin/
+
+Toolchain/Binutils/
+Toolchain/binutils-2.41/
+Toolchain/binutils-2.41.tar.gz
+
+Toolchain/GCC/
+Toolchain/gcc-13.2.0/
+Toolchain/gcc-13.2.0.tar.gz

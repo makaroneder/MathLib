@@ -7,8 +7,8 @@
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Compiler/Lexer/WhitespaceLexerRule.hpp>
 #include <Compiler/Parser/KeywordParserLayer.hpp>
-#include <Compiler/Lexer/StringLexerRule.hpp>
-#include <Compiler/IdentityEvaluator.hpp>
+#include <Compiler/Lexer/StringMatchLexerRule.hpp>
+#include <Interfaces/IdentityFunction.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <FileSystem/Path.hpp>
@@ -107,20 +107,17 @@ MathLib::String Preprocess(MathLib::FileSystem& fileSystem, const MathLib::Seque
     }
     return ret;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
         MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
             new MathLib::WhitespaceLexerRule(SIZE_MAX),
             new GroupedLexerRule((size_t)TokenType::String, '"', '"'),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
             new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
-            new MathLib::StringLexerRule((size_t)TokenType::Abstraction, "->"_M),
+            new MathLib::StringMatchLexerRule((size_t)TokenType::Abstraction, "->"_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Application, '.'_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
             new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
@@ -133,7 +130,7 @@ int main(int argc, char** argv) {
             new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
             new PatternParserLayer(),
             new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
-        )), new MathLib::IdentityEvaluator());
+        )), optimizer);
         MathLib::HostFileSystem fs;
         toolchain.LoadInput(Preprocess(fs, MathLib::String(argv[1])));
         const MathLib::Array<LambdaTerm> bindings = FromNode(toolchain.GetNode());

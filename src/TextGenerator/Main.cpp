@@ -34,10 +34,6 @@ MathLib::Array<size_t> GetNextWords(const MathLib::Sequence<MathLib::String>& te
 size_t Random(size_t min, size_t max) {
     return MathLib::Round(MathLib::RandomNumber<MathLib::num_t>(min, max));
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         #ifndef Debug

@@ -12,10 +12,13 @@ namespace MathLib {
             for (size_t i = 0; i < size; i++) this->AtUnsafe(i) = arr[i];
         }
         Buffer(const Buffer<T>& other) : Buffer(other.size) {
-            if (size) {
-                if (!buffer || !other.buffer) Panic("Buffer allocation failed");
-                for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
-            }
+            if (!size) return;
+            if (!buffer || !other.buffer) Panic("Buffer allocation failed");
+            for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+        }
+        Buffer(Buffer<T>&& other) : buffer(other.buffer), size(other.size) {
+            other.buffer = nullptr;
+            other.size = 0;
         }
         virtual ~Buffer(void) override {
             if (buffer) delete [] buffer;
@@ -31,6 +34,7 @@ namespace MathLib {
         }
         [[nodiscard]] virtual bool Reset(void) override {
             if (buffer) delete [] buffer;
+            buffer = nullptr;
             size = 0;
             return true;
         }
@@ -53,6 +57,18 @@ namespace MathLib {
             buffer = new T[size];
             if (!buffer || !other.buffer) Panic("Buffer allocation failed");
             for (size_t i = 0; i < size; i++) buffer[i] = other.buffer[i];
+            return *this;
+        }
+        Buffer<T>& operator=(Buffer<T>&& other) {
+            if (buffer) delete [] buffer;
+            buffer = other.buffer;
+            size = other.size;
+            other.buffer = nullptr;
+            other.size = 0;
+            if (buffer && !size) {
+                delete [] buffer;
+                buffer = nullptr;
+            }
             return *this;
         }
 

@@ -31,9 +31,6 @@ namespace MathLib {
         Register r15;
 
         X86State(X86Flags flags, Register ip);
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
     };
 }

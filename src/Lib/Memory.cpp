@@ -28,4 +28,16 @@ namespace MathLib {
         asm volatile("rep stosq" : "+D"(dst), "+c"(size), "+a"(value) :: "memory", "cc");
     }
     #endif
+    void MemorySet8(void* dst, size_t size, uint8_t value) {
+        MemorySet<uint8_t>(dst, size, value);    
+    }
+    void MemorySet16(void* dst, size_t size, uint16_t value) {
+        MemorySet<uint16_t>(dst, size, value);    
+    }
+    void MemorySet32(void* dst, size_t size, uint32_t value) {
+        MemorySet<uint32_t>(dst, size, value);    
+    }
+    void MemorySet64(void* dst, size_t size, uint64_t value) {
+        MemorySet<uint64_t>(dst, size, value);    
+    }
 }

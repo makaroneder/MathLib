@@ -1,0 +1,57 @@
+#ifndef TokenType_H
+#define TokenType_H
+#include <stddef.h>
+
+enum class TokenType : size_t {
+    None,
+    ParenthesesStart,
+    ParenthesesEnd,
+    BracketsStart,
+    BracketsEnd,
+    BracesStart,
+    BracesEnd,
+
+    String,
+    Number,
+    Identifier,
+    Comma,
+    LessThanEqual,
+    LessThan,
+    GreaterThanEqual,
+    GreaterThan,
+    Equal,
+    NotEqual,
+    LeftShift,
+    RightShift,
+    LogicalAnd,
+    LogicalOr,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
+    Addition,
+    Subtraction,
+    Multiplication,
+    Division,
+    Modulo,
+    Assignment,
+    AssignmentAnd,
+    AssignmentOr,
+    AssignmentXor,
+    AssignmentLeftShift,
+    AssignmentRightShift,
+    AssignmentAddition,
+    AssignmentSubtraction,
+    AssignmentMultiplication,
+    AssignmentDivision,
+    AssignmentModulo,
+    LogicalNot,
+    BitwiseNot,
+    Increment,
+    Decrement,
+
+    Function,
+    FunctionBody,
+    ArrayAccess,
+};
+
+#endif

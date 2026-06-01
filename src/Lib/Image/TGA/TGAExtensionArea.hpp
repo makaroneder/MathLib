@@ -1,6 +1,6 @@
 #ifndef MathLib_Image_TGA_ExtensionArea_H
 #define MathLib_Image_TGA_ExtensionArea_H
-#include <stdint.h>
+#include "../../Interfaces/Sequence/Sequence.hpp"
 
 namespace MathLib {
     struct TGAExtensionArea {

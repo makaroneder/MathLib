@@ -12,6 +12,9 @@ namespace MathLib {
     char ToUpper(char chr) {
         return IsLower(chr) ? (chr + 'A' - 'a') : chr;
     }
+    char ToLower(char chr) {
+        return IsUpper(chr) ? (chr + 'a' - 'A') : chr;
+    }
     bool IsUpper(char chr) {
         return IsBetween(chr, 'A', 'Z');
     }

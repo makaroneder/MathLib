@@ -18,6 +18,12 @@ namespace MathLib {
     bool MultiAllocator::Dealloc(void* ptr) {
         return (allocator1 && allocator1->Dealloc(ptr)) || (allocator2 && allocator2->Dealloc(ptr));
     }
+    size_t MultiAllocator::GetFreeMemory(void) const {
+        return (allocator1 ? allocator1->GetFreeMemory() : 0) + (allocator2 ? allocator2->GetFreeMemory() : 0);
+    }
+    size_t MultiAllocator::GetSize(void) const {
+        return (allocator1 ? allocator1->GetSize() : 0) + (allocator2 ? allocator2->GetSize() : 0);
+    }
     bool MultiAllocator::AddAllocator(Allocator* allocator) {
         if (!allocator) return false;
         if (!allocator1) {

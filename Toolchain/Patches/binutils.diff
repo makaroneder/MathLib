@@ -1,0 +1,93 @@
+diff -ruN binutils-2.41/bfd/config.bfd Binutils/bfd/config.bfd
+--- binutils-2.41/bfd/config.bfd	2023-07-03 01:00:00.000000000 +0200
++++ Binutils/bfd/config.bfd	2026-04-07 12:28:51.357671494 +0200
+@@ -235,6 +235,18 @@
+ 
+ case "${targ}" in
+ # START OF targmatch.h
++  i[3-7]86-*-makaron*)
++    targ_defvec=i386_elf32_vec
++    targ_selvecs=
++    targ64_selvecs=x86_64_elf64_vec
++    ;;
++#ifdef BFD64
++  x86_64-*-makaron*)
++    targ_defvec=x86_64_elf64_vec
++    targ_selvecs=i386_elf32_vec
++    want64=true
++    ;;
++#endif
+ #ifdef BFD64
+   aarch64-*-darwin*)
+     targ_defvec=aarch64_mach_o_vec
+diff -ruN binutils-2.41/config.sub Binutils/config.sub
+--- binutils-2.41/config.sub	2023-07-03 01:00:00.000000000 +0200
++++ Binutils/config.sub	2026-04-07 12:28:51.475004816 +0200
+@@ -1758,7 +1758,7 @@
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+ 	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | wasi* \
+ 	     | nsk* | powerunix* | genode* | zvmoe* | qnx* | emx* | zephyr* \
+-	     | fiwix* | mlibc* )
++	     | fiwix* | mlibc* | makaron* )
+ 		;;
+ 	# This one is extra strict with allowed versions
+ 	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -ruN binutils-2.41/gas/configure.tgt Binutils/gas/configure.tgt
+--- binutils-2.41/gas/configure.tgt	2023-07-03 01:00:00.000000000 +0200
++++ Binutils/gas/configure.tgt	2026-04-07 12:28:51.519004811 +0200
+@@ -125,6 +125,7 @@
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-makaron*)    fmt=elf em=gnu ;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-haiku*)			fmt=elf em=haiku ;;
+diff -ruN binutils-2.41/ld/Makefile.am Binutils/ld/Makefile.am
+--- binutils-2.41/ld/Makefile.am	2023-07-03 01:00:00.000000000 +0200
++++ Binutils/ld/Makefile.am	2026-04-07 12:28:52.300004734 +0200
+@@ -152,6 +152,7 @@
+ 
+ # These all start with e so 'make clean' can find them.
+ ALL_EMULATION_SOURCES = \
++	eelf_i386_makaron.c \
+ 	eaix5ppc.c \
+ 	eaix5rs6.c \
+ 	eaixppc.c \
+@@ -375,6 +376,7 @@
+ ALL_EMULATIONS = $(ALL_EMULATION_SOURCES:.c=.@OBJEXT@)
+ 
+ ALL_64_EMULATION_SOURCES = \
++	eelf_x86_64_makaron.c \
+ 	eaarch64cloudabi.c \
+ 	eaarch64cloudabib.c \
+ 	eaarch64elf.c \
+diff -ruN binutils-2.41/ld/configure.tgt Binutils/ld/configure.tgt
+--- binutils-2.41/ld/configure.tgt	2023-07-03 01:00:00.000000000 +0200
++++ Binutils/ld/configure.tgt	2026-04-07 12:28:52.300004734 +0200
+@@ -81,6 +81,15 @@
+ # Please try to keep this table more or less in alphabetic order - it
+ # makes it much easier to lookup a specific archictecture.
+ case "${targ}" in
++i[3-7]86-*-makaron*)
++			targ_emul=elf_i386_makaron
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_makaron elf_x86_64"
++			;;
++x86_64-*-makaron*)
++			targ_emul=elf_x86_64_makaron
++			targ_extra_emuls="elf_i386_makaron elf_x86_64 elf_i386"
++			;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
+ 			;;
+@@ -1095,6 +1104,9 @@
+ 
+ NATIVE_LIB_DIRS='/usr/local/lib /lib /usr/lib'
+ case "${target}" in
++*-*-makaron*)
++  NATIVE_LIB_DIRS='/lib'
++  ;;
+ 
+ *-*-dragonfly*)
+   NATIVE_LIB_DIRS='/lib /usr/lib /usr/pkg/lib /usr/local/lib'

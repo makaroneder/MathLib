@@ -4,10 +4,12 @@
 
 namespace MathLib {
     struct AsepriteUserDataChunk : AsepriteChunkHeader {
-        bool hasText : 1;
-        bool hasColor : 1;
-        bool hasProperties : 1;
-        uint32_t reserved : 29;
+        enum class Flag : uint8_t {
+            HasText = 0,
+            HasColor,
+            HasProperties,
+        };
+        uint32_t flags;
     } __attribute__((packed));
 }
 

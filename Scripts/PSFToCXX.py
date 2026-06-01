@@ -1,4 +1,4 @@
-from sys import argv
+from sys import argv, exit
 from pathlib import Path
 
 def ConvertName(path : str, extension : bool) -> str:
@@ -10,15 +10,15 @@ if __name__ == "__main__":
         exit(1)
     inputs : set[str] = set(argv[3:])
     with open(argv[1], "w") as sourceOutput:
-        sourceOutput.write("#include \"PSF1.hpp\"\n\nnamespace MathLib {\n")
+        sourceOutput.write("#include \"ExternArray.hpp\"\n\nnamespace MathLib {\n")
         with open(argv[2], "w") as headerOutput:
             tmp : str = ConvertName(argv[2], False)
             headerOutput.write(f"#ifndef MathLib_{tmp}_H\n#define MathLib_{tmp}_H\n")
-            headerOutput.write("#include \"PSF1.hpp\"\n\nnamespace MathLib {\n")
+            headerOutput.write("#include \"ExternArray.hpp\"\n\nnamespace MathLib {\n")
             for path in inputs:
                 name : str = ConvertName(path, True)
-                sourceOutput.write(f"\t/// @brief {path}\n")
-                headerOutput.write(f"\t/// @brief {path}\n")
+                sourceOutput.write(f"\t// {path}\n")
+                headerOutput.write(f"\t// {path}\n")
                 sourceOutput.write("\tuint8_t " + name + "Buffer[] = {")
                 i : int = 0
                 with open(path, "rb") as input:
@@ -28,8 +28,8 @@ if __name__ == "__main__":
                         sourceOutput.write(f"{" " if i else "\n\t\t"}0x{byte.hex()},")
                         i = (i + 1) % 16
                 sourceOutput.write("\n\t};\n")
-                sourceOutput.write(f"\tPSF1* {name} = (PSF1*){name}Buffer;\n")
-                headerOutput.write(f"\textern PSF1* {name};\n")
+                sourceOutput.write(f"\tExternArray<uint8_t> {name} = ExternArray<uint8_t>({name}Buffer, sizeof({name}Buffer));\n")
+                headerOutput.write(f"\textern ExternArray<uint8_t> {name};\n")
             headerOutput.write("}\n\n")
             headerOutput.write("#endif")
         sourceOutput.write("}")

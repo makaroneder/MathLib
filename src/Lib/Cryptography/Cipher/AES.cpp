@@ -1,5 +1,6 @@
 #include "AES.hpp"
 #include "../../Interfaces/Sequence/SubSequence.hpp"
+#include "../../Interfaces/Sequence/FixedSizeCollection.hpp"
 
 namespace MathLib {
     void AES::ShiftRows(Matrix<ByteFiniteField>& state) {
@@ -137,13 +138,15 @@ namespace MathLib {
             for (uint8_t y = 0; y < 4; y++) ret.AtUnsafe(i++) = state.AtUnsafe(x, y).value;
         return ret;
     }
-    Array<uint8_t> AES::DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const {
-        if (key.type != CipherKey::Type::Normal || data.GetSize() != 16) return Array<uint8_t>();
+    Array<uint8_t> AES::DecryptReadablePartial(Readable& readable, const CipherKey& key, const Interval<size_t>& range) const {
+        if (key.type != CipherKey::Type::Normal) return Array<uint8_t>();
         const size_t keySize = key.data.GetSize();
         if (keySize % 16 || keySize < 16 * 2) return Array<uint8_t>();
         const size_t min = range.GetMin();
         const size_t max = range.GetMax();
         if (min >= max || min >= 16) return Array<uint8_t>();
+        FixedSizeCollection<uint8_t, 16> data;
+        if (!readable.ReadBuffer(data.GetValue(), data.GetSize())) return Array<uint8_t>();
         const Matrix<ByteFiniteField> mul = Matrix<ByteFiniteField>(4, 4, MakeArray<ByteFiniteField>(
             0x0e, 0x0b, 0x0d, 0x09,
             0x09, 0x0e, 0x0b, 0x0d,

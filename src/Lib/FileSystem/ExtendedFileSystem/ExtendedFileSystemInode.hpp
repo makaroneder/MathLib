@@ -35,7 +35,18 @@ namespace MathLib {
         uint16_t groupID;
         uint16_t hardLinkCount;
         uint32_t sectorCount;
-        uint32_t flags; // TODO:
+        bool secureDeletion : 1;
+        bool dontRemoveData : 1;
+        bool compressed : 1;
+        bool writeDataImmediately : 1;
+        bool readOnly : 1;
+        bool appendOnly : 1;
+        bool ignoreInDump : 1;
+        bool dontUpdateLastAccessTime : 1;
+        uint32_t reserved : 21;
+        bool hashIndexedDirectory : 1;
+        bool afsDirectory : 1;
+        bool journalFile : 1;
         uint32_t hurdTranslator;
         uint32_t directBlockPointer[12];
         uint32_t singlyIndirectBlockPointer;
@@ -51,6 +62,8 @@ namespace MathLib {
         uint16_t upperUserID;
         uint16_t upperGroupID;
         uint32_t authorUserID;
+
+        [[nodiscard]] uint64_t GetSize(bool extendedFileSize) const;
     } __attribute__((packed));
 }
 

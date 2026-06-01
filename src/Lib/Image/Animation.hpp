@@ -10,8 +10,9 @@ namespace MathLib {
         Animation(const Video* video);
         [[nodiscard]] bool IsEmpty(void) const;
         void Draw(Renderer& renderer, ssize_t centerX, ssize_t centerY) const;
+        [[nodiscard]] bool CopyTo(Renderer& renderer) const;
         void Reset(void);
-        void Update(const num_t& value);
+        bool Update(const num_t& value);
         void Reverse(const num_t& value);
 
         protected:

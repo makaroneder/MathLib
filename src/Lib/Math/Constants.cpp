@@ -4,16 +4,30 @@
 namespace MathLib {
     #ifdef M_PIl
     const num_t pi = M_PIl;
-    const num_t e = M_El;
-    const num_t ln2 = M_LN2l;
     #else
     #ifdef M_PI
     const num_t pi = M_PI;
-    const num_t e = M_E;
-    const num_t ln2 = M_LN2;
     #else
     const num_t pi = 3.141592653589793;
+    #endif
+    #endif
+
+    #ifdef M_El
+    const num_t e = M_El;
+    #else
+    #ifdef M_E
+    const num_t e = M_E;
+    #else
     const num_t e = 2.718281828459045;
+    #endif
+    #endif
+
+    #ifdef M_LN2l
+    const num_t ln2 = M_LN2l;
+    #else
+    #ifdef M_LN2
+    const num_t ln2 = M_LN2;
+    #else
     const num_t ln2 = 0.693147180559945;
     #endif
     #endif

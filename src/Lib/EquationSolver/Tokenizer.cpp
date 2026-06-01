@@ -2,10 +2,6 @@
 #include "../Host.hpp"
 
 namespace MathLib {
-    /// @brief Converts a string to a node type
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Node type
     Node::Type GetType(const Sequence<char>& str, size_t& i) {
         SkipWhiteSpace(str, i);
         if (str.GetSize() <= i) return Node::Type::None;
@@ -55,10 +51,6 @@ namespace MathLib {
         }
     }
     Node* TokenizeInternal(const Sequence<char>& str, size_t& i);
-    /// @brief Tokenizes string into nodes
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Tokenized string
     Node* TokenizeComma(const Sequence<char>& str, size_t& i) {
         Node* ret = TokenizeInternal(str, i);
         SkipWhiteSpace(str, i);
@@ -68,10 +60,6 @@ namespace MathLib {
         }
         return ret;
     }
-    /// @brief Tokenizes string into nodes
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Tokenized string
     Node* TokenizeData(const Sequence<char>& str, size_t& i) {
         SkipWhiteSpace(str, i);
         if (IsDigit(str.At(i))) {
@@ -198,10 +186,6 @@ namespace MathLib {
         }                                                                       \
         return ret;                                                             \
     }
-    /// @brief Tokenizes string into nodes
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Tokenized string
     Node* TokenizeIndex(const Sequence<char>& str, size_t& i) {
         Node* ret = TokenizeData(str, i);
         SkipWhiteSpace(str, i);
@@ -217,10 +201,6 @@ namespace MathLib {
         }
         return ret;
     }
-    /// @brief Tokenizes string into nodes
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Tokenized string
     Node* TokenizeFactorial(const Sequence<char>& str, size_t& i) {
         Node* ret = TokenizeIndex(str, i);
         size_t tmp = i;
@@ -235,10 +215,6 @@ namespace MathLib {
     TokenizeLayer(Relationality, type == Node::Type::LessThan || type == Node::Type::GreaterThan || type == Node::Type::LessThanEqual || type == Node::Type::GreaterThanEqual, Addition)
     TokenizeLayer(Equality, type == Node::Type::LogicalEqual || type == Node::Type::LogicalNotEqual, Relationality)
     TokenizeLayer(Assignment, type == Node::Type::DynamicEqual || type == Node::Type::Equal, Equality)
-    /// @brief Tokenizes string into nodes
-    /// @param str String to tokenize
-    /// @param i Current position in the string
-    /// @return Tokenized string
     Node* TokenizeInternal(const Sequence<char>& str, size_t& i) {
         return TokenizeAssignment(str, i);
     }

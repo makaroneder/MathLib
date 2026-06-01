@@ -22,9 +22,6 @@ struct Hand : MathLib::Printable {
     Hand(const MathLib::Matrix<T>& position) : cards(MathLib::Array<Card>(size)), position(position) {
         for (Card& card : cards) card.selected = true;
     }
-    /// @brief Converts struct to string
-    /// @param padding String to pad with
-    /// @return String representation
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         MathLib::String ret = MathLib::CollectionToString(padding) + "{\n";
         for (const Card& card : cards) ret += card.ToString(MathLib::CollectionToString(padding) + '\t') + '\n';

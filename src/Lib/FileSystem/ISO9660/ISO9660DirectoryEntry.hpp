@@ -22,7 +22,7 @@ namespace MathLib {
         uint8_t interleaveGapSize;
         ISO9660LittleAndBigEndian<uint16_t> volumeNumber;
         uint8_t nameLength;
-        char name[1];
+        char name[0];
 
         ISO9660DirectoryEntry(void);
         [[nodiscard]] bool IsValid(void) const;

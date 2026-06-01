@@ -46,9 +46,6 @@ namespace MathLib {
         [[nodiscard]] bool operator!=(const Interval<T>& other) const {
             return !(*this == other);
         }
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             return CollectionToString(padding) + '[' + Formatter<T>::ToString(min) + ", " + Formatter<T>::ToString(max) + ']';
         }

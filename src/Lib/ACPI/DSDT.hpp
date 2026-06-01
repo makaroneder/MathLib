@@ -4,7 +4,7 @@
 
 namespace MathLib {
     struct DSDT : ACPITable {
-        static constexpr const char* expectedSignature = "DSDT";
+        static constexpr const char* expectedSignatures[] = { "DSDT", "SSDT", "PSDT", };
         uint8_t aml[];
     } __attribute__((packed));
 }

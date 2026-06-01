@@ -7,10 +7,6 @@
 namespace MathLib {
     struct HostLogger : Writable {
         HostLogger(std::ostream& stream);
-        /// @brief Writes data to the buffer
-        /// @param buffer Buffer to write data to
-        /// @param size Size of the buffer
-        /// @return Size of written bytes
         [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) override;
 
         private:

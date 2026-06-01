@@ -18,22 +18,14 @@ namespace MathLib {
         [[nodiscard]] String GetValue(void) const;
         [[nodiscard]] size_t GetChildrenCount(void) const;
         [[nodiscard]] bool AddChild(const JSON& child);
+        [[nodiscard]] Expected<JSON> GetChild(const Sequence<char>& name) const;
         [[nodiscard]] Expected<JSON> Find(const Sequence<char>& path) const;
         [[nodiscard]] virtual Iterator<const JSON> begin(void) const override;
         [[nodiscard]] virtual Iterator<const JSON> end(void) const override;
         [[nodiscard]] virtual Iterator<JSON> begin(void) override;
         [[nodiscard]] virtual Iterator<JSON> end(void) override;
-        /// @brief Saves data
-        /// @param file File to save data into
-        /// @return Status
         [[nodiscard]] virtual bool Save(Writable& file) const override;
-        /// @brief Loads data
-        /// @param file File to load data from
-        /// @return Status
         [[nodiscard]] virtual bool Load(Readable& file) override;
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         [[nodiscard]] bool operator==(const JSON& other) const;
         [[nodiscard]] bool operator!=(const JSON& other) const;

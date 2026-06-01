@@ -183,10 +183,6 @@ MathLib::Array<Action> ParseRobotsFile(MathLib::Curl& curl, const MathLib::Strin
     }
     return exceptions.AddSequence(ret) ? exceptions : MathLib::Array<Action>();
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <pattern file> <output directory>");

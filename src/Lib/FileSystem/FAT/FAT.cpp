@@ -4,36 +4,28 @@
 
 namespace MathLib {
     FAT::FAT(ByteDevice& disk) : PhysicalFileSystem(disk), type(Type::None) {
-        if (!disk.ReadPositioned<FATBootSector>(bootSector, 0)) Panic("Failed to read FAT boot sector");
-        if (!bootSector.IsValid()) type = Type::None;
-        else if (!bootSector.sectorsPerFAT) {
-            if (!bootSector.ebr32.IsValid()) type = Type::None;
-            else {
-                if (bootSector.ebr32.fsInfoCluster && bootSector.ebr32.fsInfoCluster != UINT16_MAX) {
-                    const Expected<FATFSInfo> fsInfo = disk.ReadPositioned<FATFSInfo>(ClusterToSector(bootSector.ebr32.fsInfoCluster) * bootSector.bytesPerSector);
-                    if (!fsInfo.Get("Failed to read FS info").IsValid()) type = Type::None;
-                }
-                if (type != Type::None) {
-                    sectorsPerFAT = bootSector.ebr32.sectorsPerFAT;
-                    type = Type::FAT32;
-                    dataSection = bootSector.reservedSectors + sectorsPerFAT * bootSector.fatCount;
-                    root = ClusterToSector(bootSector.ebr32.rootCluster);
-                }
-            }
+        if (!disk.ReadPositioned<FATBootSector>(bootSector, 0) || !bootSector.IsValid()) return;
+        if (bootSector.sectorsPerFAT) {
+            if (!bootSector.ebr.IsValid()) return;
+            sectorsPerFAT = bootSector.sectorsPerFAT;
+            size_t rootSectors = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
+            if (rootSectors % bootSector.bytesPerSector) rootSectors += bootSector.bytesPerSector - rootSectors % bootSector.bytesPerSector;
+            rootSectors /= bootSector.bytesPerSector;
+            root = bootSector.reservedSectors + sectorsPerFAT * bootSector.fatCount;
+            dataSection = root + rootSectors;
+            const uint32_t clusters = (bootSector.GetSectorCount() - dataSection) / bootSector.sectorsPerCluster;
+            type = clusters < 0xff5 ? Type::FAT12 : Type::FAT16;
+            return;
         }
-        else {
-            if (!bootSector.ebr.IsValid()) type = Type::None;
-            else {
-                sectorsPerFAT = bootSector.sectorsPerFAT;
-                size_t rootSectors = sizeof(FATDirectoryEntry) * bootSector.rootDirectoryEntries;
-                if (rootSectors % bootSector.bytesPerSector) rootSectors += bootSector.bytesPerSector - rootSectors % bootSector.bytesPerSector;
-                rootSectors /= bootSector.bytesPerSector;
-                root = bootSector.reservedSectors + sectorsPerFAT * bootSector.fatCount;
-                dataSection = root + rootSectors;
-                const uint32_t clusters = (bootSector.GetSectorCount() - dataSection) / bootSector.sectorsPerCluster;
-                type = clusters < 0xff5 ? Type::FAT12 : Type::FAT16;
-            }
+        if (!bootSector.ebr32.IsValid()) return;
+        sectorsPerFAT = bootSector.ebr32.sectorsPerFAT;
+        dataSection = bootSector.reservedSectors + sectorsPerFAT * bootSector.fatCount;
+        if (bootSector.ebr32.fsInfoCluster && bootSector.ebr32.fsInfoCluster != UINT16_MAX) {
+            FATFSInfo info;
+            if (!disk.ReadPositioned<FATFSInfo>(info, ClusterToSector(bootSector.ebr32.fsInfoCluster) * bootSector.bytesPerSector)) return;
         }
+        type = Type::FAT32;
+        root = ClusterToSector(bootSector.ebr32.rootCluster);
     }
     bool FAT::IsValid(void) const {
         return type != Type::None;
@@ -84,14 +76,15 @@ namespace MathLib {
     }
     Expected<FATDirectoryEntry> FAT::GetDirectoryEntry(const Sequence<char>& path) {
         size_t sector = root;
+        uint32_t cluster;
         FATDirectoryEntry prev;
         prev.name[0] = '\0';
         if (type == Type::FAT32) {
-            prev.SetCluster(bootSector.ebr32.rootCluster);
+            cluster = bootSector.ebr32.rootCluster;
+            prev.SetCluster(cluster);
             prev.name[0] = '/';
         }
         const Array<String> split = Split(path, '/'_M, false);
-        uint32_t cluster;
         if (split.IsEmpty()) return prev;
         for (const Sequence<char>& name : split) {
             while (true) {

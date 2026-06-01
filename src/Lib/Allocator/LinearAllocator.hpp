@@ -6,6 +6,7 @@ namespace MathLib {
     struct LinearAllocator : BufferAllocator {
         LinearAllocator(void* buffer, size_t size);
         LinearAllocator(Allocator* allocator, size_t size);
+        [[nodiscard]] bool Align(size_t align);
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
         [[nodiscard]] virtual void* Alloc(size_t size) override;

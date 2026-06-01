@@ -2,7 +2,7 @@
 #include "../Host.hpp"
 
 namespace MathLib {
-    RegionAllocator::Region::Region(size_t size, bool free) : size(size), free(free), reserved(0) {}
+    RegionAllocator::Region::Region(size_t size, bool free) : size(size), free(free) {}
     RegionAllocator::RegionAllocator(void* buffer, size_t size) : BufferAllocator(buffer, size) {
         if (size <= sizeof(Region)) Panic("Not enough memory for allocator");
         *(Region*)buffer = Region(size, true);
@@ -17,13 +17,12 @@ namespace MathLib {
         while (pos < this->size) {
             Region* const region = (Region*)((uintptr_t)buffer + pos);
             pos += region->size + sizeof(Region);
-            if (region->free) {
-                if (region->size == size) {
-                    ret = region;
-                    break;
-                }
-                if (region->size > size && (!ret || region->size < ret->size)) ret = region;
+            if (!region->free) continue;
+            if (region->size == size) {
+                ret = region;
+                break;
             }
+            if (region->size > size && (!ret || region->size < ret->size)) ret = region;
         }
         if (!ret) return nullptr;
         ret->free = false;
@@ -32,7 +31,6 @@ namespace MathLib {
             *(Region*)(addr + size) = Region(ret->size - size - sizeof(Region), true);
             ret->size = size;
         }
-        for (size_t i = 0; i < ret->size; i++) addr[i] = 0;
         return addr;
     }
     bool RegionAllocator::Dealloc(void* ptr) {

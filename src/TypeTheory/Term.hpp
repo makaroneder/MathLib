@@ -1,6 +1,5 @@
 #ifndef Term_H
 #define Term_H
-#include <Interfaces/Comparable.hpp>
 #include <Interfaces/Printable.hpp>
 
 struct Term;

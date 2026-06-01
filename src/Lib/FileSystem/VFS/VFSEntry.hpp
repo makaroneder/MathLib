@@ -3,13 +3,17 @@
 #include "../FileSystem.hpp"
 
 namespace MathLib {
-    struct VFSEntry {
+    struct VFSEntry;
+    struct VFSEntry : Comparable<VFSEntry> {
         FileSystem* fs;
-        String name;
+        String mountpoint;
+        bool removed;
 
-        VFSEntry(FileSystem* fs = nullptr, const Sequence<char>& name = ""_M);
-        [[nodiscard]] bool operator==(const VFSEntry& other) const;
-        [[nodiscard]] bool operator!=(const VFSEntry& other) const;
+        VFSEntry(void);
+        VFSEntry(FileSystem* fs, const Sequence<char>& mountpoint);
+
+        protected:
+        [[nodiscard]] virtual bool Equals(const VFSEntry& other) const override;
     };
 }
 

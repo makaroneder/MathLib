@@ -12,10 +12,6 @@ void Delim(void) {
     for (size_t i = 0; i < width; i++) std::cout << '-';
     std::cout << '\n';
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
         // TODO: Distributed calculation

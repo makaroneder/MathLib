@@ -15,9 +15,6 @@ namespace MathLib {
         Optimizer Recreate(void) const;
         void Destroy(void);
         [[nodiscard]] FunctionNode GetFunction(const Sequence<char>& name) const;
-        /// @brief Optimizes given node based on the given variables and creates new variables
-        /// @param node Node to optimize
-        /// @return Optimized node
         [[nodiscard]] Node* Optimize(const Node* node);
         [[nodiscard]] bool operator==(const Optimizer& other) const;
         [[nodiscard]] bool operator!=(const Optimizer& other) const;
@@ -30,21 +27,9 @@ namespace MathLib {
         [[nodiscard]] Variable* GetVariableInternal(const Sequence<char>& name);
         [[nodiscard]] Node* OptimizeComparison(const Node* node, const Sequence<Node::Type>& validTypes, Node::Type defaultType);
         [[nodiscard]] Node* OptimizeProgram(const Node* node);
-        /// @brief Optimizes given node based on the given variables and creates new variables
-        /// @param node Node to optimize
-        /// @return Optimized node
         [[nodiscard]] Node* OptimizeComma(const Node* node);
-        /// @brief Optimizes given node based on the given variables and creates new variables
-        /// @param node Node to optimize
-        /// @return Optimized node
         [[nodiscard]] Node* OptimizeVariable(const Node* node);
-        /// @brief Optimizes given node based on the given variables and creates new variables
-        /// @param node Node to optimize
-        /// @return Optimized node
         [[nodiscard]] Node* OptimizeFunction(const Node* node);
-        /// @brief Optimizes given node based on the given variables and creates new variables
-        /// @param node Node to optimize
-        /// @return Optimized node
         [[nodiscard]] Node* OptimizeInternal(const Node* node);
     };
 }

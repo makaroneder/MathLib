@@ -6,7 +6,9 @@
 #include <EquationSolver/Tokenizer.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
 #include <Libc/HostFileSystem.hpp>
+#include <Font/PSF1.hpp>
 #include <Bitmap.hpp>
+#include <Fonts.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
@@ -50,17 +52,15 @@ const MathLib::FunctionNode vname = optimizer.GetFunction(identifier);          
         if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, '0'_M, true))) MathLib::Panic("Failed to add variable"); \
         vname##Variable = optimizer.variables.GetSize() - 1;                                                                                                                \
     }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int, char**) {
     try {
-        MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
-        if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
         #ifndef Debug
         srand(time(nullptr));
         #endif
+        MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
+        if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
+        MathLib::PSF1 font;
+        if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
         MathLib::HostFileSystem fs;
         const MathLib::String path = "src/TestPrograms/Cards/";
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));
@@ -107,10 +107,10 @@ int main(int, char**) {
             }
             if (update) {
                 if (!renderer.CopyFromBuffer(table.At(0))) MathLib::Panic("Failed to draw background image");
-                if (!renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
-                if (!renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), MathLib::zap_light16_psf, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0)) MathLib::Panic("Failed to print state");
+                renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0);
+                renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0);
+                renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0);
+                renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0);
                 if (!hand.Draw(renderer, cardsImage)) MathLib::Panic("Failed to draw hand");
                 update = false;
             }

@@ -1,5 +1,5 @@
-#ifndef MathLib_Cryptography_CompressorLZMA2ChunkHeader_H
-#define MathLib_Cryptography_CompressorLZMA2ChunkHeader_H
+#ifndef MathLib_Cryptography_Compressor_LZMA2ChunkHeader_H
+#define MathLib_Cryptography_Compressor_LZMA2ChunkHeader_H
 #include <stdint.h>
 
 namespace MathLib {

@@ -11,10 +11,6 @@ MathLib::Array<HTTPHeader> resources = MathLib::MakeArray<HTTPHeader>(
         if (resource.name == name) return &resource;
     return nullptr;
 }
-/// @brief Entry point for this program
-/// @param argc Number of command line arguments
-/// @param argv Array of command line arguments
-/// @return Status
 int main(int argc, char** argv) {
     try {
         if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <port>");

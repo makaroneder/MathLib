@@ -10,9 +10,6 @@ namespace MathLib {
         [[nodiscard]] virtual bool Reset(void) override;
         [[nodiscard]] virtual bool Step(void) override;
         [[nodiscard]] virtual Register GetPC(void) const override;
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:

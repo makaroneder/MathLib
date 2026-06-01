@@ -25,13 +25,13 @@ endif
 
 HEADERS = $(call rwildcard,$(SRCDIR),*.hpp)
 HEADERS += $(call rwildcard,$(SRCDIR)/Platform,*.cpp)
-HEADERS += $(SRCDIR)/Lib/Font.hpp
+HEADERS += $(SRCDIR)/Lib/Fonts.hpp
 HEADERS += $(SRCDIR)/Lib/MathLib.hpp
 
 BUILDSYSDEPS = $(call rwildcard,$(SRCDIR)/BuildSystem,*.cpp)
 SRCPSF = $(call rwildcard,$(SRCDIR)/Lib,*.psf)
 SRCXX = $(call rwildcard,$(SRCDIR)/Lib,*.cpp)
-SRCXX += $(SRCDIR)/Lib/Font.cpp
+SRCXX += $(SRCDIR)/Lib/Fonts.cpp
 
 $(BUILDDIR)/libMath.so: $(BUILDDIR)/LibStub.o
 	@$(MKDIR) $(@D)
@@ -41,9 +41,10 @@ $(BUILDDIR)/LibStub.o: $(SRCDIR)/Lib/MathLib.hpp $(HEADERS)
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CXXFLAGS) -fPIC -x c++ -c $< -o $@
 	@echo "==> Created: $@"
-$(SRCDIR)/Lib/Font.cpp: $(SRCPSF) $(SCRIPTSDIR)/PSFToCXX.py Makefile
+$(SRCDIR)/Lib/Fonts.hpp: $(SRCDIR)/Lib/Fonts.cpp
+$(SRCDIR)/Lib/Fonts.cpp: $(SRCPSF) $(SCRIPTSDIR)/PSFToCXX.py Makefile
 	@$(MKDIR) $(@D)
-	@$(PYTHON) $(SCRIPTSDIR)/PSFToCXX.py $@ $(SRCDIR)/Lib/Font.hpp $(SRCPSF)
+	@$(PYTHON) $(SCRIPTSDIR)/PSFToCXX.py $@ $(SRCDIR)/Lib/Fonts.hpp $(SRCPSF)
 	@echo "==> Created: $@"
 $(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX) Makefile
 	@$(MKDIR) $(@D)
@@ -94,22 +95,26 @@ VIDEOPLAYERMULTX ?= 4
 VIDEOPLAYERMULTY ?= 4
 VIDEOPLAYERPATH ?= $(SRCDIR)/TestPrograms/VideoPlayer/Video.aseprite
 AESTESTSPATH ?= $(SRCDIR)/TestPrograms/AES
+ASLPATH ?= $(SRCDIR)/TestPrograms/ACPI/OS.asl
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
-OSCXX = x86_64-elf-$(CXX)
-OSCXXFLAGS = $(CXXFLAGS) -DFreestanding -ffreestanding -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
-OSLINKER = $(SRCDIR)/OS/Linker.ld
+OSSYSROOT ?= $(BUILDDIR)/SystemRoot
+OSCXX = x86_64-makaron-g++
+OSAR = x86_64-makaron-ar
+OSCXXFLAGS = $(CXXFLAGS) -I $(SRCDIR)/OS/Shared  -I $(SRCDIR)/OS/Kernel -DFreestanding -ffreestanding -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
+OSCXXUSERFLAGS = $(CXXFLAGS) -I $(SRCDIR)/OS/Shared -I $(SRCDIR)/OS/Libc -pie -fPIE
+OSLINKER = $(SRCDIR)/OS/Kernel/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -Bsymbolic -nostdlib
-OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096 -rtc base=localtime -boot d \
+OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096M -rtc base=localtime -boot d \
 -serial file:$(BUILDDIR)/OS.log -device rtl8139,netdev=net0 -cdrom $(BUILDDIR)/OS.img \
 -drive file=$(BUILDDIR)/FAT.img,format=raw,media=disk \
+-drive file=$(BUILDDIR)/EXT.img,format=raw,media=disk \
 -netdev user,id=net0,hostfwd=tcp::$(SERVERPORT)-:$(SERVERPORT)
 
 clean:
-	@$(MKDIR) $(BUILDDIR)
 	@rm -rf $(BUILDDIR)/*
-	@touch $(SRCDIR)/Lib/MathLib.hpp
-	@rm $(SRCDIR)/Lib/MathLib.hpp
-	@echo "==> Deleted compiled files"
+	@rm -f $(SRCDIR)/Lib/MathLib.hpp
+	@rm -f $(SRCDIR)/Lib/Fonts.hpp
+	@rm -f $(SRCDIR)/Lib/Fonts.cpp
 .PHONY: clean
 
 include $(BUILDDIR)/Build.mk

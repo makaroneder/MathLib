@@ -14,7 +14,9 @@ namespace MathLib {
         uint8_t checkType : 4;
         uint8_t flags2 : 4;
 
-        [[nodiscard]] uint8_t GetSizeOfCheck(void) const;
+        XZFlags(void);
+        XZFlags(CheckType type);
+        [[nodiscard]] static uint8_t GetSizeOfCheck(CheckType type);
         [[nodiscard]] ExternArray<uint8_t> GetFlags(void) const;
         [[nodiscard]] bool operator==(const XZFlags& other) const;
         [[nodiscard]] bool operator!=(const XZFlags& other) const;

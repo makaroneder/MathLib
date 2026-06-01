@@ -1,11 +1,9 @@
 #include "VFSEntry.hpp"
 
 namespace MathLib {
-    VFSEntry::VFSEntry(FileSystem* fs, const Sequence<char>& name) : fs(fs), name(CollectionToString(name)) {}
-    bool VFSEntry::operator==(const VFSEntry& other) const {
-        return name == other.name;
-    }
-    bool VFSEntry::operator!=(const VFSEntry& other) const {
-        return !(*this == other);
+    VFSEntry::VFSEntry(void) : fs(nullptr), mountpoint(), removed(true) {}
+    VFSEntry::VFSEntry(FileSystem* fs, const Sequence<char>& mountpoint) : fs(fs), mountpoint(CollectionToString(mountpoint)), removed(false) {}
+    bool VFSEntry::Equals(const VFSEntry& other) const {
+        return mountpoint == other.mountpoint;
     }
 }

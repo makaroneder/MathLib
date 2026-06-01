@@ -6,9 +6,6 @@ namespace MathLib {
     struct Test : Printable {
         [[nodiscard]] bool ReportRecord(const Record& record);
         [[nodiscard]] bool Passed(void) const;
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:

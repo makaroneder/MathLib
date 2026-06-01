@@ -2,27 +2,15 @@
 #define NeuralNetworkState_H
 #include <NeuralNetwork.hpp>
 
-/// @brief Contains every information needed by neural network
-/// @tparam T Type of number
 template <typename T>
 struct NeuralNetworkState : MathLib::Saveable {
-    /// @brief Rate by which the neural network is learning
     T rate;
-    /// @brief Input data for learning
     MathLib::Matrix<T> trainingDataInput;
-    /// @brief Output data for learning
     MathLib::Matrix<T> trainingDataOutput;
-    /// @brief Neural network
     MathLib::NeuralNetwork<T> neuralNetwork;
     MathLib::Array<T> data;
 
-    /// @brief Creates empty state
     constexpr NeuralNetworkState(void) {}
-    /// @brief Creates a new state
-    /// @param r Rate by which the neural network is learning
-    /// @param in Input data for learning
-    /// @param out Output data for learning
-    /// @param nn Neural network
     constexpr NeuralNetworkState(const T& rate, const MathLib::Matrix<T>& trainingDataInput, const MathLib::Matrix<T>& trainingDataOutput, const MathLib::NeuralNetwork<T>& neuralNetwork, const MathLib::Sequence<T>& data = MathLib::Array<T>()) : rate(rate), trainingDataInput(trainingDataInput), trainingDataOutput(trainingDataOutput), neuralNetwork(neuralNetwork), data(MathLib::CollectionToArray<T>(data)) {}
     [[nodiscard]] constexpr bool Forward(void) {
         return neuralNetwork.Forward();

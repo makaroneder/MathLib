@@ -9,6 +9,13 @@ namespace MathLib {
         ByteArray(const Sequence<uint8_t>& sequence);
         ByteArray(ByteDevice& device);
         template <typename T>
+        static ByteArray ToByteArray(const T& value) {
+            ByteArray ret = ByteArray(sizeof(T));
+            const uint8_t* buff = (const uint8_t*)&value;
+            for (size_t i = 0; i < sizeof(T); i++) ret.AtUnsafe(i) = buff[i];
+            return ret;
+        }
+        template <typename T>
         static ByteArray ToByteArray(const Sequence<T>& sequence) {
             const size_t size = sequence.GetSize();
             ByteArray ret = ByteArray(size * sizeof(T));
@@ -43,9 +50,6 @@ namespace MathLib {
         [[nodiscard]] virtual const uint8_t* GetValue(void) const override;
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
-        /// @brief Converts struct to string
-        /// @param padding String to pad with
-        /// @return String representation
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
         private:

@@ -1,7 +1,6 @@
 #ifndef Formula_H
 #define Formula_H
 #include <Interfaces/Printable.hpp>
-#include <Interfaces/Comparable.hpp>
 
 struct Formula;
 struct Formula : MathLib::Comparable<Formula>, MathLib::Printable {

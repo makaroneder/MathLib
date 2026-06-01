@@ -4,8 +4,10 @@
 
 namespace MathLib {
     struct AsepritePaletteChunkEntry {
-        bool hasName : 1;
-        uint16_t reserved : 15;
+        enum class Flag : uint8_t {
+            HasName = 0,
+        };
+        uint16_t flags;
         uint8_t red;
         uint8_t green;
         uint8_t blue;

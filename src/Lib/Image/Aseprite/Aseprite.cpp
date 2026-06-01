@@ -18,7 +18,7 @@ namespace MathLib {
         header.width = GetWidth();
         header.height = GetHeight();
         header.bpp = 32;
-        header.hasOpacityLayer = true;
+        header.flags = 1 << (uint8_t)AsepriteHeader::Flag::HasOpacityLayer;
         const AsepriteLayerChunk layer = AsepriteLayerChunk(header.width, header.height);
         const AsepriteImageCelChunk celChunk = AsepriteImageCelChunk(header.width, header.height, true);
         AsepriteFrameHeader frame;
@@ -31,7 +31,7 @@ namespace MathLib {
             if (!file.Write<AsepriteFrameHeader>(frame) || !file.Write<AsepriteLayerChunk>(layer) || !file.Write<AsepriteImageCelChunk>(celChunk)) return false;
             for (uint32_t y = 0; y < header.height; y++) {
                 for (uint32_t x = 0; x < header.width; x++) {
-                    const Color pixel = frames.At(i).pixels.AtUnsafe(x, y);
+                    const Color pixel = frames.AtUnsafe(i).pixels.AtUnsafe(x, y);
                     if (!file.Write<uint8_t>(pixel.rgba.r) || !file.Write<uint8_t>(pixel.rgba.g) || !file.Write<uint8_t>(pixel.rgba.b) || !file.Write<uint8_t>(pixel.rgba.a)) return false;
                 }
             }
@@ -56,26 +56,30 @@ namespace MathLib {
                 switch (chunk->type) {
                     case AsepriteChunkHeader::Type::Cel: {
                         const AsepriteCelChunk* cel = (const AsepriteCelChunk*)chunk;
-                        if (cel->type == AsepriteCelChunk::Type::Raw || cel->type == AsepriteCelChunk::Type::CompressedImage) {
-                            const AsepriteImageCelChunk* img = (const AsepriteImageCelChunk*)cel;
-                            frames.AtUnsafe(i) = Frame(img->width, img->height, Millisecond<num_t>(frame.duration > 0 ? frame.duration : header.speed).ToBaseUnit().GetValue());
-                            if (cel->type == AsepriteCelChunk::Type::CompressedImage) {
-                                const Array<uint32_t> pixels = ZLib().DecryptT<uint32_t>(Array<uint8_t>((const uint8_t*)img->pixels, img->size - sizeof(AsepriteCelChunk)), CipherKey(MakeArray<uint8_t>(true)));
-                                for (size_t y = 0; y < img->height; y++) {
-                                    for (size_t x = 0; x < img->width; x++) {
-                                        const uint32_t pixel = pixels.AtUnsafe(y * img->width + x);
-                                        const uint8_t* tmp = (const uint8_t*)&pixel;
-                                        frames.AtUnsafe(i).pixels.AtUnsafe(x, y) = Color(tmp[0], tmp[1], tmp[2], tmp[3]).hex;
-                                    }
-                                }
-                            }
-                            else for (size_t y = 0; y < img->height; y++) {
-                                for (size_t x = 0; x < img->width; x++) {
-                                    const uint8_t* tmp = (const uint8_t*)&img->pixels[y * img->width + x];
-                                    frames.AtUnsafe(i).pixels.AtUnsafe(x, y) = Color(tmp[0], tmp[1], tmp[2], tmp[3]).hex;
+                        if (cel->type != AsepriteCelChunk::Type::Raw && cel->type != AsepriteCelChunk::Type::CompressedImage) break;
+                        const AsepriteImageCelChunk* img = (const AsepriteImageCelChunk*)cel;
+                        frames.AtUnsafe(i) = Frame(header.width, header.height, Millisecond<num_t>(frame.duration > 0 ? frame.duration : header.speed).ToBaseUnit().GetValue());
+                        const ssize_t maxX = Min<ssize_t>(header.width - img->x, img->width);
+                        const ssize_t maxY = Min<ssize_t>(header.height - img->y, img->height);
+                        const size_t minX = Max<ssize_t>(-img->x, 0);
+                        const size_t minY = Max<ssize_t>(-img->y, 0);
+                        if (cel->type == AsepriteCelChunk::Type::CompressedImage) {
+                            const Array<uint32_t> pixels = ZLib().DecryptT<uint32_t>(Array<uint8_t>((const uint8_t*)img->pixels, img->size - sizeof(AsepriteCelChunk)), CipherKey(MakeArray<uint8_t>(true)));
+                            for (ssize_t y = minY; y < maxY; y++) {
+                                for (ssize_t x = minX; x < maxX; x++) {
+                                    const uint32_t pixel = pixels.AtUnsafe(y * img->width + x);
+                                    const uint8_t* tmp = (const uint8_t*)&pixel;
+                                    frames.AtUnsafe(i).pixels.AtUnsafe(x + img->x, y + img->y) = Color(tmp[0], tmp[1], tmp[2], tmp[3]).hex;
                                 }
                             }
                         }
+                        else for (ssize_t y = minY; y < maxY; y++) {
+                            for (ssize_t x = minX; x < maxX; x++) {
+                                const uint8_t* tmp = (const uint8_t*)&img->pixels[y * img->width + x];
+                                frames.AtUnsafe(i).pixels.AtUnsafe(x + img->x, y + img->y) = Color(tmp[0], tmp[1], tmp[2], tmp[3]).hex;
+                            }
+                        }
+                        break;
                     }
                     default: break;
                 }

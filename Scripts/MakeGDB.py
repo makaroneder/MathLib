@@ -1,4 +1,4 @@
-from sys import argv
+from sys import argv, exit
 
 if __name__ == "__main__":
     if len(argv) < 5:

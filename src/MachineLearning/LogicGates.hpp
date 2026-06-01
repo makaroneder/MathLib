@@ -3,9 +3,6 @@
 #include "NeuralNetworkState.hpp"
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 
-/// @brief Creates default state for this neural network
-/// @tparam T Type of number
-/// @return State
 [[nodiscard]] NeuralNetworkState<MathLib::num_t> GetDefaultState(void) {
     return NeuralNetworkState<MathLib::num_t>(1e-1, MathLib::matrix_t(2, 4, MathLib::VariadicSequence<MathLib::num_t,
         0, 0,

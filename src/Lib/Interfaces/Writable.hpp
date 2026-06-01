@@ -4,31 +4,19 @@
 
 namespace MathLib {
     struct Writable : Allocatable {
-        /// @brief Writes data to the buffer
-        /// @param buffer Buffer to write data to
-        /// @param size Size of the buffer
-        /// @return Size of written bytes
         [[nodiscard]] virtual size_t WriteSizedBuffer(const void* buffer, size_t size) = 0;
-        /// @brief Writes data to the buffer
-        /// @param buffer Buffer to write data to
-        /// @param size Size of the buffer
-        /// @return Status
         [[nodiscard]] bool WriteBuffer(const void* buffer, size_t size);
-        /// @brief Writes text
-        /// @param str Text to write
-        /// @return Status
+        [[nodiscard]] bool Puts(const Collection<char>& str);
         [[nodiscard]] bool Puts(const Sequence<char>& str);
-        /// @brief Writes text
-        /// @param str Text to write
-        /// @return Status
         [[nodiscard]] bool Puts(const char* str);
-        /// @brief Writes one T value
-        /// @tparam T Type of value
-        /// @param value Value to write
-        /// @return Status
+        [[nodiscard]] bool Puts(char chr);
         template <typename T>
         [[nodiscard]] bool Write(const T& value) {
             return WriteBuffer(&value, sizeof(T));
+        }
+        template <typename T>
+        [[nodiscard]] bool WriteCollection(const Collection<T>& sequence) {
+            return WriteBuffer(sequence.GetValue(), sequence.GetSize() * sizeof(T));
         }
     };
 }

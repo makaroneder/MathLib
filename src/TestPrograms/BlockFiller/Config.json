@@ -2,7 +2,8 @@
     "unlock": false,
     "levels": [
         "1.csv", "2.csv",
-        "H1.csv", "H2.csv", "H3.csv", "H4.csv", "H5.csv", "H6.csv",
+        "H1.csv", "H2.csv", "H3.csv", "H4.csv", "H5.csv", "H6.csv", "H7.csv",
+        "H8.csv", "H9.csv",
         "Final.csv"
     ]
 }

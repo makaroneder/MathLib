@@ -81,7 +81,7 @@ int main(int, char**) {
 
         MathLib::Aseprite ball;
         if (!ball.LoadFromPath(fs, path + "Ball.aseprite")) MathLib::Panic("Failed to load ball sprite");
-        const MathLib::num_t moveLag = 0.01;
+        const MathLib::num_t moveLag = 0.02;
         MathLib::num_t moveTime = 0;
 
         MathLib::SDL2 sdl2;

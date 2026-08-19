@@ -28,7 +28,12 @@ struct Matrix4x4 : MathLib::Printable {
     [[nodiscard]] Matrix4x4 operator-(int) const;
 };
 extern Matrix4x4 identity4x4;
-[[nodiscard]] Matrix4x4 Scale(const MathLib::vector3_t& scale);
-[[nodiscard]] Matrix4x4 Transalate(const MathLib::vector3_t& scale);
+[[nodiscard]] Matrix4x4 Scale(float x, float y, float z);
+[[nodiscard]] Matrix4x4 Transalate(float x, float y, float z);
+[[nodiscard]] Matrix4x4 MakePerspectiveMatrix(float fov, float aspectRatio, float near, float far);
+[[nodiscard]] Matrix4x4 RotateX(float angle);
+[[nodiscard]] Matrix4x4 RotateY(float angle);
+[[nodiscard]] Matrix4x4 RotateZ(float angle);
+[[nodiscard]] Matrix4x4 Rotate(float x, float y, float z);
 
 #endif

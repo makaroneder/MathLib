@@ -11,8 +11,6 @@ namespace MathLib {
 
         VFSEntry(void);
         VFSEntry(FileSystem* fs, const Sequence<char>& mountpoint);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const VFSEntry& other) const override;
     };
 }

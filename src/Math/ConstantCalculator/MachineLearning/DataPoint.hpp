@@ -9,8 +9,6 @@ struct DataPoint : MathLib::Comparable<DataPoint> {
 
     DataPoint(void);
     DataPoint(const Formula& input, const Formula& output);
-
-    protected:
     [[nodiscard]] virtual bool Equals(const DataPoint& other) const override;
 };
 

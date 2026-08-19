@@ -27,8 +27,6 @@ struct LambdaTerm : MathLib::Comparable<LambdaTerm>, MathLib::Printable {
     [[nodiscard]] LambdaTerm Run(const MathLib::Sequence<LambdaTerm>& bindings) const;
     [[nodiscard]] MathLib::Array<MathLib::String> GetVariables(void) const;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const LambdaTerm& other) const override;
 
     private:

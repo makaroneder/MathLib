@@ -105,6 +105,11 @@ namespace MathLib {
             for (size_t i = 0; i < BaseUnit::End; i++) this->baseUnits[i] -= other.baseUnits[i];
             return *this;
         }
+        [[nodiscard]] virtual bool Equals(const Unit<T>& other) const override {
+            bool ret = true;
+            for (size_t i = 0; i < BaseUnit::End && ret; i++) ret = this->baseUnits[i] == other.baseUnits[i];
+            return ret && FloatsEqual<T>(this->count, other.count);
+        }
 
         protected:
         T count;
@@ -112,11 +117,6 @@ namespace MathLib {
         static constexpr const char* baseUnitsStr[] = {
             "mol", "A", "m", "cd", "kg", "K", "s",
         };
-        [[nodiscard]] virtual bool Equals(const Unit<T>& other) const override {
-            bool ret = true;
-            for (size_t i = 0; i < BaseUnit::End && ret; i++) ret = this->baseUnits[i] == other.baseUnits[i];
-            return ret && FloatsEqual<T>(this->count, other.count);
-        }
 
         private:
         void Add(const Unit<T>& other) {

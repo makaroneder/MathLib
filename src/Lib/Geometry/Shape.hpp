@@ -11,8 +11,6 @@ namespace MathLib {
 
         Shape(const Matrix<T>& pos) : position(pos) {}
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const = 0;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Shape<T>& other) const override {
             return position == other.position;
         }

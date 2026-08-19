@@ -11,8 +11,6 @@ namespace MathLib {
 
         VFSFile(void);
         VFSFile(size_t fs, size_t index);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const VFSFile& other) const override;
     };
 }

@@ -12,8 +12,6 @@ struct QEMUFile : MathLib::Comparable<QEMUFile> {
 
     QEMUFile(void);
     QEMUFile(QEMUSelector selector, uint32_t size);
-
-    protected:
     [[nodiscard]] virtual bool Equals(const QEMUFile& other) const override;
 };
 

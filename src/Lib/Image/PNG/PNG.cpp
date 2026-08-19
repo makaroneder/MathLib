@@ -11,6 +11,7 @@
 #include "../../Cryptography/OneWayCipher/CRC.hpp"
 
 namespace MathLib {
+    PNG::PNG(void) : SaveableImage() {}
     PNG::PNG(size_t width, size_t height) : SaveableImage(width, height) {}
     bool PNG::Save(Writable& file) const {
         // TODO:

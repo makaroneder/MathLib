@@ -35,8 +35,6 @@ struct Formula : MathLib::Comparable<Formula>, MathLib::Printable {
     [[nodiscard]] Formula Simplify(void) const;
     Formula Evaluate(MathLib::Dictionary<MathLib::String, Formula>& derivatives) const;
     [[nodiscard]] Formula Substitute(const MathLib::Dictionary<MathLib::String, Formula>& variables) const;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Formula& other) const override;
 
     private:

@@ -19,8 +19,6 @@ struct Date : MathLib::Comparable<Date>, MathLib::Printable {
     Date(uint8_t second, uint8_t minute, uint8_t hour, uint8_t day, uint8_t month, size_t year);
     [[nodiscard]] bool IsValid(void) const;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Date& other) const override;
 };
 

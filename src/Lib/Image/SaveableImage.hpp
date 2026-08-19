@@ -4,6 +4,7 @@
 
 namespace MathLib {
     struct SaveableImage : Image, Saveable {
+        SaveableImage(void);
         SaveableImage(size_t width, size_t height);
     };
 }

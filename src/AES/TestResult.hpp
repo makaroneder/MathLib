@@ -11,8 +11,6 @@ struct TestResult : MathLib::Comparable<TestResult> {
 
     TestResult(void);
     TestResult(const MathLib::Sequence<char>& str, size_t& i);
-
-    protected:
     [[nodiscard]] virtual bool Equals(const TestResult& other) const override;
 };
 

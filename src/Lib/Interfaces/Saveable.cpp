@@ -12,10 +12,10 @@ namespace MathLib {
         return file.Exists() && Load(file);
     }
     bool Saveable::SaveFromPath(FileSystem* fileSystem, const Sequence<char>& path) const {
-        return fileSystem && SaveFromPath(*fileSystem, path);    
+        return fileSystem && SaveFromPath(*fileSystem, path);
     }
     bool Saveable::LoadFromPath(FileSystem* fileSystem, const Sequence<char>& path) {
-        return fileSystem && LoadFromPath(*fileSystem, path);    
+        return fileSystem && LoadFromPath(*fileSystem, path);
     }
     bool Saveable::LoadFromSequence(const Sequence<uint8_t>& sequence) {
         SequenceReadable readable = sequence;

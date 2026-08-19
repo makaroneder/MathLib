@@ -28,8 +28,6 @@ struct Block : MathLib::Comparable<Block> {
 
     Block(void);
     Block(Type type, ssize_t x, ssize_t y);
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Block& other) const override;
 };
 

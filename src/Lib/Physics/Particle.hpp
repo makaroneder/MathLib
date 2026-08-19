@@ -37,13 +37,11 @@ namespace MathLib {
         [[nodiscard]] virtual bool CollidesWith(const Shape<T>& other) const override {
             return this->position == ((const Particle<T>&)other).position;
         }
-
-        Matrix<T> prevPosition;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Particle<T>& other) const override {
             return Shape<T>::operator==(other) && fixed == other.fixed && prevPosition == other.prevPosition && acceleration == other.acceleration;
         }
+
+        Matrix<T> prevPosition;
 
         private:
         Matrix<T> acceleration;

@@ -14,8 +14,6 @@ namespace MathLib {
         void Reset(void);
         bool Update(const num_t& value);
         void Reverse(const num_t& value);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Animation& other) const override;
 
         private:

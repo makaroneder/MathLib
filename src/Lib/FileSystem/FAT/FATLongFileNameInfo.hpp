@@ -4,15 +4,14 @@
 #include <Interfaces/Orderable.hpp>
 
 namespace MathLib {
-    struct FATLongFileNameInfo : Orderable {
+    struct FATLongFileNameInfo;
+    struct FATLongFileNameInfo : Orderable<FATLongFileNameInfo> {
         uint8_t order;
         char16_t name[13];
 
         FATLongFileNameInfo(void);
         FATLongFileNameInfo(const FATLongFileName& lfn);
-
-        protected:
-        [[nodiscard]] virtual bool LessThanEqual(const Orderable& other) const override;
+        [[nodiscard]] virtual bool LessThanEqual(const FATLongFileNameInfo& other) const override;
     };
 }
 

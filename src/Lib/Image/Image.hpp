@@ -26,12 +26,11 @@ namespace MathLib {
         [[nodiscard]] Image RotateUpsideDown(void) const;
         [[nodiscard]] Image SwapXY(void) const;
         [[nodiscard]] Image SwapXYAndRotateUpsideDown(void) const;
+        [[nodiscard]] Image MakeWidthOdd(void) const;
         void SetRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color);
+        [[nodiscard]] virtual bool Equals(const Image& other) const override;
 
         Matrix<uint32_t> pixels;
-
-        protected:
-        [[nodiscard]] virtual bool Equals(const Image& other) const override;
     };
 }
 

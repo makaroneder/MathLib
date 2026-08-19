@@ -2,7 +2,8 @@
 #define Integer_H
 #include "NaturalNumber.hpp"
 
-struct Integer : MathLib::Orderable, MathLib::Saveable, MathLib::Printable {
+struct Integer;
+struct Integer : MathLib::Orderable<Integer>, MathLib::Saveable, MathLib::Printable {
     Integer(void);
     Integer(const NaturalNumber& natural);
     Integer(const NaturalNumber& natural, bool positive);
@@ -42,12 +43,10 @@ struct Integer : MathLib::Orderable, MathLib::Saveable, MathLib::Printable {
 
     Integer& operator^=(const NaturalNumber& other);
     [[nodiscard]] Integer operator^(const NaturalNumber& other) const;
+    [[nodiscard]] virtual bool LessThanEqual(const Integer& other) const override;
 
     NaturalNumber natural;
     bool positive;
-
-    protected:
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
 };
 
 #endif

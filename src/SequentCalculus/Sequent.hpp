@@ -13,8 +13,6 @@ struct Sequent : MathLib::Comparable<Sequent>, MathLib::Printable {
     [[nodiscard]] MathLib::Array<Sequent> Simplify(void) const;
     [[nodiscard]] MathLib::Tree<Sequent> Prove(void) const;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Sequent& other) const override;
 
     private:

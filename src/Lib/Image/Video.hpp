@@ -20,6 +20,7 @@ namespace MathLib {
         [[nodiscard]] Video RotateUpsideDown(void) const;
         [[nodiscard]] Video SwapXY(void) const;
         [[nodiscard]] Video SwapXYAndRotateUpsideDown(void) const;
+        [[nodiscard]] Video MakeWidthOdd(void) const;
         [[nodiscard]] Video Sub(const Interval<size_t>& interval) const;
 
         protected:

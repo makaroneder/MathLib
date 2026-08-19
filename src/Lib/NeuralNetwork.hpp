@@ -195,7 +195,6 @@ namespace MathLib {
                 if (!as.Add(Matrix<T>()) || !ws.Add(Matrix<T>()) || !bs.Add(Matrix<T>()) || !as.At(i + 1).Load(file) || !ws.At(i).Load(file) || !bs.At(i).Load(file)) return false;
             return true;
         }
-        protected:
         [[nodiscard]] virtual bool Equals(const NeuralNetwork<T>& other) const override {
             return count == other.count && ws == other.ws && bs == other.bs;
         }

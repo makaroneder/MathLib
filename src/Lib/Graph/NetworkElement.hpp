@@ -10,8 +10,6 @@ namespace MathLib {
 
         NetworkElement(void);
         NetworkElement(size_t node, size_t link);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const NetworkElement& other) const override;
     };
 }

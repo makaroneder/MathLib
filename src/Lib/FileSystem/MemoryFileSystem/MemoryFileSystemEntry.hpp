@@ -27,8 +27,6 @@ namespace MathLib {
         [[nodiscard]] MemoryFileSystemEntry* Find(const Sequence<char>& path);
         [[nodiscard]] MemoryFileSystemEntry* Create(const Sequence<char>& path, Type retType, bool overwrite);
         [[nodiscard]] Array<FileInfo> ReadDirectory(const Sequence<char>& path);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const MemoryFileSystemEntry& other) const override;
     };
 }

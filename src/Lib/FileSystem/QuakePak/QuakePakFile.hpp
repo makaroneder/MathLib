@@ -12,8 +12,6 @@ namespace MathLib {
 
         QuakePakFile(void);
         QuakePakFile(uint32_t position, uint32_t size);
-
-        protected:
         [[nodiscard]] virtual bool Equals(const QuakePakFile& other) const override;
     };
 }

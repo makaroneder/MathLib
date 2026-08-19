@@ -17,7 +17,9 @@ namespace MathLib {
         return Formatter<T>::ToString(x) + symbol;
     }
     template <typename T>
-    struct Complex : Orderable, Printable {
+    struct Complex;
+    template <typename T>
+    struct Complex : Orderable<Complex<T>>, Printable {
         CreateOperators(Complex<T>, T)
         Complex<T>(const T& re = 0, const T& im = 0) : real(re), imaginary(im) {}
         [[nodiscard]] T GetReal(void) const {
@@ -77,10 +79,7 @@ namespace MathLib {
         [[nodiscard]] explicit operator ssize_t(void) const {
             return (ssize_t)ToReal();
         }
-
-        protected:
-        [[nodiscard]] virtual bool LessThanEqual(const Orderable& other_) const override {
-            const Complex<T>& other = (const Complex<T>&)other_;
+        [[nodiscard]] virtual bool LessThanEqual(const Complex<T>& other) const override {
             return FloatsEqual<T>(imaginary, other.GetImaginary()) && real <= other.GetReal();
         }
 

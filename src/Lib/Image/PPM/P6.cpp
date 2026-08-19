@@ -2,6 +2,7 @@
 #include "../../Color.hpp"
 
 namespace MathLib {
+    P6::P6(void) : SaveableImage() {}
     P6::P6(size_t width, size_t height) : SaveableImage(width, height) {}
     bool P6::Save(Writable& file) const {
         const size_t width = pixels.GetWidth();

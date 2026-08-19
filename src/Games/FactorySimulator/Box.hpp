@@ -11,8 +11,6 @@ struct Box : MathLib::Comparable<Box> {
 
     Box(void);
     bool ContainsMaterial(size_t material) const;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Box& other) const override;
 };
 

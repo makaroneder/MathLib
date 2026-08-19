@@ -94,6 +94,25 @@ namespace MathLib {
             for (size_t x = 0; x < height; x++) ret.AtUnsafe(x, y) = AtUnsafe(y, height - 1 - x);
         return ret;
     }
+    Image Image::MakeWidthOdd(void) const {
+        const size_t width = GetWidth();
+        if (width % 2) return *this;
+        const size_t width2 = width / 2;
+        const size_t height = GetHeight();
+        Image ret = Image(width + 1, height);
+        for (size_t y = 0; y < height; y++) {
+            for (size_t x = 0; x < width2; x++) {
+                // TODO: Use memory copy
+                ret.AtUnsafe(x, y) = AtUnsafe(x, y);
+            }
+            ret.AtUnsafe(width2, y) = ((uint64_t)AtUnsafe(width2 - 1, y) + AtUnsafe(width2, y)) / 2;
+            for (size_t x = width2; x < width; x++) {
+                // TODO: Use memory copy
+                ret.AtUnsafe(x + 1, y) = AtUnsafe(x, y);
+            }
+        }
+        return ret;
+    }
     void Image::SetRectangle(ssize_t centerX, ssize_t centerY, size_t width, size_t height, uint32_t color) {
         const ssize_t leftX = centerX - width / 2;
         const ssize_t topY = centerY - height / 2;

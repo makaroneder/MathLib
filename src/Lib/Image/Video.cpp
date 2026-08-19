@@ -58,6 +58,11 @@ namespace MathLib {
         for (Frame& frame : ret.frames) frame.pixels = frame.SwapXYAndRotateUpsideDown().pixels;
         return ret;
     }
+    Video Video::MakeWidthOdd(void) const {
+        Video ret = *this;
+        for (Frame& frame : ret.frames) frame.pixels = frame.MakeWidthOdd().pixels;
+        return ret;
+    }
     Video Video::Sub(const Interval<size_t>& interval) const {
         return Video(CollectionToArray<Frame>(SubSequence<Frame>(frames, interval)));
     }

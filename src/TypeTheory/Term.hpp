@@ -26,8 +26,6 @@ struct Term : MathLib::Comparable<Term>, MathLib::Printable {
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
     [[nodiscard]] bool Contains(const Term& term) const;
     [[nodiscard]] Term Replace(const Term& old, const Term& replacement) const;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Term& other) const override;
 
     private:

@@ -6,6 +6,7 @@
 
 namespace MathLib {
     const String identifier = "MathLib";
+    TGA::TGA(void) : SaveableImage() {}
     TGA::TGA(size_t width, size_t height) : SaveableImage(width, height) {}
     bool TGA::Save(Writable& file) const {
         TGAHeader header = TGAHeader(identifier.GetSize(), TGAHeader::ImageType::UncompressedTrueColor, GetWidth(), GetHeight(), 32);

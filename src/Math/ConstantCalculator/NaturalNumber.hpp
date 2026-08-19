@@ -6,7 +6,8 @@
 #include <Interfaces/Printable.hpp>
 #include <Interfaces/Orderable.hpp>
 
-struct NaturalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable {
+struct NaturalNumber;
+struct NaturalNumber : MathLib::Orderable<NaturalNumber>, MathLib::Saveable, MathLib::Printable {
     NaturalNumber(void);
     NaturalNumber(size_t size);
     NaturalNumber(const MathLib::Sequence<uint8_t>& data);
@@ -60,9 +61,7 @@ struct NaturalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable
 
     NaturalNumber& operator^=(const NaturalNumber& other);
     [[nodiscard]] NaturalNumber operator^(const NaturalNumber& other) const;
-
-    protected:
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
+    [[nodiscard]] virtual bool LessThanEqual(const NaturalNumber& other) const override;
 
     private:
     [[nodiscard]] uint8_t At(size_t i) const;

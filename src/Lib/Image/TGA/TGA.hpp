@@ -4,6 +4,7 @@
 
 namespace MathLib {
     struct TGA : SaveableImage {
+        TGA(void);
         TGA(size_t width, size_t height);
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;

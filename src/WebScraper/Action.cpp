@@ -25,6 +25,6 @@ MathLib::String Action::ToString(const MathLib::Sequence<char>& padding) const {
     }
     return ret + "] " + prefix;
 }
-bool Action::LessThanEqual(const MathLib::Orderable& other) const {
-    return prefix.GetSize() <= ((const Action&)other).prefix.GetSize();
+bool Action::LessThanEqual(const Action& other) const {
+    return prefix.GetSize() <= other.prefix.GetSize();
 }

@@ -27,8 +27,6 @@ namespace MathLib {
         [[nodiscard]] virtual Array<uint8_t> DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const override;
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const XZFilter& other) const override;
     };
 }

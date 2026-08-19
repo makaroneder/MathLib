@@ -5,7 +5,7 @@
     return !(*this == other);                               \
 }                                                           \
 [[nodiscard]] self operator-(void) const {                  \
-    return *this * -1;                                      \
+    return *this * T(-1);                                   \
 }                                                           \
 [[nodiscard]] self operator+(const self& other) const {     \
     self ret = *this;                                       \

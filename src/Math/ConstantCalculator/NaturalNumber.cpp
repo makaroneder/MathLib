@@ -279,8 +279,7 @@ NaturalNumber NaturalNumber::operator^(const NaturalNumber& other) const {
     if (mod) return n * n * *this;
     return n * n;
 }
-bool NaturalNumber::LessThanEqual(const MathLib::Orderable& other_) const {
-    const NaturalNumber& other = (const NaturalNumber&)other_;
+bool NaturalNumber::LessThanEqual(const NaturalNumber& other) const {
     const size_t size = MathLib::Max<size_t>(data.GetSize(), other.data.GetSize());
     for (size_t i = size; i; i--) {
         if (At(i - 1) < other.At(i - 1)) return true;

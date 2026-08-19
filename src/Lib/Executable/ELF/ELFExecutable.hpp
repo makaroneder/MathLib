@@ -20,8 +20,6 @@ namespace MathLib {
         size_t GetDependencies(void) const;
         const char* GetDependency(size_t i) const;
         bool Relocate(const Sequence<ELFExecutable>& deps);
-        
-        protected:
         [[nodiscard]] virtual bool Equals(const ELFExecutable& other) const override;
 
         private:

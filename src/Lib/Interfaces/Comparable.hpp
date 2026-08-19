@@ -11,8 +11,6 @@ namespace MathLib {
         [[nodiscard]] bool operator!=(const Self& other) const {
             return !Equals(other);
         }
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Self& other) const = 0;
     };
 }

@@ -10,8 +10,6 @@ namespace MathLib {
 
         Record(const Sequence<char>& expression = ""_M, bool passed = false);
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Record& other) const override;
     };
 }

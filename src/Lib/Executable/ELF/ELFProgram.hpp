@@ -12,8 +12,6 @@ namespace MathLib {
         ELFProgram(void);
         ELFProgram(const ELFProgramHeader& header, const Array<uint8_t>& data);
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const ELFProgram& other) const override;
     };
 }

@@ -20,8 +20,6 @@ struct Formula : MathLib::Comparable<Formula>, MathLib::Printable {
     Formula(const MathLib::Sequence<char>& value);
     Formula(Type type, const MathLib::Sequence<Formula>& children);
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Formula& other) const override;
 
     private:

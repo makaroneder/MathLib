@@ -124,8 +124,7 @@ Integer& Integer::operator^=(const NaturalNumber& other) {
 Integer Integer::operator^(const NaturalNumber& other) const {
     return Integer(natural ^ other, positive || other.IsEven());
 }
-bool Integer::LessThanEqual(const MathLib::Orderable& other_) const {
-    const Integer& other = (const Integer&)other_;
+bool Integer::LessThanEqual(const MathLib::Integer& other) const {
     if ((IsZero() && other.IsZero()) || (!positive && other.positive)) return true;
     if (positive && other.positive) return natural <= other.natural;
     if (!positive && !other.positive) return other.natural <= natural;

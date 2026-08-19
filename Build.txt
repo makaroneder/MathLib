@@ -68,6 +68,7 @@ DefaultTarget("BlockFiller.out", "Games/BlockFiller", "-l SDL2", "BlockFiller", 
 DefaultTarget("Sine.out", "Math/Sine", "", "Sine", "", "")
 DefaultTarget("AI.out", "AI", "", "AI", "", "")
 DefaultTarget("TerrainGenerator.out", "TerrainGenerator", "-l SDL2", "TerrainGen", "", "")
+DefaultTarget("OpenGL.out", "OpenGL", "-l GL -l glfw -l glbinding", "OpenGL", "", "")
 
 DeclareTarget("$(BUILDDIR)/Main.aml", "$(SRCDIR)/TestPrograms/ACPI/Main.asl $(SCRIPTSDIR)/CompileASL.py", "$(PYTHON) Scripts/CompileASL.py $< $@ $(ASLFLAGS)", false)
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)

@@ -20,8 +20,6 @@ namespace MathLib {
 
         FileInfo(Type type = Type::Unknown, const Sequence<char>& path = ""_M);
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const FileInfo& other) const override;
     };
 }

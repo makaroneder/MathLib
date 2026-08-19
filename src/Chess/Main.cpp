@@ -48,8 +48,6 @@ struct Move : MathLib::Comparable<Move>, MathLib::Printable {
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override {
         return MathLib::CollectionToString(padding) + PairToString(startX, startY) + " -> " + PairToString(endX, endY);
     }
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Move& other) const override {
         return startX == other.startX && startY == other.startY && endX == other.endX && endY == other.endY;
     }

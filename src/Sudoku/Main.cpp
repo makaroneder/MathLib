@@ -54,8 +54,6 @@ struct Block : MathLib::Comparable<Block>, MathLib::Printable {
             if (block.possibleValues.AtUnsafe(j)) (void)possibleValues.SetUnsafe(j, false);
         return *this;
     }
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Block& other) const override {
         return possibleValues == other.possibleValues;
     }

@@ -21,8 +21,6 @@ struct Bencode : MathLib::Comparable<Bencode>, MathLib::Saveable, MathLib::Print
     [[nodiscard]] virtual bool Save(MathLib::Writable& file) const override;
     [[nodiscard]] virtual bool Load(MathLib::Readable& file) override;
     [[nodiscard]] virtual MathLib::String ToString(const MathLib::Sequence<char>& padding = ""_M) const override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Bencode& other) const override;
 };
 

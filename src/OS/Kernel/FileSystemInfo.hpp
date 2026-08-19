@@ -17,8 +17,6 @@ struct FileSystemInfo : MathLib::FileSystem, MathLib::Comparable<FileSystemInfo>
     [[nodiscard]] virtual size_t GetSize(size_t file) override;
     [[nodiscard]] virtual MathLib::Array<MathLib::FileInfo> ReadDirectory(const MathLib::Sequence<char>& path) override;
     [[nodiscard]] virtual bool CreateDirectory(const MathLib::Sequence<char>& path, bool overwrite) override;
-
-    protected:
     [[nodiscard]] virtual bool Equals(const FileSystemInfo& other) const override;
 
     private:

@@ -2,7 +2,8 @@
 #define Card_H
 #include <Geometry/Cuboid.hpp>
 
-struct Card : MathLib::Orderable, MathLib::Printable {
+struct Card;
+struct Card : MathLib::Orderable<Card>, MathLib::Printable {
     static constexpr MathLib::num_t width = 0.64;
     static constexpr MathLib::num_t height = 0.96;
     static constexpr MathLib::num_t padding = 0.1;
@@ -39,9 +40,7 @@ struct Card : MathLib::Orderable, MathLib::Printable {
     [[nodiscard]] static MathLib::Cuboid<T> ToCuboid(const MathLib::Matrix<T>& position) {
         return MathLib::Cuboid<T>(position, MathLib::CreateVector<T>(width, height, 0.01));
     }
-
-    protected:
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
+    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Card& other) const override;
 };
 
 #endif

@@ -170,8 +170,6 @@ struct Polynomial : MathLib::Comparable<Polynomial<T>>, MathLib::Printable {
         }
         return !ret.IsEmpty() && MathLib::FloatsEqual<T>(coefficients.At(0), 0) ? MathLib::SubString(ret, 0, ret.GetSize() - 3) : ret + padding + MathLib::ToString(coefficients.At(0));
     }
-
-    protected:
     [[nodiscard]] virtual bool Equals(const Polynomial<T>& other) const override {
         if (coefficients.GetSize() != other.coefficients.GetSize()) return false;
         for (size_t i = 0; i < coefficients.GetSize(); i++)

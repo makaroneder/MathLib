@@ -263,8 +263,6 @@ namespace MathLib {
             for (size_t i = 0; i < size; i++) ret = function(ret, AtUnsafe(i));
             return ret;
         }
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Sequence<T>& other) const override {
             const size_t size = GetSize();
             if (size != other.GetSize()) return false;

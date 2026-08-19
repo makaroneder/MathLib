@@ -15,8 +15,6 @@ namespace MathLib {
         [[nodiscard]] ByteFiniteField operator*(const ByteFiniteField& other) const;
         ByteFiniteField& operator*=(const ByteFiniteField& other);
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
-
-        protected:
         [[nodiscard]] virtual bool Equals(const ByteFiniteField& other) const override;
     };
 }

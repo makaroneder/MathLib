@@ -2,7 +2,8 @@
 #define RationalNumber_H
 #include "Integer.hpp"
 
-struct RationalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printable {
+struct RationalNumber;
+struct RationalNumber : MathLib::Orderable<RationalNumber>, MathLib::Saveable, MathLib::Printable {
     RationalNumber(void);
     RationalNumber(Integer nat);
     RationalNumber(Integer a, NaturalNumber b);
@@ -22,11 +23,9 @@ struct RationalNumber : MathLib::Orderable, MathLib::Saveable, MathLib::Printabl
     [[nodiscard]] RationalNumber operator*(const RationalNumber& other) const;
     RationalNumber& operator/=(const RationalNumber& other);
     [[nodiscard]] RationalNumber operator/(const RationalNumber& other) const;
-    RationalNumber& operator^=(const NaturalNumber& other);
-    [[nodiscard]] RationalNumber operator^(const NaturalNumber& other) const;
-
-    protected:
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Orderable& other) const override;
+    RationalNumber& operator^=(const Integer& other);
+    [[nodiscard]] RationalNumber operator^(const Integer& other) const;
+    [[nodiscard]] virtual bool LessThanEqual(const RationalNumber& other) const override;
 
     private:
     Integer a;

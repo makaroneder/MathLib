@@ -5,7 +5,9 @@
 
 namespace MathLib {
     template <typename T>
-    struct Set : Collection<T>, Orderable {
+    struct Set;
+    template <typename T>
+    struct Set : Collection<T>, Orderable<Set<T>> {
         template <typename F>
         friend struct Set;
 
@@ -102,10 +104,7 @@ namespace MathLib {
                 if (other.data.Contains(x) && !ret.data.Add(x)) return Expected<Set<T>>();
             return Expected<Set<T>>(ret);
         }
-
-        protected:
-        [[nodiscard]] virtual bool LessThanEqual(const Orderable& other_) const override {
-            const Set<T>& other = (const Set<T>&)other_;
+        [[nodiscard]] virtual bool LessThanEqual(const Set<T>& other) const override {
             for (const T& x : data)
                 if (!other.Contains(x)) return false;
             return true;

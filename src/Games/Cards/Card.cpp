@@ -1,8 +1,8 @@
 #include "Card.hpp"
 
 Card::Card(Type type, Color color) : type(type), color(color), selected(false) {}
-bool Card::LessThanEqual(const MathLib::Orderable& other) const {
-    return type <= ((const Card&)other).type;
+bool Card::LessThanEqual(const MathLib::Card& other) const {
+    return type <= other.type;
 }
 MathLib::String Card::ToString(const MathLib::Sequence<char>& padding) const {
     MathLib::String ret = MathLib::CollectionToString(padding);

@@ -3,32 +3,30 @@
 #include "Comparable.hpp"
 
 namespace MathLib {
-    struct Orderable;
-    struct Orderable : Comparable<Orderable> {
-        [[nodiscard]] bool operator<=(const Orderable& other) const {
+    template <typename Self>
+    struct Orderable : Comparable<Self> {
+        [[nodiscard]] bool operator<=(const Self& other) const {
             return LessThanEqual(other);
         }
-        [[nodiscard]] bool operator>=(const Orderable& other) const {
-            return other.LessThanEqual(*this);
+        [[nodiscard]] bool operator>=(const Self& other) const {
+            return other.LessThanEqual((const Self&)*this);
         }
-        [[nodiscard]] bool operator<(const Orderable& other) const {
-            return LessThanEqual(other) && !other.LessThanEqual(*this);
+        [[nodiscard]] bool operator<(const Self& other) const {
+            return LessThanEqual(other) && !other.LessThanEqual((const Self&)*this);
         }
-        [[nodiscard]] bool operator>(const Orderable& other) const {
-            return other.LessThanEqual(*this) && !LessThanEqual(other);
+        [[nodiscard]] bool operator>(const Self& other) const {
+            return other.LessThanEqual((const Self&)*this) && !LessThanEqual(other);
         }
-        [[nodiscard]] bool operator!=(const Orderable& other) const {
-            return !LessThanEqual(other) || !other.LessThanEqual(*this);
+        [[nodiscard]] bool operator!=(const Self& other) const {
+            return !LessThanEqual(other) || !other.LessThanEqual((const Self&)*this);
         }
-        [[nodiscard]] bool Uncomparable(const Orderable& other) const {
-            return !LessThanEqual(other) && !other.LessThanEqual(*this);
+        [[nodiscard]] bool Uncomparable(const Self& other) const {
+            return !LessThanEqual(other) && !other.LessThanEqual((const Self&)*this);
         }
-
-        protected:
-        [[nodiscard]] virtual bool Equals(const Orderable& other) const override {
-            return LessThanEqual(other) && other.LessThanEqual(*this);
+        [[nodiscard]] virtual bool Equals(const Self& other) const override {
+            return LessThanEqual(other) && other.LessThanEqual((const Self&)*this);
         }
-        [[nodiscard]] virtual bool LessThanEqual(const Orderable& other) const = 0;
+        [[nodiscard]] virtual bool LessThanEqual(const Self& other) const = 0;
     };
 }
 

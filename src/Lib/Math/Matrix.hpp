@@ -337,8 +337,6 @@ namespace MathLib {
         [[nodiscard]] virtual Iterator<T> end(void) override {
             return ptr.end();
         }
-
-        protected:
         [[nodiscard]] virtual bool Equals(const Matrix<T>& other) const override {
             if (width != other.width || height != other.height) return false;
             for (size_t y = 0; y < height; y++)

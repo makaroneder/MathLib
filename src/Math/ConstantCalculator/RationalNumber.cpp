@@ -103,17 +103,17 @@ RationalNumber& RationalNumber::operator/=(const RationalNumber& other) {
 RationalNumber RationalNumber::operator/(const RationalNumber& other) const {
     return *this * other.Invert();
 }
-RationalNumber& RationalNumber::operator^=(const NaturalNumber& other) {
-    a ^= other;
-    b ^= other;
+RationalNumber& RationalNumber::operator^=(const Integer& other) {
+    a ^= other.natural;
+    b ^= other.natural;
+    if (!other.positive) MathLib::Swap<NaturalNumber>(a.natural, b);
     return *this = Simplify();
 }
-RationalNumber RationalNumber::operator^(const NaturalNumber& other) const {
+RationalNumber RationalNumber::operator^(const Integer& other) const {
     RationalNumber tmp = *this;
     tmp ^= other;
     return tmp;
 }
-bool RationalNumber::LessThanEqual(const MathLib::Orderable& other_) const {
-    const RationalNumber& other = (const RationalNumber&)other_;
+bool RationalNumber::LessThanEqual(const RationalNumber& other) const {
     return a * other.b <= other.a * b;
 }

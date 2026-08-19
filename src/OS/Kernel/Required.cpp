@@ -8,8 +8,6 @@ struct AtExitFunction : MathLib::Comparable<void*> {
 
     AtExitFunction(Function function = nullptr, void* arg = nullptr, void* dso = nullptr);
     void operator()(void);
-
-    protected:
     [[nodiscard]] virtual bool Equals(void* const& other) const override;
 };
 AtExitFunction atExitFunctions[128];

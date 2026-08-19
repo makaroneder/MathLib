@@ -1,21 +1,21 @@
 #define SDL_MAIN_HANDLED
-#include "STL/STL.hpp"
-#include "QuakeMDL/QuakeMDL.hpp"
 #include <Interfaces/Sequence/TransformSequence.hpp>
+#include <Geometry/Model/QuakeMDL/QuakeMDL.hpp>
 #include <Geometry/WavefrontObject.hpp>
+#include <Geometry/Model/STL/STL.hpp>
 #include <Libc/HostFileSystem.hpp>
 #include <CommandLine.hpp>
 #include <SDL2.cpp>
 #include <iostream>
 
 template <typename T>
-Model3D<T> WavefrontObjectToModel3D(const MathLib::WavefrontObject<T>& object) {
+MathLib::Model3D<T> WavefrontObjectToModel3D(const MathLib::WavefrontObject<T>& object) {
     const auto func = MathLib::MakeFunctionT<MathLib::Vector3<T>, size_t>([&object](size_t i) -> MathLib::Vector3<T> {
         return object.verticies.At(i) + object.position;
     });
     MathLib::Array<MathLib::Vector3<T>> ret;
     for (const MathLib::Array<size_t>& face : object.faces)
-        if (!ret.AddSequence(MathLib::TransformSequence<MathLib::Vector3<T>, size_t>(MathLib::PolygonToTriangles<T, size_t>(face, func), func))) return Model3D<T>();
+        if (!ret.AddSequence(MathLib::TransformSequence<MathLib::Vector3<T>, size_t>(MathLib::PolygonToTriangles<T, size_t>(face, func), func))) return MathLib::Model3D<T>();
     return ret;
 }
 int main(int argc, char** argv) {
@@ -27,14 +27,14 @@ int main(int argc, char** argv) {
         const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
         const MathLib::String inputType = cmdLine.GetEntry("inputType"_M).Get("No input type specified");
         const MathLib::String input = cmdLine.GetEntry("input"_M).Get("No input specified");
-        Model3D<MathLib::num_t> model;
+        MathLib::Model3D<MathLib::num_t> model;
         if (inputType == "STL") {
-            STL<MathLib::num_t> stl;
+            MathLib::STL<MathLib::num_t> stl;
             if (!stl.LoadFromPath(fs, input)) MathLib::Panic("Failed to load input file");
             model = stl;
         }
         else if (inputType == "QuakeMDL") {
-            QuakeMDL<MathLib::num_t> mdl;
+            MathLib::QuakeMDL<MathLib::num_t> mdl;
             if (!mdl.LoadFromPath(fs, input)) MathLib::Panic("Failed to load input file");
             model = mdl.At(0);
         }
@@ -45,7 +45,7 @@ int main(int argc, char** argv) {
         }
         else MathLib::Panic("Unknown input type");
         MathLib::matrix_t velocity = MathLib::matrix_t(3, 1);
-        const Triangle<MathLib::num_t> triangle = Triangle<MathLib::num_t>(
+        const MathLib::Triangle<MathLib::num_t> triangle = MathLib::Triangle<MathLib::num_t>(
             MathLib::vector3_t(0, 0, 0),
             MathLib::vector3_t(1, 1, 0),
             MathLib::vector3_t(1, 0, 0)

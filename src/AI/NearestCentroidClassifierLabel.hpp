@@ -27,8 +27,6 @@ struct NearestCentroidClassifierLabel : MathLib::Comparable<NearestCentroidClass
         ++elements;
         return true;
     }
-
-    protected:
     [[nodiscard]] virtual bool Equals(const NearestCentroidClassifierLabel<T>& other) const override {
         return elements == other.elements && sum == other.sum;
     }

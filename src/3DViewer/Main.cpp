@@ -1,6 +1,5 @@
 #define SDL_MAIN_HANDLED
 #include <Interfaces/Sequence/TransformSequence.hpp>
-#include <Geometry/Model/QuakeMDL/QuakeMDL.hpp>
 #include <Geometry/WavefrontObject.hpp>
 #include <Geometry/Model/STL/STL.hpp>
 #include <Libc/HostFileSystem.hpp>
@@ -32,11 +31,6 @@ int main(int argc, char** argv) {
             MathLib::STL<MathLib::num_t> stl;
             if (!stl.LoadFromPath(fs, input)) MathLib::Panic("Failed to load input file");
             model = stl;
-        }
-        else if (inputType == "QuakeMDL") {
-            MathLib::QuakeMDL<MathLib::num_t> mdl;
-            if (!mdl.LoadFromPath(fs, input)) MathLib::Panic("Failed to load input file");
-            model = mdl.At(0);
         }
         else if (inputType == "WavefrontObject") {
             MathLib::WavefrontObject<MathLib::num_t> obj;

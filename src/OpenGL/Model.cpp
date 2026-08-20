@@ -1,5 +1,4 @@
 #include "Model.hpp"
-#include "OpenGL.hpp"
 #include <Interfaces/Sequence/EmptySequence.hpp>
 
 template <typename T>
@@ -42,7 +41,7 @@ Model::~Model(void) {
 void Model::Bind(void) const {
     glBindVertexArray(vao);
 }
-void Model::Draw(void) const {
-    if (ebo) glDrawElements(GL_TRIANGLES, vertexCount, GL_UNSIGNED_INT, nullptr);
-    else glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+void Model::Draw(OpenGLType mode) const {
+    if (ebo) glDrawElements(mode, vertexCount, GL_UNSIGNED_INT, nullptr);
+    else glDrawArrays(mode, 0, vertexCount);
 }

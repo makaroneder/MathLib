@@ -48,3 +48,7 @@ template <>
 void GLSLProgram::SetUniform(const char* name, const Matrix4x4& value) {
     glUniformMatrix4fv(GetUniformLocation(name), 1, true, value.data); 
 }
+template <>
+void GLSLProgram::SetUniform(const char* name, const Vector4& value) {
+    glUniform4fv(GetUniformLocation(name), 1, value.data);
+}

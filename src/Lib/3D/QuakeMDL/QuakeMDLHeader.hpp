@@ -1,5 +1,5 @@
-#ifndef MathLib_Geometry_Model_QuakeMDL_Header_H
-#define MathLib_Geometry_Model_QuakeMDL_Header_H
+#ifndef MathLib_3D_QuakeMDL_Header_H
+#define MathLib_3D_QuakeMDL_Header_H
 #include "QuakeMDLVector.hpp"
 #include <stdint.h>
 

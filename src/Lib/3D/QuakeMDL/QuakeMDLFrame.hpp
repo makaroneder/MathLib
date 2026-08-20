@@ -1,5 +1,5 @@
-#ifndef MathLib_Geometry_Model_QuakeMDL_Frame_H
-#define MathLib_Geometry_Model_QuakeMDL_Frame_H
+#ifndef MathLib_3D_QuakeMDL_Frame_H
+#define MathLib_3D_QuakeMDL_Frame_H
 #include "QuakeMDLVertex.hpp"
 
 namespace MathLib {

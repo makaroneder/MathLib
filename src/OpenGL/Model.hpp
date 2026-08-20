@@ -1,5 +1,6 @@
 #ifndef Model_H
 #define Model_H
+#include "OpenGL.hpp"
 #include <Interfaces/Sequence/Collection.hpp>
 
 struct Model {
@@ -7,7 +8,7 @@ struct Model {
     Model(const MathLib::Collection<uint32_t>& faces, const MathLib::Collection<float>& vertices, const MathLib::Sequence<size_t>& attributes);
     ~Model(void);
     void Bind(void) const;
-    void Draw(void) const;
+    void Draw(OpenGLType mode) const;
 
     private:
     size_t vertexCount;

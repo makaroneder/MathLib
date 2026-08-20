@@ -17,8 +17,8 @@ int main(int, char**) {
         GLFWWindow window = glfw.MakeWindow("OpenGL", 800, 800);
         MathLib::HostFileSystem fs;
         GLSLProgram program = MathLib::MakeArray<size_t>(
-            MakeShader(fs.Open("src/OpenGL/Vertex.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), (gl::GLenum)GL_VERTEX_SHADER),
-            MakeShader(fs.Open("src/OpenGL/Fragment.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), (gl::GLenum)GL_FRAGMENT_SHADER)
+            MakeShader(fs.Open("src/OpenGL/Vertex.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), GL_VERTEX_SHADER),
+            MakeShader(fs.Open("src/OpenGL/Fragment.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), GL_FRAGMENT_SHADER)
         );
         const float vertices[] = {
             -0.5, -0.5, -0.5,   0, 1,

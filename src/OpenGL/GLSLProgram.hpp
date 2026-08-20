@@ -15,6 +15,6 @@ struct GLSLProgram {
 
     size_t program;
 };
-size_t MakeShader(const char* str, gl::GLenum type);
+size_t MakeShader(const char* str, OpenGLType type);
 
 #endif

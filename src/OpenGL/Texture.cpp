@@ -14,7 +14,7 @@ Texture::Texture(const MathLib::Image& image, size_t unit) : unit(unit) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.GetWidth(), image.GetHeight(), 0, GL_ABGR_EXT, GL_UNSIGNED_BYTE, image.pixels.GetPointer());
-    gl::glGenerateMipmap((gl::GLenum)GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D);
 }
 Texture::~Texture(void) {
     glDeleteTextures(1, &texture);

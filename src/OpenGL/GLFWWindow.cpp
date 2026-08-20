@@ -1,4 +1,5 @@
 #include "GLFWWindow.hpp"
+#include "OpenGL.hpp"
 #include <Typedefs.hpp>
 
 void OnGLFWWindowResize(GLFWwindow* window, int width, int height) {
@@ -6,7 +7,7 @@ void OnGLFWWindowResize(GLFWwindow* window, int width, int height) {
 }
 GLFWWindow::GLFWWindow(const char* title, int width, int height) : window(glfwCreateWindow(width, height, title, nullptr, nullptr)) {
     if (!window) MathLib::Panic("Failed to create GLFW window");
-    glfwMakeContextCurrent(window);
+    Bind();
     glfwSetWindowUserPointer(window, this);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(true);
@@ -14,11 +15,17 @@ GLFWWindow::GLFWWindow(const char* title, int width, int height) : window(glfwCr
     glfwSetFramebufferSizeCallback(window, &OnGLFWWindowResize);
     Resize(width, height);
 }
+void GLFWWindow::Bind(void) const {
+    glfwMakeContextCurrent(window);
+}
 bool GLFWWindow::IsRunning(void) const {
     return !glfwWindowShouldClose(window);
 }
 float GLFWWindow::GetAspectRatio(void) const {
-    return aspectRatio;
+    int width = 0;
+    int height = 0;
+    glfwGetFramebufferSize(window, &width, &height);
+    return (float)width / height;
 }
 void GLFWWindow::SwapBuffers(void) {
     glfwSwapBuffers(window);
@@ -29,5 +36,4 @@ void GLFWWindow::Clear(float r, float g, float b, float a) {
 }
 void GLFWWindow::Resize(int width, int height) {
     glViewport(0, 0, width, height);
-    aspectRatio = (float)width / height;
 }

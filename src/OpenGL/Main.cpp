@@ -11,9 +11,6 @@
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <iostream>
 
-Model GenerateQuakeMDLModel(const MathLib::QuakeMDL& quakeMDL, size_t frame) {
-    return Model(quakeMDL.faces.At(frame), quakeMDL.vertices.At(frame), MathLib::VariadicSequence<size_t, 3, 2>());
-}
 int main(int, char**) {
     try {
         GLFW glfw;
@@ -27,8 +24,20 @@ int main(int, char**) {
         MathLib::QuakeMDL quakeMDL;
         if (!quakeMDL.LoadFromPath(fs, "src/TestPrograms/OpenGL/Soldier.mdl"_M)) MathLib::Panic("Failed to load quake model");
 
-        Model model = GenerateQuakeMDLModel(quakeMDL, 13);
-        Texture texture = Texture(quakeMDL.textures.At(0), 0);
+        const size_t frame = 13;
+        MathLib::Array<float> vertexBuffer;
+        const size_t size = quakeMDL.frames.At(frame).meshes.At(0).vertices.GetSize();
+        vertexBuffer = size * 5;
+        for (size_t i = 0; i < size; i++) {
+            vertexBuffer.AtUnsafe(i * 5 + 0) = quakeMDL.frames.At(frame).meshes.At(0).vertices.AtUnsafe(i).position.x;
+            vertexBuffer.AtUnsafe(i * 5 + 1) = quakeMDL.frames.At(frame).meshes.At(0).vertices.AtUnsafe(i).position.y;
+            vertexBuffer.AtUnsafe(i * 5 + 2) = quakeMDL.frames.At(frame).meshes.At(0).vertices.AtUnsafe(i).position.z;
+
+            vertexBuffer.AtUnsafe(i * 5 + 3) = quakeMDL.frames.At(frame).meshes.At(0).vertices.AtUnsafe(i).texturePosition.x;
+            vertexBuffer.AtUnsafe(i * 5 + 4) = quakeMDL.frames.At(frame).meshes.At(0).vertices.AtUnsafe(i).texturePosition.y;
+        }
+        Model model = Model(quakeMDL.frames.At(frame).meshes.At(0).triangles, vertexBuffer, MathLib::VariadicSequence<size_t, 3, 2>());
+        Texture texture = Texture(quakeMDL.frames.At(frame).meshes.At(0).textures.At(0), 0);
 
         float prevTime = glfwGetTime();
         while (window.IsRunning()) {

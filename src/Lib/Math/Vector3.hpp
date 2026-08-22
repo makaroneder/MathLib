@@ -31,6 +31,12 @@ namespace MathLib {
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override {
             return CollectionToString(padding) + '[' + Formatter<T>::ToString(x) + ", " + Formatter<T>::ToString(y) + ", " + Formatter<T>::ToString(z) + ']';
         }
+        [[nodiscard]] bool IsNaN(void) const {
+            return MathLib::IsNaN(x) || MathLib::IsNaN(y) || MathLib::IsNaN(z);
+        }
+        [[nodiscard]] bool FloatsEqual(const Vector3<T>& other) const {
+            return MathLib::FloatsEqual<T>(x, other.x) && MathLib::FloatsEqual<T>(y, other.y) && MathLib::FloatsEqual<T>(z, other.z);
+        }
         [[nodiscard]] SingleTypePair<T> Project(void) const {
             T div = Abs(z);
             if (div < eps) div = eps;
@@ -43,11 +49,15 @@ namespace MathLib {
             return Sqrt(GetLengthSquared());
         }
         void Normalize(void) {
-            const num_t length = GetLength();
-            if (FloatsEqual<num_t>(length, 0)) return;
+            const T length = GetLength();
+            if (MathLib::FloatsEqual<T>(length, 0)) return;
             x /= length;
             y /= length;
             z /= length;
+        }
+        [[nodiscard]] Vector3<T> GetNormalized(void) const {
+            const T length = GetLength();
+            return MathLib::FloatsEqual<T>(length, 0) ? Vector3<T>() : Vector3<T>(x / length, y / length, z / length);
         }
         [[nodiscard]] T DotProduct(const Vector3& other) const {
             return x * other.x + y * other.y + z * other.z;

@@ -31,6 +31,15 @@ namespace MathLib {
         [[nodiscard]] virtual const T* GetValue(void) const override {
             return buffer.data();
         }
+        [[nodiscard]] bool Add(T&& val) {
+            buffer.push_back(val);
+            return true;
+        }
+        template<typename... Args>
+        [[nodiscard]] bool CreateAndAdd(Args&&... args) {
+            buffer.emplace_back(args...);
+            return true;
+        }
         [[nodiscard]] std::vector<T> ToVector(void) const {
             return buffer;
         }

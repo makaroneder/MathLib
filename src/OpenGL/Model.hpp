@@ -4,9 +4,14 @@
 #include <Interfaces/Sequence/Collection.hpp>
 
 struct Model {
+    Model(void);
     Model(const MathLib::Collection<float>& vertices, const MathLib::Sequence<size_t>& attributes);
     Model(const MathLib::Collection<uint32_t>& faces, const MathLib::Collection<float>& vertices, const MathLib::Sequence<size_t>& attributes);
+    Model(const Model& other) = delete;
+    Model(Model&& other);
     ~Model(void);
+    Model& operator=(const Model& other) = delete;
+    Model& operator=(Model&& other);
     void Bind(void) const;
     void Draw(OpenGLType mode) const;
 

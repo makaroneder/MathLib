@@ -7,6 +7,7 @@ void GenerateBuffer(uint32_t& buffer, OpenGLType type, const MathLib::Collection
     glBindBuffer(type, buffer);
     glBufferData(type, data.GetSize() * sizeof(T), data.GetValue(), GL_STATIC_DRAW);
 }
+Model::Model(void) : vertexCount(0), vao(0), vbo(0), ebo(0) {}
 Model::Model(const MathLib::Collection<float>& vertices, const MathLib::Sequence<size_t>& attributes) : Model(MathLib::EmptySequence<uint32_t>(), vertices, attributes) {}
 Model::Model(const MathLib::Collection<uint32_t>& faces, const MathLib::Collection<float>& vertices, const MathLib::Sequence<size_t>& attributes) {
     const size_t size = attributes.GetSize();
@@ -33,10 +34,23 @@ Model::Model(const MathLib::Collection<uint32_t>& faces, const MathLib::Collecti
         sum += tmp;
     }
 }
+Model::Model(Model&& other) : vao(other.vao), vbo(other.vbo), ebo(other.ebo) {
+    other.vao = other.vbo = other.ebo = 0;
+}
 Model::~Model(void) {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
+    if (vao) glDeleteVertexArrays(1, &vao);
+    if (vbo) glDeleteBuffers(1, &vbo);
     if (ebo) glDeleteBuffers(1, &ebo);
+}
+Model& Model::operator=(Model&& other) {
+    if (vao) glDeleteVertexArrays(1, &vao);
+    if (vbo) glDeleteBuffers(1, &vbo);
+    if (ebo) glDeleteBuffers(1, &ebo);
+    vao = other.vao;
+    vbo = other.vbo;
+    ebo = other.ebo;
+    other.vao = other.vbo = other.ebo = 0;
+    return *this;
 }
 void Model::Bind(void) const {
     glBindVertexArray(vao);

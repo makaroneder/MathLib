@@ -1,5 +1,6 @@
 #ifndef MathLib_3D_QuakeMDL_H
 #define MathLib_3D_QuakeMDL_H
+#include "../Model.hpp"
 #include "QuakeMDLFrame.hpp"
 #include "QuakeMDLHeader.hpp"
 #include "QuakeMDLTriangle.hpp"
@@ -12,9 +13,7 @@
 
 namespace MathLib {
     struct QuakeMDL : Saveable {
-        Array<Image> textures;
-        Array<Array<float>> vertices;
-        Array<Array<uint32_t>> faces;
+        Array<Model> frames;
 
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;

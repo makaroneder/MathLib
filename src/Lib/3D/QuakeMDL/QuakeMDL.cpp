@@ -11,6 +11,7 @@ namespace MathLib {
     [[nodiscard]] bool QuakeMDL::Load(Readable& file) {
         QuakeMDLHeader header;
         if (!file.Read<QuakeMDLHeader>(header) || !header.IsValid()) return false;
+        Array<Image> textures;
         for (uint64_t i = 0; i < header.textures; i++) {
             QuakeMDLSkinType type;
             if (!file.Read<QuakeMDLSkinType>(type)) return false;
@@ -53,39 +54,29 @@ namespace MathLib {
                 QuakeMDLVertex mdlVertices[header.vertices];
                 if (!file.ReadBuffer(mdlVertices, header.vertices * sizeof(QuakeMDLVertex))) return false;
                 Array<uint32_t> face = baseFace;
-                Array<float> verts = Array<float>(header.vertices * 5);
-                for (uint64_t k = 0; k < header.vertices; k++) {
-                    for (uint8_t l = 0; l < 3; l++)
-                        verts.AtUnsafe(k * 5 + l) = (float)mdlVertices[k].data[l] * header.scale.data[l] + header.translate.data[l];
-                    verts.AtUnsafe(k * 5 + 3) = MathLib::nan;
-                    verts.AtUnsafe(k * 5 + 4) = MathLib::nan;
-                }
+                Array<Vertex> verts = Array<Vertex>(header.vertices);
+                for (uint64_t k = 0; k < header.vertices; k++) verts.AtUnsafe(k) = Vertex(mdlVertices[k].ToVector3(header.scale, header.translate), mdlVertices[k].GetNormal(), Vector3<float>(nan, nan, 0));
                 for (uint64_t k = 0; k < header.triangles; k++) {
-                    uint32_t newFace[] = { UINT32_MAX, UINT32_MAX, UINT32_MAX, };
                     for (uint8_t l = 0; l < 3; l++) {
                         const uint32_t index = mdlTriangles[k].vertices[l];
+                        if (index >= header.vertices) return false;
                         float s = mdlTextureCoordinates[index].s;
                         if (!mdlTriangles[k].isFrontFace && mdlTextureCoordinates[index].isOnBoundary)
                             s += header.textureWidth * 0.5;
                         s = (s + 0.5) / header.textureWidth;
-                        const float t = ((float)mdlTextureCoordinates[index].t + 0.5) / header.textureHeight;
-                        if (MathLib::IsNaN(verts.At(index * 5 + 3))) {
-                            verts.At(index * 5 + 3) = s;
-                            verts.At(index * 5 + 4) = t;
+                        const Vector3<float> texturePosition = Vector3<float>(s, ((float)mdlTextureCoordinates[index].t + 0.5) / header.textureHeight, 0);
+                        if (verts.AtUnsafe(index).texturePosition.IsNaN()) {
+                            verts.AtUnsafe(index).texturePosition = texturePosition;
                             continue;
                         }
-                        if (MathLib::FloatsEqual<float>(verts.At(index * 5 + 3), s) && MathLib::FloatsEqual<float>(verts.At(index * 5 + 4), t)) continue;
-                        newFace[l] = verts.GetSize() / 5;
-                        for (uint8_t h = 0; h < 3; h++)
-                            if (!verts.Add(verts.At(index * 5 + h))) return false;
-                        if (!verts.Add(s)) return false;
-                        if (!verts.Add(t)) return false;
+                        if (verts.AtUnsafe(index).texturePosition.FloatsEqual(texturePosition)) continue;
+                        face.AtUnsafe(k * 3 + l) = verts.GetSize();
+                        if (!verts.Add(Vertex(verts.AtUnsafe(index).position, verts.AtUnsafe(index).normal, texturePosition))) return false;
                     }
-                    for (uint8_t l = 0; l < 3; l++)
-                        if (newFace[l] != UINT32_MAX) face.AtUnsafe(k * 3 + l) = newFace[l];
                 }
-                if (!vertices.Add(verts)) return false;
-                if (!faces.Add(face)) return false;
+                for (Vertex& vertex : verts)
+                    if (vertex.texturePosition.IsNaN()) vertex.texturePosition = Vector3<float>(0, 0, 0);
+                if (!frames.Add(Model(Mesh(face, verts, textures)))) return false;
             }
         }
         return true;

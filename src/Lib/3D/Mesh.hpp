@@ -18,6 +18,7 @@ namespace MathLib {
         Mesh(const Array<Array<uint32_t>>& polygons, const Array<uint32_t>& triangles, const Array<Vertex>& vertices, const Array<Image>& textures);
         [[nodiscard]] virtual bool Equals(const Mesh& other) const override;
         void Draw(Renderer& renderer, uint32_t color) const;
+        [[nodiscard]] Array<Vertex> ToTriangles(void) const;
     };
 }
 

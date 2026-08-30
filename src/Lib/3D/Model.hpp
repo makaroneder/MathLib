@@ -12,6 +12,7 @@ namespace MathLib {
         Model(const Array<Mesh>& meshes);
         [[nodiscard]] virtual bool Equals(const Model& other) const override;
         void Draw(Renderer& renderer, uint32_t color) const;
+        [[nodiscard]] Array<Vertex> ToTriangles(void) const;
     };
 }
 

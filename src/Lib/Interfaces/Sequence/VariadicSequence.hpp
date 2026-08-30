@@ -21,6 +21,10 @@ namespace MathLib {
             return GetVariadicElement<T>(index, data...);
         }
     };
+    template <char... data>
+    [[nodiscard]] constexpr VariadicSequence<char, data...> operator""_VS(void) {
+        return VariadicSequence<char, data...>();
+    }
 }
 
 #endif

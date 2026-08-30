@@ -32,4 +32,35 @@ namespace MathLib {
                 renderer.DrawLine<float>(MathLib::Line<float>(vertices.At(i + j).position.ToMatrix(), vertices.At(i + (j + 1) % polygon).position.ToMatrix()), color);
         }
     }
+    Array<Vertex> Mesh::ToTriangles(void) const {
+        if (!polygon) {
+            // TODO: Triangulate polygons
+            const size_t size = triangles.GetSize();
+            Array<Vertex> ret = size;
+            for (size_t i = 0; i < size; i++)
+                ret.AtUnsafe(i) = vertices.At(triangles.AtUnsafe(i));
+            return ret;
+        }
+        if (polygon == 1) {
+            const size_t size = vertices.GetSize();
+            Array<Vertex> ret = size * 3;
+            for (size_t i = 0; i < size; i++)
+                for (uint8_t j = 0; j < 3; j++)
+                    ret.AtUnsafe(i * 3 + j) = vertices.AtUnsafe(i);
+            return ret;
+        }
+        if (polygon == 2) {
+            const size_t size = vertices.GetSize() / 2;
+            Array<Vertex> ret = size * 3;
+            for (size_t i = 0; i < size; i++) {
+                ret.AtUnsafe(i * 3 + 0) = vertices.AtUnsafe(i * 2 + 0);
+                ret.AtUnsafe(i * 3 + 1) = vertices.AtUnsafe(i * 2 + 0);
+                ret.AtUnsafe(i * 3 + 2) = vertices.AtUnsafe(i * 2 + 1);
+            }
+            return ret;
+        }
+        if (polygon == 3) return vertices;
+        // TODO: Triangulate polygons
+        return Array<Vertex>();
+    }
 }

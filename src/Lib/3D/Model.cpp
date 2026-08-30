@@ -10,4 +10,9 @@ namespace MathLib {
     void Model::Draw(Renderer& renderer, uint32_t color) const {
         for (const Mesh& mesh : meshes) mesh.Draw(renderer, color);
     }
+    Array<Vertex> Model::ToTriangles(void) const {
+        Array<Vertex> ret;
+        for (const Mesh& mesh : meshes) ret += mesh.ToTriangles();
+        return ret;
+    }
 }

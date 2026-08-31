@@ -62,15 +62,73 @@ MathLib::String Scope::TermToStringInternal(const Term& term, bool root) const {
         default: return "";
     }
 }
-Term* Scope::ApplyAxiom(const Term& term, const Term& axiom) const {
-    // TODO: Evaluate axioms
-    if (axiom.type != Term::Type::Symbol) return nullptr;
-    for (const Term* const& tmp : axioms) {
-        if (tmp->type != Term::Type::TypeDeclaration) continue;
-        if (tmp->left->value != axiom.value) continue;
-        return term.ApplyEquivalence(*tmp->right);
+Term* Scope::GetTypeOfSymbol(const Term& term) const {
+    for (const Term* const& axiom : axioms) {
+        if (axiom->type != Term::Type::TypeDeclaration || !axiom->left->Equals(term)) continue;
+        return axiom->right->Copy();
     }
+    const size_t size = symbols.GetSize();
+    if (term.value >= size && parent) return parent->GetTypeOfSymbol(Term(Term::Type::Symbol, term.value - size));
     return nullptr;
+}
+Term* Scope::GetTypeOf(const Term& term, const MathLib::Sequence<const Term*>& variableTypes) const {
+    const size_t size = variableTypes.GetSize();
+    switch (term.type) {
+        case Term::Type::Symbol: return GetTypeOfSymbol(term);
+        case Term::Type::Variable: return term.value < size ? variableTypes.AtUnsafe(term.value)->Copy() : nullptr;
+        case Term::Type::Abstraction: {
+            MathLib::Array<const Term*> newVariableTypes = size + 1;
+            newVariableTypes.AtUnsafe(0) = term.left;
+            for (size_t i = 0; i < size; i++) newVariableTypes.AtUnsafe(i + 1) = variableTypes.AtUnsafe(i);
+            Term* const ret = GetTypeOf(*term.right, newVariableTypes);
+            if (!ret) return nullptr;
+            Term* const tmp = term.left->Copy();
+            if (!tmp) return nullptr;
+            return new Term(Term::Type::Abstraction, tmp, ret);
+        }
+        case Term::Type::Application: {
+            Term* left = GetTypeOf(*term.left, variableTypes);
+            if (!left) return nullptr;
+            if (left->type != Term::Type::Abstraction) {
+                delete left;
+                return nullptr;
+            }
+            Term* const right = GetTypeOf(*term.right, variableTypes);
+            if (!right) {
+                delete left;
+                return nullptr;
+            }
+            if (!left->left->Equals(*right)) {
+                delete left;
+                delete right;
+                return nullptr;
+            }
+            delete right;
+            Term* const ret = left->right;
+            left->right = nullptr;
+            delete left;
+            return ret;
+        }
+        case Term::Type::Equivalence:
+        case Term::Type::TypeDeclaration: {
+            Term* const left = GetTypeOf(*term.left, variableTypes);
+            if (!left) return nullptr;
+            Term* const right = GetTypeOf(*term.right, variableTypes);
+            if (!right) {
+                delete left;
+                return nullptr;
+            }
+            return new Term(term.type, left, right);
+        }
+        default: return nullptr;
+    }
+}
+Term* Scope::ApplyAxiom(const Term& term, const Term& axiom) const {
+    const Term* const equivalence = GetTypeOf(axiom, MathLib::Array<const Term*>());
+    if (!equivalence || equivalence->type != Term::Type::Equivalence) return nullptr;
+    Term* const ret = term.ApplyEquivalence(*equivalence);
+    delete equivalence;
+    return ret;
 }
 bool Scope::AddAxiom(Term* axiom) {
     return axioms.Add(axiom);

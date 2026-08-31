@@ -15,6 +15,9 @@ GLFWWindow::GLFWWindow(const char* title, int width, int height) : window(glfwCr
     glfwSetFramebufferSizeCallback(window, &OnGLFWWindowResize);
     Resize(width, height);
 }
+GLFWWindow::~GLFWWindow(void) {
+    glfwDestroyWindow(window);
+}
 void GLFWWindow::Bind(void) const {
     glfwMakeContextCurrent(window);
 }

@@ -6,6 +6,7 @@
 struct GLFW;
 struct GLFWWindow {
     friend GLFW;
+    ~GLFWWindow(void);
     void Bind(void) const;
     [[nodiscard]] bool IsRunning(void) const;
     [[nodiscard]] float GetAspectRatio(void) const;

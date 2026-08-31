@@ -15,12 +15,13 @@ struct Scope : MathLib::Printable {
     [[nodiscard]] size_t StringToSymbol(const MathLib::String& string) const;
     [[nodiscard]] MathLib::String SymbolToString(size_t symbol) const;
     [[nodiscard]] MathLib::String TermToString(const Term& term) const;
+    [[nodiscard]] Term* GetTypeOf(const Term& term, const MathLib::Sequence<const Term*>& variableTypes) const;
     [[nodiscard]] Term* ApplyAxiom(const Term& term, const Term& axiom) const;
-    [[nodiscard]] Term* ApplyAxiom(const Term* term, const Term& axiom) const;
     [[nodiscard]] bool AddAxiom(Term* axiom);
 
     private:
     [[nodiscard]] MathLib::String TermToStringInternal(const Term& term, bool root) const;
+    [[nodiscard]] Term* GetTypeOfSymbol(const Term& term) const;
 
     MathLib::Array<Term*> axioms;
     MathLib::Array<MathLib::String> symbols;

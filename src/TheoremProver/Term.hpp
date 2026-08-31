@@ -31,10 +31,9 @@ struct Term : MathLib::Comparable<Term> {
     [[nodiscard]] virtual bool Equals(const Term& other) const override;
     [[nodiscard]] size_t GetComplexity(void) const;
     [[nodiscard]] Term* Copy(void) const;
-    [[nodiscard]] bool Match(const Term& other, MathLib::Dictionary<size_t, Term*>& variables, size_t depth) const;
-    [[nodiscard]] Term* Substitute(const MathLib::Dictionary<size_t, Term*>& variables, size_t depth) const;
     [[nodiscard]] Term* ApplyEquivalence(const Term& other) const;
     [[nodiscard]] Term* Update(const MathLib::Function<Term*, const Term&>& func, bool applyToLeft) const;
+    [[nodiscard]] Term* IncrementVariables(size_t inc) const;
 };
 
 #endif

@@ -46,49 +46,17 @@ size_t Term::GetComplexity(void) const {
 Term* Term::Copy(void) const {
     return new Term(type, value, left ? left->Copy() : nullptr, right ? right->Copy() : nullptr);
 }
-bool Term::Match(const Term& other, MathLib::Dictionary<size_t, Term*>& variables, size_t depth) const {
-    if (type == Type::Variable && value >= depth) {
-        const size_t index = value - depth;
-        const MathLib::Expected<Term*> tmp = variables.Get(index);
-        return tmp.HasValue() ? tmp.Get()->Equals(other) : variables.Add(index, other.Copy());
-    }
-    if (type != other.type) return false;
-    if (type == Type::Symbol && value != other.value) return false;
-    if ((left && !other.left) || (!left && other.left)) return false;
-    if ((right && !other.right) || (!right && other.right)) return false;
-    if (left && !left->Match(*other.left, variables, depth)) return false;
-    if (right && !right->Match(*other.right, variables, depth + (type == Type::Abstraction))) return false;
-    return true;
-}
-Term* Term::Substitute(const MathLib::Dictionary<size_t, Term*>& variables, size_t depth) const {
-    if (type == Type::Variable && value >= depth) {
-        const MathLib::Expected<Term*> tmp = variables.Get(value - depth);
-        if (tmp.HasValue()) return tmp.Get()->Copy();
-    }
-    return new Term(type, value, left ? left->Substitute(variables, depth) : nullptr, right ? right->Substitute(variables, depth + (type == Type::Abstraction)) : nullptr);
-}
 Term* Term::ApplyEquivalence(const Term& other) const {
     if (other.type != Type::Equivalence) return nullptr;
-    MathLib::Dictionary<size_t, Term*> variables;
-    Term* newValue = nullptr;
-    if (other.left->Match(*this, variables, 0)) newValue = other.right;
-    else {
-        variables.Map(MathLib::MakeFunctionT<Term*, Term*>([](Term* term) -> Term* {
-            if (term) delete term;
-            return nullptr;
-        }));
-        variables = MathLib::Dictionary<size_t, Term*>();
-        if (other.right->Match(*this, variables, 0)) newValue = other.left;
-        else return nullptr;
-    }
-    Term* const ret = newValue->Substitute(variables, 0);
-    variables.Map(MathLib::MakeFunctionT<Term*, Term*>([](Term* term) -> Term* {
-        if (term) delete term;
-        return nullptr;
-    }));
-    return ret;
+    if (Equals(*other.left)) return other.right->Copy();
+    if (Equals(*other.right)) return other.left->Copy();
+    return nullptr;
 }
 Term* Term::Update(const MathLib::Function<Term*, const Term&>& func, bool applyToLeft) const {
     if (applyToLeft) return left ? new Term(type, value, func(*left), right->Copy()) : nullptr;
     return right ? new Term(type, value, left->Copy(), func(*right)) : nullptr;
+}
+Term* Term::IncrementVariables(size_t inc) const {
+    if (type == Type::Variable) return new Term(type, value + inc);
+    return new Term(type, value, left ? left->IncrementVariables(inc) : nullptr, right ? right->IncrementVariables(inc) : nullptr);
 }

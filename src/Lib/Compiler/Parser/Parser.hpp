@@ -6,6 +6,7 @@ namespace MathLib {
     struct Parser : Allocatable {
         Parser(const Sequence<ParserLayer*>& layers);
         virtual ~Parser(void) override;
+        [[nodiscard]] bool CanParse(void) const;
         void LoadInput(const Sequence<Token>& input);
         [[nodiscard]] ParserNode Parse(void);
 

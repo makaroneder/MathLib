@@ -69,6 +69,7 @@ DefaultTarget("AI.out", "AI", "", "AI", "", "")
 DefaultTarget("TerrainGenerator.out", "TerrainGenerator", "-l SDL2", "TerrainGen", "", "")
 DefaultTarget("OpenGL.out", "OpenGL", "-l GL -l glfw -l glbinding", "OpenGL", "", "")
 DefaultTarget("TheoremProver.out", "TheoremProver", "", "TheoremProver", "", "")
+DefaultTarget("Compiler.out", "Compiler", "", "Compiler", "", "")
 
 DeclareTarget("$(BUILDDIR)/Main.aml", "$(SRCDIR)/TestPrograms/ACPI/Main.asl $(SCRIPTSDIR)/CompileASL.py", "$(PYTHON) Scripts/CompileASL.py $< $@ $(ASLFLAGS)", false)
 DeclareTarget("$(BUILDDIR)/X86.bin", "$(SRCDIR)/TestPrograms/X86/Program.asm", "$(AS) -f bin $< -o $@", false)

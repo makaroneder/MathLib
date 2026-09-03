@@ -6,6 +6,9 @@ namespace MathLib {
     Parser::~Parser(void) {
         for (ParserLayer*& layer : layers) delete layer;
     }
+    bool Parser::CanParse(void) const {
+        return i < tokens.GetSize();
+    }
     void Parser::LoadInput(const Sequence<Token>& input) {
         tokens = CollectionToArray<Token>(input);
         i = 0;

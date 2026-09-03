@@ -10,6 +10,7 @@ namespace MathLib {
         void LoadInput(const Sequence<char>& input);
         Array<Token> Lex(const Sequence<char>& input);
         [[nodiscard]] ParserNode GetNode(void) const;
+        [[nodiscard]] bool CanParse(void) const;
 
         private:
         Lexer* lexer;

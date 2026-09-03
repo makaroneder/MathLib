@@ -1,0 +1,3 @@
+func bool Main(const uint64 argc) {
+    return true;
+};

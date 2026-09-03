@@ -16,4 +16,7 @@ namespace MathLib {
     ParserNode Toolchain::GetNode(void) const {
         return optimizer(parser->Parse());
     }
+    bool Toolchain::CanParse(void) const {
+        return parser->CanParse();
+    }
 }

@@ -40,6 +40,53 @@ MathLib::String NodeToString(const MathLib::ParserNode& node) {
     }
     return ret;
 }
+MathLib::String CompileSingle(const MathLib::ParserNode& node) {
+    switch ((TokenType)node.GetType()) {
+        case TokenType::Identifier: {
+            if (node.GetData() == "true") return "1";
+            if (node.GetData() == "false") return "0";
+            std::cout << "Unknown identifier" << std::endl;
+            std::cout << NodeToString(node) << std::endl;
+            return "";
+        }
+        case TokenType::Return: return "\tmov rax, "_M + CompileSingle(node.At(0)) + "\n\tret";
+        default: {
+            std::cout << "Unknown node" << std::endl;
+            std::cout << NodeToString(node) << std::endl;
+            return "";
+        }
+    }
+}
+MathLib::String CompileScope(const MathLib::ParserNode& node) {
+    if (node.GetType() != (size_t)TokenType::Scope) {
+        std::cout << "Expected scope" << std::endl;
+        std::cout << NodeToString(node) << std::endl;
+        return "";
+    }
+    MathLib::String ret;
+    for (const MathLib::ParserNode& child : node) ret += CompileSingle(child) + '\n';
+    return ret;
+}
+MathLib::String Compile(const MathLib::ParserNode& node) {
+    MathLib::String ret = "bits 64\nsection .text\n\n";
+    for (const MathLib::ParserNode& child : node) {
+        if (child.GetType() != (size_t)TokenType::Function) {
+            std::cout << "Only functions are allowed in global scope" << std::endl;
+            std::cout << NodeToString(child) << std::endl;
+            return "";
+        }
+        ret += "global "_M + child.GetData() + '\n';
+        ret += child.GetData() + ":\n";
+        const MathLib::String tmp = CompileScope(child.At(2));
+        if (tmp.IsEmpty()) {
+            std::cout << "Failed to compile function" << std::endl;
+            std::cout << NodeToString(child) << std::endl;
+            return "";
+        }
+        ret += tmp + '\n';
+    }
+    return ret + "global _start\n_start:\n\tcall Main\n\txor rdi, rdi\n\ttest rax, rax\n\tsete dil\n\tmov rax, 60\n\tsyscall";
+}
 int main(int, char**) {
     try {
         const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
@@ -65,7 +112,9 @@ int main(int, char**) {
         );
         MathLib::HostFileSystem fs;
         toolchain.LoadInput('{'_M + fs.Open("src/TestPrograms/Compiler/Main.txt"_M, MathLib::OpenMode::Read).ReadUntil('\0') + '}');
-        std::cout << NodeToString(toolchain.GetNode()) << std::endl;
+        const MathLib::ParserNode node = toolchain.GetNode();
+        std::cout << NodeToString(node) << std::endl;
+        if (!fs.Open("bin/Out.asm"_M, MathLib::OpenMode::Write).Puts(Compile(node))) MathLib::Panic("Failed to save compiled program");
         return EXIT_SUCCESS;
     }
     catch (const std::exception& ex) {

@@ -1,7 +1,7 @@
 #ifndef Shell_H
 #define Shell_H
-#include <MainData.h>
+#include <ModuleEntryData.hpp>
 
-void ShellTask(const MainData*);
+void ShellTask(const ModuleEntryData*);
 
 #endif

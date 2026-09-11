@@ -1,13 +1,13 @@
 #ifndef Arch_H
 #define Arch_H
+#include <ModuleEntryData.hpp>
 #include <Typedefs.hpp>
-#include <MainData.h>
 
 [[nodiscard]] bool InitArch(uintptr_t signature, void* info);
 [[noreturn]] void ArchPanic(void);
 [[noreturn]] void ShutdownArch(void);
 void ArchSetInterrupts(bool value);
-[[nodiscard]] size_t ArchAddTask(uintptr_t address, const MainData* data);
+[[nodiscard]] size_t ArchAddTask(uintptr_t address, const ModuleEntryData* data);
 [[nodiscard]] bool ArchRemoveTask(size_t task);
 [[nodiscard]] size_t ArchGetCurrentTask(void);
 [[nodiscard]] MathLib::num_t ArchSqrt(MathLib::num_t x);

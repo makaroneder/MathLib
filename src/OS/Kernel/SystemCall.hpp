@@ -1,8 +1,7 @@
 #ifndef SystemCall_H
 #define SystemCall_H
-#include <SystemCalls.h>
-#include <stdint.h>
+#include <SystemCalls.hpp>
 
-[[nodiscard]] uint64_t OnSystemCall(SystemCall num, void* args);
+[[nodiscard]] uint64_t OnSystemCall(SystemCall systemCall, void* args);
 
 #endif

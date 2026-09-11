@@ -35,7 +35,7 @@ namespace MathLib {
             buffer.push_back(val);
             return true;
         }
-        template<typename... Args>
+        template <typename... Args>
         [[nodiscard]] bool CreateAndAdd(Args&&... args) {
             buffer.emplace_back(args...);
             return true;

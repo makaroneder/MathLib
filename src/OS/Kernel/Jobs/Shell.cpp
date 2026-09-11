@@ -6,7 +6,7 @@
 #include "../DateKeeper.hpp"
 #include "../KernelRenderer.hpp"
 
-void ShellTask(const MainData*) {
+void ShellTask(const ModuleEntryData*) {
     MathLib::String command = "";
     if (!textUI->Clear() || !textUI->Puts("> ")) MathLib::Panic("Shell error");
     // TODO: Split output of commands so we can read it if it's too long

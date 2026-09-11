@@ -64,7 +64,7 @@ bool InitDisk(MathLib::ByteDevice* disk, const MathLib::Sequence<char>& diskName
     LogString("No file system found on disk "_M + diskName + '\n');
     return true;
 }
-void IdleTask(const MainData*) {
+void IdleTask(const ModuleEntryData*) {
     while (true) {}
 }
 bool constructorsCalled = false;

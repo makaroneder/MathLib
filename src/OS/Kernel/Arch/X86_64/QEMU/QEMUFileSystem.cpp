@@ -12,12 +12,10 @@ void QEMUFileSystem::Read(void* buffer, size_t size) const {
     for (size_t i = 0; i < size; i++) buff[i] = ReadPort<uint8_t>((uint16_t)IOOffset::Data);
 }
 bool QEMUFileSystem::IsValid(void) const {
-    char buff[4];
+    uint32_t signature;
     SetSelector(QEMUSelector::Signature);
-    Read(buff, SizeOfArray(buff));
-    for (uint8_t i = 0; i < SizeOfArray(buff); i++)
-        if (buff[i] != expectedSignature[i]) return false;
-    return true;
+    Read(&signature, sizeof(uint32_t));
+    return signature == *(const uint32_t*)expectedSignature;
 }
 bool QEMUFileSystem::Foreach(const MathLib::Function<bool, QEMUFileEntry>& function) {
     uint32_t entries = 0;

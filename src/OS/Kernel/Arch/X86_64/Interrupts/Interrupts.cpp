@@ -30,8 +30,8 @@
 #include "PIC8259.hpp"
 #include "Cascade.hpp"
 #include "../CPU.hpp"
-#include <MainData.h>
 #include <Host.hpp>
+#include <ModuleEntryData.hpp>
 
 bool initialized = false;
 size_t interruptDisabledCount = 1;
@@ -75,7 +75,7 @@ struct Task {
         Dead,
     };
     Task(void);
-    Task(uintptr_t address, const MainData* data);
+    Task(uintptr_t address, const ModuleEntryData* data);
     ~Task(void);
     [[nodiscard]] bool Save(const Registers& base);
     [[nodiscard]] bool Load(Registers& base);
@@ -91,7 +91,7 @@ struct Task {
     State state;
 };
 Task::Task(void) : regs(), stack(nullptr), state() {}
-Task::Task(uintptr_t address, const MainData* data) : regs(), stack(new uint8_t[stackSize + 15]), state(State::Init) {
+Task::Task(uintptr_t address, const ModuleEntryData* data) : regs(), stack(new uint8_t[stackSize + 15]), state(State::Init) {
     regs.ip = address;
     regs.di = (uintptr_t)data;
     regs.ksp = ((uintptr_t)stack + stackSize) / 16 * 16;
@@ -158,7 +158,7 @@ void ArchSetInterrupts(bool value) {
 MathLib::Array<Task*> tasks;
 size_t task = 0;
 
-size_t ArchAddTask(uintptr_t address, const MainData* data) {
+size_t ArchAddTask(uintptr_t address, const ModuleEntryData* data) {
     ArchSetInterrupts(false);
     const size_t size = tasks.GetSize();
     Task* task = new Task(address, data);

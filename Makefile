@@ -96,10 +96,9 @@ AESTESTSPATH ?= $(SRCDIR)/TestPrograms/AES
 ASLPATH ?= $(SRCDIR)/TestPrograms/ACPI/OS.asl
 OSROOT ?= $(SRCDIR)/TestPrograms/OS
 OSSYSROOT ?= $(BUILDDIR)/SystemRoot
-OSCXX = x86_64-makaron-g++
-OSAR = x86_64-makaron-ar
-OSCXXFLAGS = $(CXXFLAGS) -I $(SRCDIR)/OS/Shared  -I $(SRCDIR)/OS/Kernel -DFreestanding -ffreestanding -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer -fstack-protector-all
-OSCXXUSERFLAGS = $(CXXFLAGS) -I $(SRCDIR)/OS/Shared -I $(SRCDIR)/OS/Libc -pie -fPIE
+OSCXX = x86_64-elf-g++
+OSAR = x86_64-elf-ar
+OSCXXFLAGS = $(CXXFLAGS) -I $(SRCDIR)/OS/Shared -I $(SRCDIR)/OS/Kernel -DFreestanding -ffreestanding -fstack-protector-all -mcmodel=large -mno-red-zone -fno-exceptions -fno-rtti -fno-omit-frame-pointer
 OSLINKER = $(SRCDIR)/OS/Kernel/Linker.ld
 OSLDFLAGS = $(OSCXXFLAGS) -Bsymbolic -nostdlib
 OSQEMUCMD = qemu-system-x86_64 -usb -smp 1 -M q35 -m 4096M -rtc base=localtime -boot d \

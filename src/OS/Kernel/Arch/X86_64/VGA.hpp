@@ -4,7 +4,7 @@
 #include "../../TextUI.hpp"
 
 struct VGA : TextUI {
-    enum class Color {
+    enum class Color : uint8_t {
         Black = 0,
         Blue,
         Green,

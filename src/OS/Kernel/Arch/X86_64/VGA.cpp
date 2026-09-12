@@ -41,24 +41,22 @@ size_t VGA::WriteSizedBuffer(const void* buffer, size_t size) {
                 break;
             }
             default: {
-                if (pos < GetSize()) {
-                    this->buffer[offset] = buff8[i];
-                    this->buffer[offset + 1] = ((uint8_t)ToVGAColor(bgColor) << 4) | (uint8_t)ToVGAColor(fgColor);
-                    position.first++;
-                }
+                if (pos >= GetSize()) break;
+                this->buffer[offset] = buff8[i];
+                this->buffer[offset + 1] = ((uint8_t)ToVGAColor(bgColor) << 4) | (uint8_t)ToVGAColor(fgColor);
+                position.first++;
             }
         }
         if (position.first >= width) {
             position.first = 0;
             position.second++;
         }
-        if (position.second >= height) {
-            const size_t diff = position.second - height + 1;
-            for (size_t y = diff; y < height; y++)
-                MathLib::MemoryCopy(&this->buffer[y * width * 2], &this->buffer[(y - diff) * width * 2], width * 2);
-            for (size_t x = 0; x < width; x++) this->buffer[((height - diff) * width + x) * 2] = ' ';
-            position.second -= diff;
-        }
+        if (position.second < height) continue;
+        const size_t diff = position.second - height + 1;
+        for (size_t y = diff; y < height; y++)
+            MathLib::MemoryCopy(&this->buffer[y * width * 2], &this->buffer[(y - diff) * width * 2], width * 2);
+        for (size_t x = 0; x < width; x++) this->buffer[((height - diff) * width + x) * 2] = ' ';
+        position.second -= diff;
     }
     SetPosition(position);
     return size;

@@ -1,7 +1,6 @@
 #include <EquationSolver/Preprocesor.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <EquationSolver/Optimizer.hpp>
-#include <Libc/HostFileSystem.hpp>
 #include <Math/Exponential.hpp>
 #include <String.hpp>
 #include <Host.hpp>
@@ -221,43 +220,35 @@ template <typename T>
         default: return MathLib::Expected<Polynomial<T>>();
     }
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
-        MathLib::HostFileSystem fs;
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
-        #ifdef Debug
-        std::cout << "Generated nodes:\n" << *root << std::endl;
-        #endif
-        MathLib::Optimizer optimizer = MathLib::Optimizer();
-        MathLib::Node* optimizedRoot = optimizer.Optimize(root);
-        delete root;
-        #ifdef Debug
-        std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
-        #endif
-        delete optimizedRoot;
-        optimizer.runtime = true;
-        const Polynomial<MathLib::num_t> w = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('w'_M).body).Get("Failed to read polynomials from file");
-        const Polynomial<MathLib::num_t> q = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('q'_M).body).Get("Failed to read polynomials from file");
-        optimizer.Destroy();
-        std::cout << "W(x) = " << w << '\n';
-        std::cout << "Q(x) = " << q << '\n';
-        std::cout << "W(x) + Q(x) = " << w + q << '\n';
-        std::cout << "W(x) - Q(x) = " << w - q << '\n';
-        std::cout << "W(x) * Q(x) = " << w * q << '\n';
-        std::cout << "W(x) / Q(x) = " << w / q << '\n';
-        std::cout << "W(x) % Q(x) = " << w % q << '\n';
-        std::cout << "W(Q(x)) = " << w.Composition(q).Get("Failed to compose 2 polynomials") << '\n';
-        std::cout << "W'(x) = " << w.Derivative() << '\n';
-        std::cout << "integral(W(x) dx) = " << w.AntiDerivative(0) << " + C\n";
-        const MathLib::Array<MathLib::complex_t> tmp = w.Solve<MathLib::complex_t>();
-        std::cout << "W(x) = 0 for x = {\n";
-        for (const MathLib::complex_t& x : tmp) std::cout << '\t' << x << '\n';
-        std::cout << '}' << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+    MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
+    #ifdef Debug
+    std::cout << "Generated nodes:\n" << *root << std::endl;
+    #endif
+    MathLib::Optimizer optimizer = MathLib::Optimizer();
+    MathLib::Node* optimizedRoot = optimizer.Optimize(root);
+    delete root;
+    #ifdef Debug
+    std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
+    #endif
+    delete optimizedRoot;
+    optimizer.runtime = true;
+    const Polynomial<MathLib::num_t> w = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('w'_M).body).Get("Failed to read polynomials from file");
+    const Polynomial<MathLib::num_t> q = SplitPolynomial<MathLib::num_t>(optimizer.GetFunction('q'_M).body).Get("Failed to read polynomials from file");
+    optimizer.Destroy();
+    std::cout << "W(x) = " << w << '\n';
+    std::cout << "Q(x) = " << q << '\n';
+    std::cout << "W(x) + Q(x) = " << w + q << '\n';
+    std::cout << "W(x) - Q(x) = " << w - q << '\n';
+    std::cout << "W(x) * Q(x) = " << w * q << '\n';
+    std::cout << "W(x) / Q(x) = " << w / q << '\n';
+    std::cout << "W(x) % Q(x) = " << w % q << '\n';
+    std::cout << "W(Q(x)) = " << w.Composition(q).Get("Failed to compose 2 polynomials") << '\n';
+    std::cout << "W'(x) = " << w.Derivative() << '\n';
+    std::cout << "integral(W(x) dx) = " << w.AntiDerivative(0) << " + C\n";
+    const MathLib::Array<MathLib::complex_t> tmp = w.Solve<MathLib::complex_t>();
+    std::cout << "W(x) = 0 for x = {\n";
+    for (const MathLib::complex_t& x : tmp) std::cout << '\t' << x << '\n';
+    std::cout << '}' << std::endl;
 }

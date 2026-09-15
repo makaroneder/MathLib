@@ -8,7 +8,7 @@
 #include <Compiler/Parser/KeywordParserLayer.hpp>
 #include <Compiler/Lexer/StringMatchLexerRule.hpp>
 #include <Interfaces/IdentityFunction.hpp>
-#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <FunctionT.hpp>
 #include <iostream>
@@ -203,50 +203,42 @@ bool Prove(const MathLib::ParserNode& node) {
     MathLib::Array<MathLib::ParserNode> bindings;
     return ProveInternal(node, bindings).GetType() != SIZE_MAX;
 }
-int main(int argc, char** argv) {
-    try {
-        // TODO: leftAlternativity + flexibility => rightAlternativity (replace leftAlternativityAndCommutativityImpliesRightAlternativity)
-        // TODO: rightAlternativity + flexibility => leftAlternativity (replace rightAlternativityAndCommutativityImpliesLeftAlternativity)
-        // TODO: leftAlternativity + rightAlternativity => flexibility (replace associativityImpliesFlexibility)
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    // TODO: leftAlternativity + flexibility => rightAlternativity (replace leftAlternativityAndCommutativityImpliesRightAlternativity)
+    // TODO: rightAlternativity + flexibility => leftAlternativity (replace rightAlternativityAndCommutativityImpliesLeftAlternativity)
+    // TODO: leftAlternativity + rightAlternativity => flexibility (replace associativityImpliesFlexibility)
 
-        // TODO: leftBolIdentity a * (b * (a * c)) == (a * (b * a)) * c
-        // TODO: rightBolIdentity ((c * a) * b) * a == c * ((a * b) * a)
-        // TODO: associativity => leftBolIdentity
-        // TODO: associativity => rightBolIdentity
-        // TODO: leftBolIdentity => leftAlternativity
-        // TODO: rightBolIdentity => rightAlternativity
-        // TODO: leftBolIdentity + flexibility => rightBolIdentity
-        // TODO: rightBolIdentity + flexibility => leftBolIdentity
+    // TODO: leftBolIdentity a * (b * (a * c)) == (a * (b * a)) * c
+    // TODO: rightBolIdentity ((c * a) * b) * a == c * ((a * b) * a)
+    // TODO: associativity => leftBolIdentity
+    // TODO: associativity => rightBolIdentity
+    // TODO: leftBolIdentity => leftAlternativity
+    // TODO: rightBolIdentity => rightAlternativity
+    // TODO: leftBolIdentity + flexibility => rightBolIdentity
+    // TODO: rightBolIdentity + flexibility => leftBolIdentity
 
-        // TODO: leibnizIdentity (a * b) * c == (a * (b * c)) + ((a * c) * b)
-        // TODO: jacobiIdentity (a * (b * c)) + (b * (c * a)) + (c * (a * b)) == 0
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
-        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
-        MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
-            new MathLib::WhitespaceLexerRule(SIZE_MAX),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
-            new MathLib::StringMatchLexerRule((size_t)TokenType::Equality, "=="_M),
-            new MathLib::StringMatchLexerRule((size_t)TokenType::Implication, "=>"_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::Bind, '='_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
-            new MathLib::IdentifierLexerRule((size_t)TokenType::Identifier, true)
-        )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Bind, (size_t)TokenType::Bind),
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Implication, (size_t)TokenType::Implication),
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Equality, (size_t)TokenType::Equality),
-            new MathLib::FunctionParserLayer((size_t)TokenType::Function, (size_t)TokenType::Identifier, (size_t)TokenType::ParenthesesStart),
-            new MathLib::IdentityParserLayer((size_t)TokenType::Identifier, (size_t)TokenType::Identifier),
-            new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd)
-        )), optimizer);
-        MathLib::HostFileSystem fs;
-        toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
-        std::cout << Prove(toolchain.GetNode()) << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    // TODO: leibnizIdentity (a * b) * c == (a * (b * c)) + ((a * c) * b)
+    // TODO: jacobiIdentity (a * (b * c)) + (b * (c * a)) + (c * (a * b)) == 0
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+    const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
+    MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
+        new MathLib::WhitespaceLexerRule(SIZE_MAX),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
+        new MathLib::StringMatchLexerRule((size_t)TokenType::Equality, "=="_M),
+        new MathLib::StringMatchLexerRule((size_t)TokenType::Implication, "=>"_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::Bind, '='_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
+        new MathLib::IdentifierLexerRule((size_t)TokenType::Identifier, true)
+    )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Bind, (size_t)TokenType::Bind),
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Implication, (size_t)TokenType::Implication),
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Equality, (size_t)TokenType::Equality),
+        new MathLib::FunctionParserLayer((size_t)TokenType::Function, (size_t)TokenType::Identifier, (size_t)TokenType::ParenthesesStart),
+        new MathLib::IdentityParserLayer((size_t)TokenType::Identifier, (size_t)TokenType::Identifier),
+        new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd)
+    )), optimizer);
+    toolchain.LoadInput(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
+    std::cout << Prove(toolchain.GetNode()) << std::endl;
 }

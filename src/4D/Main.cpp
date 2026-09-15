@@ -1,11 +1,9 @@
-#define SDL_MAIN_HANDLED
 #include <EquationSolver/Preprocesor.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <Geometry/Hyperrectangle.hpp>
-#include <Libc/HostFileSystem.hpp>
+#include <WindowManager.hpp>
 #include <CommandLine.hpp>
-#include <SDL2.cpp>
 #include <iostream>
 
 template <typename T>
@@ -33,50 +31,42 @@ template <typename T>
     }
 #define FunctionToArray(name) const MathLib::Array<MathLib::num_t> name##Arr = GetArray<MathLib::num_t>(optimizer, name, name##Variable, time)
 
-int main(int argc, char** argv) {
-    try {
-        MathLib::SDL2 sdl2;
-        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("4D viewer", 800, 800);
-        MathLib::HostFileSystem fs;
-        const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program"_M).Get("No program specified")));
-        #ifdef Debug
-        std::cout << "Generated nodes:\n" << *root << std::endl;
-        #endif
-        MathLib::Optimizer optimizer = MathLib::Optimizer();
-        MathLib::Node* optimizedRoot = optimizer.Optimize(root);
-        delete root;
-        #ifdef Debug
-        std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
-        #endif
-        delete optimizedRoot;
-        optimizer.runtime = true;
-        AddFunction(position, "p"_M)
-        AddFunction(size, "s"_M)
-        AddFunction(rotation, "r"_M)
-        AddFunction(color, "c"_M)
-        const MathLib::num_t startTime = MathLib::GetTime();
-        bool pause = false;
-        while (true) {
-            if (!pause) {
-                const MathLib::String time = MathLib::ToString(MathLib::GetTime() - startTime);
-                FunctionToArray(position);
-                FunctionToArray(size);
-                FunctionToArray(rotation);
-                FunctionToArray(color);
-                renderer.Fill(0);
-                renderer.DrawShape<MathLib::num_t>(MathLib::Hyperrectangle<MathLib::num_t>(MathLib::matrix_t(positionArr.GetSize(), 1, positionArr), MathLib::matrix_t(sizeArr.GetSize(), 1, sizeArr)), MathLib::matrix_t(rotationArr.GetSize(), 1, rotationArr), MathLib::Color::FromVector<MathLib::num_t>(MathLib::matrix_t(colorArr.GetSize(), 1, colorArr)).hex);
-            }
-            if (!renderer.Update()) MathLib::Panic("Failed to update UI");
-            const MathLib::Event event = renderer.GetEvent();
-            if (event.type == MathLib::Event::Type::Quit) break;
-            else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed && event.key == ' ') pause = !pause;
+void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
+    MathLib::Renderer* renderer = windowManager.MakeRenderer("4D viewer", 800, 800);
+    if (!renderer) MathLib::Panic("Failed to create renderer");
+    const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
+    MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program"_M).Get("No program specified")));
+    #ifdef Debug
+    std::cout << "Generated nodes:\n" << *root << std::endl;
+    #endif
+    MathLib::Optimizer optimizer = MathLib::Optimizer();
+    MathLib::Node* optimizedRoot = optimizer.Optimize(root);
+    delete root;
+    #ifdef Debug
+    std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
+    #endif
+    delete optimizedRoot;
+    optimizer.runtime = true;
+    AddFunction(position, "p"_M)
+    AddFunction(size, "s"_M)
+    AddFunction(rotation, "r"_M)
+    AddFunction(color, "c"_M)
+    const MathLib::num_t startTime = MathLib::GetTime();
+    bool pause = false;
+    while (true) {
+        if (!pause) {
+            const MathLib::String time = MathLib::ToString(MathLib::GetTime() - startTime);
+            FunctionToArray(position);
+            FunctionToArray(size);
+            FunctionToArray(rotation);
+            FunctionToArray(color);
+            renderer->Fill(0);
+            renderer->DrawShape<MathLib::num_t>(MathLib::Hyperrectangle<MathLib::num_t>(MathLib::matrix_t(positionArr.GetSize(), 1, positionArr), MathLib::matrix_t(sizeArr.GetSize(), 1, sizeArr)), MathLib::matrix_t(rotationArr.GetSize(), 1, rotationArr), MathLib::Color::FromVector<MathLib::num_t>(MathLib::matrix_t(colorArr.GetSize(), 1, colorArr)).hex);
         }
-        optimizer.Destroy();
-        return EXIT_SUCCESS;
+        if (!renderer->Update()) MathLib::Panic("Failed to update UI");
+        const MathLib::Event event = renderer->GetEvent();
+        if (event.type == MathLib::Event::Type::Quit) break;
+        else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed && event.key == ' ') pause = !pause;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    optimizer.Destroy();
 }

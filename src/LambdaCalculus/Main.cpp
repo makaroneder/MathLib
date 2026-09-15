@@ -9,11 +9,11 @@
 #include <Compiler/Parser/KeywordParserLayer.hpp>
 #include <Compiler/Lexer/StringMatchLexerRule.hpp>
 #include <Interfaces/IdentityFunction.hpp>
-#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <FileSystem/Path.hpp>
 #include <String.hpp>
-#include <iostream>
+#include <Logger.hpp>
 
 enum class TokenType : uint8_t {
     ParenthesesStart,
@@ -107,48 +107,42 @@ MathLib::String Preprocess(MathLib::FileSystem& fileSystem, const MathLib::Seque
     }
     return ret;
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
-        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
-        MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
-            new MathLib::WhitespaceLexerRule(SIZE_MAX),
-            new GroupedLexerRule((size_t)TokenType::String, '"', '"'),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
-            new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
-            new MathLib::StringMatchLexerRule((size_t)TokenType::Abstraction, "->"_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::Application, '.'_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
-            new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
-        )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
-            new MathLib::RightBinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction),
-            new MathLib::LeftBinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
-            new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
-            new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
-            new PatternParserLayer(),
-            new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
-        )), optimizer);
-        MathLib::HostFileSystem fs;
-        toolchain.LoadInput(Preprocess(fs, MathLib::String(argv[1])));
-        const MathLib::Array<LambdaTerm> bindings = FromNode(toolchain.GetNode());
-        const size_t size = bindings.GetSize();
-        size_t main = SIZE_MAX;
-        for (size_t i = 0; i < size; i++) {
-            if (i) std::cout << ",\n";
-            std::cout << bindings.At(i);
-            if (bindings.At(i).value == "Main") main = i;
-        }
-        std::cout << std::endl;
-        if (main == SIZE_MAX) MathLib::Panic("No Main function specified");
-        LambdaTerm ret = bindings.At(main).Run(bindings);
-        std::cout << "Output: " << ret << std::endl;
-        return EXIT_SUCCESS;
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+    const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
+    MathLib::Toolchain toolchain = MathLib::Toolchain(new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
+        new MathLib::WhitespaceLexerRule(SIZE_MAX),
+        new GroupedLexerRule((size_t)TokenType::String, '"', '"'),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
+        new MathLib::IdentifierLexerRule((size_t)TokenType::Variable, true),
+        new MathLib::StringMatchLexerRule((size_t)TokenType::Abstraction, "->"_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::Application, '.'_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
+        new MathLib::SingleCharLexerRule((size_t)TokenType::Definition, '='_M)
+    )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Definition, (size_t)TokenType::Definition),
+        new MathLib::RightBinaryParserLayer((size_t)TokenType::Abstraction, (size_t)TokenType::Abstraction),
+        new MathLib::LeftBinaryParserLayer((size_t)TokenType::Application, (size_t)TokenType::Application),
+        new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd),
+        new MathLib::IdentityParserLayer((size_t)TokenType::String, (size_t)TokenType::String),
+        new PatternParserLayer(),
+        new MathLib::IdentityParserLayer((size_t)TokenType::Variable, (size_t)TokenType::Variable)
+    )), optimizer);
+    toolchain.LoadInput(Preprocess(fs, MathLib::String(argv[1])));
+    const MathLib::Array<LambdaTerm> bindings = FromNode(toolchain.GetNode());
+    const size_t size = bindings.GetSize();
+    size_t main = SIZE_MAX;
+    for (size_t i = 0; i < size; i++) {
+        if (i) LogString(",\n");
+        LogString(bindings.At(i).ToString());
+        if (bindings.At(i).value == "Main") main = i;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    LogChar('\n');
+    if (main == SIZE_MAX) MathLib::Panic("No Main function specified");
+    const LambdaTerm ret = bindings.At(main).Run(bindings);
+    LogString("Output: ");
+    LogString(ret.ToString());
+    LogChar('\n');
 }

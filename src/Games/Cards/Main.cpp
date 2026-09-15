@@ -1,15 +1,13 @@
-#define SDL_MAIN_HANDLED
 #include "Hand.hpp"
 #include <EquationSolver/Preprocesor.hpp>
 #include <Allocator/RegionAllocator.hpp>
 #include <EquationSolver/Optimizer.hpp>
 #include <EquationSolver/Tokenizer.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
-#include <Libc/HostFileSystem.hpp>
+#include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
 #include <Bitmap.hpp>
 #include <Fonts.hpp>
-#include <SDL2.cpp>
 #include <iostream>
 
 template <typename T>
@@ -52,100 +50,92 @@ const MathLib::FunctionNode vname = optimizer.GetFunction(identifier);          
         if (!optimizer.variables.Add(MathLib::Variable(vname.arguments.At(0).name, vname.arguments.At(0).dataType, '0'_M, true))) MathLib::Panic("Failed to add variable"); \
         vname##Variable = optimizer.variables.GetSize() - 1;                                                                                                                \
     }
-int main(int, char**) {
-    try {
-        #ifndef Debug
-        srand(time(nullptr));
-        #endif
-        MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
-        if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
-        MathLib::PSF1 font;
-        if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
-        MathLib::HostFileSystem fs;
-        const MathLib::String path = "src/TestPrograms/Cards/";
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));
-        #ifdef Debug
-        std::cout << "Generated nodes:\n" << *root << std::endl;
-        #endif
-        MathLib::Optimizer optimizer = MathLib::Optimizer();
-        MathLib::Node* optimizedRoot = optimizer.Optimize(root);
-        delete root;
-        #ifdef Debug
-        std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
-        #endif
-        delete optimizedRoot;
-        optimizer.runtime = true;
-        AddFunction(hands, "hands"_M)
-        AddFunction(discards, "discards"_M)
-        AddFunction(requiredPoints, "points"_M)
-        MathLib::Aseprite table;
-        if (!table.LoadFromPath(fs, path + "Table.aseprite")) MathLib::Panic("Failed to load table image");
-        MathLib::SDL2 sdl2;
-        MathLib::SDL2Renderer renderer = sdl2.MakeRenderer("Cards", table.GetWidth(), table.GetHeight());
-        MathLib::Aseprite cardsImage;
-        if (!cardsImage.LoadFromPath(fs, path + "Cards.aseprite")) MathLib::Panic("Failed to load cards");
-        MathLib::Bitmap cards = MathLib::Bitmap((size_t)Card::Type::TypeCount * (size_t)Card::Color::ColorCount);
-        cards.Fill(true);
-        Hand<MathLib::num_t> hand = Hand<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, -1, 0));
-        if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to initialize deck");
-        bool update = true;
-        size_t round = 0;
-        size_t remainingHands = 0;
-        size_t remainingDiscards = 0;
-        ssize_t remainingPoints = 0;
-        while (true) {
-            if (!remainingPoints) {
-                round++;
-                remainingHands = Evaluate<size_t>(optimizer, hands, handsVariable, MathLib::ToString(round, 10));
-                remainingDiscards = Evaluate<size_t>(optimizer, discards, discardsVariable, MathLib::ToString(round, 10));
-                remainingPoints = Evaluate<size_t>(optimizer, requiredPoints, requiredPointsVariable, MathLib::ToString(round, 10));
-                update = true;
-            }
-            if (!remainingHands) {
-                round = remainingPoints = 0;
-                continue;
-            }
-            if (update) {
-                if (!renderer.CopyFromBuffer(table.At(0))) MathLib::Panic("Failed to draw background image");
-                renderer.Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0);
-                renderer.Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0);
-                renderer.Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0);
-                renderer.Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0);
-                if (!hand.Draw(renderer, cardsImage)) MathLib::Panic("Failed to draw hand");
-                update = false;
-            }
-            if (!renderer.Update()) MathLib::Panic("Failed to update UI");
-            const MathLib::Event event = renderer.GetEvent();
-            if (event.type == MathLib::Event::Type::Quit) break;
-            else if (event.type == MathLib::Event::Type::MousePressed && event.pressed && event.mouseButton == MathLib::Event::MouseButton::Left)
-                update = hand.Select(renderer.IndexToPosition<MathLib::num_t>(event.mouseX, event.mouseY));
-            else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
-                switch (event.key) {
-                    case 'e': {
-                        remainingPoints -= hand.GetPoints();
-                        remainingHands--;
-                        if (remainingPoints < 0) remainingPoints = 0;
-                        hand.SelectAll();
-                        if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to play hand");
+void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
+    #ifndef Debug
+    srand(time(nullptr));
+    #endif
+    MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
+    if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
+    MathLib::PSF1 font;
+    if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
+    const MathLib::String path = "Data/Cards/";
+    MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));
+    #ifdef Debug
+    std::cout << "Generated nodes:\n" << *root << std::endl;
+    #endif
+    MathLib::Optimizer optimizer = MathLib::Optimizer();
+    MathLib::Node* optimizedRoot = optimizer.Optimize(root);
+    delete root;
+    #ifdef Debug
+    std::cout << "Optimized nodes:\n" << *optimizedRoot << std::endl;
+    #endif
+    delete optimizedRoot;
+    optimizer.runtime = true;
+    AddFunction(hands, "hands"_M)
+    AddFunction(discards, "discards"_M)
+    AddFunction(requiredPoints, "points"_M)
+    MathLib::Aseprite table;
+    if (!table.LoadFromPath(fs, path + "Table.aseprite")) MathLib::Panic("Failed to load table image");
+    MathLib::Renderer* renderer = windowManager.MakeRenderer("Cards", table.GetWidth(), table.GetHeight());
+    if (!renderer) MathLib::Panic("Failed to create renderer");
+    MathLib::Aseprite cardsImage;
+    if (!cardsImage.LoadFromPath(fs, path + "Cards.aseprite")) MathLib::Panic("Failed to load cards");
+    MathLib::Bitmap cards = MathLib::Bitmap((size_t)Card::Type::TypeCount * (size_t)Card::Color::ColorCount);
+    cards.Fill(true);
+    Hand<MathLib::num_t> hand = Hand<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(0, -1, 0));
+    if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to initialize deck");
+    bool update = true;
+    size_t round = 0;
+    size_t remainingHands = 0;
+    size_t remainingDiscards = 0;
+    ssize_t remainingPoints = 0;
+    while (true) {
+        if (!remainingPoints) {
+            round++;
+            remainingHands = Evaluate<size_t>(optimizer, hands, handsVariable, MathLib::ToString(round, 10));
+            remainingDiscards = Evaluate<size_t>(optimizer, discards, discardsVariable, MathLib::ToString(round, 10));
+            remainingPoints = Evaluate<size_t>(optimizer, requiredPoints, requiredPointsVariable, MathLib::ToString(round, 10));
+            update = true;
+        }
+        if (!remainingHands) {
+            round = remainingPoints = 0;
+            continue;
+        }
+        if (update) {
+            if (!renderer->CopyFromBuffer(table.At(0))) MathLib::Panic("Failed to draw background image");
+            renderer->Puts<MathLib::num_t>("Round: "_M + MathLib::ToString(round, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.7, 0), UINT32_MAX, 0);
+            renderer->Puts<MathLib::num_t>("Remaining hands: "_M + MathLib::ToString(remainingHands, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.5, 0), UINT32_MAX, 0);
+            renderer->Puts<MathLib::num_t>("Remaining discards: "_M + MathLib::ToString(remainingDiscards, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.3, 0), UINT32_MAX, 0);
+            renderer->Puts<MathLib::num_t>("Remaining points: "_M + MathLib::ToString(remainingPoints, 10), font, MathLib::CreateVector<MathLib::num_t>(0.05, 3.1, 0), UINT32_MAX, 0);
+            if (!hand.Draw(*renderer, cardsImage)) MathLib::Panic("Failed to draw hand");
+            update = false;
+        }
+        if (!renderer->Update()) MathLib::Panic("Failed to update UI");
+        const MathLib::Event event = renderer->GetEvent();
+        if (event.type == MathLib::Event::Type::Quit) break;
+        else if (event.type == MathLib::Event::Type::MousePressed && event.pressed && event.mouseButton == MathLib::Event::MouseButton::Left)
+            update = hand.Select(renderer->IndexToPosition<MathLib::num_t>(event.mouseX, event.mouseY));
+        else if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) {
+            switch (event.key) {
+                case 'e': {
+                    remainingPoints -= hand.GetPoints();
+                    remainingHands--;
+                    if (remainingPoints < 0) remainingPoints = 0;
+                    hand.SelectAll();
+                    if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to play hand");
+                    update = true;
+                    break;
+                }
+                case 'r': {
+                    if (remainingDiscards) {
+                        remainingDiscards--;
+                        if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to discard cards");
                         update = true;
-                        break;
                     }
-                    case 'r': {
-                        if (remainingDiscards) {
-                            remainingDiscards--;
-                            if (!SwapCards<MathLib::num_t>(hand, cards)) MathLib::Panic("Failed to discard cards");
-                            update = true;
-                        }
-                        break;
-                    }
+                    break;
                 }
             }
         }
-        delete MathLib::allocator;
-        return EXIT_SUCCESS;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    delete MathLib::allocator;
 }

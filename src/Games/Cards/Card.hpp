@@ -40,7 +40,7 @@ struct Card : MathLib::Orderable<Card>, MathLib::Printable {
     [[nodiscard]] static MathLib::Cuboid<T> ToCuboid(const MathLib::Matrix<T>& position) {
         return MathLib::Cuboid<T>(position, MathLib::CreateVector<T>(width, height, 0.01));
     }
-    [[nodiscard]] virtual bool LessThanEqual(const MathLib::Card& other) const override;
+    [[nodiscard]] virtual bool LessThanEqual(const Card& other) const override;
 };
 
 #endif

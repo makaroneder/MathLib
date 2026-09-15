@@ -1,7 +1,7 @@
 #include "Card.hpp"
 
 Card::Card(Type type, Color color) : type(type), color(color), selected(false) {}
-bool Card::LessThanEqual(const MathLib::Card& other) const {
+bool Card::LessThanEqual(const Card& other) const {
     return type <= other.type;
 }
 MathLib::String Card::ToString(const MathLib::Sequence<char>& padding) const {

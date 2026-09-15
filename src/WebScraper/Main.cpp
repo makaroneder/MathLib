@@ -2,12 +2,11 @@
 #include <JSON.hpp>
 #include <String.hpp>
 #include <FunctionT.hpp>
-#include <Libc/HostFileSystem.hpp>
 #include <FileSystem/Directory.hpp>
 #include <Interfaces/Dictionary.hpp>
 #include <Interfaces/ComparisionFunction.hpp>
 #include <Interfaces/Sequence/SubSequence.hpp>
-#include <Curl.cpp>
+#include <Curl/Curl.cpp>
 #include <iostream>
 
 MathLib::String ToProtocol(const MathLib::Sequence<char>& url) {
@@ -183,31 +182,23 @@ MathLib::Array<Action> ParseRobotsFile(MathLib::Curl& curl, const MathLib::Strin
     }
     return exceptions.AddSequence(ret) ? exceptions : MathLib::Array<Action>();
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <pattern file> <output directory>");
-        MathLib::HostFileSystem fs;
-        MathLib::JSON pattern;
-        if (!pattern.LoadFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to load pattern file");
-        MathLib::Array<Action> actions;
-        if (!AddActions(pattern, actions, "ignore"_M, Action::Type::Ignore)) MathLib::Panic("Failed to load ignore list");
-        if (!AddActions(pattern, actions, "scrape"_M, Action::Type::Scrape)) MathLib::Panic("Failed to load scrape list");
-        if (!AddActions(pattern, actions, "save"_M, Action::Type::Save)) MathLib::Panic("Failed to load save list");
-        if (!actions.CocktailShakerSort(MathLib::ComparisionFunction<Action>(MathLib::ComparisionFunctionType::LessThan))) MathLib::Panic("Failed to sort actions");
-        const MathLib::String url = pattern.Find("url"_M).Get("No URL specified").GetValue();
-        MathLib::Curl curl;
-        if (pattern.Find("parseRobots"_M).Get("No action for parsing robots.txt specified").GetValue() == "true") {
-            MathLib::Array<Action> tmp = ParseRobotsFile(curl, url);
-            if (!tmp.AddSequence(actions)) MathLib::Panic("Failed to add data generated from robots.txt");
-            actions = tmp;
-        }
-        MathLib::Directory directory = MathLib::Directory(fs, MathLib::String(argv[2]));
-        if (!directory.CreateDirectory(""_M, false)) MathLib::Panic("Failed to create output directory");
-        if (!Scrape(directory, curl, actions, url, MathLib::StringToNumber(pattern.Find("maxDepth"_M).Get("No max depth specified").GetValue()))) MathLib::Panic("Failed to scrape URL");
-        return EXIT_SUCCESS;
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <pattern file> <output directory>");
+    MathLib::JSON pattern;
+    if (!pattern.LoadFromPath(fs, MathLib::String(argv[1]))) MathLib::Panic("Failed to load pattern file");
+    MathLib::Array<Action> actions;
+    if (!AddActions(pattern, actions, "ignore"_M, Action::Type::Ignore)) MathLib::Panic("Failed to load ignore list");
+    if (!AddActions(pattern, actions, "scrape"_M, Action::Type::Scrape)) MathLib::Panic("Failed to load scrape list");
+    if (!AddActions(pattern, actions, "save"_M, Action::Type::Save)) MathLib::Panic("Failed to load save list");
+    if (!actions.CocktailShakerSort(MathLib::ComparisionFunction<Action>(MathLib::ComparisionFunctionType::LessThan))) MathLib::Panic("Failed to sort actions");
+    const MathLib::String url = pattern.Find("url"_M).Get("No URL specified").GetValue();
+    MathLib::Curl curl;
+    if (pattern.Find("parseRobots"_M).Get("No action for parsing robots.txt specified").GetValue() == "true") {
+        MathLib::Array<Action> tmp = ParseRobotsFile(curl, url);
+        if (!tmp.AddSequence(actions)) MathLib::Panic("Failed to add data generated from robots.txt");
+        actions = tmp;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    MathLib::Directory directory = MathLib::Directory(fs, MathLib::String(argv[2]));
+    if (!directory.CreateDirectory(""_M, false)) MathLib::Panic("Failed to create output directory");
+    if (!Scrape(directory, curl, actions, url, MathLib::StringToNumber(pattern.Find("maxDepth"_M).Get("No max depth specified").GetValue()))) MathLib::Panic("Failed to scrape URL");
 }

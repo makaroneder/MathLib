@@ -1,8 +1,9 @@
 #include <Interfaces/Sequence/TransformSequence.hpp>
 #include <Interfaces/Sequence/SubSequence.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <FunctionT.hpp>
+#include <Logger.hpp>
 #include <Host.hpp>
-#include <iostream>
 
 MathLib::Array<MathLib::String> SplitIntoWords(const MathLib::String& str) {
     const size_t size = str.GetSize();
@@ -34,30 +35,23 @@ MathLib::Array<size_t> GetNextWords(const MathLib::Sequence<MathLib::String>& te
 size_t Random(size_t min, size_t max) {
     return MathLib::Round(MathLib::RandomNumber<MathLib::num_t>(min, max));
 }
-int main(int, char**) {
-    try {
-        #ifndef Debug
-        srand(time(nullptr));
-        #endif
-        const MathLib::String data = "0 0 0 1 0 1 1 1 1 0 0 0 0 1 0"_M;
-        const MathLib::Array<MathLib::String> text = SplitIntoWords(data);
-        const size_t maxSize = 10;
-        const size_t order = 2;
-        MathLib::Array<size_t> words = MathLib::MakeArray<size_t>(Random(0, text.GetSize() - 1));
-        for (size_t i = 0; i < maxSize; i++) {
-            const size_t wordCount = words.GetSize();
-            if (i) std::cout << ' ';
-            std::cout << text.AtUnsafe(words.AtUnsafe(wordCount - 1));
-            const MathLib::Array<size_t> next = GetNextWords(text, MathLib::SubSequence<size_t>(words, MathLib::Interval<size_t>(wordCount - MathLib::Min<size_t>(wordCount, order), wordCount)));
-            const size_t size = next.GetSize();
-            if (!size) break;
-            if (!words.Add(next.AtUnsafe(Random(0, size - 1)))) MathLib::Panic("Failed to add word to history");
-        }
-        std::cout << std::endl;
-        return EXIT_SUCCESS;
+void Main(int, char**, MathLib::FileSystem&) {
+    #ifndef Debug
+    srand(time(nullptr));
+    #endif
+    const MathLib::String data = "0 0 0 1 0 1 1 1 1 0 0 0 0 1 0"_M;
+    const MathLib::Array<MathLib::String> text = SplitIntoWords(data);
+    const size_t maxSize = 10;
+    const size_t order = 2;
+    MathLib::Array<size_t> words = MathLib::MakeArray<size_t>(Random(0, text.GetSize() - 1));
+    for (size_t i = 0; i < maxSize; i++) {
+        const size_t wordCount = words.GetSize();
+        if (i) LogChar(' ');
+        LogString(text.AtUnsafe(words.AtUnsafe(wordCount - 1)));
+        const MathLib::Array<size_t> next = GetNextWords(text, MathLib::SubSequence<size_t>(words, MathLib::Interval<size_t>(wordCount - MathLib::Min<size_t>(wordCount, order), wordCount)));
+        const size_t size = next.GetSize();
+        if (!size) break;
+        if (!words.Add(next.AtUnsafe(Random(0, size - 1)))) MathLib::Panic("Failed to add word to history");
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    LogChar('\n');
 }

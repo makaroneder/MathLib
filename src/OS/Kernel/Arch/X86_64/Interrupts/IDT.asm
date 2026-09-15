@@ -73,7 +73,7 @@ ISR%1:
     PushAll
     mov rdi, %1
     mov rsi, rsp
-    xor rdx, rdx
+    xor edx, edx
     call InterruptHandler
     PopAll
     iretq

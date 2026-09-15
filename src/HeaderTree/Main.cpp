@@ -1,5 +1,4 @@
 #include <Interfaces/Sequence/ByteDeviceSequence.hpp>
-#include <Libc/HostFileSystem.hpp>
 #include <Graph/Tree.hpp>
 #include <String.hpp>
 #include <iostream>
@@ -59,20 +58,12 @@ MathLib::Tree<size_t> GenerateHeaderTree(MathLib::FileSystem& fileSystem, const 
     MathLib::Array<MathLib::Tree<size_t>> visited;
     return GenerateHeaderTreeInternal(fileSystem, basePath, path, visited);
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <file>");
-        MathLib::HostFileSystem fs;
-        MathLib::Array<MathLib::String> split = MathLib::Split(MathLib::String(argv[1]), '/'_M, false);
-        MathLib::String basePath = "";
-        for (size_t i = 0; i < split.GetSize() - 1; i++) basePath += split.At(i) + '/';
-        const MathLib::num_t tmp = MathLib::GetTime();
-        std::cout << GenerateHeaderTree(fs, MathLib::SubString(basePath, 0, basePath.GetSize() - 1), MathLib::String(argv[1])) << std::endl;
-        std::cout << "Time: " << MathLib::GetTime() - tmp << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <file>");
+    MathLib::Array<MathLib::String> split = MathLib::Split(MathLib::String(argv[1]), '/'_M, false);
+    MathLib::String basePath = "";
+    for (size_t i = 0; i < split.GetSize() - 1; i++) basePath += split.At(i) + '/';
+    const MathLib::num_t tmp = MathLib::GetTime();
+    std::cout << GenerateHeaderTree(fs, MathLib::SubString(basePath, 0, basePath.GetSize() - 1), MathLib::String(argv[1])) << std::endl;
+    std::cout << "Time: " << MathLib::GetTime() - tmp << std::endl;
 }

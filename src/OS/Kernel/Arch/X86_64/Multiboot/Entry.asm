@@ -195,6 +195,7 @@ Entry:
 
 bits 64
 extern Main
+extern __stack_chk_guard
 
 ; Input
 ;   rsi -> MB1Info | MB2Info
@@ -206,5 +207,29 @@ Entry64:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    xor rbp, rbp
-    jmp Main
+    xor ebp, ebp
+    mov eax, 7
+    xor ecx, ecx
+    cpuid
+    shr ebx, 18
+    and ebx, 1
+    jz .fail1
+    mov ecx, 100
+    .loop1:
+        rdseed rax
+        jc .done
+        loop .loop1
+    .fail1:
+        mov eax, 1
+        xor ecx, ecx
+        cpuid
+        shr ecx, 30
+        and ecx, 1
+        jz .fail2
+        mov ecx, 100
+    .loop2:
+        rdrand rax
+        jc .done
+        loop .loop2
+    .done: mov [__stack_chk_guard], rax
+    .fail2: jmp Main

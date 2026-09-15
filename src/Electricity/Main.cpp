@@ -1,6 +1,7 @@
+#include <FileSystem/FileSystem.hpp>
 #include <Typedefs.hpp>
+#include <Logger.hpp>
 #include <Host.hpp>
-#include <iostream>
 
 struct CircuitState {
     MathLib::num_t voltage;
@@ -68,20 +69,21 @@ MathLib::num_t SeriesCircuit::GetResistance(void) const {
     return a->GetResistance() + b->GetResistance();
 }
 
-int main(int, char**) {
-    try {
-        const MathLib::num_t voltage = 5;
-        const CircuitElement a = 100;
-        const CircuitElement b = 1000;
-        const SeriesCircuit v = SeriesCircuit(&a, &b);
-        const MathLib::num_t current = voltage / v.GetResistance();
-        const CircuitState state = v.GetState(CircuitState(voltage, current));
-        std::cout << "I : [" << current << ", " << state.current << ']' << std::endl;
-        std::cout << "V : [" << voltage << ", " << state.voltage << ']' << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int, char**, MathLib::FileSystem&) {
+    const MathLib::num_t voltage = 5;
+    const CircuitElement a = 100;
+    const CircuitElement b = 1000;
+    const SeriesCircuit v = SeriesCircuit(&a, &b);
+    const MathLib::num_t current = voltage / v.GetResistance();
+    const CircuitState state = v.GetState(CircuitState(voltage, current));
+    LogString("I : [");
+    LogString(MathLib::ToString(current));
+    LogString(", ");
+    LogString(MathLib::ToString(state.current));
+    LogString("]\n");
+    LogString("V : [");
+    LogString(MathLib::ToString(voltage));
+    LogString(", ");
+    LogString(MathLib::ToString(state.voltage));
+    LogString("]\n");
 }

@@ -1,47 +1,37 @@
+#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Cryptography/Code/RepetitionCode.hpp>
 #include <Cryptography/Cipher/NestedCipher.hpp>
 #include <Cryptography/Channel/FlipChannel.hpp>
 #include <Cryptography/Channel/Channel.hpp>
 #include <Math/UniformDiscreteMeasure.hpp>
-#include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <Cryptography/Cipher/ROT13.hpp>
 #include <iostream>
 
-int main(int, char**) {
-    try {
-        #ifndef Debug
-        srand(time(nullptr));
-        #endif
-        MathLib::FlipChannel<MathLib::num_t, MathLib::UniformDiscreteMeasure<MathLib::num_t>> flip;
-        MathLib::NestedCipher cipher = MathLib::NestedCipher(MathLib::MakeArray<MathLib::Cipher*>(
-            new MathLib::RepetitionCode(),
-            new MathLib::ROT13()
-        ));
-        const MathLib::Channel channel = MathLib::Channel(
-            flip, cipher
-        );
-        const MathLib::String message = "Hello";
-        // const MathLib::String tmp = channel.SendString(message, MathLib::VariadicSequence<uint64_t, 3>());
-        const MathLib::String tmp = channel.SendString(message,
+void Main(int, char**, MathLib::FileSystem&) {
+    #ifndef Debug
+    srand(time(nullptr));
+    #endif
+    MathLib::FlipChannel<MathLib::num_t, MathLib::UniformDiscreteMeasure<MathLib::num_t>> flip;
+    MathLib::NestedCipher cipher = MathLib::NestedCipher(MathLib::MakeArray<MathLib::Cipher*>(
+        new MathLib::RepetitionCode(),
+        new MathLib::ROT13()
+    ));
+    const MathLib::Channel channel = MathLib::Channel(
+        flip, cipher
+    );
+    const MathLib::String message = "Hello";
+    const MathLib::String tmp = channel.SendString(message,
+        MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
+            MathLib::CipherKey(),
             MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
-                MathLib::CipherKey(),
-                MathLib::CipherKey(MathLib::MakeArray<MathLib::CipherKey>(
-                    MathLib::CipherKey(MathLib::ByteArray::ToByteArray<uint64_t>(MathLib::VariadicSequence<uint64_t, 3>())),
-                    MathLib::CipherKey()
-                ))
+                MathLib::CipherKey(MathLib::ByteArray::ToByteArray<uint64_t>(MathLib::VariadicSequence<uint64_t, 3>())),
+                MathLib::CipherKey()
             ))
-        );
-        std::cout << "Sent: " << message << std::endl;
-        std::cout << "Recieved: " << tmp << std::endl;
-        const size_t diff = message.GetSize() - tmp.GetSize();
-        std::cout << "Lost data: " << diff << std::endl;
-        if (!diff) {
-            std::cout << "Hamming distance: " << message.GetHammingDistance(tmp) << std::endl;
-        }
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+        ))
+    );
+    std::cout << "Sent: " << message << std::endl;
+    std::cout << "Recieved: " << tmp << std::endl;
+    const size_t diff = message.GetSize() - tmp.GetSize();
+    std::cout << "Lost data: " << diff << std::endl;
+    if (!diff) std::cout << "Hamming distance: " << message.GetHammingDistance(tmp) << std::endl;
 }

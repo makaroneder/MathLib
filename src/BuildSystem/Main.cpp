@@ -7,7 +7,6 @@
 #include <Libc/HostFileSystem.hpp>
 #include <iostream>
 
-MathLib::HostFileSystem fileSystem;
 MathLib::Array<Target> targets;
 MathLib::Array<FileSearch> fileSearchs;
 MathLib::Array<FileTranslation> fileTranslations;
@@ -37,7 +36,8 @@ MathLib::String nonPhonyTargets = "";
 int main(int argc, char** argv) {
     try {
         if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output file>");
-        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fileSystem, MathLib::String(argv[1])));
+        MathLib::HostFileSystem fs;
+        MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
         #ifdef Debug
         std::cout << "Generated nodes:\n" << *root << std::endl;
         #endif
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
         #endif
         delete optimizedRoot;
         optimizer.Destroy();
-        MathLib::File output = fileSystem.Open(MathLib::String(argv[2]), MathLib::OpenMode::Write);
+        MathLib::File output = fs.Open(MathLib::String(argv[2]), MathLib::OpenMode::Write);
         for (size_t i = 0; i < fileSearchs.GetSize(); i++)
             if (!output.Puts("FILESEARCH"_M + MathLib::ToString(i + 1) + " = $(call rwildcard," + fileSearchs.At(i).directory + ",*" + fileSearchs.At(i).extension + ")\n")) MathLib::Panic("Failed to write output data");
         for (size_t i = 0; i < fileTranslations.GetSize(); i++)
@@ -72,8 +72,8 @@ int main(int argc, char** argv) {
         }
         return EXIT_SUCCESS;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
+    catch (const std::exception& exception) {
+        std::cerr << exception.what() << std::endl;
         return EXIT_FAILURE;
     }
 }

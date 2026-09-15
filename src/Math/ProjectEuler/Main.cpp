@@ -1,5 +1,6 @@
+#include <FileSystem/FileSystem.hpp>
 #include <Tests/Test.hpp>
-#include <iostream>
+#include <Logger.hpp>
 
 size_t Problem1(size_t limit) {
     const size_t limit3 = --limit / 3;
@@ -36,21 +37,20 @@ size_t Problem3(size_t limit) {
     }
     return 1;
 }
-int main(int, char**) {
-    try {
-        MathLib::Test test;
-        TestOperation(test, Problem1(10) == 23);
-        TestOperation(test, Problem2(90) == 2 + 8 + 34);
-        TestOperation(test, Problem3(13195) == 29);
-        std::cout << "1) " << Problem1(1000) << std::endl;
-        std::cout << "2) " << Problem2(4000000) << std::endl;
-        std::cout << "3) " << Problem3(600851475143) << std::endl;
-        std::cout << "-----------" << std::endl;
-        std::cout << test << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int, char**, MathLib::FileSystem&) {
+    MathLib::Test test;
+    TestOperation(test, Problem1(10) == 23);
+    TestOperation(test, Problem2(90) == 2 + 8 + 34);
+    TestOperation(test, Problem3(13195) == 29);
+    LogString("1) ");
+    LogString(MathLib::ToString(Problem1(1000), 10));
+    LogChar('\n');
+    LogString("2) ");
+    LogString(MathLib::ToString(Problem2(4000000), 10));
+    LogChar('\n');
+    LogString("3) ");
+    LogString(MathLib::ToString(Problem3(600851475143), 10));
+    LogString("\n-----------\n");
+    LogString(test.ToString());
+    LogChar('\n');
 }

@@ -4,6 +4,7 @@ SCRIPTSDIR = Scripts
 BUILDTYPE ?= Debug
 
 CXX = g++
+AR = ar
 AS = nasm
 VALGRIND = valgrind
 PYTHON = python3
@@ -50,51 +51,51 @@ $(SRCDIR)/Lib/MathLib.hpp: $(SCRIPTSDIR)/MakeIncludes.py $(SRCXX) Makefile
 	@$(MKDIR) $(@D)
 	@$(PYTHON) $< $(patsubst $(SRCDIR)/Lib/%.cpp, %.cpp, $(SRCXX)) $@
 	@echo "==> Created: $@"
-$(BUILDDIR)/TmpBuild.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libMath.so
+$(BUILDDIR)/Build.out: $(BUILDSYSDEPS) $(HEADERS) $(BUILDDIR)/libMath.so
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CXXFLAGS) $(BUILDSYSDEPS) -o $@ -L $(BUILDDIR) -l Math
 	@echo "==> Created: $@"
-$(BUILDDIR)/Build.mk: $(BUILDDIR)/TmpBuild.out Build.txt
+$(BUILDDIR)/Build.mk: $(BUILDDIR)/Build.out Build.txt
 	@$(MKDIR) $(@D)
 	@./$^ $@
 	@echo "==> Created: $@"
 
-MATHPROGRAMS ?= $(call rwildcard,$(SRCDIR)/TestPrograms/Math,*.txt)
+MATHPROGRAMS ?= $(call rwildcard,Data/Math,*.txt)
 MLITERS ?= 20000
 SERVERPORT ?= 8080
-INTERPRETERPROGRAM ?= $(SRCDIR)/TestPrograms/Interpreter/Main.txt
-CHEMPROGRAM ?= $(SRCDIR)/TestPrograms/Chemistry/All.txt
+INTERPRETERPROGRAM ?= Data/Interpreter/Main.txt
+CHEMPROGRAM ?= Data/Chemistry/All.txt
 CARBONS ?= 6
-ANIMATIONFILE ?= $(SRCDIR)/TestPrograms/Math/Trigonometry/Sine.txt
-POLYNOMIAL ?= $(SRCDIR)/TestPrograms/Math/Polynomial.txt
+ANIMATIONFILE ?= Data/Math/Trigonometry/Sine.txt
+POLYNOMIAL ?= Data/Math/Polynomial.txt
 IMGCONVINPUTTYPE ?= TGA
-IMGCONVINPUT ?= $(SRCDIR)/TestPrograms/RPG/Emoji.tga
+IMGCONVINPUT ?= Data/RPG/Emoji.tga
 IMGCONVOUTPUTTYPE ?= P6
 IMGCONVOUTPUT ?= $(BUILDDIR)/ImageConverter.ppm
 ELFPROGRAM ?= $(BUILDDIR)/ELFParser.out
-4DPROGRAM ?= $(SRCDIR)/TestPrograms/4D/Tesseract.txt
+4DPROGRAM ?= Data/4D/Tesseract.txt
 HEADERTREEINPUT ?= $(SRCDIR)/Lib/Host.hpp
 FSCONVFS ?= GNUTAR
 FSCONVOUTPUT ?= $(BUILDDIR)/FS.tar
 FSCONVINPUT ?= Makefile Makefile TODO.md TODO.md
-BENCODEINPUT ?= $(SRCDIR)/TestPrograms/Bencode/ArchLinux.torrent
-LAMBDAINPUT ?= $(SRCDIR)/TestPrograms/LambdaCalculus/Main.txt
-SCRAPERINPUT ?= $(SRCDIR)/TestPrograms/WebScraper/Wikipedia.json
+BENCODEINPUT ?= Data/Bencode/ArchLinux.torrent
+LAMBDAINPUT ?= Data/LambdaCalculus/Main.txt
+SCRAPERINPUT ?= Data/WebScraper/Wikipedia.json
 SCRAPEROUTPUT ?= $(BUILDDIR)/WebScraperOutput
-SEQUENTINPUT ?= $(SRCDIR)/TestPrograms/SequentCalculus/ModusPonens.txt
-PROVERINPUT ?= $(SRCDIR)/TestPrograms/Prover/Main.txt
-TYPETHEORYINPUT ?= $(SRCDIR)/TestPrograms/TypeTheory/Main.txt
-SUDOKUINPUT ?= $(SRCDIR)/TestPrograms/Sudoku/2.csv
+SEQUENTINPUT ?= Data/SequentCalculus/ModusPonens.txt
+PROVERINPUT ?= Data/Prover/Main.txt
+TYPETHEORYINPUT ?= Data/TypeTheory/Main.txt
+SUDOKUINPUT ?= Data/Sudoku/2.csv
 VIDEOPLAYERWIDTH ?= 800
 VIDEOPLAYERHEIGHT ?= 800
 VIDEOPLAYERSPEED ?= 0.1
 VIDEOPLAYERSKIPDURATION ?= 1
 VIDEOPLAYERMULTX ?= 4
 VIDEOPLAYERMULTY ?= 4
-VIDEOPLAYERPATH ?= $(SRCDIR)/TestPrograms/VideoPlayer/Video.aseprite
-AESTESTSPATH ?= $(SRCDIR)/TestPrograms/AES
-ASLPATH ?= $(SRCDIR)/TestPrograms/ACPI/OS.asl
-OSROOT ?= $(SRCDIR)/TestPrograms/OS
+VIDEOPLAYERPATH ?= Data/VideoPlayer/Video.aseprite
+AESTESTSPATH ?= Data/AES
+ASLPATH ?= Data/ACPI/OS.asl
+OSROOT ?= Data/OS
 OSSYSROOT ?= $(BUILDDIR)/SystemRoot
 OSCXX = x86_64-elf-g++
 OSAR = x86_64-elf-ar

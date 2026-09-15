@@ -147,18 +147,11 @@ MathLib::String ToChemicalString(const MathLib::Tree<size_t>& tree, const MathLi
     }
     return ret + padding + '}';
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <carbons>");
-        const MathLib::Second<MathLib::num_t> start = MathLib::GetTime();
-        const MathLib::Array<MathLib::Tree<size_t>> connections = CreateComponent(MathLib::StringToNumber(MathLib::String(argv[1])));
-        for (const MathLib::Tree<size_t>& root : connections) std::cout << ToChemicalString(root) << '\n';
-        std::cout << "Isomers: " << connections.GetSize() << std::endl;
-        std::cout << "Time: " << MathLib::Second<MathLib::num_t>(MathLib::GetTime()) - start << std::endl;
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int argc, char** argv, MathLib::FileSystem&) {
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <carbons>");
+    const MathLib::Second<MathLib::num_t> start = MathLib::GetTime();
+    const MathLib::Array<MathLib::Tree<size_t>> connections = CreateComponent(MathLib::StringToNumber(MathLib::String(argv[1])));
+    for (const MathLib::Tree<size_t>& root : connections) std::cout << ToChemicalString(root) << '\n';
+    std::cout << "Isomers: " << connections.GetSize() << std::endl;
+    std::cout << "Time: " << MathLib::Second<MathLib::num_t>(MathLib::GetTime()) - start << std::endl;
 }

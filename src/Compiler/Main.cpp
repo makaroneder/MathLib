@@ -10,7 +10,7 @@
 #include <Compiler/Lexer/IdentifierLexerRule.hpp>
 #include <Compiler/Lexer/SingleCharLexerRule.hpp>
 #include <Interfaces/IdentityFunction.hpp>
-#include <Libc/HostFileSystem.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <Compiler/Toolchain.hpp>
 #include <iostream>
 
@@ -87,38 +87,30 @@ MathLib::String Compile(const MathLib::ParserNode& node) {
     }
     return ret + "global _start\n_start:\n\tcall Main\n\txor rdi, rdi\n\ttest rax, rax\n\tsete dil\n\tmov rax, 60\n\tsyscall";
 }
-int main(int, char**) {
-    try {
-        const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
-        MathLib::Toolchain toolchain = MathLib::Toolchain(
-            new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
-                new MathLib::WhitespaceLexerRule(SIZE_MAX),
-                new MathLib::IdentifierLexerRule((size_t)TokenType::Identifier, false),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::Semicolon, ';'_M),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::BracketsStart, '{'_M),
-                new MathLib::SingleCharLexerRule((size_t)TokenType::BracketsEnd, '}'_M)
-            )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
-                new FunctionParserLayer(),
-                new ReturnParserLayer(),
-                new LetParserLayer(),
-                new ScopeParserLayer(),
-                new MathLib::RightBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
-                new MathLib::IdentityParserLayer((size_t)TokenType::Identifier, (size_t)TokenType::Identifier),
-                new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd)
-            )), optimizer
-        );
-        MathLib::HostFileSystem fs;
-        toolchain.LoadInput('{'_M + fs.Open("src/TestPrograms/Compiler/Main.txt"_M, MathLib::OpenMode::Read).ReadUntil('\0') + '}');
-        const MathLib::ParserNode node = toolchain.GetNode();
-        std::cout << NodeToString(node) << std::endl;
-        if (!fs.Open("bin/Out.asm"_M, MathLib::OpenMode::Write).Puts(Compile(node))) MathLib::Panic("Failed to save compiled program");
-        return EXIT_SUCCESS;
-    }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+void Main(int, char**, MathLib::FileSystem& fs) {
+    const MathLib::IdentityFunction<MathLib::ParserNode, MathLib::ParserNode> optimizer;
+    MathLib::Toolchain toolchain = MathLib::Toolchain(
+        new MathLib::Lexer(MathLib::MakeArray<MathLib::LexerRule*>(
+            new MathLib::WhitespaceLexerRule(SIZE_MAX),
+            new MathLib::IdentifierLexerRule((size_t)TokenType::Identifier, false),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::Semicolon, ';'_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::Comma, ','_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesStart, '('_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::ParenthesesEnd, ')'_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::BracketsStart, '{'_M),
+            new MathLib::SingleCharLexerRule((size_t)TokenType::BracketsEnd, '}'_M)
+        )), new MathLib::Parser(MathLib::MakeArray<MathLib::ParserLayer*>(
+            new FunctionParserLayer(),
+            new ReturnParserLayer(),
+            new LetParserLayer(),
+            new ScopeParserLayer(),
+            new MathLib::RightBinaryParserLayer((size_t)TokenType::Comma, (size_t)TokenType::Comma),
+            new MathLib::IdentityParserLayer((size_t)TokenType::Identifier, (size_t)TokenType::Identifier),
+            new MathLib::UnwrapperParserLayer((size_t)TokenType::ParenthesesStart, (size_t)TokenType::ParenthesesEnd)
+        )), optimizer
+    );
+    toolchain.LoadInput('{'_M + fs.Open("Data/Compiler/Main.txt"_M, MathLib::OpenMode::Read).ReadUntil('\0') + '}');
+    const MathLib::ParserNode node = toolchain.GetNode();
+    std::cout << NodeToString(node) << std::endl;
+    if (!fs.Open("bin/Out.asm"_M, MathLib::OpenMode::Write).Puts(Compile(node))) MathLib::Panic("Failed to save compiled program");
 }

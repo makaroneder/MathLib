@@ -1,4 +1,3 @@
-#include <Libc/HostFileSystem.hpp>
 #include <SingleTypePair.hpp>
 #include <Math/Matrix.hpp>
 #include <Bitmap.hpp>
@@ -218,28 +217,20 @@ bool BruteforceInternal(MathLib::Matrix<Block>& sudoku, size_t i, size_t j, bool
 bool Bruteforce(MathLib::Matrix<Block>& sudoku) {
     return BruteforceInternal(sudoku, 0, 0, true);
 }
-int main(int argc, char** argv) {
-    try {
-        if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
-        MathLib::HostFileSystem fs;
-        const MathLib::CSV csv = MathLib::CSV(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
-        const size_t height = csv.GetHeight();
-        const size_t maxWidth = csv.GetMaxWidth();
-        MathLib::Matrix<size_t> sudoku = MathLib::Matrix<size_t>(maxWidth, height);
-        for (size_t y = 0; y < height; y++) {
-            const size_t width = csv.GetWidth(y);
-            for (size_t x = 0; x < width; x++) sudoku.AtUnsafe(x, y) = MathLib::StringToNumber(csv.At(x, y));
-            for (size_t x = width; x < maxWidth; x++) sudoku.AtUnsafe(x, y) = 0;
-        }
-        MathLib::Matrix<Block> parsedSudoku = GetPossibleValues(sudoku);
-        const MathLib::num_t time = MathLib::GetTime();
-        Bruteforce(parsedSudoku);
-        std::cout << MathLib::GetTime() - time << std::endl;
-        std::cout << SudokuToCSVString(parsedSudoku) << std::endl;
-        return EXIT_SUCCESS;
+void Main(int argc, char** argv, MathLib::FileSystem& fs) {
+    if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
+    const MathLib::CSV csv = MathLib::CSV(fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadUntil('\0'));
+    const size_t height = csv.GetHeight();
+    const size_t maxWidth = csv.GetMaxWidth();
+    MathLib::Matrix<size_t> sudoku = MathLib::Matrix<size_t>(maxWidth, height);
+    for (size_t y = 0; y < height; y++) {
+        const size_t width = csv.GetWidth(y);
+        for (size_t x = 0; x < width; x++) sudoku.AtUnsafe(x, y) = MathLib::StringToNumber(csv.At(x, y));
+        for (size_t x = width; x < maxWidth; x++) sudoku.AtUnsafe(x, y) = 0;
     }
-    catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    MathLib::Matrix<Block> parsedSudoku = GetPossibleValues(sudoku);
+    const MathLib::num_t time = MathLib::GetTime();
+    Bruteforce(parsedSudoku);
+    std::cout << MathLib::GetTime() - time << std::endl;
+    std::cout << SudokuToCSVString(parsedSudoku) << std::endl;
 }

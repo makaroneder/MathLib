@@ -90,6 +90,10 @@ namespace MathLib {
         return (x << n) | (x >> (bits - n));
     }
     template <typename T>
+    [[nodiscard]] constexpr T CircularRightShift(const T& x, uint8_t n, uint8_t bits = sizeof(T) * 8) {
+        return (x >> n) | (x << (bits - n));
+    }
+    template <typename T>
     [[nodiscard]] Array<T> StalinSort(const Sequence<T>& array, const Function<bool, T, T>& compare) {
         const size_t size = array.GetSize();
         if (!size) return Array<T>();

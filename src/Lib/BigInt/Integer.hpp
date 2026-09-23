@@ -1,0 +1,54 @@
+#ifndef MathLib_BigInt_Integer_H
+#define MathLib_BigInt_Integer_H
+#include "NaturalNumber.hpp"
+
+namespace MathLib {
+    struct Integer;
+    struct Integer : Orderable<Integer>, Saveable, Printable {
+        Integer(void);
+        Integer(const NaturalNumber& natural);
+        Integer(const NaturalNumber& natural, bool positive);
+        [[nodiscard]] bool IsZero(void) const;
+        [[nodiscard]] bool IsEven(void) const;
+        [[nodiscard]] size_t GetSize(void) const;
+        [[nodiscard]] String ToHexString(void) const;
+        [[nodiscard]] virtual bool Save(Writable& file) const override;
+        [[nodiscard]] virtual bool Load(Readable& file) override;
+        [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+
+        [[nodiscard]] Integer DivMod(const uint8_t& other, uint8_t& mod) const;
+        [[nodiscard]] Integer DivModBySubtraction(const Integer& other, NaturalNumber& mod) const;
+        [[nodiscard]] Integer LongDivMod(const Integer& other, NaturalNumber& mod) const;
+        [[nodiscard]] Integer GreatestCommonDivisor(const Integer& other) const;
+        [[nodiscard]] Integer LeastCommonMultiple(const Integer& other) const;
+        void MultiplyBy256(uint8_t last);
+
+        Integer& operator+=(const Integer& other);
+        [[nodiscard]] Integer operator+(const Integer& other) const;
+        Integer& operator++(void);
+        Integer operator++(int);
+
+        [[nodiscard]] Integer operator-(void) const;
+        Integer& operator-=(const Integer& other);
+        [[nodiscard]] Integer operator-(const Integer& other) const;
+        Integer& operator--(void);
+        Integer operator--(int);
+
+        Integer& operator*=(const Integer& other);
+        [[nodiscard]] Integer operator*(const Integer& other) const;
+
+        Integer& operator/=(const Integer& other);
+        [[nodiscard]] Integer operator/(const Integer& other) const;
+        Integer& operator%=(const Integer& other);
+        [[nodiscard]] Integer operator%(const Integer& other) const;
+
+        Integer& operator^=(const NaturalNumber& other);
+        [[nodiscard]] Integer operator^(const NaturalNumber& other) const;
+        [[nodiscard]] virtual bool LessThanEqual(const Integer& other) const override;
+
+        NaturalNumber natural;
+        bool positive;
+    };
+}
+
+#endif

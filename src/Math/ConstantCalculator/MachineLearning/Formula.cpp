@@ -4,7 +4,7 @@
 #include <FunctionT.hpp>
 
 Formula::Formula(void) : value(), name(), children(), type(Type::None) {}
-Formula::Formula(const RationalNumber& value) : value(value), name(), children(), type(Type::Constant) {}
+Formula::Formula(const MathLib::RationalNumber& value) : value(value), name(), children(), type(Type::Constant) {}
 Formula::Formula(const MathLib::Sequence<char>& name) : value(), name(MathLib::CollectionToString(name)), children(), type(Type::Variable) {}
 Formula::Formula(Type type, const Formula& a, const Formula& b) : value(), name(), children(MathLib::MakeArray<Formula>(a, b)), type(type) {}
 Formula::Formula(Type type, const MathLib::Sequence<Formula>& children) : value(), name(), children(MathLib::CollectionToArray<Formula>(children)), type(type) {}
@@ -14,7 +14,7 @@ Formula Formula::MakeAdd(Formula a, Formula b) {
     if (a.type == Type::None || b.type == Type::None) return Formula();
     if (b.type == Type::Constant) MathLib::Swap<Formula>(a, b);
     if (a.type == Type::Constant) {
-        if (a.value == RationalNumber()) return b;
+        if (a.value == MathLib::RationalNumber()) return b;
         if (b.type == Type::Constant) return Formula(a.value + b.value);
         if (b.type == Type::Add) for (uint8_t i = 0; i < 2; i++)
             if (b.children.AtUnsafe(i).type == Type::Constant)
@@ -28,9 +28,9 @@ Formula Formula::MakeSub(Formula a, Formula b) {
     a = a.Simplify();
     b = b.Simplify();
     if (a.type == Type::None || b.type == Type::None) return Formula();
-    if (a == b) return RationalNumber();
+    if (a == b) return MathLib::RationalNumber();
     if (b.type == Type::Constant) {
-        if (b.value == RationalNumber()) return a;
+        if (b.value == MathLib::RationalNumber()) return a;
         if (a.type == Type::Constant) return Formula(a.value - b.value);
         if (a.type == Type::Add) for (uint8_t i = 0; i < 2; i++)
             if (a.children.AtUnsafe(i).type == Type::Constant)
@@ -45,8 +45,8 @@ Formula Formula::MakeMul(Formula a, Formula b) {
     if (a == b) return MakeSquare(a);
     if (b.type == Type::Constant) MathLib::Swap<Formula>(a, b);
     if (a.type == Type::Constant) {
-        if (a.value == RationalNumber()) return a;
-        if (a.value == RationalNumber(NaturalNumber::FromT<uint8_t>(1))) return b;
+        if (a.value == MathLib::RationalNumber()) return a;
+        if (a.value == MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(1))) return b;
         if (b.type == Type::Constant) return Formula(a.value * b.value);
         if (b.type == Type::Mul) for (uint8_t i = 0; i < 2; i++)
             if (b.children.AtUnsafe(i).type == Type::Constant)
@@ -66,12 +66,12 @@ Formula Formula::MakeDiv(Formula a, Formula b) {
     a = a.Simplify();
     b = b.Simplify();
     if (a.type == Type::None || b.type == Type::None) return Formula();
-    if (a == b) return RationalNumber(NaturalNumber::FromT<uint8_t>(1));
+    if (a == b) return MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(1));
     if (b.type == Type::Constant) {
-        if (b.value == RationalNumber(NaturalNumber::FromT<uint8_t>(1))) return a;
+        if (b.value == MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(1))) return a;
         if (a.type == Type::Constant) return Formula(a.value / b.value);
     }
-    if (a.type == Type::Constant && a.value == RationalNumber(NaturalNumber())) return a;
+    if (a.type == Type::Constant && a.value == MathLib::RationalNumber(MathLib::NaturalNumber())) return a;
     return Formula(Type::Div, a, b);
 }
 Formula Formula::MakeSquare(Formula base) {
@@ -80,7 +80,7 @@ Formula Formula::MakeSquare(Formula base) {
     if (base.type == Type::Constant) return Formula(base.value * base.value);
     if (base.type == Type::Add || base.type == Type::Sub) {
         const Formula a = MakeAdd(MakeSquare(base.children.At(0)), MakeSquare(base.children.At(1)));
-        const Formula b = MakeMul(RationalNumber(NaturalNumber::FromT<uint8_t>(2)), MakeMul(base.children.At(0), base.children.At(1)));
+        const Formula b = MakeMul(MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(2)), MakeMul(base.children.At(0), base.children.At(1)));
         return base.type == Type::Add ? MakeAdd(a, b) : MakeSub(a, b);
     }
     return Formula(Type::Square, MathLib::MakeArray<Formula>(base));
@@ -122,18 +122,18 @@ bool Formula::Equals(const Formula& other) const {
 Formula Formula::EvaluateInternal(MathLib::Dictionary<MathLib::String, Formula>& derivatives) const {
     switch (type) {
         case Type::Constant: return *this;
-        case Type::Variable: return derivatives.AddOrReplace(MathLib::DictionaryElement<MathLib::String, Formula>(name, RationalNumber(NaturalNumber::FromT<uint8_t>(1)))) ? *this : Formula();
+        case Type::Variable: return derivatives.AddOrReplace(MathLib::DictionaryElement<MathLib::String, Formula>(name, MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(1)))) ? *this : Formula();
         case Type::Add: {
             const Formula output1 = children.At(0).EvaluateInternal(derivatives);
             MathLib::Dictionary<MathLib::String, Formula> tmp;
             const Formula output2 = children.At(1).EvaluateInternal(tmp);
-            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeAdd), Formula(RationalNumber())) ? MakeAdd(output1, output2) : Formula();
+            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeAdd), Formula(MathLib::RationalNumber())) ? MakeAdd(output1, output2) : Formula();
         }
         case Type::Sub: {
             const Formula output1 = children.At(0).EvaluateInternal(derivatives);
             MathLib::Dictionary<MathLib::String, Formula> tmp;
             const Formula output2 = children.At(1).EvaluateInternal(tmp);
-            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeSub), Formula(RationalNumber())) ? MakeSub(output1, output2) : Formula();
+            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeSub), Formula(MathLib::RationalNumber())) ? MakeSub(output1, output2) : Formula();
         }
         case Type::Mul: {
             const MathLib::FunctionPointer<Formula, Formula, Formula> func = MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeMul);
@@ -142,7 +142,7 @@ Formula Formula::EvaluateInternal(MathLib::Dictionary<MathLib::String, Formula>&
             const Formula output2 = children.At(1).EvaluateInternal(tmp);
             derivatives.Map(MathLib::PartialFunctionApplication<Formula, Formula, Formula>(func, output2));
             tmp.Map(MathLib::PartialFunctionApplication<Formula, Formula, Formula>(func, output1));
-            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeAdd), Formula(RationalNumber())) ? MakeMul(output1, output2) : Formula();
+            return derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeAdd), Formula(MathLib::RationalNumber())) ? MakeMul(output1, output2) : Formula();
         }
         case Type::Div: {
             const MathLib::FunctionPointer<Formula, Formula, Formula> func = MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeMul);
@@ -151,7 +151,7 @@ Formula Formula::EvaluateInternal(MathLib::Dictionary<MathLib::String, Formula>&
             const Formula output2 = children.At(1).EvaluateInternal(tmp);
             derivatives.Map(MathLib::PartialFunctionApplication<Formula, Formula, Formula>(func, output2));
             tmp.Map(MathLib::PartialFunctionApplication<Formula, Formula, Formula>(func, output1));
-            if (!derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeSub), Formula(RationalNumber()))) return Formula();
+            if (!derivatives.Combine<Formula>(tmp, MathLib::FunctionPointer<Formula, Formula, Formula>(&MakeSub), Formula(MathLib::RationalNumber()))) return Formula();
             derivatives.Map(MathLib::MakeFunctionT<Formula, Formula>([&output2](Formula a) -> Formula {
                 return MakeDiv(a, MakeMul(output2, output2));
             }));
@@ -160,7 +160,7 @@ Formula Formula::EvaluateInternal(MathLib::Dictionary<MathLib::String, Formula>&
         case Type::Square: {
             const Formula ret = children.At(0).EvaluateInternal(derivatives);
             derivatives.Map(MathLib::MakeFunctionT<Formula, Formula>([](Formula a) -> Formula {
-                return MakeMul(RationalNumber(NaturalNumber::FromT<uint8_t>(2)), a);
+                return MakeMul(MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(2)), a);
             }));
             return MakeSquare(ret);
         }

@@ -1,6 +1,6 @@
 #ifndef Formula_H
 #define Formula_H
-#include "../RationalNumber.hpp"
+#include <BigInt/RationalNumber.hpp>
 #include <Interfaces/Dictionary.hpp>
 
 struct Formula;
@@ -15,13 +15,13 @@ struct Formula : MathLib::Comparable<Formula>, MathLib::Printable {
         Div,
         Square,
     };
-    RationalNumber value;
+    MathLib::RationalNumber value;
     MathLib::String name;
     MathLib::Array<Formula> children;
     Type type;
 
     Formula(void);
-    Formula(const RationalNumber& value);
+    Formula(const MathLib::RationalNumber& value);
     Formula(const MathLib::Sequence<char>& name);
     Formula(Type type, const Formula& a, const Formula& b);
     Formula(Type type, const MathLib::Sequence<Formula>& children);

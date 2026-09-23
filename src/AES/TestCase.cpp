@@ -15,7 +15,7 @@ TestCase::TestCase(const MathLib::Sequence<char>& str) {
     i += 28;
     
     MathLib::SkipWhiteSpace(str, i);
-    if (!str.Contains("# AESVS "_M)) return;
+    if (!str.Contains("# AESVS "_M, i)) return;
     i += 8;
     while (!MathLib::IsWhiteSpace(str.AtUnsafe(i))) name += str.AtUnsafe(i++);
     if (!str.Contains(" test data for "_M, i)) return;

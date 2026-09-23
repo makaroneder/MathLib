@@ -7,7 +7,11 @@ namespace MathLib {
         MultiAllocator(void);
         MultiAllocator(Allocator* allocator);
         MultiAllocator(Allocator* allocator1, Allocator* allocator2);
+        MultiAllocator(MultiAllocator&& other);
+        MultiAllocator(const MultiAllocator& other) = delete;
         virtual ~MultiAllocator(void) override;
+        MultiAllocator& operator=(const MultiAllocator& other) = delete;
+        MultiAllocator& operator=(MultiAllocator&& other);
         [[nodiscard]] virtual void* Alloc(size_t size) override;
         [[nodiscard]] virtual bool Dealloc(void* ptr) override;
         [[nodiscard]] virtual size_t GetFreeMemory(void) const override;

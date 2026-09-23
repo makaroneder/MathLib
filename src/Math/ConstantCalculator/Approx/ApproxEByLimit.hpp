@@ -1,7 +1,7 @@
 #ifndef ApproxEByLimit_H
 #define ApproxEByLimit_H
-#include "../RationalNumber.hpp"
+#include <BigInt/RationalNumber.hpp>
 
-RationalNumber ApproxEByLimit(NaturalNumber n);
+MathLib::RationalNumber ApproxEByLimit(MathLib::NaturalNumber n);
 
 #endif

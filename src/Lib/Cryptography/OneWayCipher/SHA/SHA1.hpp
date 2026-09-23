@@ -1,6 +1,6 @@
 #ifndef MathLib_Cryptography_OneWayCipher_SHA1_H
 #define MathLib_Cryptography_OneWayCipher_SHA1_H
-#include "../OneWayCipher.hpp"
+#include "../../OneWayCipher.hpp"
 
 namespace MathLib {
     struct SHA1 : OneWayCipher {

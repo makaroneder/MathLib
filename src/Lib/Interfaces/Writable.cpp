@@ -22,4 +22,13 @@ namespace MathLib {
     bool Writable::Puts(char chr) {
         return WriteBuffer(&chr, sizeof(char));
     }
+    bool Writable::WriteBigEndianBuffer16(const void* buffer, size_t size) {
+        const uint16_t* const buffer16 = (const uint16_t*)buffer;
+        for (size_t i = 0; i < size; i++)
+            if (!Write<uint16_t>(SwapEndian16(buffer16[i]))) return false;
+        return true;
+    }
+    bool Writable::WriteBigEndian16(uint16_t value) {
+        return Write<uint16_t>(SwapEndian16(value));
+    }
 }

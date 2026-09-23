@@ -22,6 +22,12 @@ namespace MathLib {
         [[nodiscard]] bool ReadCollection(Collection<T>& sequence) {
             return ReadBuffer(sequence.GetValue(), sequence.GetSize() * sizeof(T));
         }
+        template <typename T>
+        [[nodiscard]] bool ReadBigEndian16(T& value) {
+            if (sizeof(T) != sizeof(uint16_t) || !Read<T>(value)) return false;
+            value = (T)SwapEndian16((uint16_t)value);
+            return true;
+        }
 
         protected:
         [[nodiscard]] bool DefaultSkip(size_t size);

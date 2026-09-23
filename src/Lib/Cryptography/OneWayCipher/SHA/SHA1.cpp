@@ -1,20 +1,12 @@
 #include "SHA1.hpp"
-#include "../../Interfaces/Sequence/SequenceUnion.hpp"
-#include "../../Interfaces/Sequence/ExtendedSequence.hpp"
-#include "../../Interfaces/Sequence/FixedSizeCollection.hpp"
+#include "SHAPadding.hpp"
+#include "../../../Interfaces/Sequence/FixedSizeCollection.hpp"
 
 namespace MathLib {
     Array<uint8_t> SHA1::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (!(key.IsEmpty() || (key.type == CipherKey::Type::Normal && key.data.GetSize() == sizeof(bool)))) return Array<uint8_t>();
         const bool sha0 = !key.IsEmpty() && key.data.AsT<bool>().Get();
-        const ExtendedSequence<uint8_t> tmp1 = ExtendedSequence<uint8_t>(data, 0x80, 1);
-        const size_t padLen = (56 - (tmp1.GetSize() % 64) + 64) % 64;
-        const ExtendedSequence<uint8_t> tmp2 = ExtendedSequence<uint8_t>(tmp1, 0x00, padLen);
-        const uint64_t originalSize = data.GetSize() * 8;
-        FixedSizeCollection<uint8_t, sizeof(uint64_t)> originalSizeSequence;
-        for (uint8_t i = 0; i < sizeof(uint64_t); i++)
-            originalSizeSequence.AtUnsafe(i) = originalSize >> (56 - 8 * i);
-        const SequenceUnion<uint8_t> input = SequenceUnion<uint8_t>(tmp2, originalSizeSequence);
+        const Array<uint8_t> input = SHAPadding().Encrypt(data, CipherKey());
         const size_t size = input.GetSize();
         uint32_t h[] = {
             0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476, 0xc3d2e1f0,

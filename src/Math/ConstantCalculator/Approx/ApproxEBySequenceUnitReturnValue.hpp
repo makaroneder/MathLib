@@ -1,13 +1,13 @@
 #ifndef ApproxEBySequenceUnitReturnValue_H
 #define ApproxEBySequenceUnitReturnValue_H
-#include "../RationalNumber.hpp"
+#include <BigInt/RationalNumber.hpp>
 
 struct ApproxEBySequenceUnitReturnValue {
-    RationalNumber ret;
-    NaturalNumber factorial;
+    MathLib::RationalNumber ret;
+    MathLib::NaturalNumber factorial;
 
     ApproxEBySequenceUnitReturnValue(void);
-    ApproxEBySequenceUnitReturnValue(const RationalNumber& ret, const NaturalNumber& factorial);
+    ApproxEBySequenceUnitReturnValue(const MathLib::RationalNumber& ret, const MathLib::NaturalNumber& factorial);
 };
 
 #endif

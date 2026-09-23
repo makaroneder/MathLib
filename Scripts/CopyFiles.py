@@ -9,8 +9,8 @@ if __name__ == "__main__":
     inputs : set[str] = set(argv[1:-2])
     strip : int = int(argv[-1])
     for input in inputs:
-        with open(input, "r") as inputFile:
+        with open(input, "rb") as inputFile:
             output : str = argv[-2] + '/' + str.join("/", input.split('/')[strip:])
             makedirs(path.dirname(output), exist_ok = True)
-            with open(output, "w") as outputFile:
+            with open(output, "wb") as outputFile:
                 outputFile.write(inputFile.read())

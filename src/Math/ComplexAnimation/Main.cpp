@@ -8,6 +8,7 @@
 
 void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
     if (argc < 4) MathLib::Panic("Usage: "_M + argv[0] + " <input file> <output image directory> <output file>");
+    if (!fs.CreateDirectory(MathLib::String(argv[2]), false)) MathLib::Panic("Failed to create output directory");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Complex animation", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
     if (!renderer->SetImage<MathLib::P6>()) MathLib::Panic("Failed to set image interface in renderer");

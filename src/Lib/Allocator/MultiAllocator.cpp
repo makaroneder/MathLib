@@ -4,9 +4,18 @@ namespace MathLib {
     MultiAllocator::MultiAllocator(void) : allocator1(nullptr), allocator2(nullptr) {}
     MultiAllocator::MultiAllocator(Allocator* allocator) : allocator1(allocator), allocator2(nullptr) {}
     MultiAllocator::MultiAllocator(Allocator* allocator1, Allocator* allocator2) : allocator1(allocator1), allocator2(allocator2) {}
+    MultiAllocator::MultiAllocator(MultiAllocator&& other) : allocator1(other.allocator1), allocator2(other.allocator2) {
+        other.allocator1 = other.allocator2 = nullptr;
+    }
     MultiAllocator::~MultiAllocator(void) {
         if (allocator1) delete allocator1;
         if (allocator2) delete allocator2;
+    }
+    MultiAllocator& MultiAllocator::operator=(MultiAllocator&& other) {
+        allocator1 = other.allocator1;
+        allocator2 = other.allocator2;
+        other.allocator1 = other.allocator2 = nullptr;
+        return *this;
     }
     void* MultiAllocator::Alloc(size_t size) {
         if (allocator1) {

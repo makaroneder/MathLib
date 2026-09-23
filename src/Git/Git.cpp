@@ -1,8 +1,8 @@
 #include "Git.hpp"
 #include "GitTree.hpp"
 #include "GitCommit.hpp"
-#include <Cryptography/OneWayCipher/SHA1.hpp>
 #include <Cryptography/Compressor/ZLib.hpp>
+#include <Cryptography/OneWayCipher/SHA/SHA1.hpp>
 
 MathLib::String Git::HashToPath(const MathLib::String& hash) {
     return "objects/"_M + hash.AtUnsafe(0) + hash.AtUnsafe(1) + '/' + MathLib::SubString(hash, 2, hash.GetSize() - 2);

@@ -10,6 +10,8 @@ namespace MathLib {
         [[nodiscard]] bool Puts(const Sequence<char>& str);
         [[nodiscard]] bool Puts(const char* str);
         [[nodiscard]] bool Puts(char chr);
+        [[nodiscard]] bool WriteBigEndianBuffer16(const void* buffer, size_t size);
+        [[nodiscard]] bool WriteBigEndian16(uint16_t value);
         template <typename T>
         [[nodiscard]] bool Write(const T& value) {
             return WriteBuffer(&value, sizeof(T));
@@ -17,6 +19,10 @@ namespace MathLib {
         template <typename T>
         [[nodiscard]] bool WriteCollection(const Collection<T>& sequence) {
             return WriteBuffer(sequence.GetValue(), sequence.GetSize() * sizeof(T));
+        }
+        template <typename T>
+        [[nodiscard]] bool WriteSizeAndBuffer(const void* buffer, T size) {
+            return Write<T>(size) && WriteBuffer(buffer, size);
         }
     };
 }

@@ -3,31 +3,31 @@
 
 Formula MakeMeanSquaredError(const MathLib::Sequence<DataPoint>& dataSet, const MathLib::Function<Formula, Formula>& function) {
     const size_t size = dataSet.GetSize();
-    Formula ret = RationalNumber();
+    Formula ret = MathLib::RationalNumber();
     for (size_t i = 0; i < size; i++) {
         const DataPoint data = dataSet.At(i);
         const Formula tmp = Formula::MakeSub(data.output, function(data.input));
         ret = Formula::MakeAdd(ret, Formula::MakeSquare(tmp));
     }
-    return Formula::MakeDiv(ret, RationalNumber(NaturalNumber::FromT<size_t>(size)));
+    return Formula::MakeDiv(ret, MathLib::RationalNumber(MathLib::NaturalNumber::FromT<size_t>(size)));
 }
 Formula MakePolynomial(const MathLib::Sequence<Formula>& coefficients, const Formula& variable) {
     const size_t size = coefficients.GetSize();
-    Formula ret = RationalNumber();
-    Formula mul = RationalNumber(NaturalNumber::FromT<uint8_t>(1));
+    Formula ret = MathLib::RationalNumber();
+    Formula mul = MathLib::RationalNumber(MathLib::NaturalNumber::FromT<uint8_t>(1));
     for (size_t i = size; i; i--) {
         ret = Formula::MakeAdd(ret, Formula::MakeMul(coefficients.At(i - 1), mul));
         mul = Formula::MakeMul(mul, variable);
     }
     return ret;
 }
-Regression::Regression(const RationalNumber& learningRate, const MathLib::Sequence<DataPoint>& dataSet, const MathLib::Sequence<MathLib::String>& coefficients, const MathLib::Function<Formula, const MathLib::Sequence<Formula>&, const Formula&>& function) : learningRate(learningRate), weights(), derivatives(), function(function) {
+Regression::Regression(const MathLib::RationalNumber& learningRate, const MathLib::Sequence<DataPoint>& dataSet, const MathLib::Sequence<MathLib::String>& coefficients, const MathLib::Function<Formula, const MathLib::Sequence<Formula>&, const Formula&>& function) : learningRate(learningRate), weights(), derivatives(), function(function) {
     const size_t size = coefficients.GetSize();
     MathLib::Array<Formula> coeffs = size;
     weights = size;
     for (size_t i = 0; i < size; i++) {
         coeffs.At(i) = coefficients.At(i);
-        weights.At(i) = MathLib::DictionaryElement<MathLib::String, Formula>(coeffs.At(i).name, Formula(RationalNumber()));
+        weights.At(i) = MathLib::DictionaryElement<MathLib::String, Formula>(coeffs.At(i).name, Formula(MathLib::RationalNumber()));
     }
     MakeMeanSquaredError(dataSet, MathLib::MakeFunctionT<Formula, Formula>([&coeffs, &function](Formula variable) -> Formula {
         return function(coeffs, variable);
@@ -44,7 +44,7 @@ MathLib::String Regression::ToString(const MathLib::Sequence<char>& padding) con
 bool Regression::Learn(void) {
     MathLib::Dictionary<MathLib::String, Formula> tmp;
     for (MathLib::DictionaryElement<MathLib::String, Formula>& weight : weights) {
-        const Formula derivative = derivatives.Get(weight.GetKey()).GetOr(RationalNumber()).Substitute(weights).Evaluate(tmp);
+        const Formula derivative = derivatives.Get(weight.GetKey()).GetOr(MathLib::RationalNumber()).Substitute(weights).Evaluate(tmp);
         if (derivative.type != Formula::Type::Constant) return false;
         weight.value.value -= learningRate * derivative.value;
     }

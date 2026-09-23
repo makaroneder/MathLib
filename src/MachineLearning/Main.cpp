@@ -12,11 +12,11 @@
 void Main(int argc, char** argv, MathLib::FileSystem& fs) {
     #ifdef Debug
     const MathLib::num_t start = MathLib::GetTime();
+    const size_t printStatements = 10;
     #else
     srand(time(nullptr));
     #endif
     if (argc < 3) MathLib::Panic("Usage: "_M + argv[0] + " <file> <iteration count>");
-    const size_t printStatements = 10;
     const size_t limit = (size_t)MathLib::StringToNumber(MathLib::String(argv[2]));
     NeuralNetworkState<MathLib::num_t> state;
     if (access(argv[1], F_OK) == -1) {

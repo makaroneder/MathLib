@@ -8,5 +8,5 @@ if __name__ == "__main__":
         file.write("set disassembly-flavor intel\n")
         file.write(f"symbol-file {argv[2]}\n")
         file.write(f"break *{argv[3]}\n")
-        file.write(f"target remote | {argv[4]} -S -gdb stdio\n")
+        file.write(f"target remote | {" ".join(argv[4:])} -S -gdb stdio\n")
         file.write("continue\n")

@@ -2,8 +2,8 @@
 #define ApproxEBySequence_H
 #include "ApproxEBySequenceUnitReturnValue.hpp"
 
-void ApproxEBySequenceUnit(NaturalNumber start, NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret);
-void ApproxEBySequenceMultiUnit(NaturalNumber start, NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret);
-RationalNumber ApproxEBySequence(NaturalNumber limit);
+void ApproxEBySequenceUnit(MathLib::NaturalNumber start, MathLib::NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret);
+void ApproxEBySequenceMultiUnit(MathLib::NaturalNumber start, MathLib::NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret);
+MathLib::RationalNumber ApproxEBySequence(MathLib::NaturalNumber limit);
 
 #endif

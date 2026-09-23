@@ -1,5 +1,5 @@
 #include "ApproxEByLimit.hpp"
 
-RationalNumber ApproxEByLimit(NaturalNumber n) {
-    return RationalNumber(n + NaturalNumber::FromT<uint8_t>(1), n) ^ n;
+MathLib::RationalNumber ApproxEByLimit(MathLib::NaturalNumber n) {
+    return MathLib::RationalNumber(n + MathLib::NaturalNumber::FromT<uint8_t>(1), n) ^ n;
 }

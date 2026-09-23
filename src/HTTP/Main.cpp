@@ -1,6 +1,7 @@
 #include "HTTPRequest.hpp"
 #include "HTTPResponse.hpp"
 #include <Libc/HostSocket.hpp>
+#include <FileSystem/FileSystem.hpp>
 #include <iostream>
 
 MathLib::Array<HTTPHeader> resources = MathLib::MakeArray<HTTPHeader>(
@@ -16,7 +17,7 @@ void Main(int argc, char** argv, MathLib::FileSystem&) {
     MathLib::HostSocket server = MathLib::HostSocket(true);
     if (!server.Bind(atoi(argv[1]))) MathLib::Panic("Failed to bind socket to local address");
     std::cout << "Waiting for a client to connect on http://localhost:" << argv[1] << std::endl;
-    MathLib::Socket* client = server.GetConnection();
+    MathLib::HostSocket* client = server.GetConnection();
     if (!client) MathLib::Panic("Failed to get client connection");
     while (true) {
         char buff[1025] = { '\0', };

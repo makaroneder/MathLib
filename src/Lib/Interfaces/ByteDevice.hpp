@@ -1,11 +1,10 @@
 #ifndef MathLib_Interfaces_ByteDevice_H
 #define MathLib_Interfaces_ByteDevice_H
 #include "../SeekMode.hpp"
-#include "Readable.hpp"
-#include "Writable.hpp"
+#include "RWDevice.hpp"
 
 namespace MathLib {
-    struct ByteDevice : Readable, Writable {
+    struct ByteDevice : RWDevice {
         ByteDevice(void);
         [[nodiscard]] virtual size_t GetSize(void) const = 0;
         [[nodiscard]] virtual size_t ReadPositionedSizedBuffer(void* buffer, size_t size, size_t position) = 0;

@@ -5,11 +5,11 @@
 #include "../../Interfaces/Sequence/TransformSequence.hpp"
 
 namespace MathLib {
-    HMAC::HMAC(OneWayCipher& hash) : hash(hash) {}
+    HMAC::HMAC(const OneWayCipher& hash) : hash(hash) {}
     Array<uint8_t> HMAC::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
-        if (key.type != CipherKey::Type::MultiKey || key.children.GetSize() != 3) return Array<uint8_t>();
+        if (!key.CheckChildrenSize(3)) return Array<uint8_t>();
         const CipherKey key1 = key.children.AtUnsafe(0);
-        if (key1.type != CipherKey::Type::Normal || key1.data.GetSize() != sizeof(BlockSize)) return Array<uint8_t>();
+        if (!key1.CheckDataSize(sizeof(BlockSize))) return Array<uint8_t>();
         const BlockSize blockSize = key1.data.AsT<BlockSize>().Get();
         const CipherKey key2 = key.children.AtUnsafe(1);
         if (key2.type != CipherKey::Type::Normal) return Array<uint8_t>();

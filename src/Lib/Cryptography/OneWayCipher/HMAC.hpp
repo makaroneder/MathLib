@@ -21,11 +21,11 @@ namespace MathLib {
             SHA3224 = 144,
         };
 
-        HMAC(OneWayCipher& hash);
+        HMAC(const OneWayCipher& hash);
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
 
         private:
-        OneWayCipher& hash;
+        const OneWayCipher& hash;
     };
 }
 

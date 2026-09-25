@@ -1,9 +1,8 @@
 #ifndef TLS_H
 #define TLS_H
 #include "TLSRandom.hpp"
-#include "TLSCipherSuite.hpp"
 #include "TLSRecordHeader.hpp"
-#include "TLSCompressionMethod.hpp"
+#include "EncryptionMethod.hpp"
 #include "TLSSignatureAndHashAlgorithm.hpp"
 #include <Interfaces/RWDevice.hpp>
 
@@ -31,8 +30,9 @@ struct TLS : MathLib::RWDevice {
 
     MathLib::Array<uint8_t> dataBuffer;
     MathLib::RWDevice& base;
-    TLSCipherSuite cipherSuite;
-    TLSCompressionMethod compressionMethod;
+    EncryptionMethod writeEncryption;
+    EncryptionMethod readEncryption;
+    EncryptionMethod nextReadEncryption;
     TLSRecordHeader::Type mode;
 };
 

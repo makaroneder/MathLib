@@ -29,6 +29,12 @@ namespace MathLib {
             default: return false;
         }
     }
+    bool CipherKey::CheckDataSize(size_t size) const {
+        return type == Type::Normal && data.GetSize() == size;
+    }
+    bool CipherKey::CheckChildrenSize(size_t size) const {
+        return type == Type::MultiKey && children.GetSize() == size;
+    }
     bool CipherKey::Equals(const CipherKey& other) const {
         return type == other.type && data == other.data && children == other.children;
     }

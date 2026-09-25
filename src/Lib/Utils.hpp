@@ -23,6 +23,7 @@ namespace MathLib {
     [[nodiscard]] size_t BitwiseXnor(size_t x, size_t y);
     [[nodiscard]] uint16_t SwapEndian16(uint16_t x);
     [[nodiscard]] uint32_t SwapEndian32(uint32_t x);
+    [[nodiscard]] uint64_t SwapEndian64(uint64_t x);
     [[nodiscard]] num_t Abs(num_t x);
     [[nodiscard]] num_t Pow(num_t x, num_t y);
     [[nodiscard]] complex_t Sqrt(complex_t x);

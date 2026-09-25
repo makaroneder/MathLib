@@ -19,6 +19,8 @@ namespace MathLib {
         CipherKey(const Sequence<CipherKey>& children);
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
         [[nodiscard]] bool IsEmpty(void) const;
+        [[nodiscard]] bool CheckDataSize(size_t size) const;
+        [[nodiscard]] bool CheckChildrenSize(size_t size) const;
         [[nodiscard]] virtual bool Equals(const CipherKey& other) const override;
     };
 }

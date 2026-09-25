@@ -2,7 +2,7 @@
 #include "../../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
-    CBC::CBC(Cipher& cipher) : cipher(cipher) {}
+    CBC::CBC(const Cipher& cipher) : cipher(cipher) {}
     Array<uint8_t> CBC::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {
         if (key.type != CipherKey::Type::MultiKey || key.children.GetSize() != 2) return Array<uint8_t>();
         const CipherKey key1 = key.children.AtUnsafe(0);

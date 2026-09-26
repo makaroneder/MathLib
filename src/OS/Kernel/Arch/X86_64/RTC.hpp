@@ -11,8 +11,8 @@ struct RTC : CMOS, DateKeeper, InterruptTimer {
     virtual void OnInterrupt(uintptr_t interrupt, Registers* regs, uintptr_t error) override;
     [[nodiscard]] virtual MathLib::num_t GetFrequency(void) const override;
     [[nodiscard]] virtual bool SetFrequency(MathLib::num_t frequency) override;
-    [[nodiscard]] virtual Date GetDate(void) const override;
-    virtual void SetDate(const Date& date) override;
+    [[nodiscard]] virtual MathLib::Date GetDate(void) const override;
+    virtual void SetDate(const MathLib::Date& date) override;
 
     private:
     Register centuryRegister;

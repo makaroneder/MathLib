@@ -375,6 +375,8 @@ def AddExecutableWithRunDependencies(name : str, env : TargetEnvironment, runFla
     targets[f"debug{name}"] = Target(lambda inputs, dependencies, output, env : valgrind.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), [], False)
 def AddExecutable(name : str, env : TargetEnvironment, runFlags : Callable[[str], list[str]], flags: list[str], directories: list[str], validExtensions : list[str]) -> None:
     AddExecutableWithRunDependencies(name, env, lambda list : runFlags(list[0]), flags, directories, validExtensions, [])
+AddExecutableWithRunDependencies("AML", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])
+AddExecutableWithRunDependencies("X86", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
 AddExecutable("4D", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [f"-program {dataDir}/4D/Tesseract.txt"], [], ["4D"], [".cpp"])
 AddExecutable("AES", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/AES"], [], ["AES"], [".cpp"])
 AddExecutable("AI", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["AI"], [".cpp"])
@@ -430,8 +432,6 @@ AddExecutable("TypeTheory", TargetEnvironment(["host"], None, ["console"]), lamb
 AddExecutable("VideoPlayer", TargetEnvironment(["host"], None, gfxRuntime), lambda program : ["-width 800", "-height 800", "-speed 0.1", "-skipDuration 1", "-multX 4", "-multY 4", f"-path {dataDir}/VideoPlayer/Video.aseprite"], [], ["VideoPlayer"], [".cpp"])
 AddExecutable("WebScraper", TargetEnvironment(["host"], None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
 AddExecutable("WebsiteReader", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
-AddExecutableWithRunDependencies("AML", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])
-AddExecutableWithRunDependencies("X86", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
 
 if __name__ == "__main__":
     if len(argv) < 2:

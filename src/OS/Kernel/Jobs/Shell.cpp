@@ -38,7 +38,7 @@ void ShellTask(const ModuleEntryData*) {
                 }
                 else if (args.At(0) == "read") output = args.GetSize() < 2 ? "Usage: read <path>\n" : vfs.Open(args.At(1), MathLib::OpenMode::Read).ReadUntil('\0') + '\n';
                 else if (args.At(0) == "date") output = dateKeeper->GetDate().ToString() + '\n';
-                else if (args.At(0) == "info") output = "Creation year: "_M + MathLib::ToString(Date::currentYear, 10) + '\n';
+                else if (args.At(0) == "info") output = "Creation year: "_M + MathLib::ToString(MathLib::Date::currentYear, 10) + '\n';
                 else if (args.At(0) == "memory") output = ReportFreeMemory();
                 else if (args.At(0) == "dumpMemory") {
                     if (args.GetSize() < 3) output = "Usage: dumpMemory <address> <size> [line size]\n";

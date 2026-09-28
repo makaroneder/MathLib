@@ -61,7 +61,7 @@ namespace MathLib {
             h[3] += d;
             h[4] += e;
         }
-        Array<uint8_t> ret = Array<uint8_t>(SizeOfArray(h) * sizeof(uint32_t));
+        Array<uint8_t> ret = Array<uint8_t>(sizeof(h));
         for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
             for (uint8_t j = 0; j < SizeOfArray(h); j++)
                 ret[i + j * sizeof(uint32_t)] = h[j] >> (24 - 8 * i);

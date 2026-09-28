@@ -1,4 +1,5 @@
 #include "Test.hpp"
+#include "../TLS/TLS.hpp"
 #include "../Math/Matrix.hpp"
 #include "../Math/Sigmoid.hpp"
 #include "../Physics/SIUnits.hpp"
@@ -302,6 +303,22 @@ namespace MathLib {
         TestOperation(test, HMAC(sha1).IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0xde, 0x7c, 0x9b, 0x85, 0xb8, 0xb7, 0x8a, 0xa6, 0xbc, 0x8a, 0x7a, 0x36, 0xf7, 0x0a, 0x90, 0x70, 0x1c, 0x9d, 0xb4, 0xd9), CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<HMAC::BlockSize>(HMAC::BlockSize::SHA1)), CipherKey(ByteArray::ToByteArray<char>("key"_M)), CipherKey()))));
         TestOperation(test, HMAC(sha256).IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0xf7, 0xbc, 0x83, 0xf4, 0x30, 0x53, 0x84, 0x24, 0xb1, 0x32, 0x98, 0xe6, 0xaa, 0x6f, 0xb1, 0x43, 0xef, 0x4d, 0x59, 0xa1, 0x49, 0x46, 0x17, 0x59, 0x97, 0x47, 0x9d, 0xbc, 0x2d, 0x1a, 0x3c, 0xd8), CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<HMAC::BlockSize>(HMAC::BlockSize::SHA256)), CipherKey(ByteArray::ToByteArray<char>("key"_M)), CipherKey()))));
 
+        const size_t size1 = SizeOfArray(TLS::supportedCipherSuites);
+        const size_t size2 = SizeOfArray(TLS::supportedCompressionMethods);
+        const CipherKey tlsKey = CipherKey(MakeArray<CipherKey>(
+            CipherKey(ByteArray::ToByteArray<TLSRecordHeader::Type>(TLSRecordHeader::Type::ApplicationData)),
+            CipherKey(ByteArray::ToByteArray<uint16_t>(TLS::version)),
+            CipherKey(ByteArray::ToByteArray<uint64_t>(0))
+        ));
+        for (size_t i = 0; i < size1; i++) {
+            for (size_t j = 0; j < size2; j++) {
+                EncryptionMethod cipherSuite = EncryptionMethod(TLS::supportedCipherSuites[i], TLS::supportedCompressionMethods[j]);
+                cipherSuite.macKey = cipherSuite.GetMACSize();
+                cipherSuite.cipherKey = cipherSuite.GetKeySize();
+                cipherSuite.cipherIV = cipherSuite.GetIVSize();
+                TestOperation(test, cipherSuite.TestEncryption<uint8_t>(identitySequence, tlsKey));
+            }
+        }
         return test;
     }
 }

@@ -223,6 +223,7 @@ appendTAR : Tool = Tool("tar", ["-rf @"], [], [])
 unwrapTAR : Tool = Tool("tar", ["-xf @"], [], [])
 makeEXT2 : Tool = Tool("genext2fs", [], ["@"], [])
 makeGRUB2 : Tool = Tool("grub-mkrescue", ["-quiet", "-l", "-J", "-R", "-o @"], [], [])
+makeCertificate : Tool = Tool("openssl", ["req", "-noenc", "-x509", "-outform DER"], ["-keyout @.key", "-out @"], [])
 
 baseExec : Tool = Tool("", baseGCCFlags, [f"-L {buildDir}", "-o @"], [])
 baseEnvTools : Environment = Environment({
@@ -329,7 +330,7 @@ def MakeTarget(output : str, env : EnvironmentIdentifier) -> str:
     if "" in toolsDependencies: return ""
     if targets[target].givesOutput:
         Path(dirname(outputPath)).mkdir(parents = True, exist_ok = True)
-        if not force and exists(outputPath) and max([Path(file).stat().st_mtime for file in inputs + dependencies + toolsDependencies]) <= Path(outputPath).stat().st_mtime:
+        if not force and exists(outputPath) and max([0] + [Path(file).stat().st_mtime for file in inputs + dependencies + toolsDependencies]) <= Path(outputPath).stat().st_mtime:
             return outputPath
         print(f"==> [{env}] {output}")
     return outputPath if targets[target].make(inputs, dependencies, outputPath, env) else ""
@@ -352,6 +353,7 @@ targets : dict[str, Target] = {
 
     "Main.aml": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, "-oa"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), ["../Scripts/CompileASL.py", f"../{dataDir}/ACPI/Main.asl"], True),
     "X86.bin": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, inputs), lambda : [], lambda env : ["as"], TargetEnvironment(["binaryAssembler"], [], []), [f"../{dataDir}/X86/Program.asm"], True),
+    "Certificate.der": Target(lambda inputs, dependencies, output, env : makeCertificate.run(output, ["-newkey rsa:4096", "-sha256", "-days 3650", "-subj /CN=example.com"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), [], True),
 
     "Kernel.map": Target(lambda inputs, dependencies, output, env : True, lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), [], True),
     "Kernel.elf": Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-T {inputs[0]}", dependencies[1], env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtbegin.o"]).removesuffix("\n")] + dependencies[2:-1] + [env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtend.o"]).removesuffix("\n"), dependencies[-1]]), lambda : ["MathLib.hpp", "OS/Shared/crti.s.o"] + Sort(CompileSourceFiles(["OS/Kernel", "OS/Shared"], [".cpp", ".asm"]) + ["LibStub.o"]) + ["OS/Shared/crtn.s.o"], lambda env : [AssertNotNone(env.runtimeEnvironment), "cxx"], TargetEnvironment(["os"], ["executable"], ["elf"]), ["OS/Kernel/Linker.ld"], True),
@@ -366,7 +368,7 @@ targets : dict[str, Target] = {
     "debugOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["gdb"].run(dependencies[0], []), lambda : ["OS.gdb"], lambda env : ["gdb"], TargetEnvironment(["os"], [], []), [], False),
 }
 gfxRuntime : list[str] = ["sdl2"]
-executables : list[str] = ["Main.aml", "X86.bin", "OS.gdb"]
+executables : list[str] = ["Main.aml", "X86.bin", "Certificate.der", "OS.gdb"]
 def AddExecutableWithRunDependencies(name : str, env : TargetEnvironment, runFlags : Callable[[list[str]], list[str]], flags: list[str], directories: list[str], validExtensions : list[str], runDeps : list[str]) -> None:
     executables.append(f"{name}.out")
     targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions)
@@ -377,6 +379,7 @@ def AddExecutable(name : str, env : TargetEnvironment, runFlags : Callable[[str]
     AddExecutableWithRunDependencies(name, env, lambda list : runFlags(list[0]), flags, directories, validExtensions, [])
 AddExecutableWithRunDependencies("AML", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])
 AddExecutableWithRunDependencies("X86", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
+AddExecutableWithRunDependencies("ASN1", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["ASN1"], [".cpp"], ["Certificate.der"])
 AddExecutable("4D", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [f"-program {dataDir}/4D/Tesseract.txt"], [], ["4D"], [".cpp"])
 AddExecutable("AES", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/AES"], [], ["AES"], [".cpp"])
 AddExecutable("AI", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["AI"], [".cpp"])

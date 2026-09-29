@@ -3,7 +3,9 @@
 #include "../Cryptography/ModeOfOperation/CBC.hpp"
 #include "../Interfaces/Sequence/SubSequence.hpp"
 #include "../Interfaces/Sequence/ByteArray.hpp"
+#include "TLSSignatureAndHashAlgorithm.hpp"
 #include "../Cryptography/Cipher/AES.hpp"
+#include "../BigInt/NaturalNumber.hpp"
 #include "EncryptionMethod.hpp"
 #include "TLSRecordHeader.hpp"
 
@@ -13,10 +15,18 @@ namespace MathLib {
     EncryptionMethod::EncryptionMethod(TLSCipherSuite cipherSuite, TLSCompressionMethod compressionMethod, const Array<uint8_t>& macKey, const Array<uint8_t>& cipherKey, const Array<uint8_t>& cipherIV) : macKey(macKey), cipherKey(cipherKey), cipherIV(cipherIV), cipherSuite(cipherSuite), compressionMethod(compressionMethod) {}
     Cipher* EncryptionMethod::GetCipher(Cipher*& tmpCipher, CipherKey& key) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: {
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: {
                 AES* const tmp = new AES();
                 tmpCipher = tmp;
                 if (!tmpCipher) return nullptr;
@@ -49,17 +59,25 @@ namespace MathLib {
     }
     OneWayCipher* EncryptionMethod::GetHash(HMAC::BlockSize& blockSize, CipherKey& key) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA: {
-                blockSize = HMAC::BlockSize::SHA1;
-                key = CipherKey();
-                return new SHA1();
-            }
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: {
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256: {
                 blockSize = HMAC::BlockSize::SHA256;
                 key = CipherKey();
                 return new SHA256();
+            }
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: {
+                blockSize = HMAC::BlockSize::SHA1;
+                key = CipherKey();
+                return new SHA1();
             }
             default: return nullptr;
         }
@@ -154,49 +172,123 @@ namespace MathLib {
         delete hash;
         return status ? CollectionToArray<uint8_t>(SubSequence<uint8_t>(decrypted, Interval<size_t>(start, end))) : Array<uint8_t>();
     }
+    bool EncryptionMethod::GeneratePreMasterSecretAndKeyExchange(Readable& readable, MathLib::Array<uint8_t>& preMasterSecret, MathLib::Array<uint8_t>& keyExchange) const {
+        switch (cipherSuite) {
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256: {
+                bool dhe = true;
+                switch (cipherSuite) {
+                    case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA:
+                    case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+                    case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+                    case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256: {
+                        dhe = false;
+                        break;
+                    }
+                    default: break;
+                }
+                Array<uint8_t> tmp[3];
+                for (uint8_t i = 0; i < 3; i++) {
+                    uint16_t size = 0;
+                    if (!readable.ReadBigEndian16(size)) return false;
+                    tmp[i] = size;
+                    if (!readable.ReadCollection<uint8_t>(tmp[i])) return false;
+                }
+                if (dhe) {
+                    TLSSignatureAndHashAlgorithm algorithm;
+                    if (!readable.Read<TLSSignatureAndHashAlgorithm>(algorithm)) return false;
+                    uint16_t size = 0;
+                    if (!readable.ReadBigEndian16(size)) return false;
+                    Array<uint8_t> signature = size;
+                    if (!readable.ReadCollection<uint8_t>(signature)) return false;
+                    // TODO: Verify signature
+                }
+                preMasterSecret = tmp[2];
+                keyExchange = (NaturalNumber(tmp[1]) % NaturalNumber(tmp[0])).data;
+                return true;
+            }
+            default: return false;
+        }
+    }
     bool EncryptionMethod::IsNone(void) const {
         return compressionMethod == TLSCompressionMethod::None && cipherSuite == TLSCipherSuite::None;
     }
     uint8_t EncryptionMethod::GetKeySize(void) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256: return 128 / 8;
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: return 256 / 8;
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA: return 256 / 8;
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: return 128 / 8;
             default: return 0;
         }
     }
     uint8_t EncryptionMethod::GetMACSize(void) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA: return 20;
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: return 32;
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256: return 32;
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: return 20;
             default: return 0;
         }
     }
     uint8_t EncryptionMethod::GetIVSize(void) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: return 16;
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: return 16;
             default: return 0;
         }
     }
     uint8_t EncryptionMethod::GetBlockSize(void) const {
         switch (cipherSuite) {
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256:
             case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA:
-            case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256: return 16;
+            case TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA:
+            case TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA: return 16;
             default: return 0;
         }
-    }
-    bool EncryptionMethod::IsSHA1(void) const {
-        return cipherSuite == TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA || cipherSuite == TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA;
-    }
-    bool EncryptionMethod::IsSHA256(void) const {
-        return cipherSuite == TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256 || cipherSuite == TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256;
     }
 }

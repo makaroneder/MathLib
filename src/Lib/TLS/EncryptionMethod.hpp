@@ -18,13 +18,12 @@ namespace MathLib {
         EncryptionMethod(TLSCipherSuite cipherSuite, TLSCompressionMethod compressionMethod, const Array<uint8_t>& macKey, const Array<uint8_t>& cipherKey, const Array<uint8_t>& cipherIV);
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
         [[nodiscard]] virtual Array<uint8_t> DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const override;
+        [[nodiscard]] bool GeneratePreMasterSecretAndKeyExchange(Readable& readable, MathLib::Array<uint8_t>& preMasterSecret, MathLib::Array<uint8_t>& keyExchange) const;
         [[nodiscard]] bool IsNone(void) const;
         [[nodiscard]] uint8_t GetKeySize(void) const;
         [[nodiscard]] uint8_t GetMACSize(void) const;
         [[nodiscard]] uint8_t GetIVSize(void) const;
         [[nodiscard]] uint8_t GetBlockSize(void) const;
-        [[nodiscard]] bool IsSHA1(void) const;
-        [[nodiscard]] bool IsSHA256(void) const;
         [[nodiscard]] Cipher* GetCipher(Cipher*& tmpCipher, CipherKey& key) const;
         [[nodiscard]] OneWayCipher* GetHash(HMAC::BlockSize& blockSize, CipherKey& key) const;
     };

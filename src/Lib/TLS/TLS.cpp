@@ -15,8 +15,14 @@
 namespace MathLib {
     TLSSignatureAndHashAlgorithm TLS::supportedSignatureAndHashAlgorithms[] = {
         TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA256, TLSSignatureAlgorithm::RSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA256, TLSSignatureAlgorithm::DSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA256, TLSSignatureAlgorithm::Anonymous),
         TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA224, TLSSignatureAlgorithm::RSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA224, TLSSignatureAlgorithm::DSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA224, TLSSignatureAlgorithm::Anonymous),
         TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA1, TLSSignatureAlgorithm::RSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA1, TLSSignatureAlgorithm::DSA),
+        TLSSignatureAndHashAlgorithm(TLSHashAlgorithm::SHA1, TLSSignatureAlgorithm::Anonymous),
     };
     TLS::TLS(RWDevice& base) : dataBuffer(), base(base), writeEncryption(), readEncryption(), writeSequenceNumber(0), readSequenceNumber(0), mode(TLSRecordHeader::Type::Handshake) {}
     bool TLS::PerformHandshake(const Collection<char>& host) {
@@ -82,9 +88,8 @@ namespace MathLib {
         Array<uint8_t> extensions = extensionsSize;
         if (!device.ReadCollection<uint8_t>(extensions)) return false;
 
-        NaturalNumber modulo;
-        NaturalNumber generator;
-        NaturalNumber publicKey;
+        MathLib::Array<uint8_t> preMasterSecret;
+        MathLib::Array<uint8_t> keyExchange;
         bool sendCertificate = false;
         while (true) {
             if (!device.Read<TLSHandshakeHeader>(header)) return false;
@@ -107,27 +112,7 @@ namespace MathLib {
                     break;
                 }
                 case TLSHandshakeHeader::Type::ServerKeyExchange: {
-                    // TODO: Check if we should receive this
-                    uint32_t sizeSum = 0;
-                    Array<uint8_t> tmp[3];
-                    for (uint8_t i = 0; i < 3; i++) {
-                        uint16_t size = 0;
-                        if (!device.ReadBigEndian16(size)) return false;
-                        sizeSum += sizeof(uint16_t) + size;
-                        tmp[i] = size;
-                        if (!device.ReadCollection<uint8_t>(tmp[i])) return false;
-                    }
-                    modulo = tmp[0];
-                    generator = tmp[1];
-                    publicKey = tmp[2];
-                    TLSSignatureAndHashAlgorithm algorithm;
-                    if (!device.Read<TLSSignatureAndHashAlgorithm>(algorithm)) return false;
-                    uint16_t size = 0;
-                    if (!device.ReadBigEndian16(size)) return false;
-                    Array<uint8_t> signature = size;
-                    if (!device.ReadCollection<uint8_t>(signature)) return false;
-                    if (header.size.Get() != sizeSum + sizeof(TLSSignatureAndHashAlgorithm) + sizeof(uint16_t) + size) return false;
-                    // TODO: Verify signature
+                    if (!EncryptionMethod(nextCipherSuite, nextCompressionMethod).GeneratePreMasterSecretAndKeyExchange(device, preMasterSecret, keyExchange)) return false;
                     break;
                 }
                 case TLSHandshakeHeader::Type::CertificateRequest: {
@@ -161,7 +146,7 @@ namespace MathLib {
         TLSPRF prf = TLSPRF(hmac, HMAC::BlockSize::SHA256, CipherKey());
         const Array<uint8_t> masterSecret = prf.EncryptT<char>("master secret"_M, CipherKey(MakeArray<CipherKey>(
             CipherKey(ByteArray::ToByteArray<size_t>(48)),
-            CipherKey(publicKey.data),
+            CipherKey(preMasterSecret),
             CipherKey(randomCS)
         )));
         const size_t macSize = EncryptionMethod(nextCipherSuite, nextCompressionMethod).GetMACSize();
@@ -185,10 +170,9 @@ namespace MathLib {
         readEncryption.cipherIV = Array<uint8_t>(ivSize);
         if (!keys.ReadCollection<uint8_t>(readEncryption.cipherIV)) return false;
 
-        const NaturalNumber tmp = generator % modulo;
-        if (!device.Write<TLSHandshakeHeader>(TLSHandshakeHeader(TLSHandshakeHeader::Type::ClientKeyExchange, tmp.GetSize() + sizeof(uint16_t)))) return false;
-        if (!device.WriteBigEndian16(tmp.GetSize())) return false;
-        if (!device.WriteCollection<uint8_t>(tmp.data)) return false;
+        if (!device.Write<TLSHandshakeHeader>(TLSHandshakeHeader(TLSHandshakeHeader::Type::ClientKeyExchange, keyExchange.GetSize() + sizeof(uint16_t)))) return false;
+        if (!device.WriteBigEndian16(keyExchange.GetSize())) return false;
+        if (!device.WriteCollection<uint8_t>(keyExchange)) return false;
 
         mode = TLSRecordHeader::Type::ChangeCipherSpec;
         if (!Write<uint8_t>(0x01)) return false;

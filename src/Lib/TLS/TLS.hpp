@@ -11,9 +11,17 @@ namespace MathLib {
         static constexpr uint16_t version = 0x0303;
         static constexpr TLSCipherSuite supportedCipherSuites[] = {
             TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256,
+            TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA256,
+            TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256,
             TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA,
+            TLSCipherSuite::DHE_DSS_AES_256_CBC_SHA,
+            TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA,
             TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA256,
+            TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA256,
+            TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256,
             TLSCipherSuite::DHE_RSA_AES_128_CBC_SHA,
+            TLSCipherSuite::DHE_DSS_AES_128_CBC_SHA,
+            TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA,
         };
         static constexpr TLSCompressionMethod supportedCompressionMethods[] = {
             TLSCompressionMethod::None,

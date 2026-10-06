@@ -435,6 +435,7 @@ AddExecutable("TypeTheory", TargetEnvironment(["host"], None, ["console"]), lamb
 AddExecutable("VideoPlayer", TargetEnvironment(["host"], None, gfxRuntime), lambda program : ["-width 800", "-height 800", "-speed 0.1", "-skipDuration 1", "-multX 4", "-multY 4", f"-path {dataDir}/VideoPlayer/Video.aseprite"], [], ["VideoPlayer"], [".cpp"])
 AddExecutable("WebScraper", TargetEnvironment(["host"], None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
 AddExecutable("WebsiteReader", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
+AddExecutable("ModelGenerator", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
 
 if __name__ == "__main__":
     if len(argv) < 2:

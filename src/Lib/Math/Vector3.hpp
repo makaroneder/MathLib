@@ -126,6 +126,7 @@ namespace MathLib {
         }
     };
     using vector3_t = Vector3<num_t>;
+    using vector3f_t = Vector3<float>;
 }
 
 #endif

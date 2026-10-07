@@ -3,18 +3,20 @@
 #include <Math/Vector4.hpp>
 
 struct ModelGenerator {
-    size_t firstVertex;
+    MathLib::WritableSequence<MathLib::Vector4>& vertices;
+    MathLib::WritableSequence<size_t>& faces;
+    MathLib::Vector4 dx;
+    MathLib::Vector4 dy;
+    MathLib::Vector4 dz;
+    MathLib::Vector4 dw;
 
-    ModelGenerator(void);
-    [[nodiscard]] virtual MathLib::Vector4 GetX(void) const = 0;
-    [[nodiscard]] virtual MathLib::Vector4 GetY(void) const = 0;
-    [[nodiscard]] virtual MathLib::Vector4 GetZ(void) const = 0;
-    [[nodiscard]] virtual MathLib::Vector4 GetW(void) const = 0;
-    [[nodiscard]] virtual size_t Vertex(const MathLib::Vector4& vertex) = 0;
-    virtual void Face(size_t a, size_t b, size_t c) = 0;
-    void Quad(size_t a, size_t b, size_t c, size_t d);
-    void IsoscelesTriangle(const MathLib::Vector4& center, float size, float base);
-    void PrismWithIsoscelesTriangleBase(const MathLib::Vector4& center, float triangleSize, float triangleBase, float size);
+    ModelGenerator(MathLib::WritableSequence<MathLib::Vector4>& vertices, MathLib::WritableSequence<size_t>& faces, const MathLib::Vector4& dx, const MathLib::Vector4& dy, const MathLib::Vector4& dz, const MathLib::Vector4& dw);
+    [[nodiscard]] ModelGenerator Rotate(float x, float y, float z) const;
+    [[nodiscard]] size_t Vertex(const MathLib::Vector4& vertex);
+    [[nodiscard]] bool Face(size_t a, size_t b, size_t c);
+    [[nodiscard]] bool Quad(size_t a, size_t b, size_t c, size_t d);
+    [[nodiscard]] bool IsoscelesTriangle(const MathLib::Vector4& center, float size, float base);
+    [[nodiscard]] bool PrismWithIsoscelesTriangleBase(const MathLib::Vector4& center, float triangleSize, float triangleBase, float size);
 };
 
 #endif

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from os.path import dirname, isfile, splitext, exists
+from os.path import dirname, isfile, splitext, exists, normpath
 from subprocess import Popen, PIPE
 from typing import Callable
 from sys import argv, exit
@@ -187,23 +187,25 @@ class Target:
     getDependenciesInternal : Callable[[], list[str]]
     getToolsInternal : Callable[[EnvironmentIdentifier], list[str]]
     environment : TargetEnvironment
-    inputs : list[str]
+    getInputsInternal : Callable[[str], list[str]]
     givesOutput : bool
 
-    def __init__(self : 'Target', makeInternal : Callable[[list[str], list[str], str, EnvironmentIdentifier], bool], getDependenciesInternal : Callable[[], list[str]], getToolsInternal : Callable[[EnvironmentIdentifier], list[str]], environment : TargetEnvironment, inputs : list[str], givesOutput : bool) -> None:
+    def __init__(self : 'Target', makeInternal : Callable[[list[str], list[str], str, EnvironmentIdentifier], bool], getDependenciesInternal : Callable[[], list[str]], getToolsInternal : Callable[[EnvironmentIdentifier], list[str]], environment : TargetEnvironment, getInputsInternal : Callable[[str], list[str]], givesOutput : bool) -> None:
         self.makeInternal = makeInternal
         self.getDependenciesInternal = getDependenciesInternal
         self.getToolsInternal = getToolsInternal
         self.environment = environment
-        self.inputs = inputs
+        self.getInputsInternal = getInputsInternal
         self.givesOutput = givesOutput
-    def make(self : 'Target', inputs : list[str], dependencies : list[str], output : str, environment : EnvironmentIdentifier): return self.makeInternal(inputs, dependencies, output, environment)
-    def getTools(self : 'Target', env : EnvironmentIdentifier): return self.getToolsInternal(env)
-    def getDependencies(self : 'Target', sub : str, env : EnvironmentIdentifier):
+    def make(self : 'Target', inputs : list[str], dependencies : list[str], output : str, environment : EnvironmentIdentifier) -> bool: return self.makeInternal(inputs, dependencies, output, environment)
+    def getTools(self : 'Target', env : EnvironmentIdentifier) -> list[str]: return self.getToolsInternal(env)
+    def getDependencies(self : 'Target', sub : str, env : EnvironmentIdentifier) -> list[str]:
         return [MakeTarget(dependency.replace("%", sub), env) for dependency in self.getDependenciesInternal()]
-    def getToolsDependencies(self : 'Target', env : EnvironmentIdentifier):
+    def getToolsDependencies(self : 'Target', env : EnvironmentIdentifier) -> list[str]:
         dependencies : list[str] = env.getDependencies(self.getTools(env))
         return [MakeTarget(dependency, env) for dependency in dependencies]
+    def getInputs(self : 'Target', sub : str) -> list[str]:
+        return self.getInputsInternal(sub)
 
 baseGCCFlags : list[str] = ["-g", "-O0", "-DDebug", "-Wall", "-Wextra", "-Werror", "-I .", f"-I {srcDir}/Lib", f"-I {srcDir}/Platform", f"-I {buildDir}", "-Wno-packed-bitfield-compat", "-Wno-unused-function"]
 baseNASMFlags : list[str] = ["-g", "-O0", "-DDebug", "-Werror", f"-I {srcDir}", f"-I {srcDir}/Lib", f"-I {srcDir}/Platform"]
@@ -284,8 +286,8 @@ def CompileSourceFiles(directories : list[str], validExtensions : list[str]) -> 
         ret += [source.removeprefix(f"{srcDir}/") + ".o" for source in ListDirectory(f"{srcDir}/{directory}") if splitext(source)[1] in validExtensions]
     ret.sort()
     return ret
-def Link(env : TargetEnvironment, flags : list[str], directories : list[str], validExtensions : list[str]) -> Target:
-    return Target(lambda inputs, dependencies, output, env : env.getLinker().run(output, dependencies + flags), lambda : CompileSourceFiles(directories, validExtensions), lambda env : [AssertNotNone(env.linker)], env, [], True)
+def Link(env : TargetEnvironment, flags : list[str], directories : list[str], validExtensions : list[str], dependencies : list[str]) -> Target:
+    return Target(lambda inputs, dependencies, output, env : env.getLinker().run(output, dependencies + flags), lambda : Sort(CompileSourceFiles(directories, validExtensions) + dependencies), lambda env : [AssertNotNone(env.linker)], env, lambda sub : [], True)
 
 def MatchesTarget(output : str, target : str) -> str | None:
     split : list[str] = target.replace("*", "%").split("%")
@@ -323,7 +325,7 @@ def MakeTarget(output : str, env : EnvironmentIdentifier) -> str:
     if not env.isValid(): return ""
     outputPath : str = buildDir + '/' + env.toPath() + output
     inputs : list[str] = []
-    for input in targets[target].inputs: inputs += ConvertPath(srcDir + "/" + input.replace("%", sub))
+    for input in targets[target].getInputs(sub): inputs += ConvertPath(input)
     dependencies : list[str] = targets[target].getDependencies(sub, forwardEnv)
     if "" in dependencies: return ""
     toolsDependencies : list[str] = targets[target].getToolsDependencies(forwardEnv)
@@ -334,47 +336,64 @@ def MakeTarget(output : str, env : EnvironmentIdentifier) -> str:
             return outputPath
         print(f"==> [{env}] {output}")
     return outputPath if targets[target].make(inputs, dependencies, outputPath, env) else ""
+includesCache : dict[str, set[str]] = {}
+def GetIncludesInternal(path : str) -> set[str]:
+    path = normpath(path)
+    if not Path(path).exists(): return set([])
+    if path in includesCache: return includesCache[path]
+    directory : str = "/".join(Path(path).parts[:-1]) + '/'
+    ret : list[str] = [path]
+    buffer : str = ""
+    with open(path, "r") as file: buffer = file.read()
+    position : int = 0
+    while True:
+        location : int = buffer.find("#include ", position)
+        if location == -1: break
+        location += len("#include ") + 1
+        local : bool = buffer[location - 1] == '"'
+        last : int = buffer.find('"' if local else '>', location)
+        ret += GetIncludesInternal((directory if local else f"{srcDir}/Lib/") + buffer[location:last])
+        position = last + 1
+    includesCache[path] = set(ret)
+    return includesCache[path]
+def GetIncludes(path : str) -> list[str]:
+    return list(GetIncludesInternal(path))
 
 targets : dict[str, Target] = {
-    "clean": Target(lambda inputs, dependencies, output, env : removeDirectory.run(f"{buildDir}/", []), lambda : [], lambda env : [], TargetEnvironment([], [], []), [], False),
+    "clean": Target(lambda inputs, dependencies, output, env : removeDirectory.run(f"{buildDir}/", []), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False),
 
-    "%.cpp.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["cxx"].run(output, [inputs[0]]), lambda : [], lambda env : ["cxx"], TargetEnvironment(None, [], []), ["%.cpp"], True),
-    "%.asm.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), ["%.asm"], True),
-    "%.s.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), ["%.s"], True),
+    "%.cpp.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["cxx"].run(output, [inputs[0]]), lambda : [], lambda env : ["cxx"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.cpp"] + GetIncludes(f"{srcDir}/{sub}.cpp"), True),
+    "%.asm.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.asm"], True),
+    "%.s.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.s"], True),
 
-    "Math.lib": Target(lambda inputs, dependencies, output, env : env.getLinker().run(output, dependencies), lambda : ["LibStub.o"], lambda env : [AssertNotNone(env.linker)], TargetEnvironment(None, None, []), [], True),
-    "LibStub.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["cxx"].run(output, dependencies), lambda : ["MathLib.hpp"], lambda env : ["cxx"], TargetEnvironment(None, [], []), ["Lib/*.hpp"], True),
-    "MathLib.hpp": Target(lambda inputs, dependencies, output, env : python.run("", inputs + dependencies + [output]), lambda : ["Fonts.cpp"], lambda env : [], TargetEnvironment([], [], []), ["../Scripts/MakeIncludes.py", "Lib/*.cpp"], True),
-    "Fonts.cpp": Target(lambda inputs, dependencies, output, env : python.run("", [inputs[0], output, dirname(output) + "/Fonts.hpp"] + inputs[1:]), lambda : [], lambda env : [], TargetEnvironment([], [], []), ["../Scripts/PSFToCXX.py", "*.psf"], True),
-    "Fonts.hpp": Target(lambda inputs, dependencies, output, env : True, lambda : ["Fonts.cpp"], lambda env : [], TargetEnvironment([], [], []), [], True),
+    "Math.lib": Link(TargetEnvironment(None, None, []), [], ["Lib"], [".cpp"], []),
+    "ConsoleInit.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/Console"], [".cpp"], []),
+    "SDL2Init.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/SDL2"], [".cpp"], []),
 
-    "ConsoleInit.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/Console"], [".cpp"]),
-    "SDL2Init.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/SDL2"], [".cpp"]),
+    "Main.aml": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, "-oa"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : ["Scripts/CompileASL.py", f"{dataDir}/ACPI/Main.asl"], True),
+    "X86.bin": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, inputs), lambda : [], lambda env : ["as"], TargetEnvironment(["binaryAssembler"], [], []), lambda sub : [f"{dataDir}/X86/Program.asm"], True),
+    "Certificate.der": Target(lambda inputs, dependencies, output, env : makeCertificate.run(output, ["-newkey rsa:4096", "-sha256", "-days 3650", "-subj /CN=example.com"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : [], True),
 
-    "Main.aml": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, "-oa"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), ["../Scripts/CompileASL.py", f"../{dataDir}/ACPI/Main.asl"], True),
-    "X86.bin": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, inputs), lambda : [], lambda env : ["as"], TargetEnvironment(["binaryAssembler"], [], []), [f"../{dataDir}/X86/Program.asm"], True),
-    "Certificate.der": Target(lambda inputs, dependencies, output, env : makeCertificate.run(output, ["-newkey rsa:4096", "-sha256", "-days 3650", "-subj /CN=example.com"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), [], True),
+    "Kernel.map": Target(lambda inputs, dependencies, output, env : True, lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : [], True),
+    "Kernel.elf": Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-T {inputs[0]}", dependencies[0], env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtbegin.o"]).removesuffix("\n")] + dependencies[1:-1] + [env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtend.o"]).removesuffix("\n"), dependencies[-1]]), lambda : ["OS/Shared/crti.s.o"] + Sort(CompileSourceFiles(["OS/Kernel", "OS/Shared"], [".cpp", ".asm"]) + CompileSourceFiles(["Lib"], [".cpp"])) + ["OS/Shared/crtn.s.o"], lambda env : [AssertNotNone(env.runtimeEnvironment), "cxx"], TargetEnvironment(["os"], ["executable"], ["elf"]), lambda sub : [f"{srcDir}/OS/Kernel/Linker.ld"], True),
+    "libModule.a": Link(TargetEnvironment(["os"], ["static"], []), [], ["OS/Module"], [".cpp", ".asm"], []),
 
-    "Kernel.map": Target(lambda inputs, dependencies, output, env : True, lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), [], True),
-    "Kernel.elf": Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-T {inputs[0]}", dependencies[1], env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtbegin.o"]).removesuffix("\n")] + dependencies[2:-1] + [env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtend.o"]).removesuffix("\n"), dependencies[-1]]), lambda : ["MathLib.hpp", "OS/Shared/crti.s.o"] + Sort(CompileSourceFiles(["OS/Kernel", "OS/Shared"], [".cpp", ".asm"]) + ["LibStub.o"]) + ["OS/Shared/crtn.s.o"], lambda env : [AssertNotNone(env.runtimeEnvironment), "cxx"], TargetEnvironment(["os"], ["executable"], ["elf"]), ["OS/Kernel/Linker.ld"], True),
-    "libModule.a": Link(TargetEnvironment(["os"], ["static"], []), [], ["OS/Module"], [".cpp", ".asm"]),
+    "FAT.img": Target(lambda inputs, dependencies, output, env : createDisk.run(output, ["count=93750"]) and makeFAT.run(output, ["-F 16"]) and copyToFAT.run(output, inputs), lambda : [], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : [f"{dataDir}/OS/FAT/*"], True),
+    "EXT.img": Target(lambda inputs, dependencies, output, env : makeDirectory.run(f"{buildDir}/tmp/lib", []) and python.run("", inputs + [f"{buildDir}/tmp", "3"]) and python.run("", [inputs[0]] + dependencies + [f"{buildDir}/tmp/lib", "3"]) and makeEXT2.run(output, ["-b 100000", f"-d {buildDir}/tmp"]) and removeDirectory.run(f"{buildDir}/tmp", []), lambda : ["libModule.a"], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : ["Scripts/CopyFiles.py", f"{dataDir}/OS/EXT/*"], True),
+    "OS.img": Target(lambda inputs, dependencies, output, env : makeDirectory.run(f"{buildDir}/tmp/boot", []) and python.run("", inputs + [f"{buildDir}/tmp", "3"]) and python.run("", [inputs[0]] + dependencies + [f"{buildDir}/tmp/boot", "4"]) and makeGRUB2.run(output, [f"{buildDir}/tmp"]) and removeDirectory.run(f"{buildDir}/tmp", []), lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : ["Scripts/CopyFiles.py", f"{dataDir}/OS/ISO9660/*"], True),
+    "OS.gdb": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, f"{buildDir}/os/executable/elf/Kernel.elf", "Entry", env.getEnv().tools["qemu"].generateCommand("", ["-no-reboot", "-no-shutdown"])]), lambda : [], lambda env : ["qemu"], TargetEnvironment(["os"], [], []), lambda sub : ["Scripts/MakeGDB.py"], True),
 
-    "FAT.img": Target(lambda inputs, dependencies, output, env : createDisk.run(output, ["count=93750"]) and makeFAT.run(output, ["-F 16"]) and copyToFAT.run(output, inputs), lambda : [], lambda env : [], TargetEnvironment(["os"], [], []), [f"../{dataDir}/OS/FAT/*"], True),
-    "EXT.img": Target(lambda inputs, dependencies, output, env : makeDirectory.run(f"{buildDir}/tmp/lib", []) and python.run("", inputs + [f"{buildDir}/tmp", "5"]) and python.run("", [inputs[0]] + dependencies + [f"{buildDir}/tmp/lib", "3"]) and makeEXT2.run(output, ["-b 100000", f"-d {buildDir}/tmp"]) and removeDirectory.run(f"{buildDir}/tmp", []), lambda : ["libModule.a"], lambda env : [], TargetEnvironment(["os"], [], []), ["../Scripts/CopyFiles.py", f"../{dataDir}/OS/EXT/*"], True),
-    "OS.img": Target(lambda inputs, dependencies, output, env : makeDirectory.run(f"{buildDir}/tmp/boot", []) and python.run("", inputs + [f"{buildDir}/tmp", "5"]) and python.run("", [inputs[0]] + dependencies + [f"{buildDir}/tmp/boot", "4"]) and makeGRUB2.run(output, [f"{buildDir}/tmp"]) and removeDirectory.run(f"{buildDir}/tmp", []), lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), ["../Scripts/CopyFiles.py", f"../{dataDir}/OS/ISO9660/*"], True),
-    "OS.gdb": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, f"{buildDir}/os/executable/elf/Kernel.elf", "Entry", env.getEnv().tools["qemu"].generateCommand("", ["-no-reboot", "-no-shutdown"])]), lambda : [], lambda env : ["qemu"], TargetEnvironment(["os"], [], []), ["../Scripts/MakeGDB.py"], True),
-
-    "runOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["qemu"].run("", ["-debugcon stdio"]), lambda : [], lambda env : ["qemu"], TargetEnvironment(["os"], [], []), [], False),
-    "debugOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["gdb"].run(dependencies[0], []), lambda : ["OS.gdb"], lambda env : ["gdb"], TargetEnvironment(["os"], [], []), [], False),
+    "runOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["qemu"].run("", ["-debugcon stdio"]), lambda : [], lambda env : ["qemu"], TargetEnvironment(["os"], [], []), lambda sub : [], False),
+    "debugOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["gdb"].run(dependencies[0], []), lambda : ["OS.gdb"], lambda env : ["gdb"], TargetEnvironment(["os"], [], []), lambda sub : [], False),
 }
 gfxRuntime : list[str] = ["sdl2"]
 executables : list[str] = ["Main.aml", "X86.bin", "Certificate.der", "OS.gdb"]
 def AddExecutableWithRunDependencies(name : str, env : TargetEnvironment, runFlags : Callable[[list[str]], list[str]], flags: list[str], directories: list[str], validExtensions : list[str], runDeps : list[str]) -> None:
     executables.append(f"{name}.out")
-    targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions)
-    targets[f"{name}.out"] = Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-l:{name}.lib"]), lambda : [f"{name}.lib"], lambda env : [AssertNotNone(env.runtimeEnvironment)], env, [], True)
-    targets[f"run{name}"] = Target(lambda inputs, dependencies, output, env : run.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), [], False)
-    targets[f"debug{name}"] = Target(lambda inputs, dependencies, output, env : valgrind.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), [], False)
+    targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions, [])
+    targets[f"{name}.out"] = Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-l:{name}.lib"]), lambda : [f"{name}.lib"], lambda env : [AssertNotNone(env.runtimeEnvironment)], env, lambda sub : [], True)
+    targets[f"run{name}"] = Target(lambda inputs, dependencies, output, env : run.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False)
+    targets[f"debug{name}"] = Target(lambda inputs, dependencies, output, env : valgrind.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False)
 def AddExecutable(name : str, env : TargetEnvironment, runFlags : Callable[[str], list[str]], flags: list[str], directories: list[str], validExtensions : list[str]) -> None:
     AddExecutableWithRunDependencies(name, env, lambda list : runFlags(list[0]), flags, directories, validExtensions, [])
 AddExecutableWithRunDependencies("AML", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])

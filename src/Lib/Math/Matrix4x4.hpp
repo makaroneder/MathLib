@@ -27,7 +27,6 @@ namespace MathLib {
         [[nodiscard]] Vector4 operator*(const Vector4& other) const;
         [[nodiscard]] Matrix4x4 operator-(int) const;
     };
-    extern Matrix4x4 identity4x4;
     [[nodiscard]] Matrix4x4 Scale(float x, float y, float z);
     [[nodiscard]] Matrix4x4 Transalate(float x, float y, float z);
     [[nodiscard]] Matrix4x4 MakePerspectiveMatrix(float fov, float aspectRatio, float near, float far);

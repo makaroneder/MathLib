@@ -3,12 +3,6 @@
 #include "Trigonometry.hpp"
 
 namespace MathLib {
-    Matrix4x4 identity4x4 = Matrix4x4(
-        Vector4(1, 0, 0, 0),
-        Vector4(0, 1, 0, 0),
-        Vector4(0, 0, 1, 0),
-        Vector4(0, 0, 0, 1)
-    );
     Matrix4x4 Scale(float x, float y, float z) {
         return Matrix4x4(
             Vector4(x, 0, 0, 0),

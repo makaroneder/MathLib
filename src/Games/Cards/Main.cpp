@@ -7,7 +7,6 @@
 #include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
 #include <Bitmap.hpp>
-#include <Fonts.hpp>
 #include <iostream>
 
 template <typename T>
@@ -57,7 +56,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     MathLib::allocator = new MathLib::RegionAllocator(MathLib::allocator, 1024 * 1024);
     if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
     MathLib::PSF1 font;
-    if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
+    if (!font.LoadFromPath(fs, "Data/Fonts/zap-light16.psf"_M)) MathLib::Panic("Failed to load PSF1 font");
     const MathLib::String path = "Data/Cards/";
     MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, path + "Program.txt"));
     #ifdef Debug

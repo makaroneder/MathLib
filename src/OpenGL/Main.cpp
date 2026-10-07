@@ -1,10 +1,10 @@
 #include "GLFW.hpp"
 #include "Model.hpp"
 #include "Texture.hpp"
-#include "Matrix4x4.hpp"
 #include "GLSLProgram.hpp"
 #include <Typedefs.hpp>
 #include <ExternArray.hpp>
+#include <Math/Matrix4x4.hpp>
 #include <Math/Trigonometry.hpp>
 #include <3D/QuakeMDL/QuakeMDL.hpp>
 #include <Interfaces/Sequence/VariadicSequence.hpp>
@@ -43,12 +43,12 @@ void Main(int, char**, MathLib::FileSystem& fs) {
         std::cout << 1 / deltaTime << std::endl;
         prevTime = time;
 
-        const Matrix4x4 transform = Rotate(-MathLib::pi / 2, 0, time);
-        const Matrix4x4 camera = Transalate(0, 0, -70);
-        const Matrix4x4 projection = MakePerspectiveMatrix(MathLib::pi * 45 / 180, window.GetAspectRatio(), 0.1, 100);
-        program.SetUniform<Matrix4x4>("transform", transform);
-        program.SetUniform<Matrix4x4>("camera", camera);
-        program.SetUniform<Matrix4x4>("projection", projection);
+        const MathLib::Matrix4x4 transform = MathLib::Rotate(-MathLib::pi / 2, 0, time);
+        const MathLib::Matrix4x4 camera = MathLib::Transalate(0, 0, -70);
+        const MathLib::Matrix4x4 projection = MathLib::MakePerspectiveMatrix(MathLib::pi * 45 / 180, window.GetAspectRatio(), 0.1, 100);
+        program.SetUniform<MathLib::Matrix4x4>("transform", transform);
+        program.SetUniform<MathLib::Matrix4x4>("camera", camera);
+        program.SetUniform<MathLib::Matrix4x4>("projection", projection);
 
         window.Clear(0.2, 0.3, 0.3, 1);
         model.Draw(GL_TRIANGLES);

@@ -68,6 +68,7 @@ namespace MathLib {
         [[nodiscard]] virtual bool Load(Readable& file) override {
             const Array<String> split = Split(file.ReadUntil('\0'), "\n"_M, true);
             for (const Sequence<char>& line : split) {
+                if (line.IsEmpty()) continue;
                 if (line[0] == 'v' && line[1] == ' ') {
                     size_t i = 2;
                     Matrix<T> v = CreateVector<T>(0, 0, 0);

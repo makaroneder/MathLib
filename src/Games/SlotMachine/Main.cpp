@@ -3,7 +3,6 @@
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
-#include <Fonts.hpp>
 #include <Pair.hpp>
 #include <iostream>
 
@@ -12,7 +11,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     srand(time(nullptr));
     #endif
     MathLib::PSF1 font;
-    if (!font.LoadFromSequence(MathLib::zap_light16_psf)) MathLib::Panic("Failed to load PSF1 font");
+    if (!font.LoadFromPath(fs, "Data/Fonts/zap-light16.psf"_M)) MathLib::Panic("Failed to load PSF1 font");
     const MathLib::String path = "Data/SlotMachine/";
     const Symbol symbols[] = {
         Symbol(fs, path + "Nothing.obj", "Nothing"_M, MathLib::VariadicSequence<size_t, 0, 0, 0>()),

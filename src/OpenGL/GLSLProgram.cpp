@@ -1,5 +1,5 @@
 #include "GLSLProgram.hpp"
-#include "Matrix4x4.hpp"
+#include <Math/Matrix4x4.hpp>
 
 size_t MakeShader(const char* str, OpenGLType type) {
     const size_t shader = glCreateShader(type);
@@ -45,10 +45,10 @@ void GLSLProgram::SetUniform(const char* name, const int& value) {
     glUniform1i(GetUniformLocation(name), value); 
 }
 template <>
-void GLSLProgram::SetUniform(const char* name, const Matrix4x4& value) {
+void GLSLProgram::SetUniform(const char* name, const MathLib::Matrix4x4& value) {
     glUniformMatrix4fv(GetUniformLocation(name), 1, true, value.data); 
 }
 template <>
-void GLSLProgram::SetUniform(const char* name, const Vector4& value) {
+void GLSLProgram::SetUniform(const char* name, const MathLib::Vector4& value) {
     glUniform4fv(GetUniformLocation(name), 1, value.data);
 }

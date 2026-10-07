@@ -3,6 +3,11 @@
 namespace MathLib {
     Vector4::Vector4(void) : data { 0, 0, 0, 0 } {}
     Vector4::Vector4(float a, float b, float c, float d) : data { a, b, c, d } {}
+    bool Vector4::Equals(const Vector4& other) const {
+        for (uint8_t i = 0; i < size; i++)
+            if (!MathLib::FloatsEqual<float>(data[i], other.data[i])) return false;
+        return true;
+    }
     String Vector4::ToString(const Sequence<char>&) const {
         String ret = '['_M;
         for (uint8_t i = 0; i < size; i++) {

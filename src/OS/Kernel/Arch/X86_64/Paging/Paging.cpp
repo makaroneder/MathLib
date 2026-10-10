@@ -1,6 +1,6 @@
 #ifdef __x86_64__
 #include "Paging.hpp"
-#include "../CPUID.hpp"
+#include <CPU/CPUID.hpp>
 #include <Memory.hpp>
 
 uint8_t firstIndex = 1;
@@ -10,18 +10,18 @@ const uint8_t offsets[] = {
 };
 void PreparePaging(void) {
     uintptr_t maxCPUID;
-    CPUID(0x00, &maxCPUID, nullptr, nullptr, nullptr);
+    MathLib::CPUID(0x00, &maxCPUID, nullptr, nullptr, nullptr);
     bool page2MB = false;
     bool page1GB = false;
     if (maxCPUID >= 0x01) {
         uintptr_t d;
-        CPUID(0x01, nullptr, nullptr, nullptr, &d);
+        MathLib::CPUID(0x01, nullptr, nullptr, nullptr, &d);
         if (d & (1 << 3)) page2MB = true;
     }
-    CPUID(0x80000000, &maxCPUID, nullptr, nullptr, nullptr);
+    MathLib::CPUID(0x80000000, &maxCPUID, nullptr, nullptr, nullptr);
     if (maxCPUID >= 0x80000001) {
         uintptr_t d;
-        CPUID(0x80000001, nullptr, nullptr, nullptr, &d);
+        MathLib::CPUID(0x80000001, nullptr, nullptr, nullptr, &d);
         if (d & (1 << 26)) page1GB = true;
     }
     if (page1GB) lastIndex -= 2;

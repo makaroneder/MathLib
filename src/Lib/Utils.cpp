@@ -1,4 +1,5 @@
 #include "Utils.hpp"
+#include "CPU/Sqrt.hpp"
 #include "Math/Trigonometry.hpp"
 
 namespace MathLib {
@@ -83,6 +84,9 @@ namespace MathLib {
     num_t Abs(num_t x) {
         return x < 0 ? -x : x;
     }
+    num_t Abs(complex_t x) {
+        return x.GetLength();
+    }
     num_t Pow(num_t x, num_t y) {
         return Pow(complex_t(x, 0), complex_t(y, 0)).ToReal();
     }
@@ -90,7 +94,7 @@ namespace MathLib {
         return Pow(x, 0.5);
     }
     num_t Sqrt(num_t x) {
-        return Sqrt(complex_t(x, 0)).ToReal();
+        return sqrtFunction(x);
     }
     num_t Cbrt(num_t x) {
         return Pow(x, 1 / 3);
@@ -98,8 +102,14 @@ namespace MathLib {
     num_t NaturalLog(num_t x) {
         return NaturalLog(complex_t(x, 0)).ToReal();
     }
+    bool IsNaN(num_t x) {
+        return x != x;
+    }
     bool IsNaN(complex_t x) {
         return IsNaN(x.GetReal()) || IsNaN(x.GetImaginary());
+    }
+    bool IsInf(num_t x) {
+        return x == infinity || x == -infinity;
     }
     bool IsInf(complex_t x) {
         return IsInf(x.GetReal()) || IsInf(x.GetImaginary());

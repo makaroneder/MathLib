@@ -13,9 +13,6 @@ namespace MathLib {
     num_t GetTime(void) {
         return mainTimer ? mainTimer->GetTime() : 0;
     }
-    num_t Abs(complex_t x) {
-        return ArchSqrt(x.GetLengthSquared());
-    }
     complex_t NaturalLog(complex_t x) {
         return complex_t(ArchLn(Abs(x)), x.GetArgument());
     }
@@ -91,12 +88,6 @@ namespace MathLib {
     }
     complex_t Pow(complex_t x, complex_t y) {
         return FloatsEqual<num_t>(x.ToReal(), 0) ? complex_t(FloatsEqual<num_t>(y.ToReal(), 0), 0) : ComplexExp(y * NaturalLog(x));
-    }
-    bool IsNaN(num_t x) {
-        return x != x;
-    }
-    bool IsInf(num_t x) {
-        return x == infinity || x == -infinity;
     }
     num_t Round(num_t x) {
         const ssize_t ix = x;

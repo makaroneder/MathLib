@@ -52,20 +52,11 @@ namespace MathLib {
     num_t RandomFloat(void) {
         return (num_t)rand() / RAND_MAX;
     }
-    num_t Abs(complex_t x) {
-        return std::abs(ToStdComplex(x));
-    }
     complex_t Pow(complex_t x, complex_t y) {
         return FloatsEqual<num_t>(x.ToReal(), 0) ? complex_t(FloatsEqual<num_t>(y.ToReal(), 0), 0) : FromStdComplex(std::pow(ToStdComplex(x), ToStdComplex(y)));
     }
     complex_t NaturalLog(complex_t x) {
         return FromStdComplex(std::log(ToStdComplex(x)));
-    }
-    bool IsNaN(num_t x) {
-        return std::isnan(x);
-    }
-    bool IsInf(num_t x) {
-        return std::isinf(x);
     }
     num_t Exp(num_t x) {
         return std::exp(x);

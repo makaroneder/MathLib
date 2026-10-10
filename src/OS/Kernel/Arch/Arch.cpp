@@ -2,17 +2,6 @@
 #include <Math/Constants.hpp>
 #include <Host.hpp>
 
-MathLib::num_t GenericSqrt(MathLib::num_t x) {
-    if (x < 0) return MathLib::nan;
-    if (!x) return 0;
-    MathLib::num_t guess = x;
-    MathLib::num_t prev;
-    do {
-        prev = guess;
-        guess = (guess + x / guess) / 2;
-    } while (MathLib::Abs(guess - prev) > MathLib::eps);
-    return guess;
-}
 MathLib::num_t GenericRealInversedTan(MathLib::num_t x) {
     if (MathLib::Abs(x) > 1) {
         if (x > 0) return MathLib::pi / 2 - GenericRealInversedTan(1 / x);

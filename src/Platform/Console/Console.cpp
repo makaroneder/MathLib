@@ -1,11 +1,15 @@
 #include <Libc/HostFileSystem.hpp>
 #include <Libc/HostLogger.hpp>
+#include <CPU/FPU/FPU.hpp>
 #include <Logger.hpp>
 #include <iostream>
 
 void Main(int argc, char** argv, MathLib::FileSystem& fs);
 int main(int argc, char** argv) {
     try {
+        #ifdef __x86_64__
+        MathLib::waitForFPU = false;
+        #endif
         MathLib::logger = new MathLib::HostLogger(std::cout);
         if (!MathLib::logger) MathLib::Panic("Failed to create logger");
         MathLib::HostFileSystem fs;

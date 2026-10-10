@@ -13,7 +13,6 @@
 #include "ACPI/ACPI.hpp"
 #include "GDT/TSS.hpp"
 #include "../Arch.hpp"
-#include "CPUID.hpp"
 #include "CMOS.hpp"
 #include "Math.hpp"
 #include "CPU.hpp"
@@ -23,6 +22,7 @@
 #include "IO.hpp"
 #include <Logger.hpp>
 #include <String.hpp>
+#include <CPU/CPUID.hpp>
 #include <Allocator/LinearAllocator.hpp>
 
 AlignedPageTable pml4;
@@ -60,15 +60,15 @@ bool InitArch(uintptr_t signature, void* info) {
     }
     if (!InitMath()) return false;
     uintptr_t maxCPUID;
-    CPUID(0x00, &maxCPUID, nullptr, nullptr, nullptr);
+    MathLib::CPUID(0x00, &maxCPUID, nullptr, nullptr, nullptr);
     if (maxCPUID >= 0x07) {
         uintptr_t b;
-        CPUID(0x07, nullptr, &b, nullptr, nullptr);
-        if (b & 1 << (uint8_t)CPUIDBits::B7SMEP) {
+        MathLib::CPUID(0x07, nullptr, &b, nullptr, nullptr);
+        if (b & 1 << (uint8_t)MathLib::CPUIDBits::B7SMEP) {
             const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
             if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeExecutionsProtectionEnable)) return false;
         }
-        if (b & 1 << (uint8_t)CPUIDBits::B7SMAP) {
+        if (b & 1 << (uint8_t)MathLib::CPUIDBits::B7SMAP) {
             const MathLib::Expected<uintptr_t> tmp = GetControlRegister(4);
             if (!tmp.HasValue() || !SetControlRegister(4, tmp.Get() | 1 << (uint8_t)ControlRegister4::SupervisorModeAccessProtectionEnable)) return false;
         }

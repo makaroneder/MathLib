@@ -10,8 +10,6 @@ void ArchSetInterrupts(bool value);
 [[nodiscard]] size_t ArchAddTask(uintptr_t address, const ModuleEntryData* data);
 [[nodiscard]] bool ArchRemoveTask(size_t task);
 [[nodiscard]] size_t ArchGetCurrentTask(void);
-[[nodiscard]] MathLib::num_t ArchSqrt(MathLib::num_t x);
-[[nodiscard]] MathLib::num_t GenericSqrt(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t ArchInversedTan2(MathLib::num_t y, MathLib::num_t x);
 [[nodiscard]] MathLib::num_t GenericInversedTan2(MathLib::num_t y, MathLib::num_t x);
 [[nodiscard]] MathLib::num_t ArchLn(MathLib::num_t x);

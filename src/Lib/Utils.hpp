@@ -25,12 +25,15 @@ namespace MathLib {
     [[nodiscard]] uint32_t SwapEndian32(uint32_t x);
     [[nodiscard]] uint64_t SwapEndian64(uint64_t x);
     [[nodiscard]] num_t Abs(num_t x);
+    [[nodiscard]] num_t Abs(complex_t x);
     [[nodiscard]] num_t Pow(num_t x, num_t y);
     [[nodiscard]] complex_t Sqrt(complex_t x);
     [[nodiscard]] num_t Sqrt(num_t x);
     [[nodiscard]] num_t Cbrt(num_t x);
     [[nodiscard]] num_t NaturalLog(num_t x);
+    [[nodiscard]] bool IsNaN(num_t x);
     [[nodiscard]] bool IsNaN(complex_t x);
+    [[nodiscard]] bool IsInf(num_t x);
     [[nodiscard]] bool IsInf(complex_t x);
     [[nodiscard]] complex_t Exp(complex_t x);
     [[nodiscard]] num_t Ceil(num_t x);

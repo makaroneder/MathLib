@@ -1,14 +1,14 @@
 #ifdef __x86_64__
 #include "MSR.hpp"
-#include "CPUID.hpp"
+#include <CPU/CPUID.hpp>
 #include <Emulator/Register.hpp>
 
 bool hasMSR = false;
 bool HasMSR(void) {
     if (hasMSR) return hasMSR;
     uintptr_t d;
-    CPUID(0x1, nullptr, nullptr, nullptr, &d);
-    if (d & (1 << (uint8_t)CPUIDBits::D1MSR)) hasMSR = true;
+    MathLib::CPUID(0x1, nullptr, nullptr, nullptr, &d);
+    if (d & (1 << (uint8_t)MathLib::CPUIDBits::D1MSR)) hasMSR = true;
     return hasMSR;
 }
 MathLib::Expected<uint64_t> GetMSR(uint32_t msr) {

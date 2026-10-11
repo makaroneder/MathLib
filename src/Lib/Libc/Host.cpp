@@ -55,9 +55,6 @@ namespace MathLib {
     complex_t Pow(complex_t x, complex_t y) {
         return FloatsEqual<num_t>(x.ToReal(), 0) ? complex_t(FloatsEqual<num_t>(y.ToReal(), 0), 0) : FromStdComplex(std::pow(ToStdComplex(x), ToStdComplex(y)));
     }
-    complex_t NaturalLog(complex_t x) {
-        return FromStdComplex(std::log(ToStdComplex(x)));
-    }
     num_t Exp(num_t x) {
         return std::exp(x);
     }
@@ -69,9 +66,6 @@ namespace MathLib {
     }
     complex_t Sin(complex_t x) {
         return FromStdComplex(std::sin(ToStdComplex(x)));
-    }
-    complex_t InversedSin(complex_t x) {
-        return FromStdComplex(std::asin(ToStdComplex(x)));
     }
     num_t InversedTan2(num_t y, num_t x) {
         return std::atan2(y, x);

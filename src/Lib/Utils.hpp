@@ -31,6 +31,7 @@ namespace MathLib {
     [[nodiscard]] num_t Sqrt(num_t x);
     [[nodiscard]] num_t Cbrt(num_t x);
     [[nodiscard]] num_t NaturalLog(num_t x);
+    [[nodiscard]] complex_t NaturalLog(complex_t x);
     [[nodiscard]] bool IsNaN(num_t x);
     [[nodiscard]] bool IsNaN(complex_t x);
     [[nodiscard]] bool IsInf(num_t x);
@@ -38,7 +39,6 @@ namespace MathLib {
     [[nodiscard]] complex_t Exp(complex_t x);
     [[nodiscard]] num_t Ceil(num_t x);
     [[nodiscard]] num_t Sin(num_t x);
-    [[nodiscard]] num_t InversedSin(num_t x);
 }
 
 #endif

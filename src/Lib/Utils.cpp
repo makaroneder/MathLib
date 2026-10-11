@@ -1,4 +1,5 @@
 #include "Utils.hpp"
+#include "CPU/Ln.hpp"
 #include "CPU/Sqrt.hpp"
 #include "Math/Trigonometry.hpp"
 
@@ -100,7 +101,10 @@ namespace MathLib {
         return Pow(x, 1 / 3);
     }
     num_t NaturalLog(num_t x) {
-        return NaturalLog(complex_t(x, 0)).ToReal();
+        return lnFunction(x);
+    }
+    complex_t NaturalLog(complex_t x) {
+        return complex_t(NaturalLog(x.GetLength()), x.GetArgument());
     }
     bool IsNaN(num_t x) {
         return x != x;
@@ -122,8 +126,5 @@ namespace MathLib {
     }
     num_t Sin(num_t x) {
         return Sin(complex_t(x, 0)).ToReal();
-    }
-    num_t InversedSin(num_t x) {
-        return InversedSin(complex_t(x, 0)).ToReal();
     }
 }

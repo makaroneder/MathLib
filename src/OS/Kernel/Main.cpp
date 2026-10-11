@@ -12,6 +12,7 @@
 #include <FileSystem/MemoryFileSystem/MemoryFileSystem.hpp>
 #include <FileSystem/ISO9660/ISO9660.hpp>
 #include <FileSystem/FAT/FAT.hpp>
+#include <CPU/FPU/FPU.hpp>
 #include <MBR/MBR.hpp>
 #include <Logger.hpp>
 #include <JSON.hpp>
@@ -73,6 +74,7 @@ bool constructorsCalled = false;
 }
 extern "C" void _init(void);
 extern "C" [[noreturn]] void Main(uintptr_t signature, void* info) {
+    MathLib::waitForFPU = true;
     _init();
     if (!constructorsCalled) MathLib::Panic("Failed to call global constructors");
     if (!InitArch(signature, info)) MathLib::Panic("Failed to initialize architecture");

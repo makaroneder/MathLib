@@ -58,19 +58,6 @@ MathLib::num_t ArchInversedTan2(MathLib::num_t y, MathLib::num_t x) {
     }
     else return GenericInversedTan2(y, x);
 }
-MathLib::num_t ArchLn(MathLib::num_t x) {
-    if (MathLib::fpu) {
-        MathLib::num_t ret;
-        asm volatile (
-            "fldln2\n"
-            "fldt %1\n"
-            "fyl2x\n"
-            "fstpt %0" : "=m"(ret) : "m"(x) : "st"
-        );
-        return ret;
-    }
-    else return GenericLn(x);
-}
 MathLib::num_t ArchExp(MathLib::num_t x) {
     // TODO:
     return GenericExp(x);

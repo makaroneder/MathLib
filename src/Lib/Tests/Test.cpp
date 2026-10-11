@@ -180,12 +180,12 @@ namespace MathLib {
         TestOperation(test, FloatsEqual<num_t>(Sin(pi), 0));
         TestOperation(test, Sin(complex_t(0, 0)) == complex_t(0, 0));
         TestOperation(test, Sin(complex_t(pi, 0)) == complex_t(0, 0));
-        TestOperation(test, FloatsEqual<num_t>(InversedSin(0), 0));
-        TestOperation(test, FloatsEqual<num_t>(InversedSin(1), pi / 2));
-        TestOperation(test, FloatsEqual<num_t>(InversedSin(-1), -pi / 2));
-        TestOperation(test, InversedSin(complex_t(0, 0)) == complex_t(0, 0));
-        TestOperation(test, InversedSin(complex_t(1, 0)) == complex_t(pi / 2, 0));
-        TestOperation(test, InversedSin(complex_t(-1, 0)) == complex_t(-pi / 2, 0));
+        TestOperation(test, FloatsEqual<num_t>(InversedSin<num_t>(0), 0));
+        TestOperation(test, FloatsEqual<num_t>(InversedSin<num_t>(1), pi / 2));
+        TestOperation(test, FloatsEqual<num_t>(InversedSin<num_t>(-1), -pi / 2));
+        TestOperation(test, InversedSin<complex_t>(complex_t(0, 0)) == complex_t(0, 0));
+        TestOperation(test, InversedSin<complex_t>(complex_t(1, 0)) == complex_t(pi / 2, 0));
+        TestOperation(test, InversedSin<complex_t>(complex_t(-1, 0)) == complex_t(-pi / 2, 0));
         TestOperation(test, FloatsEqual<num_t>(InversedTan2(0, 0), 0));
         TestOperation(test, FloatsEqual<num_t>(InversedTan2(1, 0), pi / 2));
         TestOperation(test, FloatsEqual<num_t>(InversedTan2(0, 1), 0));

@@ -30,24 +30,6 @@ MathLib::num_t GenericInversedTan2(MathLib::num_t y, MathLib::num_t x) {
     else if (y < 0) return -MathLib::pi / 2;
     else return MathLib::nan;
 }
-MathLib::num_t GenericLn(MathLib::num_t x) {
-    if (x <= 0) return MathLib::nan;
-    MathLib::num_t logx = 0;
-    while (x >= 2) {
-        x /= 2;
-        logx += MathLib::ln2;
-    }
-    MathLib::num_t result = (x - 1) / (x + 1);
-    MathLib::num_t numerator = result;
-    const MathLib::num_t tmp = result * result;
-    size_t i = 1;
-    while (MathLib::Abs(numerator) > MathLib::eps) {
-        numerator *= tmp;
-        i += 2;
-        result += numerator / i;
-    }
-    return logx + result * 2;
-}
 MathLib::num_t GenericExp(MathLib::num_t x) {
     MathLib::num_t sum = 1;
     MathLib::num_t term = 1;

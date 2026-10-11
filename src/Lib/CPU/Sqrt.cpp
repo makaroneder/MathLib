@@ -16,7 +16,8 @@ namespace MathLib {
         return sqrtFunction(x);
     }
     num_t GenericSqrt(num_t x) {
-        if (x < 0) return nan;
+        if (IsNaN(x) || x < 0) return nan;
+        if (IsInf(x)) return infinity;
         if (FloatsEqual<num_t>(x, 0)) return 0;
         num_t ret = x;
         num_t prev;

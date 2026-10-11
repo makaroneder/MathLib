@@ -4,7 +4,7 @@
 
 namespace MathLib {
     bool fpu = false;
-    bool waitForFPU = true;
+    bool waitForFPU = false;
     bool checkedFPU = false;
 
     void CheckFPU(void) {

@@ -12,8 +12,6 @@ void ArchSetInterrupts(bool value);
 [[nodiscard]] size_t ArchGetCurrentTask(void);
 [[nodiscard]] MathLib::num_t ArchInversedTan2(MathLib::num_t y, MathLib::num_t x);
 [[nodiscard]] MathLib::num_t GenericInversedTan2(MathLib::num_t y, MathLib::num_t x);
-[[nodiscard]] MathLib::num_t ArchLn(MathLib::num_t x);
-[[nodiscard]] MathLib::num_t GenericLn(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t ArchExp(MathLib::num_t x);
 [[nodiscard]] MathLib::num_t GenericExp(MathLib::num_t x);
 

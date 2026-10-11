@@ -13,9 +13,6 @@ namespace MathLib {
     num_t GetTime(void) {
         return mainTimer ? mainTimer->GetTime() : 0;
     }
-    complex_t NaturalLog(complex_t x) {
-        return complex_t(ArchLn(Abs(x)), x.GetArgument());
-    }
     num_t Exp(num_t x) {
         return ArchExp(x);
     }
@@ -26,10 +23,9 @@ namespace MathLib {
         complex_t term = complex_t(1, 0);
         complex_t sum = term;
         size_t n = 1;
-        while (Abs(term) > eps) {
-            term *= complex_t(0, x.GetImaginary()) / n;
+        while (term.GetLengthSquared() > eps) {
+            term *= complex_t(0, x.GetImaginary()) / n++;
             sum += term;
-            n++;
         }
         return sum * Exp(x.GetReal());
     }
@@ -110,8 +106,5 @@ namespace MathLib {
             n++;
         }
         return sum;
-    }
-    complex_t InversedSin(complex_t x) {
-        return complex_t(0, 1) * NaturalLog(Sqrt(-x * x + 1) - x * complex_t(0, 1));
     }
 }

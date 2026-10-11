@@ -17,12 +17,10 @@ namespace MathLib {
     [[nodiscard]] num_t StringToNumber(const Sequence<char>& str);
     [[nodiscard]] String ToString(num_t x);
     [[nodiscard]] complex_t Pow(complex_t x, complex_t y);
-    [[nodiscard]] complex_t NaturalLog(complex_t x);
     [[nodiscard]] num_t Exp(num_t x);
     [[nodiscard]] num_t Round(num_t x);
     [[nodiscard]] num_t Floor(num_t x);
     [[nodiscard]] complex_t Sin(complex_t x);
-    [[nodiscard]] complex_t InversedSin(complex_t x);
     [[nodiscard]] num_t InversedTan2(num_t y, num_t x);
 }
 

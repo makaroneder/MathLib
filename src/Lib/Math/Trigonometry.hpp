@@ -97,12 +97,16 @@ namespace MathLib {
         return (Exp(x) * 2) / (Exp(x * 2) - 1);
     }
     template <typename T>
+    [[nodiscard]] constexpr T InversedSin(const T& x) {
+        return (T)(complex_t(0, 1) * NaturalLog(complex_t(0, -1) * x + Sqrt(-x * x + 1)));
+    }
+    template <typename T>
     [[nodiscard]] constexpr T InversedCos(const T& x) {
-        return T(pi / 2) - InversedSin(x);
+        return T(pi / 2) - InversedSin<T>(x);
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedTan(const T& x) {
-        return InversedSin(x / Sqrt(x * x + 1));
+        return InversedSin<T>(x / Sqrt(x * x + 1));
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedCot(const T& x) {
@@ -114,11 +118,11 @@ namespace MathLib {
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedCsc(const T& x) {
-        return InversedSin(T(1) / x);
+        return InversedSin<T>(T(1) / x);
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedCrd(const T& x) {
-        return InversedSin(x / 2) * 2;
+        return InversedSin<T>(x / 2) * 2;
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedExsec(const T& x) {
@@ -134,7 +138,7 @@ namespace MathLib {
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedCoversin(const T& x) {
-        return InversedSin(T(1) - x);
+        return InversedSin<T>(T(1) - x);
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedVercos(const T& x) {
@@ -142,7 +146,7 @@ namespace MathLib {
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedCovercos(const T& x) {
-        return InversedSin(x - 1);
+        return InversedSin<T>(x - 1);
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedHaversin(const T& x) {
@@ -150,7 +154,7 @@ namespace MathLib {
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedHacoversin(const T& x) {
-        return InversedSin(T(1) - x * 2);
+        return InversedSin<T>(T(1) - x * 2);
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedHavercos(const T& x) {
@@ -158,7 +162,7 @@ namespace MathLib {
     }
     template <typename T>
     [[nodiscard]] constexpr T InversedHacovercos(const T& x) {
-        return InversedSin(x * 2 - 1);
+        return InversedSin<T>(x * 2 - 1);
     }
     template <typename T>
     [[nodiscard]] T InversedHyperbolicSin(const T& x) {

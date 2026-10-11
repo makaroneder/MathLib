@@ -55,7 +55,7 @@ namespace MathLib {
     CreateComplexBuiltinFunction(HyperbolicCot, HyperbolicCot<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(HyperbolicSec, HyperbolicSec<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(HyperbolicCsc, HyperbolicCsc<complex_t>, 1, args[0]->ToNumber().At(0))
-    CreateComplexBuiltinFunction(InversedSin, InversedSin, 1, args[0]->ToNumber().At(0))
+    CreateComplexBuiltinFunction(InversedSin, InversedSin<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(InversedCos, InversedCos<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(InversedTan, InversedTan<complex_t>, 1, args[0]->ToNumber().At(0))
     CreateComplexBuiltinFunction(InversedCot, InversedCot<complex_t>, 1, args[0]->ToNumber().At(0))

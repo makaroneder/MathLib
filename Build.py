@@ -226,6 +226,7 @@ unwrapTAR : Tool = Tool("tar", ["-xf @"], [], [])
 makeEXT2 : Tool = Tool("genext2fs", [], ["@"], [])
 makeGRUB2 : Tool = Tool("grub-mkrescue", ["-quiet", "-l", "-J", "-R", "-o @"], [], [])
 makeCertificate : Tool = Tool("openssl", ["req", "-noenc", "-x509", "-outform DER"], ["-keyout @.key", "-out @"], [])
+wget : Tool = Tool("wget", ["-q", "-O @"], [], [])
 
 baseExec : Tool = Tool("", baseGCCFlags, [f"-L {buildDir}", "-o @"], [])
 baseEnvTools : Environment = Environment({
@@ -248,12 +249,28 @@ envs : dict[str, Environment] = {
             "sdl2" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:SDL2Init.lib -Wl,--no-whole-archive"], ["-l:libSDL2.so", "-l:Math.lib"], ["Math.lib", "SDL2Init.lib"])),
             "openGL" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:libGL.so", "-l:libglfw.so", "-l:libglbinding.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
             "curl" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:libcurl.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "miniaudio" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
         }),
         "dynamic" : Linker(Tool("g++", [], [], []), {
             "console" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:ConsoleInit.lib"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
             "sdl2" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:SDL2Init.lib"], ["-l:libSDL2.so", "-l:Math.lib"], ["Math.lib", "SDL2Init.lib"])),
             "openGL" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:ConsoleInit.lib"], ["-l:libGL.so", "-l:libglfw.so", "-l:libglbinding.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
             "curl" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:ConsoleInit.lib"], ["-l:libcurl.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "miniaudio" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:ConsoleInit.lib"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
+        }),
+    })),
+    "windows" : baseEnv.add(Environment({
+        "cc" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC"], [], []),
+        "cxx" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC"], [], []),
+        "as" : Tool("nasm", [], [], []),
+    }, {
+        "static" : Linker(Tool("x86_64-w64-mingw32-ar", [], [], []), {
+            "console" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/static", "-static-libstdc++" ,"-static-libgcc", "-static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "miniaudio" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/static", "-static-libstdc++" ,"-static-libgcc", "-static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
+        }),
+        "dynamic" : Linker(Tool("g++", [], [], []), {
+            "console" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/dynamic", "-l:ConsoleInit.lib"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "miniaudio" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/dynamic", "-l:ConsoleInit.lib"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
         }),
     })),
     "os" : baseEnvTools.add(Environment({
@@ -286,8 +303,8 @@ def CompileSourceFiles(directories : list[str], validExtensions : list[str]) -> 
         ret += [source.removeprefix(f"{srcDir}/") + ".o" for source in ListDirectory(f"{srcDir}/{directory}") if splitext(source)[1] in validExtensions]
     ret.sort()
     return ret
-def Link(env : TargetEnvironment, flags : list[str], directories : list[str], validExtensions : list[str], dependencies : list[str]) -> Target:
-    return Target(lambda inputs, dependencies, output, env : env.getLinker().run(output, dependencies + flags), lambda : Sort(CompileSourceFiles(directories, validExtensions) + dependencies), lambda env : [AssertNotNone(env.linker)], env, lambda sub : [], True)
+def Link(env : TargetEnvironment, flags : list[str], directories : list[str], validExtensions : list[str], dependencies : list[str], nonLinkableDependencies : list[str]) -> Target:
+    return Target(lambda inputs, dependencies, output, env : env.getLinker().run(output, dependencies[len(nonLinkableDependencies):] + flags), lambda : nonLinkableDependencies + Sort(CompileSourceFiles(directories, validExtensions) + dependencies), lambda env : [AssertNotNone(env.linker)], env, lambda sub : [], True)
 
 def MatchesTarget(output : str, target : str) -> str | None:
     split : list[str] = target.replace("*", "%").split("%")
@@ -363,12 +380,16 @@ targets : dict[str, Target] = {
     "clean": Target(lambda inputs, dependencies, output, env : removeDirectory.run(f"{buildDir}/", []), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False),
 
     "%.cpp.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["cxx"].run(output, [inputs[0]]), lambda : [], lambda env : ["cxx"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.cpp"] + GetIncludes(f"{srcDir}/{sub}.cpp"), True),
+    "%.c.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["cc"].run(output, [inputs[0]]), lambda : [], lambda env : ["cc"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.c"] + GetIncludes(f"{srcDir}/{sub}.c"), True),
     "%.asm.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.asm"], True),
     "%.s.o": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, [inputs[0]]), lambda : [], lambda env : ["as"], TargetEnvironment(None, [], []), lambda sub : [f"{srcDir}/{sub}.s"], True),
 
-    "Math.lib": Link(TargetEnvironment(None, None, []), [], ["Lib"], [".cpp"], []),
-    "ConsoleInit.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/Console"], [".cpp"], []),
-    "SDL2Init.lib": Link(TargetEnvironment(["host"], None, []), [], ["Platform/SDL2"], [".cpp"], []),
+    "Math.lib": Link(TargetEnvironment(None, None, []), [], ["Lib"], [".cpp"], [], []),
+    "ConsoleInit.lib": Link(TargetEnvironment(None, None, []), [], ["Platform/Console"], [".cpp"], [], []),
+    "SDL2Init.lib": Link(TargetEnvironment(None, None, []), [], ["Platform/SDL2"], [".cpp"], [], []),
+    "Miniaudio.lib": Link(TargetEnvironment(None, None, []), [], ["Platform/Miniaudio"], [".cpp"], [], ["miniaudio.h"]),
+
+    "miniaudio.h": Target(lambda inputs, dependencies, output, env : wget.run(output, ["https://raw.githubusercontent.com/mackron/miniaudio/refs/heads/master/miniaudio.h"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : [], True),
 
     "Main.aml": Target(lambda inputs, dependencies, output, env : python.run("", inputs + [output, "-oa"]), lambda : [], lambda env : [], TargetEnvironment([], [], []), lambda sub : ["Scripts/CompileASL.py", f"{dataDir}/ACPI/Main.asl"], True),
     "X86.bin": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["as"].run(output, inputs), lambda : [], lambda env : ["as"], TargetEnvironment(["binaryAssembler"], [], []), lambda sub : [f"{dataDir}/X86/Program.asm"], True),
@@ -376,7 +397,7 @@ targets : dict[str, Target] = {
 
     "Kernel.map": Target(lambda inputs, dependencies, output, env : True, lambda : ["Kernel.elf"], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : [], True),
     "Kernel.elf": Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-T {inputs[0]}", dependencies[0], env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtbegin.o"]).removesuffix("\n")] + dependencies[1:-1] + [env.getEnv().tools["cxx"].runAndGetStdout("", ["-print-file-name=crtend.o"]).removesuffix("\n"), dependencies[-1]]), lambda : ["OS/Shared/crti.s.o"] + Sort(CompileSourceFiles(["OS/Kernel", "OS/Shared"], [".cpp", ".asm"]) + CompileSourceFiles(["Lib"], [".cpp"])) + ["OS/Shared/crtn.s.o"], lambda env : [AssertNotNone(env.runtimeEnvironment), "cxx"], TargetEnvironment(["os"], ["executable"], ["elf"]), lambda sub : [f"{srcDir}/OS/Kernel/Linker.ld"], True),
-    "libModule.a": Link(TargetEnvironment(["os"], ["static"], []), [], ["OS/Module"], [".cpp", ".asm"], []),
+    "libModule.a": Link(TargetEnvironment(["os"], ["static"], []), [], ["OS/Module"], [".cpp", ".asm"], [], []),
 
     "FAT.img": Target(lambda inputs, dependencies, output, env : createDisk.run(output, ["count=93750"]) and makeFAT.run(output, ["-F 16"]) and copyToFAT.run(output, inputs), lambda : [], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : [f"{dataDir}/OS/FAT/*"], True),
     "EXT.img": Target(lambda inputs, dependencies, output, env : makeDirectory.run(f"{buildDir}/tmp/lib", []) and python.run("", inputs + [f"{buildDir}/tmp", "3"]) and python.run("", [inputs[0]] + dependencies + [f"{buildDir}/tmp/lib", "3"]) and makeEXT2.run(output, ["-b 100000", f"-d {buildDir}/tmp"]) and removeDirectory.run(f"{buildDir}/tmp", []), lambda : ["libModule.a"], lambda env : [], TargetEnvironment(["os"], [], []), lambda sub : ["Scripts/CopyFiles.py", f"{dataDir}/OS/EXT/*"], True),
@@ -390,77 +411,77 @@ gfxRuntime : list[str] = ["sdl2"]
 executables : list[str] = ["Main.aml", "X86.bin", "Certificate.der", "OS.gdb"]
 def AddExecutableWithRunDependencies(name : str, env : TargetEnvironment, runFlags : Callable[[list[str]], list[str]], flags: list[str], directories: list[str], validExtensions : list[str], runDeps : list[str]) -> None:
     executables.append(f"{name}.out")
-    targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions, [])
+    targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions, [], [])
     targets[f"{name}.out"] = Target(lambda inputs, dependencies, output, env : env.getRuntimeEnvironment().run(output, [f"-l:{name}.lib"]), lambda : [f"{name}.lib"], lambda env : [AssertNotNone(env.runtimeEnvironment)], env, lambda sub : [], True)
     targets[f"run{name}"] = Target(lambda inputs, dependencies, output, env : run.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False)
     targets[f"debug{name}"] = Target(lambda inputs, dependencies, output, env : valgrind.run(dependencies[0], runFlags(dependencies)), lambda : [f"{name}.out"] + runDeps, lambda env : [], TargetEnvironment([], [], []), lambda sub : [], False)
 def AddExecutable(name : str, env : TargetEnvironment, runFlags : Callable[[str], list[str]], flags: list[str], directories: list[str], validExtensions : list[str]) -> None:
     AddExecutableWithRunDependencies(name, env, lambda list : runFlags(list[0]), flags, directories, validExtensions, [])
-AddExecutableWithRunDependencies("AML", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])
-AddExecutableWithRunDependencies("X86", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
-AddExecutableWithRunDependencies("ASN1", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{program[1]}"], [], ["ASN1"], [".cpp"], ["Certificate.der"])
-AddExecutable("4D", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [f"-program {dataDir}/4D/Tesseract.txt"], [], ["4D"], [".cpp"])
-AddExecutable("AES", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/AES"], [], ["AES"], [".cpp"])
-AddExecutable("AI", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["AI"], [".cpp"])
-AddExecutable("ASL", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/ACPI/OS.asl"], [], ["ASL"], [".cpp"])
-AddExecutable("Bencode", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/Bencode/ArchLinux.torrent"], [], ["Bencode"], [".cpp"])
-AddExecutable("BNF", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["BNF"], [".cpp"])
-AddExecutable("IsomerGenerator", TargetEnvironment(["host"], None, ["console"]), lambda program : ["6"], [], ["Chemistry/IsomerGenerator"], [".cpp"])
-AddExecutable("ReactionBalancer", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/Chemistry/All.txt"], [], ["Chemistry/ReactionBalancer"], [".cpp"])
-AddExecutable("Circuit", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Circuit"], [".cpp"])
-AddExecutable("Compiler", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Compiler"], [".cpp"])
-AddExecutable("Electricity", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Electricity"], [".cpp"])
-AddExecutable("ELFParser", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"-program {program}"], [], ["ELFParser"], [".cpp"])
-AddExecutable("6502", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Emulator/6502"], [".cpp"])
-AddExecutable("FileSystemConverter", TargetEnvironment(["host"], None, ["console"]), lambda program : ["GNUTAR", f"{buildDir}/FS.tar", "Makefile Makefile", "TODO.md TODO.md"], [], ["FileSystemConverter"], [".cpp"])
-AddExecutable("BlockFiller", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Games/BlockFiller"], [".cpp"])
-AddExecutable("Cards", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Games/Cards"], [".cpp"])
-AddExecutable("Chomp", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Games/Chomp"], [".cpp"])
-AddExecutable("GameOfLife", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Games/GameOfLife"], [".cpp"])
-AddExecutable("GameTheory", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Games/GameTheory"], [".cpp"])
-AddExecutable("SlotMachine", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Games/SlotMachine"], [".cpp"])
-AddExecutable("Git", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Git"], [".cpp"])
-AddExecutable("HeaderTree", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{srcDir}/Lib/Typedefs.hpp"], [], ["HeaderTree"], [".cpp"])
-AddExecutable("HTTP", TargetEnvironment(["host"], None, ["console"]), lambda program : ["8080"], [], ["HTTP"], [".cpp"])
-AddExecutable("ImageConverter", TargetEnvironment(["host"], None, gfxRuntime), lambda program : ["-inputType TGA", f"-input {dataDir}/RPG/Emoji.tga", "-outputType P6", f"-output {buildDir}/ImageConverter.ppm"], [], ["ImageConverter"], [".cpp"])
-AddExecutable("LambdaCalculus", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/LambdaCalculus/Main.txt"], [], ["LambdaCalculus"], [".cpp"])
-AddExecutable("MachineLearning", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{buildDir}/ML.bin", "20000"], [], ["MachineLearning"], [".cpp"])
-AddExecutable("Channel", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/Channel"], [".cpp"])
-AddExecutable("ChaosTheory", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Math/ChaosTheory"], [".cpp"])
-AddExecutable("ComplexAnimation", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [f"{dataDir}/Math/Trigonometry/Sine.txt", f"{buildDir}/ComplexAnimationFrames", f"{buildDir}/Animation.mp4"], [], ["Math/ComplexAnimation"], [".cpp"])
-AddExecutable("ConstantCalculator", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/ConstantCalculator"], [".cpp"])
-AddExecutable("Graph", TargetEnvironment(["host"], None, gfxRuntime), lambda program : ListDirectory(f"{dataDir}/Math"), [], ["Math/Graph"], [".cpp"])
-AddExecutable("Polynomial", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/Math/Polynomial.txt"], [], ["Math/Polynomial"], [".cpp"])
-AddExecutable("PolynomialApproximation", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/PolynomialApproximation"], [".cpp"])
-AddExecutable("ProjectEuler", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/ProjectEuler"], [".cpp"])
-AddExecutable("Prover", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/Prover/Main.txt"], [], ["Math/Prover"], [".cpp"])
-AddExecutable("Quiz", TargetEnvironment(["host"], None, ["console"]), lambda program : ListDirectory(f"{dataDir}/Math"), [], ["Math/Quiz"], [".cpp"])
-AddExecutable("Sine", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/Sine"], [".cpp"])
-AddExecutable("Transform", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Math/Transform"], [".cpp"])
-AddExecutable("OpenGL", TargetEnvironment(["host"], None, ["openGL"]), lambda program : [], [], ["OpenGL"], [".cpp"])
-AddExecutable("Paint", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Paint"], [".cpp"])
-AddExecutable("Gravity", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Physics/Gravity"], [".cpp"])
-AddExecutable("Ray", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Physics/Ray"], [".cpp"])
-AddExecutable("Rope", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Physics/Rope"], [".cpp"])
-AddExecutable("Queue", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Queue"], [".cpp"])
-AddExecutable("SequentCalculus", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/SequentCalculus/ModusPonens.txt"], [], ["SequentCalculus"], [".cpp"])
-AddExecutable("Sort", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["Sort"], [".cpp"])
-AddExecutable("Sudoku", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/Sudoku/2.csv"], [], ["Sudoku"], [".cpp"])
-AddExecutable("TerrainGenerator", TargetEnvironment(["host"], None, gfxRuntime), lambda program : [], [], ["TerrainGenerator"], [".cpp"])
-AddExecutable("Tests", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["Tests"], [".cpp"])
-AddExecutable("TextGenerator", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["TextGenerator"], [".cpp"])
-AddExecutable("TheoremProver", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["TheoremProver"], [".cpp"])
-AddExecutable("TypeTheory", TargetEnvironment(["host"], None, ["console"]), lambda program : [f"{dataDir}/TypeTheory/Main.txt"], [], ["TypeTheory"], [".cpp"])
-AddExecutable("VideoPlayer", TargetEnvironment(["host"], None, gfxRuntime), lambda program : ["-width 800", "-height 800", "-speed 0.1", "-skipDuration 1", "-multX 4", "-multY 4", f"-path {dataDir}/VideoPlayer/Video.aseprite"], [], ["VideoPlayer"], [".cpp"])
-AddExecutable("WebScraper", TargetEnvironment(["host"], None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
-AddExecutable("WebsiteReader", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
-AddExecutable("ModelGenerator", TargetEnvironment(["host"], None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
+AddExecutableWithRunDependencies("AML", TargetEnvironment(None, None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/AML"], [".cpp"], ["Main.aml"])
+AddExecutableWithRunDependencies("X86", TargetEnvironment(None, None, ["console"]), lambda program : [f"{program[1]}"], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
+AddExecutableWithRunDependencies("ASN1", TargetEnvironment(None, None, ["console"]), lambda program : [f"{program[1]}"], [], ["ASN1"], [".cpp"], ["Certificate.der"])
+AddExecutable("4D", TargetEnvironment(None, None, gfxRuntime), lambda program : [f"-program {dataDir}/4D/Tesseract.txt"], [], ["4D"], [".cpp"])
+AddExecutable("AES", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/AES"], [], ["AES"], [".cpp"])
+AddExecutable("AI", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["AI"], [".cpp"])
+AddExecutable("ASL", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/ACPI/OS.asl"], [], ["ASL"], [".cpp"])
+AddExecutable("Bencode", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/Bencode/ArchLinux.torrent"], [], ["Bencode"], [".cpp"])
+AddExecutable("BNF", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["BNF"], [".cpp"])
+AddExecutable("IsomerGenerator", TargetEnvironment(None, None, ["console"]), lambda program : ["6"], [], ["Chemistry/IsomerGenerator"], [".cpp"])
+AddExecutable("ReactionBalancer", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/Chemistry/All.txt"], [], ["Chemistry/ReactionBalancer"], [".cpp"])
+AddExecutable("Circuit", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Circuit"], [".cpp"])
+AddExecutable("Compiler", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Compiler"], [".cpp"])
+AddExecutable("Electricity", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Electricity"], [".cpp"])
+AddExecutable("ELFParser", TargetEnvironment(None, None, ["console"]), lambda program : [f"-program {program}"], [], ["ELFParser"], [".cpp"])
+AddExecutable("6502", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Emulator/6502"], [".cpp"])
+AddExecutable("FileSystemConverter", TargetEnvironment(None, None, ["console"]), lambda program : ["GNUTAR", f"{buildDir}/FS.tar", "Makefile Makefile", "TODO.md TODO.md"], [], ["FileSystemConverter"], [".cpp"])
+AddExecutable("BlockFiller", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/BlockFiller"], [".cpp"])
+AddExecutable("Cards", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/Cards"], [".cpp"])
+AddExecutable("Chomp", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/Chomp"], [".cpp"])
+AddExecutable("GameOfLife", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/GameOfLife"], [".cpp"])
+AddExecutable("GameTheory", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Games/GameTheory"], [".cpp"])
+AddExecutable("SlotMachine", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/SlotMachine"], [".cpp"])
+AddExecutable("Git", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Git"], [".cpp"])
+AddExecutable("HeaderTree", TargetEnvironment(None, None, ["console"]), lambda program : [f"{srcDir}/Lib/Typedefs.hpp"], [], ["HeaderTree"], [".cpp"])
+AddExecutable("HTTP", TargetEnvironment(None, None, ["console"]), lambda program : ["8080"], [], ["HTTP"], [".cpp"])
+AddExecutable("ImageConverter", TargetEnvironment(None, None, gfxRuntime), lambda program : ["-inputType TGA", f"-input {dataDir}/RPG/Emoji.tga", "-outputType P6", f"-output {buildDir}/ImageConverter.ppm"], [], ["ImageConverter"], [".cpp"])
+AddExecutable("LambdaCalculus", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/LambdaCalculus/Main.txt"], [], ["LambdaCalculus"], [".cpp"])
+AddExecutable("MachineLearning", TargetEnvironment(None, None, ["console"]), lambda program : [f"{buildDir}/ML.bin", "20000"], [], ["MachineLearning"], [".cpp"])
+AddExecutable("Channel", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/Channel"], [".cpp"])
+AddExecutable("ChaosTheory", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Math/ChaosTheory"], [".cpp"])
+AddExecutable("ComplexAnimation", TargetEnvironment(None, None, gfxRuntime), lambda program : [f"{dataDir}/Math/Trigonometry/Sine.txt", f"{buildDir}/ComplexAnimationFrames", f"{buildDir}/Animation.mp4"], [], ["Math/ComplexAnimation"], [".cpp"])
+AddExecutable("ConstantCalculator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/ConstantCalculator"], [".cpp"])
+AddExecutable("Graph", TargetEnvironment(None, None, gfxRuntime), lambda program : ListDirectory(f"{dataDir}/Math"), [], ["Math/Graph"], [".cpp"])
+AddExecutable("Polynomial", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/Math/Polynomial.txt"], [], ["Math/Polynomial"], [".cpp"])
+AddExecutable("PolynomialApproximation", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/PolynomialApproximation"], [".cpp"])
+AddExecutable("ProjectEuler", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/ProjectEuler"], [".cpp"])
+AddExecutable("Prover", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/Prover/Main.txt"], [], ["Math/Prover"], [".cpp"])
+AddExecutable("Quiz", TargetEnvironment(None, None, ["console"]), lambda program : ListDirectory(f"{dataDir}/Math"), [], ["Math/Quiz"], [".cpp"])
+AddExecutable("Sine", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/Sine"], [".cpp"])
+AddExecutable("Transform", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Math/Transform"], [".cpp"])
+AddExecutable("OpenGL", TargetEnvironment(None, None, ["openGL"]), lambda program : [], [], ["OpenGL"], [".cpp"])
+AddExecutable("Paint", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Paint"], [".cpp"])
+AddExecutable("Gravity", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Physics/Gravity"], [".cpp"])
+AddExecutable("Ray", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Physics/Ray"], [".cpp"])
+AddExecutable("Rope", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Physics/Rope"], [".cpp"])
+AddExecutable("Queue", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Queue"], [".cpp"])
+AddExecutable("SequentCalculus", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/SequentCalculus/ModusPonens.txt"], [], ["SequentCalculus"], [".cpp"])
+AddExecutable("Sort", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Sort"], [".cpp"])
+AddExecutable("Sudoku", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/Sudoku/2.csv"], [], ["Sudoku"], [".cpp"])
+AddExecutable("TerrainGenerator", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["TerrainGenerator"], [".cpp"])
+AddExecutable("Tests", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["Tests"], [".cpp"])
+AddExecutable("TextGenerator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["TextGenerator"], [".cpp"])
+AddExecutable("TheoremProver", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["TheoremProver"], [".cpp"])
+AddExecutable("TypeTheory", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/TypeTheory/Main.txt"], [], ["TypeTheory"], [".cpp"])
+AddExecutable("VideoPlayer", TargetEnvironment(None, None, gfxRuntime), lambda program : ["-width 800", "-height 800", "-speed 0.1", "-skipDuration 1", "-multX 4", "-multY 4", f"-path {dataDir}/VideoPlayer/Video.aseprite"], [], ["VideoPlayer"], [".cpp"])
+AddExecutable("WebScraper", TargetEnvironment(None, None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
+AddExecutable("WebsiteReader", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
+AddExecutable("ModelGenerator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
 
 if __name__ == "__main__":
     if len(argv) < 2:
         print(f"Usage: {argv[0]} <target>")
         exit(1)
-    defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("host", "dynamic", "sdl2")
+    defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("windows", "static", "sdl2")
     currentTargets : list[str] = executables if argv[1] == "all" else [argv[1]]
     failedTargets : list[str] = []
     for target in currentTargets:

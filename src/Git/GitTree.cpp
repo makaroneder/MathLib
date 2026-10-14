@@ -1,25 +1,35 @@
 #include "GitTree.hpp"
-#include <Interfaces/Sequence/ByteArray.hpp>
+#include <Cryptography/OneWayCipher/SHA/SHA1.hpp>
 #include <Cryptography/Compressor/ZLib.hpp>
 #include <ExternArray.hpp>
 
-bool GitTree::Save(MathLib::Writable& file) const {
+MathLib::String GitTree::GetHash(void) const {
+    const MathLib::Array<uint8_t> hash = MathLib::SHA1().Encrypt(SaveInternal(), MathLib::CipherKey());
+    const size_t size = hash.GetSize();
+    MathLib::String ret;
+    for (size_t i = 0; i < size; i++) ret += MathLib::ToString(hash.AtUnsafe(i), 16, 2);
+    return ret;
+}
+MathLib::ByteArray GitTree::SaveInternal(void) const {
     const size_t elementCount = elements.GetSize();
     size_t size = elementCount * (7 + 1 + 20);
     for (const MathLib::DictionaryElement<MathLib::String, MathLib::String>& element : elements)
         size += element.GetKey().GetSize();
     const MathLib::String sizeStr = MathLib::ToString(size, 10);
     MathLib::ByteArray buffer = MathLib::ByteArray(5 + sizeStr.GetSize() + 1 + size);
-    if (!buffer.Puts(treeStart)) return false;
-    if (!buffer.Puts(sizeStr) || !buffer.Write<char>('\0')) return false;
+    if (!buffer.Puts(treeStart)) return MathLib::Array<uint8_t>();
+    if (!buffer.Puts(sizeStr) || !buffer.Write<char>('\0')) return MathLib::Array<uint8_t>();
     for (const MathLib::DictionaryElement<MathLib::String, MathLib::String>& element : elements) {
-        if (!buffer.WriteBuffer(fileMode, 7) || !buffer.Puts(element.GetKey()) || !buffer.Write<char>('\0')) return false;
+        if (!buffer.WriteBuffer(fileMode, 7) || !buffer.Puts(element.GetKey()) || !buffer.Write<char>('\0')) return MathLib::Array<uint8_t>();
         const size_t size = element.value.GetSize();
         for (size_t i = 0; i < size; i += 2)
-            if (!buffer.Write<uint8_t>(MathLib::StringToU8(element.value.AtUnsafe(i), element.value.AtUnsafe(i + 1)))) return false;
+            if (!buffer.Write<uint8_t>(MathLib::StringToU8(element.value.AtUnsafe(i), element.value.AtUnsafe(i + 1)))) return MathLib::Array<uint8_t>();
     }
-    const MathLib::Array<uint8_t> data = MathLib::ZLib().Encrypt(buffer, MathLib::CipherKey());
-    return file.WriteBuffer(data.GetValue(), data.GetSize());
+    return buffer;
+}
+bool GitTree::Save(MathLib::Writable& file) const {
+    const MathLib::Array<uint8_t> data = MathLib::ZLib().Encrypt(SaveInternal(), MathLib::CipherKey());
+    return file.WriteCollection<uint8_t>(data);
 }
 bool GitTree::Load(MathLib::Readable& file) {
     const MathLib::Array<uint8_t> data = MathLib::ZLib().DecryptReadable(file, MathLib::CipherKey());

@@ -21,6 +21,13 @@ namespace MathLib {
             return WriteBuffer(sequence.GetValue(), sequence.GetSize() * sizeof(T));
         }
         template <typename T>
+        [[nodiscard]] bool WriteSequence(const Sequence<T>& sequence) {
+            const size_t size = sequence.GetSize();
+            for (size_t i = 0; i < size; i++)
+                if (!Write<T>(sequence.AtUnsafe(i))) return false;
+            return true;
+        }
+        template <typename T>
         [[nodiscard]] bool WriteSizeAndBuffer(const void* buffer, T size) {
             return Write<T>(size) && WriteBuffer(buffer, size);
         }

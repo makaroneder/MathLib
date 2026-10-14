@@ -1,12 +1,13 @@
 #ifndef MathLib_FileSystem_H
 #define MathLib_FileSystem_H
+#include "../Database.hpp"
 #include "SeekMode.hpp"
 #include "OpenMode.hpp"
 #include "FileInfo.hpp"
 #include "File.hpp"
 
 namespace MathLib {
-    struct FileSystem : Allocatable {
+    struct FileSystem : Database {
         [[nodiscard]] File Open(const Sequence<char>& path, OpenMode mode);
         [[nodiscard]] virtual bool IsValid(void) const = 0;
         [[nodiscard]] virtual size_t OpenInternal(const Sequence<char>& path, OpenMode mode) = 0;
@@ -20,6 +21,9 @@ namespace MathLib {
         [[nodiscard]] bool ListFiles(Writable& logger, const Sequence<char>& path, size_t maxDepth, const Sequence<char>& padding = ""_M);
         [[nodiscard]] bool ListFiles(Writable* logger, const Sequence<char>& path, size_t maxDepth, const Sequence<char>& padding = ""_M);
         [[nodiscard]] Array<FileInfo> GetContentsOfDirectory(const Sequence<char>& path);
+        [[nodiscard]] virtual bool CreateRecord(const Sequence<char>& path, const Sequence<uint8_t>& data) override;
+        [[nodiscard]] virtual Array<uint8_t> Read(const Sequence<char>& path) override;
+        [[nodiscard]] virtual bool Overwrite(const Sequence<char>& path, const void* buffer, size_t size, size_t position) override;
     };
 }
 

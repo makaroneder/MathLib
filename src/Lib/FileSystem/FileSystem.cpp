@@ -46,4 +46,13 @@ namespace MathLib {
         }
         return ret;
     }
+    bool FileSystem::CreateRecord(const Sequence<char>& path, const Sequence<uint8_t>& data) {
+        return Open(path, OpenMode::Write).WriteSequence<uint8_t>(data);
+    }
+    Array<uint8_t> FileSystem::Read(const Sequence<char>& path) {
+        return Open(path, OpenMode::Read).ReadAll();
+    }
+    bool FileSystem::Overwrite(const Sequence<char>& path, const void* buffer, size_t size, size_t position) {
+        return Open(path, OpenMode::ReadWrite).WritePositionedBuffer(buffer, size, position);
+    }
 }

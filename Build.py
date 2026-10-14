@@ -481,12 +481,11 @@ if __name__ == "__main__":
     if len(argv) < 2:
         print(f"Usage: {argv[0]} <target>")
         exit(1)
-    defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("windows", "static", "sdl2")
+    defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("host", "dynamic", "sdl2")
     currentTargets : list[str] = executables if argv[1] == "all" else [argv[1]]
     failedTargets : list[str] = []
     for target in currentTargets:
-        if not MakeTarget(target, defaultEnv):
-            failedTargets.append(target)
+        if not MakeTarget(target, defaultEnv): failedTargets.append(target)
     if len(failedTargets) == 1:
         print(f"Failed to run target {failedTargets[0]}")
         exit(1)

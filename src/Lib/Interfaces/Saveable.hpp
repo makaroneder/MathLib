@@ -8,9 +8,13 @@ namespace MathLib {
         [[nodiscard]] virtual bool Save(Writable& file) const = 0;
         [[nodiscard]] virtual bool Load(Readable& file) = 0;
         [[nodiscard]] bool SaveFromPath(FileSystem& fileSystem, const Sequence<char>& path) const;
-        [[nodiscard]] bool LoadFromPath(FileSystem& fileSystem, const Sequence<char>& path);
         [[nodiscard]] bool SaveFromPath(FileSystem* fileSystem, const Sequence<char>& path) const;
+        [[nodiscard]] bool SaveFromDatabase(Database& database, const Sequence<char>& path) const;
+        [[nodiscard]] bool SaveFromDatabase(Database* database, const Sequence<char>& path) const;
+        [[nodiscard]] bool LoadFromPath(FileSystem& fileSystem, const Sequence<char>& path);
         [[nodiscard]] bool LoadFromPath(FileSystem* fileSystem, const Sequence<char>& path);
+        [[nodiscard]] bool LoadFromDatabase(Database& database, const Sequence<char>& path);
+        [[nodiscard]] bool LoadFromDatabase(Database* database, const Sequence<char>& path);
         [[nodiscard]] bool LoadFromSequence(const Sequence<uint8_t>& sequence);
     };
 }

@@ -6,6 +6,9 @@
 namespace MathLib {
     template <typename T>
     struct SubSequence : Sequence<T> {
+        SubSequence(const Sequence<T>& sequence, size_t start, size_t end) : interval(start, end), sequence(sequence) {
+            if (interval.GetMax() > sequence.GetSize()) Panic("Sub sequence is out of bounds");
+        }
         SubSequence(const Sequence<T>& sequence, const Interval<size_t>& interval) : interval(interval), sequence(sequence) {
             if (interval.GetMax() > sequence.GetSize()) Panic("Sub sequence is out of bounds");
         }

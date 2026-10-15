@@ -5,6 +5,7 @@
 #include "../Physics/SIUnits.hpp"
 #include "../Math/Trigonometry.hpp"
 #include "../FileSystem/Cipher/Ar/Ar.hpp"
+#include "../Cryptography/Code/Base64.hpp"
 #include "../Cryptography/Cipher/PKCS7.hpp"
 #include "../Cryptography/Cipher/ROT13.hpp"
 #include "../Cryptography/Code/UnaryCode.hpp"
@@ -289,6 +290,7 @@ namespace MathLib {
         TestOperation(test, Ar().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, PKCS7().TestEncryption<uint8_t>(identitySequence, CipherKey(MakeArray<uint8_t>(64))));
         TestOperation(test, SHAPadding().TestEncryption<uint8_t>(identitySequence, CipherKey()));
+        TestOperation(test, Base64().TestEncryption<uint8_t>(identitySequence, CipherKey()));
 
         const SHA1 sha1;
         const SHA256 sha256;

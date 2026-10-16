@@ -2,66 +2,68 @@
 #include "DERTagType.hpp"
 #include "DERTagClass.hpp"
 #include "../Cryptography/Code/Base64.hpp"
+#include "../Interfaces/CountedReadable.hpp"
 #include "../Interfaces/Sequence/SubSequence.hpp"
 #include "../Interfaces/Sequence/ConvertSequence.hpp"
 
 namespace MathLib {
-    [[nodiscard]] size_t ParseDERLength(const Array<uint8_t>& certificateData, size_t& i) {
-        const uint8_t data = certificateData.At(i++);
+    [[nodiscard]] size_t ParseDERLength(Readable& certificateData) {
+        uint8_t data = 0;
+        if (!certificateData.Read<uint8_t>(data)) return SIZE_MAX;
         const uint8_t size = data & 0b1111111;
         if (!(data & (1 << 7))) return size;
         if (!size || size == 127) return SIZE_MAX;
         size_t ret = 0;
-        for (uint8_t j = 0; j < size; j++) ret = (ret << 8) | certificateData.At(i++);
+        for (uint8_t j = 0; j < size; j++) {
+            uint8_t tmp = 0;
+            if (!certificateData.Read<uint8_t>(tmp)) return SIZE_MAX;
+            ret = (ret << 8) | tmp;
+        }
         return ret;
     }
-    [[nodiscard]] bool ParseDERInternal(DERTerm& certificate, const Array<uint8_t>& certificateData, size_t& i) {
-        const uint8_t encoding = certificateData.At(i++);
+    bool ParseDER(DERTerm& certificate, Readable& certificateData) {
+        uint8_t encoding = 0;
+        if (!certificateData.Read<uint8_t>(encoding)) return false;
         if ((DERTagType)encoding == DERTagType::LongForm) return false;
         const DERTagType tagType = (DERTagType)(encoding & 0b11111);
         const DERTagClass tagClass = (DERTagClass)(encoding >> 6);
         // const bool constructed = encoding & (1 << 5);
-        size_t length = ParseDERLength(certificateData, i);
+        const size_t length = ParseDERLength(certificateData);
         if (length == SIZE_MAX) return false;
         switch (tagClass) {
             case DERTagClass::ContextSpecific: {
-                const size_t save = i;
-                if (!ParseDERInternal(certificate, certificateData, i)) return false;
-                return length == i - save;
+                CountedReadable counter = certificateData;
+                if (!ParseDER(certificate, counter)) return false;
+                return length == counter.GetReadBytes();
             }
             case DERTagClass::Universal: switch (tagType) {
                 case DERTagType::Null: return !length;
                 case DERTagType::Integer: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::Integer)) return false;
                     certificate.value = length;
-                    certificate.value.CopyFromBuffer(certificateData.GetValue() + i);
-                    i += length;
-                    return true;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::BitString: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::ByteArray)) return false;
-                    const uint8_t unusedBits = certificateData.AtUnsafe(i++);
+                    uint8_t unusedBits = 0;
+                    if (!certificateData.Read<uint8_t>(unusedBits)) return false;
                     if (unusedBits) {
                         // TODO:
                         return false;
                     }
                     certificate.value = length - 1;
-                    certificate.value.CopyFromBuffer(certificateData.GetValue() + i);
-                    i += length - 1;
-                    return true;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::OctetString: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::ByteArray)) return false;
                     certificate.value = length;
-                    certificate.value.CopyFromBuffer(certificateData.GetValue() + i);
-                    i += length;
-                    return true;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::Bool: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::Bool)) return false;
                     if (length != 1) return false;
-                    certificate.value = MakeArray<uint8_t>(certificateData.AtUnsafe(i++));
-                    return true;
+                    certificate.value = 1;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::ObjectIdentifier: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::ObjectIdentifier)) return false;
@@ -69,7 +71,8 @@ namespace MathLib {
                     Array<size_t> buffer;
                     size_t curr = 0;
                     for (size_t j = 0; j < length; j++) {
-                        const uint8_t tmp = certificateData.AtUnsafe(i++);
+                        uint8_t tmp = 0;
+                        if (!certificateData.Read<uint8_t>(tmp)) return false;
                         curr = (curr << 7) | (tmp & ~(1 << 7));
                         if (tmp & (1 << 7)) continue;
                         if (!buffer.Add(curr)) return false;
@@ -88,18 +91,14 @@ namespace MathLib {
                 case DERTagType::PrintableString: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::String)) return false;
                     certificate.value = length;
-                    certificate.value.CopyFromBuffer(certificateData.GetValue() + i);
-                    i += length;
-                    return true;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::UTCTime:
                 case DERTagType::GeneralizedTime: {
                     // TODO: Decode
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::Date)) return false;
                     certificate.value = length;
-                    certificate.value.CopyFromBuffer(certificateData.GetValue() + i);
-                    i += length;
-                    return true;
+                    return certificateData.ReadCollection<uint8_t>(certificate.value);
                 }
                 case DERTagType::Sequence:
                 case DERTagType::Set: {
@@ -107,20 +106,20 @@ namespace MathLib {
                     size_t currentChild = 0;
                     const size_t children = certificate.children.GetSize();
                     size_t index = 0;
-                    while (length) {
-                        const size_t save = i;
+                    CountedReadable counter = certificateData;
+                    while (true) {
                         if (children <= currentChild) {
                             DERTerm tmp;
                             if (certificate.memberTemplate) tmp = *certificate.memberTemplate;
                             tmp.name = (tmp.name.IsEmpty() ? "Unknown"_M : tmp.name) + ToString(index++, 10);
-                            if (!ParseDERInternal(tmp, certificateData, i)) return false;
+                            if (!ParseDER(tmp, counter)) return false;
                             if (!certificate.children.Add(tmp)) return false;
                         }
-                        else if (!ParseDERInternal(certificate.children.AtUnsafe(currentChild), certificateData, i)) return false;
+                        else if (!ParseDER(certificate.children.AtUnsafe(currentChild), counter)) return false;
                         currentChild++;
-                        const size_t difference = i - save;
-                        if (length < difference) return false;
-                        length -= difference;
+                        const size_t tmp = counter.GetReadBytes();
+                        if (length == tmp) break;
+                        if (length < tmp) return false;
                     }
                     return true;
                 }
@@ -128,10 +127,6 @@ namespace MathLib {
             }
             default: return false;
         }
-    }
-    bool ParseDER(DERTerm& certificate, const Array<uint8_t>& certificateData) {
-        size_t i = 0;
-        return ParseDERInternal(certificate, certificateData, i);
     }
     Array<uint8_t> DecodePEM(const String& data, const String& label, size_t offset) {
         const size_t tmpStart = data.Find("-----BEGIN "_M + label + "-----", offset);

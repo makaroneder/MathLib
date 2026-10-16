@@ -37,6 +37,9 @@ void Main(int argc, char** argv, MathLib::FileSystem& fs) {
         )),
         MathLib::DERTerm(MathLib::DERTerm::Type::ByteArray, "Signature")
     ));
-    if (!MathLib::ParseDER(certificate, fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read).ReadAll())) MathLib::Panic("Failed to parse DER");
+    if (true) {
+        MathLib::File file = fs.Open(MathLib::String(argv[1]), MathLib::OpenMode::Read);
+        if (!MathLib::ParseDER(certificate, file)) MathLib::Panic("Failed to parse DER");
+    }
     std::cout << certificate << std::endl;
 }

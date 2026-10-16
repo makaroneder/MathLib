@@ -11,12 +11,14 @@ namespace MathLib {
             'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/',
         };
         static constexpr uint8_t paddingSymbol = '=';
+        static constexpr uint8_t lineBreakSymbol = '\n';
 
         [[nodiscard]] virtual Array<uint8_t> Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const override;
         [[nodiscard]] virtual Array<uint8_t> DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const override;
 
         private:
         [[nodiscard]] uint8_t ReverseSymbol(uint8_t symbol) const;
+        [[nodiscard]] uint8_t GetSymbol(const Sequence<uint8_t>& data, size_t& i) const;
     };
 }
 

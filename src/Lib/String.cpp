@@ -59,13 +59,17 @@ namespace MathLib {
         }
         return ret;
     }
-    String DumpMemory(uintptr_t addr, size_t size, size_t lineSize, const String& padding) {
+    String DumpMemory(uintptr_t addr, size_t size, size_t lineSize, bool printASCII, const String& padding) {
         String ret;
         const uint8_t* buff = (const uint8_t*)addr;
         for (size_t y = 0; y < size; y += lineSize) {
             ret += padding;
             for (size_t x = 0; x < lineSize; x++)
                 ret += (y + x < size ? ToString(buff[y + x], 16, 2) : "??") + ' ';
+            if (!printASCII) {
+                ret += '\n';
+                continue;
+            }
             ret += '\t';
             for (size_t x = 0; x < lineSize; x++) {
                 ret += y + x < size ? (IsAlphaDigit(buff[y + x]) ? (char)buff[y + x] : '.') : '?';

@@ -19,7 +19,7 @@ namespace MathLib {
             padd2 + "Address: 0x" + MathLib::ToString(address, 16, 16) + '\n' +
             padd2 + "Entry: 0x" + MathLib::ToString(entry, 16, 16) + '\n' +
             padd2 + "Data: {\n" +
-                DumpMemory<uint8_t>(data, 16, padd2 + '\t') +
+                DumpMemory<uint8_t>(data, 16, true, padd2 + '\t') +
             padd2 + "}\n" +
         padd + '}';
     }

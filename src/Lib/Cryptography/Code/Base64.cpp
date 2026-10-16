@@ -28,18 +28,18 @@ namespace MathLib {
         if (!key.IsEmpty()) return Array<uint8_t>();
         const size_t size = data.GetSize();
         Array<uint8_t> ret;
-        for (size_t i = 0; i < size; i += 4) {
-            const uint8_t sym0 = ReverseSymbol(data.AtUnsafe(i + 0));
-            if (sym0 == UINT8_MAX) return Array<uint8_t>();
-            const uint8_t sym1 = ReverseSymbol(data.AtUnsafe(i + 1));
-            if (sym1 == UINT8_MAX) return Array<uint8_t>();
+        for (size_t i = 0; i < size;) {
+            const uint8_t sym0 = GetSymbol(data, i);
+            if (sym0 == UINT8_MAX || sym0 == sizeof(symbols)) return Array<uint8_t>();
+            const uint8_t sym1 = GetSymbol(data, i);
+            if (sym1 == UINT8_MAX || sym1 == sizeof(symbols)) return Array<uint8_t>();
             if (!ret.Add((sym0 << 2) | ((sym1 & 0b110000) >> 4))) return Array<uint8_t>();
-            if (i + 2 == size || data.AtUnsafe(i + 2) == paddingSymbol) break;
-            const uint8_t sym2 = ReverseSymbol(data.AtUnsafe(i + 2));
+            const uint8_t sym2 = GetSymbol(data, i);
+            if (sym2 == sizeof(symbols)) break;
             if (sym2 == UINT8_MAX) return Array<uint8_t>();
             if (!ret.Add(((sym1 & 0b001111) << 4) | ((sym2 & 0b111100) >> 2))) return Array<uint8_t>();
-            if (i + 3 == size || data.AtUnsafe(i + 3) == paddingSymbol) break;
-            const uint8_t sym3 = ReverseSymbol(data.AtUnsafe(i + 3));
+            const uint8_t sym3 = GetSymbol(data, i);
+            if (sym3 == sizeof(symbols)) break;
             if (sym3 == UINT8_MAX) return Array<uint8_t>();
             if (!ret.Add(((sym2 & 0b000011) << 6) | (sym3 & 0b111111))) return Array<uint8_t>();
         }
@@ -51,8 +51,17 @@ namespace MathLib {
         return sub;
     }
     uint8_t Base64::ReverseSymbol(uint8_t symbol) const {
+        if (symbol == paddingSymbol) return sizeof(symbols);
         for (uint8_t i = 0; i < sizeof(symbols); i++)
             if (symbols[i] == symbol) return i;
         return UINT8_MAX;
+    }
+    uint8_t Base64::GetSymbol(const Sequence<uint8_t>& data, size_t& i) const {
+        const size_t size = data.GetSize();
+        while (true) {
+            if (i >= size) return sizeof(symbols);
+            if (data.AtUnsafe(i++) == lineBreakSymbol) continue;
+            return ReverseSymbol(data.AtUnsafe(i - 1));
+        }
     }
 }

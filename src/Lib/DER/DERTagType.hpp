@@ -1,0 +1,46 @@
+#ifndef MathLib_DER_TagType_H
+#define MathLib_DER_TagType_H
+#include <stdint.h>
+
+enum class DERTagType : uint8_t {
+    EndOfContent = 0,
+    Bool,
+    Integer,
+    BitString,
+    OctetString,
+    Null,
+    ObjectIdentifier,
+    ObjectDescriptor,
+    External,
+    Float,
+    Enumerated,
+    EmbeddedPDV,
+    UTF8String,
+    RelativeOID,
+    Time,
+    Reserved,
+    Sequence,
+    Set,
+    NumericString,
+    PrintableString,
+    T61String,
+    VideotexString,
+    IA5String,
+    UTCTime,
+    GeneralizedTime,
+    GraphicString,
+    VisibleString,
+    GeneralString,
+    UniversalString,
+    CharacterString,
+    BMPString,
+    LongForm,
+    Date = LongForm,
+    TimeOfDay,
+    DateTime,
+    Duration,
+    OIDIRI,
+    RelativeOIDIRI,
+};
+
+#endif

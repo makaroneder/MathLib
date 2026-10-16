@@ -49,12 +49,11 @@ namespace MathLib {
     }
     String NaturalNumber::ToHexString(void) const {
         const size_t size = data.GetSize();
-        String ret = "0x";
-        if (IsZero()) return ret + "0";
+        if (IsZero()) return "0x00";
         size_t start = size;
-        while (!data.At(start - 1)) start--;
-        ret += MathLib::ToString(data.At(start - 1), 16);
-        for (size_t i = start - 1; i; i--) ret += MathLib::ToString(data.At(i - 1), 16, 2);
+        while (!data.AtUnsafe(start - 1)) start--;
+        String ret = "0x";
+        for (size_t i = start; i; i--) ret += MathLib::ToString(data.AtUnsafe(i - 1), 16, 2);
         return ret;
     }
     String NaturalNumber::ToString(const Sequence<char>& padding) const {

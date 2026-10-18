@@ -37,6 +37,9 @@ namespace MathLib {
     size_t NaturalNumber::GetSize(void) const {
         return data.GetSize();
     }
+    bool NaturalNumber::GetBit(size_t n) const {
+        return At(n / 8) & (1 << (n % 8));
+    }
     bool NaturalNumber::Save(Writable& file) const {
         const size_t size = data.GetSize();
         return file.Write<size_t>(size) && file.WriteBuffer(data.GetValue(), size);
@@ -141,24 +144,10 @@ namespace MathLib {
     NaturalNumber NaturalNumber::GreatestCommonDivisor(const NaturalNumber& other) const {
         if (IsZero()) return other;
         if (other.IsZero()) return *this;
-        NaturalNumber mod;
-        (void)LongDivMod(other, mod);
-        return other.GreatestCommonDivisor(mod);
+        return other.GreatestCommonDivisor(*this % other);
     }
     NaturalNumber NaturalNumber::LeastCommonMultiple(const NaturalNumber& other) const {
-        NaturalNumber mod;
-        return (*this * other).LongDivMod(GreatestCommonDivisor(other), mod);
-    }
-    NaturalNumber NaturalNumber::GreatestCommonDivisorBySubtraction(const NaturalNumber& other) const {
-        if (IsZero()) return other;
-        if (other.IsZero()) return *this;
-        NaturalNumber mod;
-        (void)DivModBySubtraction(other, mod);
-        return other.GreatestCommonDivisorBySubtraction(mod);
-    }
-    NaturalNumber NaturalNumber::LeastCommonMultipleBySubtraction(const NaturalNumber& other) const {
-        NaturalNumber mod;
-        return (*this * other).DivModBySubtraction(GreatestCommonDivisorBySubtraction(other), mod);
+        return (*this * other) / GreatestCommonDivisor(other);
     }
     NaturalNumber NaturalNumber::GenerateCoprime(void) const {
         if (*this == NaturalNumber::FromT<uint8_t>(2) || *this == NaturalNumber::FromT<uint8_t>(3)) return NaturalNumber::FromT<uint8_t>(1);
@@ -182,17 +171,25 @@ namespace MathLib {
         NaturalNumber ret;
         NaturalNumber curr;
         while (true) {
-            NaturalNumber tmp;
-            (void)curr.DivModBySubtraction(mod, tmp);
-            if (tmp == NaturalNumber::FromT<uint8_t>(1)) return ret;
+            if (curr % mod == NaturalNumber::FromT<uint8_t>(1)) return ret;
             ++ret;
             curr += *this;
         }
     }
+    NaturalNumber NaturalNumber::ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const {
+        NaturalNumber ret = NaturalNumber::FromT<uint8_t>(1);
+        NaturalNumber base = *this % mod;
+        const size_t bits = exp.GetSize() * 8;
+        for (size_t i = 0; i < bits; i++) {
+            if (i) base = (base * base) % mod;
+            if (exp.GetBit(i)) ret = (ret * base) % mod;
+        }
+        return ret;
+    }
     void NaturalNumber::MultiplyBy256(uint8_t last) {
         const size_t size = data.GetSize();
         Array<uint8_t> arr = Array<uint8_t>(size + 1);
-        arr.At(0) = last;
+        arr.AtUnsafe(0) = last;
         MemoryCopy(data.GetValue(), arr.GetValue() + 1, size);
         data = arr;
     }
@@ -222,14 +219,12 @@ namespace MathLib {
         for (size_t i = 0; i < other.data.GetSize(); i++) {
             uint8_t sub = other.data.At(i);
             for (size_t j = i; j < data.GetSize(); j++) {
-                if (sub <= data.At(j)) {
+                if (sub <= ret.data.At(j)) {
                     ret.data.At(j) -= sub;
                     break;
                 }
-                else {
-                    ret.data.At(j) += UINT8_MAX - sub + 1;
-                    sub = 1;
-                }
+                ret.data.At(j) += UINT8_MAX - sub + 1;
+                sub = 1;
             }
         }
         return ret;
@@ -257,20 +252,20 @@ namespace MathLib {
     }
     NaturalNumber& NaturalNumber::operator/=(const NaturalNumber& other) {
         NaturalNumber mod;
-        return *this = LongDivMod(other, mod);
+        return *this = DivModBySubtraction(other, mod);
     }
     NaturalNumber NaturalNumber::operator/(const NaturalNumber& other) const {
         NaturalNumber mod;
-        return LongDivMod(other, mod);
+        return DivModBySubtraction(other, mod);
     }
     NaturalNumber& NaturalNumber::operator%=(const NaturalNumber& other) {
         NaturalNumber mod;
-        (void)LongDivMod(other, mod);
+        (void)DivModBySubtraction(other, mod);
         return *this = mod;
     }
     NaturalNumber NaturalNumber::operator%(const NaturalNumber& other) const {
         NaturalNumber mod;
-        (void)LongDivMod(other, mod);
+        (void)DivModBySubtraction(other, mod);
         return mod;
     }
     NaturalNumber& NaturalNumber::operator^=(const NaturalNumber& other) {

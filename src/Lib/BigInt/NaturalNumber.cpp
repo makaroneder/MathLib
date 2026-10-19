@@ -1,4 +1,5 @@
 #include "NaturalNumber.hpp"
+#include "../Interfaces/Sequence/SubSequence.hpp"
 
 namespace MathLib {
     Array<SingleTypePair<NaturalNumber>> GetNextCoprimePair(const SingleTypePair<NaturalNumber>& pair) {
@@ -68,6 +69,19 @@ namespace MathLib {
             ret += mod + '0';
         } while (!self.IsZero());
         return ret.Reverse(0, ret.GetSize()) ? CollectionToString(padding) + ret : "";
+    }
+    NaturalNumber NaturalNumber::RandomLessThanEqual(void) const {
+        bool restrictedSize = true;
+        const size_t size = GetSize();
+        Array<uint8_t> ret = size;
+        size_t lastZero = SIZE_MAX;
+        for (size_t i = 0; i < size; i++) {
+            ret.AtUnsafe(i) = RandomNumber<uint8_t>(0, restrictedSize ? data.AtUnsafe(i) : UINT8_MAX);
+            restrictedSize &= ret.AtUnsafe(i) == data.AtUnsafe(i);
+            if (ret.AtUnsafe(i)) lastZero = SIZE_MAX;
+            else if (lastZero == SIZE_MAX) lastZero = i;
+        }
+        return lastZero == SIZE_MAX ? NaturalNumber(ret) : NaturalNumber(SubSequence<uint8_t>(ret, 0, lastZero));
     }
     NaturalNumber NaturalNumber::Add(const Sequence<uint8_t>& other, uint8_t carry) const {
         const size_t otherSize = other.GetSize();
@@ -168,6 +182,7 @@ namespace MathLib {
         }
     }
     NaturalNumber NaturalNumber::GetModularInverse(const NaturalNumber& mod) const {
+        if (mod <= NaturalNumber::FromT<uint8_t>(1)) return NaturalNumber();
         NaturalNumber ret;
         NaturalNumber curr;
         while (true) {
@@ -175,6 +190,10 @@ namespace MathLib {
             ++ret;
             curr += *this;
         }
+    }
+    NaturalNumber NaturalNumber::GetModularInverseByFermatsLittleTheorem(const NaturalNumber& mod) const {
+        const Expected<NaturalNumber> exp = mod - NaturalNumber::FromT<uint8_t>(2);
+        return exp.HasValue() ? ModularExponentiation(exp.Get(), mod) : NaturalNumber();
     }
     NaturalNumber NaturalNumber::ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const {
         NaturalNumber ret = NaturalNumber::FromT<uint8_t>(1);

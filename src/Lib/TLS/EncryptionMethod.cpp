@@ -223,6 +223,16 @@ namespace MathLib {
     bool EncryptionMethod::IsNone(void) const {
         return compressionMethod == TLSCompressionMethod::None && cipherSuite == TLSCipherSuite::None;
     }
+    bool EncryptionMethod::RequiresCertificate(void) const {
+        switch (cipherSuite) {
+            case TLSCipherSuite::None:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA:
+            case TLSCipherSuite::DH_Anonymous_AES_128_CBC_SHA256:
+            case TLSCipherSuite::DH_Anonymous_AES_256_CBC_SHA256: return false;
+            default: return true;
+        }
+    }
     uint8_t EncryptionMethod::GetKeySize(void) const {
         switch (cipherSuite) {
             case TLSCipherSuite::DHE_RSA_AES_256_CBC_SHA256:

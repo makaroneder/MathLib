@@ -13,6 +13,7 @@ namespace MathLib {
         SignatureAlgorithms = 0x000d,
         Padding = 0x0015,
         EncryptThenMAC,
+        ExtendedMasterSecret,
         RenegotiationInfo = 0xff01,
     };
 }

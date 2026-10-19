@@ -18,6 +18,7 @@ namespace MathLib {
         return ret;
     }
     bool Readable::DefaultSkip(size_t size) {
+        if (!size) return true;
         uint8_t buffer[size];
         return ReadBuffer(buffer, size);
     }

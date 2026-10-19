@@ -20,6 +20,7 @@ namespace MathLib {
         [[nodiscard]] virtual Array<uint8_t> DecryptPartial(const Sequence<uint8_t>& data, const CipherKey& key, const Interval<size_t>& range) const override;
         [[nodiscard]] bool GeneratePreMasterSecretAndKeyExchange(Readable& readable, MathLib::Array<uint8_t>& preMasterSecret, MathLib::Array<uint8_t>& keyExchange) const;
         [[nodiscard]] bool IsNone(void) const;
+        [[nodiscard]] bool RequiresCertificate(void) const;
         [[nodiscard]] uint8_t GetKeySize(void) const;
         [[nodiscard]] uint8_t GetMACSize(void) const;
         [[nodiscard]] uint8_t GetIVSize(void) const;

@@ -1,6 +1,8 @@
 #include "TLS.hpp"
 #include "TLSPRF.hpp"
 #include "TLSAlert.hpp"
+#include "../DER/DER.hpp"
+#include "../DER/X509.hpp"
 #include "TLSExtension.hpp"
 #include "../ExternArray.hpp"
 #include "TLSRecordHeader.hpp"
@@ -8,6 +10,7 @@
 #include "TLSHandshakeHeader.hpp"
 #include "../BigInt/NaturalNumber.hpp"
 #include "../Interfaces/SavedRWDevice.hpp"
+#include "../Interfaces/CountedReadable.hpp"
 #include "../Interfaces/Sequence/ByteArray.hpp"
 #include "../Cryptography/OneWayCipher/HMAC.hpp"
 #include "../Cryptography/OneWayCipher/SHA/SHA256.hpp"
@@ -31,12 +34,13 @@ namespace MathLib {
         ByteArray handshakeData;
         const bool signatureAlgorithmsExtension = true;
         const bool renegotiationInfoExtension = true;
+        const bool extendedMasterSecretExtension = true;
         const uint16_t hostSize = host.GetSize();
         uint16_t extensionsSize = (
             signatureAlgorithmsExtension * (sizeof(TLSExtension) + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(supportedSignatureAndHashAlgorithms)) +
             renegotiationInfoExtension * (sizeof(TLSExtension) + sizeof(uint16_t) + sizeof(uint8_t)) +
-            (hostSize ? sizeof(TLSExtension) + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TLSServerNameType) + sizeof(uint16_t) + hostSize : 0) +
-            0
+            extendedMasterSecretExtension * (sizeof(TLSExtension) + sizeof(uint16_t)) +
+            (hostSize ? sizeof(TLSExtension) + sizeof(uint16_t) + sizeof(uint16_t) + sizeof(TLSServerNameType) + sizeof(uint16_t) + hostSize : 0)
         );
         const uint32_t handshakeSize = sizeof(uint16_t) + sizeof(TLSRandom) + sizeof(uint8_t) + sizeof(uint16_t) + sizeof(supportedCipherSuites) + sizeof(uint8_t) + sizeof(supportedCompressionMethods) + sizeof(uint16_t) + extensionsSize;
         if (!handshakeData.Write<TLSHandshakeHeader>(TLSHandshakeHeader(TLSHandshakeHeader::Type::ClientHello, handshakeSize))) return false;
@@ -57,6 +61,10 @@ namespace MathLib {
             if (!handshakeData.WriteBigEndian16((uint16_t)TLSExtension::RenegotiationInfo)) return false;
             if (!handshakeData.WriteBigEndian16(1)) return false;
             if (!handshakeData.Write<uint8_t>(0x00)) return false;
+        }
+        if (extendedMasterSecretExtension) {
+            if (!handshakeData.WriteBigEndian16((uint16_t)TLSExtension::ExtendedMasterSecret)) return false;
+            if (!handshakeData.WriteBigEndian16(0)) return false;
         }
         if (hostSize) {
             if (!handshakeData.WriteBigEndian16((uint16_t)TLSExtension::ServerName)) return false;
@@ -85,28 +93,65 @@ namespace MathLib {
         TLSCompressionMethod nextCompressionMethod;
         if (!device.Read<TLSCompressionMethod>(nextCompressionMethod)) return false;
         if (!device.ReadBigEndian16<uint16_t>(extensionsSize)) return false;
-        Array<uint8_t> extensions = extensionsSize;
-        if (!device.ReadCollection<uint8_t>(extensions)) return false;
-
+        bool useExtendedMasterSecret = false;
+        while (extensionsSize) {
+            if (extensionsSize < sizeof(TLSExtension) + sizeof(uint16_t)) return false;
+            extensionsSize -= sizeof(TLSExtension) + sizeof(uint16_t);
+            TLSExtension extension;
+            if (!device.ReadBigEndian16(extension)) return false;
+            uint16_t length = 0;
+            if (!device.ReadBigEndian16(length)) return false;
+            if (extensionsSize < length) return false;
+            extensionsSize -= length;
+            switch (extension) {
+                case TLSExtension::RenegotiationInfo: {
+                    if (!renegotiationInfoExtension || length != 1 || device.Read<uint8_t>().GetOr(1)) return false;
+                    break;
+                }
+                case TLSExtension::ExtendedMasterSecret: {
+                    if (!extendedMasterSecretExtension || length || useExtendedMasterSecret) return false;
+                    useExtendedMasterSecret = true;
+                    break;
+                }
+                default: {
+                    if (!device.Skip(length)) return false;
+                    break;
+                }
+            }
+        }
         MathLib::Array<uint8_t> preMasterSecret;
         MathLib::Array<uint8_t> keyExchange;
         bool sendCertificate = false;
+        bool gotCertificate = false;
         while (true) {
             if (!device.Read<TLSHandshakeHeader>(header)) return false;
             if (header.type == TLSHandshakeHeader::Type::ServerHelloDone) break;
             switch (header.type) {
                 case TLSHandshakeHeader::Type::Certificate: {
-                    // TODO: Check if we should receive this
+                    // TODO: Extract public key
+                    gotCertificate = true;
                     Int24 size24;
                     if (!device.Read<Int24>(size24)) return false;
                     uint32_t size = size24.Get();
                     if (header.size.Get() != size + sizeof(Int24)) return false;
+                    DERTerm prevCertificate;
                     while (size) {
                         if (!device.Read<Int24>(size24)) return false;
-                        uint32_t certificateSize = size24.Get();
+                        const uint32_t certificateSize = size24.Get();
                         if (size < certificateSize) return false;
-                        // TODO: Verify certificate
-                        if (!device.Skip(certificateSize)) return false;
+                        CountedReadable counter = device;
+                        DERTerm attributeTypeAndValue;
+                        DERTerm relativeDistinguishedName;
+                        DERTerm certificate = CreateX509CertificateTemplate(attributeTypeAndValue, relativeDistinguishedName);
+                        if (!ParseDER(certificate, counter)) return false;
+                        if (!IsX509CertificateValid(certificate)) return false;
+                        if (prevCertificate.type == DERTerm::Type::Unknown) {
+                            if (hostSize && !IsX509CertificateOwnedBy(certificate, host)) return false;
+                        }
+                        else if (!IsX509CertificateSignedBy(prevCertificate, certificate)) return false;
+                        prevCertificate = certificate;
+                        const size_t tmp = counter.GetReadBytes();
+                        if (tmp > certificateSize || !device.Skip(certificateSize - tmp)) return false;
                         size -= certificateSize + sizeof(Int24);
                     }
                     break;
@@ -131,6 +176,7 @@ namespace MathLib {
                 default: return false;
             }
         }
+        if (gotCertificate != EncryptionMethod(nextCipherSuite, nextCompressionMethod).RequiresCertificate()) return false;
         if (sendCertificate) {
             if (!device.Write<TLSHandshakeHeader>(TLSHandshakeHeader(TLSHandshakeHeader::Type::Certificate, sizeof(Int24)))) return false;
             if (!device.Write<Int24>(0)) return false;
@@ -144,10 +190,10 @@ namespace MathLib {
         SHA256 hash;
         HMAC hmac = hash;
         TLSPRF prf = TLSPRF(hmac, HMAC::BlockSize::SHA256, CipherKey());
-        const Array<uint8_t> masterSecret = prf.EncryptT<char>("master secret"_M, CipherKey(MakeArray<CipherKey>(
+        const Array<uint8_t> masterSecret = prf.EncryptT<char>(useExtendedMasterSecret ? "extended master secret"_M : "master secret"_M, CipherKey(MakeArray<CipherKey>(
             CipherKey(ByteArray::ToByteArray<size_t>(48)),
             CipherKey(preMasterSecret),
-            CipherKey(randomCS)
+            CipherKey(useExtendedMasterSecret ? SHA256().Encrypt(handshakeData, CipherKey()) : randomCS)
         )));
         const size_t macSize = EncryptionMethod(nextCipherSuite, nextCompressionMethod).GetMACSize();
         const size_t keySize = EncryptionMethod(nextCipherSuite, nextCompressionMethod).GetKeySize();

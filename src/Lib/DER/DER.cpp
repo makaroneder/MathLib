@@ -32,12 +32,16 @@ namespace MathLib {
         if (length == SIZE_MAX) return false;
         switch (tagClass) {
             case DERTagClass::ContextSpecific: {
+                // TODO: Use this information
                 CountedReadable counter = certificateData;
                 if (!ParseDER(certificate, counter)) return false;
                 return length == counter.GetReadBytes();
             }
             case DERTagClass::Universal: switch (tagType) {
-                case DERTagType::Null: return !length;
+                case DERTagType::Null: {
+                    if (!certificate.CheckTypeCompatibility(DERTerm::Type::Unknown)) return false;
+                    return !length;
+                }
                 case DERTagType::Integer: {
                     if (!certificate.CheckTypeCompatibility(DERTerm::Type::Integer)) return false;
                     certificate.value = length;
@@ -121,6 +125,7 @@ namespace MathLib {
                         if (length == tmp) break;
                         if (length < tmp) return false;
                     }
+                    certificate.memberTemplate = nullptr;
                     return true;
                 }
                 default: return false;

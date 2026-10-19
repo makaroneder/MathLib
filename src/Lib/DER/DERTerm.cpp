@@ -43,8 +43,7 @@ namespace MathLib {
         }
     }
     bool DERTerm::CheckTypeCompatibility(Type readType) {
-        if (type != Type::Unknown) return type == readType;
-        type = readType;
-        return true;
+        if (type == Type::Unknown) type = readType;
+        return type == readType && (type == Type::Sequence || !memberTemplate);
     }
 }

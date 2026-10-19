@@ -30,6 +30,7 @@ namespace MathLib {
         [[nodiscard]] virtual bool Save(Writable& file) const override;
         [[nodiscard]] virtual bool Load(Readable& file) override;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
+        [[nodiscard]] NaturalNumber RandomLessThanEqual(void) const;
         [[nodiscard]] NaturalNumber Add(const Sequence<uint8_t>& other, uint8_t carry) const;
         [[nodiscard]] NaturalNumber DivMod(const uint8_t& other, uint8_t& mod) const;
         [[nodiscard]] NaturalNumber DivModBySubtraction(const NaturalNumber& other, NaturalNumber& mod) const;
@@ -39,6 +40,7 @@ namespace MathLib {
         [[nodiscard]] NaturalNumber LeastCommonMultiple(const NaturalNumber& other) const;
         [[nodiscard]] NaturalNumber GenerateCoprime(void) const;
         [[nodiscard]] NaturalNumber GetModularInverse(const NaturalNumber& mod) const;
+        [[nodiscard]] NaturalNumber GetModularInverseByFermatsLittleTheorem(const NaturalNumber& mod) const;
         [[nodiscard]] NaturalNumber ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const;
         void MultiplyBy256(uint8_t last);
 

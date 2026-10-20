@@ -1,7 +1,6 @@
 #include "TLS.hpp"
 #include "TLSPRF.hpp"
 #include "TLSAlert.hpp"
-#include "../DER/DER.hpp"
 #include "../DER/X509.hpp"
 #include "TLSExtension.hpp"
 #include "../ExternArray.hpp"
@@ -140,10 +139,8 @@ namespace MathLib {
                         const uint32_t certificateSize = size24.Get();
                         if (size < certificateSize) return false;
                         CountedReadable counter = device;
-                        DERTerm attributeTypeAndValue;
-                        DERTerm relativeDistinguishedName;
-                        DERTerm certificate = CreateX509CertificateTemplate(attributeTypeAndValue, relativeDistinguishedName);
-                        if (!ParseDER(certificate, counter)) return false;
+                        DERTerm certificate;
+                        if (!ParseX509Certificate(certificate, counter)) return false;
                         if (!IsX509CertificateValid(certificate)) return false;
                         if (prevCertificate.type == DERTerm::Type::Unknown) {
                             if (hostSize && !IsX509CertificateOwnedBy(certificate, host)) return false;

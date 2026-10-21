@@ -3,6 +3,7 @@
 #include <EquationSolver/Optimizer.hpp>
 #include <FileSystem/FileSystem.hpp>
 #include <WindowManager.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 template <typename T>
@@ -61,6 +62,7 @@ void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager
     if (argc < 2) MathLib::Panic("Usage: "_M + argv[0] + " <input file>");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Math graph", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Array<MathLib::Optimizer> states;
     for (int i = 1; i < argc; i++) {
         MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[i])));

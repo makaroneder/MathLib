@@ -2,11 +2,13 @@
 #include <FileSystem/FileSystem.hpp>
 #include <Physics/SIUnits.hpp>
 #include <WindowManager.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Physics simulation", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Array<MathLib::matrix_t> points;
     for (MathLib::num_t i = 0; i <= 5; i += 0.1)
         if (!points.Add(MathLib::CreateVector<MathLib::num_t>(i, 3, 0))) MathLib::Panic("Failed to add point to the rope");

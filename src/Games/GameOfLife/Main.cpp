@@ -1,6 +1,7 @@
 #include "LifeAutomaton.hpp"
 #include <WindowManager.hpp>
 #include <DummyRenderer.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void MakeGameOfLifeBlinker(LifeAutomaton& game, const MathLib::Matrix<size_t>& position) {
@@ -22,6 +23,7 @@ void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManag
     const size_t yMultiplier = 10;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Game of life", width * xMultiplier, height * yMultiplier);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     LifeAutomaton game = LifeAutomaton(width, height, MathLib::String(LifeAutomaton::life));
     std::cout << game << std::endl;
     MakeGameOfLifeBlinker(game, MathLib::CreateVector<size_t>(width / 2 + 11, height / 2 - 15, 0));

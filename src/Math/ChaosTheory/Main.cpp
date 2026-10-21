@@ -2,11 +2,13 @@
 #include <FileSystem/FileSystem.hpp>
 #include <WindowManager.hpp>
 #include <Math/Modulo.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Chaos theory", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     const MathLib::matrix_t epsMatrix = MathLib::CreateVector<MathLib::num_t>(MathLib::eps, MathLib::eps, MathLib::eps);
     const MathLib::matrix_t startPos = MathLib::CreateVector<MathLib::num_t>(0, 1, 1.05);
     const MathLib::matrix_t params = MathLib::CreateVector<MathLib::num_t>(10, 28, 8.0 / 3);

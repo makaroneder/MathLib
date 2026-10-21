@@ -3,6 +3,7 @@
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
+#include <Defer.hpp>
 #include <Pair.hpp>
 #include <iostream>
 
@@ -33,6 +34,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     if (!machine.LoadFromPath(fs, path + "Machine.obj")) MathLib::Panic("Failed to load wavefront object");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Slot machine", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     ssize_t score = 100000;
     MathLib::Array<size_t> symbolIndexes = MathLib::Array<size_t>(3);
     MathLib::num_t specialTime = 0;

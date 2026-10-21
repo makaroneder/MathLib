@@ -6,6 +6,7 @@
 #include <Image/PNG/PNG.hpp>
 #include <Image/PPM/P6.hpp>
 #include <CommandLine.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 [[nodiscard]] bool SetImageInterface(MathLib::Renderer& renderer, const MathLib::Sequence<char>& type) {
@@ -18,6 +19,7 @@
 void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Image converter", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::DummyRenderer dummyRenderer = MathLib::DummyRenderer(0, 0);
     const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
     if (!SetImageInterface(dummyRenderer, cmdLine.GetEntry("inputType"_M).Get("No input type specified"))) MathLib::Panic("Invalid inputType");

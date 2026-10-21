@@ -1,11 +1,13 @@
 #include "Lens.hpp"
 #include <FileSystem/FileSystem.hpp>
 #include <WindowManager.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Ray tracing", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Ray<MathLib::num_t> ray = MathLib::Ray<MathLib::num_t>(MathLib::CreateVector<MathLib::num_t>(-3, 2, 0), MathLib::CreateVector<MathLib::num_t>(1, -1, 0));
     const MathLib::num_t airRefractionIndex = 1;
     bool isInsideLens = false;

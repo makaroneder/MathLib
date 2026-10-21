@@ -476,6 +476,7 @@ AddExecutable("VideoPlayer", TargetEnvironment(None, None, gfxRuntime), lambda p
 AddExecutable("WebScraper", TargetEnvironment(None, None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
 AddExecutable("WebsiteReader", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
 AddExecutable("ModelGenerator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
+AddExecutable("MapGenerator", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["MapGenerator"], [".cpp"])
 
 if __name__ == "__main__":
     if len(argv) < 2:

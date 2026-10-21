@@ -1,6 +1,7 @@
 #include <Allocator/RegionAllocator.hpp>
 #include <FileSystem/FileSystem.hpp>
 #include <WindowManager.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManager) {
@@ -8,6 +9,7 @@ void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManag
     if (!MathLib::allocator) MathLib::Panic("Failed to allocate allocator");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Paint", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     renderer->Fill(0);
     const uint32_t colors[] = {
         UINT32_MAX,

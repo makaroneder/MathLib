@@ -108,6 +108,10 @@ namespace MathLib {
             }
         }
     }
+    void Renderer::PutsFromLeft(const Sequence<char>& str, const Font& font, ssize_t startX, ssize_t startY, uint32_t fgColor, uint32_t bgColor) {
+        const size_t size = str.GetSize();
+        for (size_t i = 0; i < size; i++) Putc(str.AtUnsafe(i), font, startX + font.GetWidth() / 2 + i * font.GetWidth(), startY + font.GetHeight() / 2, fgColor, bgColor);
+    }
     Event Renderer::WaitForEvent(void) {
         Event ret;
         while (ret.type == Event::Type::None) ret = GetEvent();

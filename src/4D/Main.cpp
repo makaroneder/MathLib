@@ -4,6 +4,7 @@
 #include <Geometry/Hyperrectangle.hpp>
 #include <WindowManager.hpp>
 #include <CommandLine.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 template <typename T>
@@ -34,6 +35,7 @@ template <typename T>
 void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("4D viewer", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     const MathLib::CommandLine cmdLine = MathLib::CommandLine(argc, (const char**)argv);
     MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, cmdLine.GetEntry("program"_M).Get("No program specified")));
     #ifdef Debug

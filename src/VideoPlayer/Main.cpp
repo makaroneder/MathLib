@@ -2,6 +2,7 @@
 #include <Image/Animation.hpp>
 #include <WindowManager.hpp>
 #include <CommandLine.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
@@ -18,6 +19,7 @@ void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager
     const size_t centerY = height / 2;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Video player", width, height);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Aseprite video;
     if (!video.LoadFromPath(fs, path)) MathLib::Panic("Failed to load video");
     video.Resize(multX, multY);

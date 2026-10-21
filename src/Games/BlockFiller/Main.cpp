@@ -2,6 +2,7 @@
 #include <Image/Aseprite/Aseprite.hpp>
 #include <WindowManager.hpp>
 #include <Collision.hpp>
+#include <Defer.hpp>
 #include <JSON.hpp>
 #include <iostream>
 
@@ -81,6 +82,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     MathLib::num_t moveTime = 0;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Block filler", width, height);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::num_t prevTime = MathLib::GetTime();
     int8_t dx = 0;
     int8_t dy = 0;

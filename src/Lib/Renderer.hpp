@@ -156,6 +156,7 @@ namespace MathLib {
             }
         }
         void Putc(char chr, const Font& font, ssize_t centerX, ssize_t centerY, uint32_t fgColor, uint32_t bgColor);
+        void PutsFromLeft(const Sequence<char>& str, const Font& font, ssize_t startX, ssize_t startY, uint32_t fgColor, uint32_t bgColor);
         template <typename T>
         void Puts(const Sequence<char>& str, const Font& font, Matrix<T> pos, uint32_t fgColor, uint32_t bgColor) {
             const Array<String> strs = Split(str, '\n'_M, false);

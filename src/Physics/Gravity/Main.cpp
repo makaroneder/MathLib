@@ -1,11 +1,13 @@
 #include "Body.hpp"
 #include <FileSystem/FileSystem.hpp>
 #include <WindowManager.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManager) {
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Gravity simulation", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::num_t prevTime = MathLib::GetTime();
     Body bodies[] = {
         Body(Vector2(0, 1), Vector2(1, 0), 1),

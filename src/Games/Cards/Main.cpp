@@ -7,6 +7,7 @@
 #include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
 #include <Bitmap.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 template <typename T>
@@ -77,6 +78,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     if (!table.LoadFromPath(fs, path + "Table.aseprite")) MathLib::Panic("Failed to load table image");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Cards", table.GetWidth(), table.GetHeight());
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Aseprite cardsImage;
     if (!cardsImage.LoadFromPath(fs, path + "Cards.aseprite")) MathLib::Panic("Failed to load cards");
     MathLib::Bitmap cards = MathLib::Bitmap((size_t)Card::Type::TypeCount * (size_t)Card::Color::ColorCount);

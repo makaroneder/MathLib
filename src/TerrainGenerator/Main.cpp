@@ -1,4 +1,5 @@
 #include "Option.hpp"
+#include <Defer.hpp>
 #include <WindowManager.hpp>
 #include <FileSystem/FileSystem.hpp>
 #include <iostream>
@@ -39,6 +40,7 @@ void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManag
     const size_t blocks = blockWidth * blockHeight;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Terrain generator", width, height);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     Block map[blocks];
     Option options[] = {
         Option(

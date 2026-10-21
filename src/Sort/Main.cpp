@@ -1,5 +1,6 @@
 #include "SignaledWritableSequence.hpp"
 #include "Action.hpp"
+#include <Defer.hpp>
 #include <WindowManager.hpp>
 #include <FileSystem/FileSystem.hpp>
 #include <Interfaces/ComparisionFunction.hpp>
@@ -15,6 +16,7 @@ void Main(int, char**, MathLib::FileSystem&, MathLib::WindowManager& windowManag
     const size_t blockWidth = 10;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Sort"_M, width, height);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Array<size_t> base = MathLib::CollectionToArray<size_t>(MathLib::RandomSequence<size_t>(
         MathLib::Interval<size_t>(0, height - 1), width / blockWidth
     ));

@@ -4,6 +4,7 @@
 #include <Libc/HostFunction.hpp>
 #include <WindowManager.hpp>
 #include <Image/PPM/P6.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
@@ -11,6 +12,7 @@ void Main(int argc, char** argv, MathLib::FileSystem& fs, MathLib::WindowManager
     if (!fs.CreateDirectory(MathLib::String(argv[2]), false)) MathLib::Panic("Failed to create output directory");
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Complex animation", 800, 800);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     if (!renderer->SetImage<MathLib::P6>()) MathLib::Panic("Failed to set image interface in renderer");
     MathLib::Node* root = MathLib::Tokenize(MathLib::Preproces(fs, MathLib::String(argv[1])));
     #ifdef Debug

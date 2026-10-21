@@ -2,6 +2,7 @@
 #include <Image/Aseprite/Aseprite.hpp>
 #include <WindowManager.hpp>
 #include <Collision.hpp>
+#include <Defer.hpp>
 #include <iostream>
 
 void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
@@ -16,6 +17,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     const size_t centerY = height / 2;
     MathLib::Renderer* renderer = windowManager.MakeRenderer("Chomp", width, height);
     if (!renderer) MathLib::Panic("Failed to create renderer");
+    defer(delete renderer);
     MathLib::Aseprite block;
     if (!block.LoadFromPath(fs, path + "Block.aseprite")) MathLib::Panic("Failed to load block image");
     block.Resize(2, 2);

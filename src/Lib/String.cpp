@@ -63,19 +63,18 @@ namespace MathLib {
         String ret;
         const uint8_t* buff = (const uint8_t*)addr;
         for (size_t y = 0; y < size; y += lineSize) {
+            if (y) ret += '\n';
             ret += padding;
-            for (size_t x = 0; x < lineSize; x++)
-                ret += (y + x < size ? ToString(buff[y + x], 16, 2) : "??") + ' ';
-            if (!printASCII) {
-                ret += '\n';
-                continue;
-            }
-            ret += '\t';
             for (size_t x = 0; x < lineSize; x++) {
-                ret += y + x < size ? (IsAlphaDigit(buff[y + x]) ? (char)buff[y + x] : '.') : '?';
-                ret += ' ';
+                if (x) ret += ' ';
+                ret += y + x < size ? ToString(buff[y + x], 16, 2) : "??";
             }
-            ret.At(ret.GetSize() - 1) = '\n';
+            if (!printASCII) continue;
+            ret += " \t";
+            for (size_t x = 0; x < lineSize; x++) {
+                if (x) ret += ' ';
+                ret += y + x < size ? (IsAlphaDigit(buff[y + x]) ? (char)buff[y + x] : '.') : '?';
+            }
         }
         return ret;
     }

@@ -28,14 +28,11 @@ namespace MathLib {
         if (!positive) ret += '-';
         return ret + natural.ToString();
     }
-    Integer Integer::DivMod(const uint8_t& other, uint8_t& mod) const {
+    Integer Integer::DivMod(uint8_t other, uint8_t mod) const {
         return Integer(natural.DivMod(other, mod), positive);
     }
-    Integer Integer::DivModBySubtraction(const Integer& other, NaturalNumber& mod) const {
-        return Integer(natural.DivModBySubtraction(other.natural, mod), positive == other.positive);
-    }
-    Integer Integer::LongDivMod(const Integer& other, NaturalNumber& mod) const {
-        return Integer(natural.LongDivMod(other.natural, mod), positive == other.positive);
+    Integer Integer::DivMod(const Integer& other, NaturalNumber& mod) const {
+        return Integer(natural.DivMod(other.natural, mod), positive == other.positive);
     }
     Integer Integer::GreatestCommonDivisor(const Integer& other) const {
         return natural.GreatestCommonDivisor(other.natural);
@@ -101,20 +98,20 @@ namespace MathLib {
     }
     Integer& Integer::operator/=(const Integer& other) {
         NaturalNumber mod;
-        return *this = LongDivMod(other, mod);
+        return *this = DivMod(other, mod);
     }
     Integer Integer::operator/(const Integer& other) const {
         NaturalNumber mod;
-        return LongDivMod(other, mod);
+        return DivMod(other, mod);
     }
     Integer& Integer::operator%=(const Integer& other) {
         NaturalNumber mod;
-        (void)natural.LongDivMod(other.natural, mod);
+        (void)natural.DivMod(other.natural, mod);
         return *this = mod;
     }
     Integer Integer::operator%(const Integer& other) const {
         NaturalNumber mod;
-        (void)natural.LongDivMod(other.natural, mod);
+        (void)natural.DivMod(other.natural, mod);
         return mod;
     }
     Integer& Integer::operator^=(const NaturalNumber& other) {

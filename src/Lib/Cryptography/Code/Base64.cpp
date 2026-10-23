@@ -30,7 +30,8 @@ namespace MathLib {
         Array<uint8_t> ret;
         for (size_t i = 0; i < size;) {
             const uint8_t sym0 = GetSymbol(data, i);
-            if (sym0 == UINT8_MAX || sym0 == sizeof(symbols)) return Array<uint8_t>();
+            if (sym0 == sizeof(symbols)) break;
+            if (sym0 == UINT8_MAX) return Array<uint8_t>();
             const uint8_t sym1 = GetSymbol(data, i);
             if (sym1 == UINT8_MAX || sym1 == sizeof(symbols)) return Array<uint8_t>();
             if (!ret.Add((sym0 << 2) | ((sym1 & 0b110000) >> 4))) return Array<uint8_t>();

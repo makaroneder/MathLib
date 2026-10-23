@@ -11,7 +11,7 @@ namespace MathLib {
         MathLib::String ret = "{\n";
         switch (type) {
             case Type::Normal: {
-                ret += DumpMemory<uint8_t>(data, 16, false, padd2);
+                ret += DumpMemory<uint8_t>(data, 16, false, padd2) + '\n';
                 break;
             }
             case Type::MultiKey: {

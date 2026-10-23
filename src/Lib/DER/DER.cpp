@@ -3,6 +3,7 @@
 #include "DERTagClass.hpp"
 #include "../Cryptography/Code/Base64.hpp"
 #include "../Interfaces/CountedReadable.hpp"
+#include "../Interfaces/Sequence/ByteArray.hpp"
 #include "../Interfaces/Sequence/SubSequence.hpp"
 #include "../Interfaces/Sequence/ConvertSequence.hpp"
 
@@ -133,12 +134,19 @@ namespace MathLib {
             default: return false;
         }
     }
+    bool ParseDERFromSequence(DERTerm& certificate, const Sequence<uint8_t>& certificateData) {
+        ByteArray array = certificateData;
+        return ParseDER(certificate, array);
+    }
+    bool ParseDERFromPEM(DERTerm& certificate, const String& data, const String& label, size_t offset) {
+        return ParseDERFromSequence(certificate, DecodePEM(data, label, offset));
+    }
     Array<uint8_t> DecodePEM(const String& data, const String& label, size_t offset) {
-        const size_t tmpStart = data.Find("-----BEGIN "_M + label + "-----", offset);
+        const size_t tmpStart = data.Find("-----BEGIN "_M + label + "-----\n", offset);
         if (tmpStart == SIZE_MAX) return Array<uint8_t>();
-        const size_t start = tmpStart + 11 + label.GetSize() + 5;
+        const size_t start = tmpStart + 11 + label.GetSize() + 6;
         const size_t end = data.Find("-----END "_M + label + "-----", start);
         if (end == SIZE_MAX) return Array<uint8_t>();
-        return Base64().Decrypt(ConvertSequence<uint8_t, char>(SubSequence<char>(data, start, end)), CipherKey());
+        return Base64().Decrypt(ConvertSequence<uint8_t, char>(SubSequence<char>(data, start, end - 1)), CipherKey());
     }
 }

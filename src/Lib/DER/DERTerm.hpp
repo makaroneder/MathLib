@@ -39,6 +39,7 @@ namespace MathLib {
         Type type;
 
         DERTerm(void);
+        DERTerm(const String& name);
         DERTerm(Type type, const String& name);
         DERTerm(Type type, const String& name, const Array<uint8_t>& value);
         DERTerm(const String& name, const Array<DERTerm>& children);

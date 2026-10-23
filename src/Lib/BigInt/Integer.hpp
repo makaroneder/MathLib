@@ -16,9 +16,8 @@ namespace MathLib {
         [[nodiscard]] virtual bool Load(Readable& file) override;
         [[nodiscard]] virtual String ToString(const Sequence<char>& padding = ""_M) const override;
 
-        [[nodiscard]] Integer DivMod(const uint8_t& other, uint8_t& mod) const;
-        [[nodiscard]] Integer DivModBySubtraction(const Integer& other, NaturalNumber& mod) const;
-        [[nodiscard]] Integer LongDivMod(const Integer& other, NaturalNumber& mod) const;
+        [[nodiscard]] Integer DivMod(uint8_t other, uint8_t mod) const;
+        [[nodiscard]] Integer DivMod(const Integer& other, NaturalNumber& mod) const;
         [[nodiscard]] Integer GreatestCommonDivisor(const Integer& other) const;
         [[nodiscard]] Integer LeastCommonMultiple(const Integer& other) const;
         void MultiplyBy256(uint8_t last);

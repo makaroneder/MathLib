@@ -46,7 +46,7 @@ void ShellTask(const ModuleEntryData*) {
                         const uintptr_t addr = MathLib::StringToNumber(args.At(1));
                         const size_t size = MathLib::StringToNumber(args.At(2));
                         const size_t lineSize = args.GetSize() < 4 ? 8 : MathLib::StringToNumber(args.At(3));
-                        output = MathLib::DumpMemory(addr, size, lineSize, true);
+                        output = MathLib::DumpMemory(addr, size, lineSize, true) + '\n';
                     }
                 }
                 else if (args.At(0) == "dumpFile") {
@@ -57,7 +57,7 @@ void ShellTask(const ModuleEntryData*) {
                         uint8_t buff[size];
                         if (!file.ReadBuffer(buff, size)) output = "Failed to read file\n";
                         const size_t lineSize = args.GetSize() < 3 ? 8 : MathLib::StringToNumber(args.At(2));
-                        output = MathLib::DumpMemory((uintptr_t)buff, size, lineSize, true);
+                        output = MathLib::DumpMemory((uintptr_t)buff, size, lineSize, true) + '\n';
                     }
                 }
                 else output = "Unknown command: '"_M + args.At(0) + "'\n";

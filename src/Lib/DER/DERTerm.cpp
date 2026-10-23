@@ -3,6 +3,7 @@
 
 namespace MathLib {
     DERTerm::DERTerm(void) : name(), children(), value(), memberTemplate(nullptr), type(Type::Unknown) {}
+    DERTerm::DERTerm(const String& name) : name(name), children(), value(), memberTemplate(nullptr), type(Type::Unknown) {}
     DERTerm::DERTerm(Type type, const String& name) : name(name), children(), value(), memberTemplate(nullptr), type(type) {}
     DERTerm::DERTerm(Type type, const String& name, const Array<uint8_t>& value) : name(name), children(), value(value), memberTemplate(nullptr), type(type) {}
     DERTerm::DERTerm(const String& name, const Array<DERTerm>& children) : name(name), children(children), value(), memberTemplate(nullptr), type(Type::Sequence) {}
@@ -22,7 +23,7 @@ namespace MathLib {
             }
             case Type::Integer: return padd + name + ": " + NaturalNumber(value).ToHexString();
             case Type::Date: // TODO: Decode
-            case Type::ByteArray: return padd + name + ": {\n" + DumpMemory<uint8_t>(value, 16, false, padd + '\t') + padd + '}';
+            case Type::ByteArray: return padd + name + ": {\n" + DumpMemory<uint8_t>(value, 16, false, padd + '\t') + '\n' + padd + '}';
             case Type::ObjectIdentifier: {
                 String ret;
                 for (const uint8_t& chr : value) ret += chr;

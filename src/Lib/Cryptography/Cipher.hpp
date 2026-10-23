@@ -10,12 +10,20 @@ namespace MathLib {
         [[nodiscard]] virtual bool VerifySignature(const Sequence<Array<uint8_t>>& signature, const Sequence<uint8_t>& hash, const CipherKey& key) const override;
         [[nodiscard]] Array<uint8_t> Decrypt(const Sequence<uint8_t>& data, const CipherKey& key) const;
         template <typename T>
+        Array<T> CheckEncryption(const Sequence<T>& data, const CipherKey& encryptionKey, const CipherKey& decryptionKey) const {
+            return DecryptT<T>(EncryptT<T>(data, encryptionKey), decryptionKey);
+        }
+        template <typename T>
         Array<T> CheckEncryption(const Sequence<T>& data, const CipherKey& key) const {
             return DecryptT<T>(EncryptT<T>(data, key), key);
         }
         template <typename T>
         bool TestEncryption(const Sequence<T>& data, const CipherKey& key) const {
             return CheckEncryption(data, key) == data;
+        }
+        template <typename T>
+        bool TestEncryption(const Sequence<T>& data, const CipherKey& encryptionKey, const CipherKey& decryptionKey) const {
+            return CheckEncryption(data, encryptionKey, decryptionKey) == data;
         }
         template <typename T>
         [[nodiscard]] Array<T> DecryptT(const Sequence<uint8_t>& data, const CipherKey& key) const {

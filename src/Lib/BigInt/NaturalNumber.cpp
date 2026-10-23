@@ -110,8 +110,33 @@ namespace MathLib {
         }
         return div.Reverse(0, div.GetSize()) ? div : NaturalNumber();
     }
+    NaturalNumber NaturalNumber::DivMod(const NaturalNumber& other, NaturalNumber& mod) const {
+        const size_t degree = other.GetDegree();
+        if (!degree) {
+            uint8_t mod8 = 0;
+            const NaturalNumber ret = DivMod(other.data.AtUnsafe(0), mod8);
+            mod = FromT<uint8_t>(mod8);
+            return ret;
+        }
+        return LongDivMod(other, mod);
+    }
+    NaturalNumber NaturalNumber::Mul(const NaturalNumber& other) const {
+        if (other.IsZero()) return NaturalNumber();
+        uint8_t mod = 0;
+        const NaturalNumber n = *this * other.DivMod(2, mod);
+        if (mod) return n + n + *this;
+        return n + n;
+    }
     NaturalNumber NaturalNumber::DivModBySubtraction(const NaturalNumber& other, NaturalNumber& mod) const {
         if (other.IsZero()) return NaturalNumber();
+        if (LessThanEqual(other)) {
+            if (other.LessThanEqual(*this)) {
+                mod = NaturalNumber();
+                return NaturalNumber::FromT<uint8_t>(1);
+            }
+            mod = *this;
+            return NaturalNumber();
+        }
         mod = *this;
         NaturalNumber ret = NaturalNumber();
         while (true) {
@@ -123,23 +148,24 @@ namespace MathLib {
     }
     NaturalNumber NaturalNumber::LongDivMod(const NaturalNumber& other, NaturalNumber& mod) const {
         if (other.IsZero()) return NaturalNumber();
-        if (*this < other) {
+        if (LessThanEqual(other)) {
+            if (other.LessThanEqual(*this)) {
+                mod = NaturalNumber();
+                return NaturalNumber::FromT<uint8_t>(1);
+            }
             mod = *this;
             return NaturalNumber();
         }
         NaturalNumber ret;
-        mod = *this;
-        const size_t otherDegree = other.GetDegree();
-        const uint8_t otherLeadingByte = other.At(otherDegree);
-        while (!mod.IsZero()) {
-            const size_t modDegree = mod.GetDegree();
-            if (modDegree < otherDegree) break;
-            const uint8_t modLeadingByte = mod.At(modDegree);
-            if (modLeadingByte % otherLeadingByte) break;
-            NaturalNumber tmp = FromT<uint8_t>(modLeadingByte / otherLeadingByte);
-            for (size_t i = otherDegree; i < modDegree; i++) tmp.MultiplyBy256(0);
-            ret += tmp;
-            mod -= other * tmp;
+        mod = NaturalNumber();
+        const size_t degree = GetDegree() + 1;
+        for (size_t i = degree; i; i--) {
+            mod.MultiplyBy256(data.At(i - 1));
+            NaturalNumber tmp;
+            const NaturalNumber div = mod.DivModBySubtraction(other, tmp);
+            mod = tmp;
+            if (div.GetDegree()) return NaturalNumber();
+            ret.MultiplyBy256(div.IsZero() ? 0 : div.data.At(0));
         }
         return ret;
     }
@@ -196,6 +222,7 @@ namespace MathLib {
         return exp.HasValue() ? ModularExponentiation(exp.Get(), mod) : NaturalNumber();
     }
     NaturalNumber NaturalNumber::ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const {
+        if (IsZero()) return exp.IsZero() ? NaturalNumber::FromT<uint8_t>(1) : NaturalNumber();
         NaturalNumber ret = NaturalNumber::FromT<uint8_t>(1);
         NaturalNumber base = *this % mod;
         const size_t bits = exp.GetSize() * 8;
@@ -263,28 +290,24 @@ namespace MathLib {
         return *this = *this * other;
     }
     NaturalNumber NaturalNumber::operator*(const NaturalNumber& other) const {
-        if (other.IsZero()) return NaturalNumber();
-        uint8_t mod = 0;
-        const NaturalNumber n = *this * other.DivMod(2, mod);
-        if (mod) return n + n + *this;
-        return n + n;
+        return Mul(other);
     }
     NaturalNumber& NaturalNumber::operator/=(const NaturalNumber& other) {
         NaturalNumber mod;
-        return *this = DivModBySubtraction(other, mod);
+        return *this = DivMod(other, mod);
     }
     NaturalNumber NaturalNumber::operator/(const NaturalNumber& other) const {
         NaturalNumber mod;
-        return DivModBySubtraction(other, mod);
+        return DivMod(other, mod);
     }
     NaturalNumber& NaturalNumber::operator%=(const NaturalNumber& other) {
         NaturalNumber mod;
-        (void)DivModBySubtraction(other, mod);
+        (void)DivMod(other, mod);
         return *this = mod;
     }
     NaturalNumber NaturalNumber::operator%(const NaturalNumber& other) const {
         NaturalNumber mod;
-        (void)DivModBySubtraction(other, mod);
+        (void)DivMod(other, mod);
         return mod;
     }
     NaturalNumber& NaturalNumber::operator^=(const NaturalNumber& other) {

@@ -33,6 +33,8 @@ namespace MathLib {
         [[nodiscard]] NaturalNumber RandomLessThanEqual(void) const;
         [[nodiscard]] NaturalNumber Add(const Sequence<uint8_t>& other, uint8_t carry) const;
         [[nodiscard]] NaturalNumber DivMod(const uint8_t& other, uint8_t& mod) const;
+        [[nodiscard]] NaturalNumber DivMod(const NaturalNumber& other, NaturalNumber& mod) const;
+        [[nodiscard]] NaturalNumber Mul(const NaturalNumber& other) const;
         [[nodiscard]] NaturalNumber DivModBySubtraction(const NaturalNumber& other, NaturalNumber& mod) const;
         [[nodiscard]] NaturalNumber LongDivMod(const NaturalNumber& other, NaturalNumber& mod) const;
         [[nodiscard]] NaturalNumber Factorial(const NaturalNumber& level) const;

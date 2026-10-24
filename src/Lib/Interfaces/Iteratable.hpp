@@ -1,5 +1,5 @@
-#ifndef MathLib_Iteratable_H
-#define MathLib_Iteratable_H
+#ifndef MathLib_Interfaces_Iteratable_H
+#define MathLib_Interfaces_Iteratable_H
 #include "Iterator.hpp"
 
 namespace MathLib {

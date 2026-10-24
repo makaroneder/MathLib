@@ -1,14 +1,14 @@
-#include "PNG.hpp"
+#include "../../Interfaces/Sequence/ExternArray.hpp"
+#include "../../Cryptography/OneWayCipher/CRC.hpp"
+#include "../../Cryptography/Compressor/ZLib.hpp"
+#include "PNGFilterMethod.hpp"
+#include "../../Memory.hpp"
+#include "../../Color.hpp"
+#include "IDATChunk.hpp"
 #include "PNGHeader.hpp"
 #include "IENDChunk.hpp"
 #include "IHDRChunk.hpp"
-#include "IDATChunk.hpp"
-#include "../../Color.hpp"
-#include "../../Memory.hpp"
-#include "PNGFilterMethod.hpp"
-#include "../../ExternArray.hpp"
-#include "../../Cryptography/Compressor/ZLib.hpp"
-#include "../../Cryptography/OneWayCipher/CRC.hpp"
+#include "PNG.hpp"
 
 namespace MathLib {
     PNG::PNG(void) : SaveableImage() {}

@@ -4,7 +4,6 @@
 #include "Color.hpp"
 #include "String.hpp"
 #include "Threads.hpp"
-#include "FunctionT.hpp"
 #include "Font/Font.hpp"
 #include "Image/Video.hpp"
 #include "Math/Quaternion.hpp"

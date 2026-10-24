@@ -1,6 +1,6 @@
 #ifndef MathLib_Cryptography_Compressor_XZ_Flags_H
 #define MathLib_Cryptography_Compressor_XZ_Flags_H
-#include "../../../ExternArray.hpp"
+#include "../../../Interfaces/Sequence/ExternArray.hpp"
 
 namespace MathLib {
     struct XZFlags {

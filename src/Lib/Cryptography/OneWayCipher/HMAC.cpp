@@ -1,8 +1,8 @@
-#include "HMAC.hpp"
-#include "../../FunctionT.hpp"
-#include "../../Interfaces/Sequence/SequenceUnion.hpp"
-#include "../../Interfaces/Sequence/ExtendedSequence.hpp"
 #include "../../Interfaces/Sequence/TransformSequence.hpp"
+#include "../../Interfaces/Sequence/ExtendedSequence.hpp"
+#include "../../Interfaces/Sequence/SequenceUnion.hpp"
+#include "../../Interfaces/FunctionT.hpp"
+#include "HMAC.hpp"
 
 namespace MathLib {
     HMAC::HMAC(const OneWayCipher& hash) : hash(hash) {}

@@ -1,5 +1,6 @@
 #include "NaturalNumber.hpp"
 #include "../Interfaces/Sequence/SubSequence.hpp"
+#include "../Interfaces/Sequence/ExtendedSequence.hpp"
 
 namespace MathLib {
     Array<SingleTypePair<NaturalNumber>> GetNextCoprimePair(const SingleTypePair<NaturalNumber>& pair) {
@@ -8,6 +9,37 @@ namespace MathLib {
             SingleTypePair<NaturalNumber>(pair.first + pair.first + pair.second, pair.first),
             SingleTypePair<NaturalNumber>(pair.first + pair.second + pair.second, pair.second)
         );
+    }
+    [[nodiscard]] size_t GetDegree(const Sequence<uint8_t>& data) {
+        const size_t size = data.GetSize();
+        for (size_t i = size; i; i--)
+            if (data.AtUnsafe(i - 1)) return i - 1;
+        return 0;
+    }
+    [[nodiscard]] NaturalNumber MultSequence(const Sequence<uint8_t>& a, const Sequence<uint8_t>& b) {
+        const size_t sizeA = a.GetSize();
+        const size_t sizeB = b.GetSize();
+        if (!sizeA || !sizeB) return NaturalNumber();
+        size_t n = Max<size_t>(GetDegree(a), GetDegree(b)) + 1;
+        if (n == 1) {
+            const uint16_t tmp = a.AtUnsafe(0) * b.AtUnsafe(0);
+            return tmp <= UINT8_MAX ? NaturalNumber::FromT<uint8_t>(tmp) : NaturalNumber::FromT<uint16_t>(tmp);
+        }
+        n += n % 2;
+        const size_t m = n / 2;
+        const ExtendedSequence<uint8_t> seqA = ExtendedSequence<uint8_t>(a, 0, n - sizeA);
+        const ExtendedSequence<uint8_t> seqB = ExtendedSequence<uint8_t>(b, 0, n - sizeB);
+        const SubSequence<uint8_t> x0 = SubSequence<uint8_t>(seqA, 0, m);
+        const SubSequence<uint8_t> x1 = SubSequence<uint8_t>(seqA, m, n);
+        const SubSequence<uint8_t> y0 = SubSequence<uint8_t>(seqB, 0, m);
+        const SubSequence<uint8_t> y1 = SubSequence<uint8_t>(seqB, m, n);
+        const NaturalNumber z3 = (NaturalNumber(x1) + x0).Mul(NaturalNumber(y1) + y0);
+        NaturalNumber z2 = MultSequence(x1, y1);
+        const NaturalNumber z0 = MultSequence(x0, y0);
+        NaturalNumber z1 = ((z3 - z2).Get() - z0).Get();
+        z1.MultiplyBy256ToThePowerOf(m);
+        z2.MultiplyBy256ToThePowerOf(m * 2);
+        return z2 + z1 + z0;
     }
     NaturalNumber::NaturalNumber(void) : data() {}
     NaturalNumber::NaturalNumber(size_t size) : data(size) {}
@@ -30,10 +62,7 @@ namespace MathLib {
         return data.IsEmpty() || !(data.At(0) & 1);
     }
     size_t NaturalNumber::GetDegree(void) const {
-        const size_t size = data.GetSize();
-        for (size_t i = size; i; i--)
-            if (data.AtUnsafe(i - 1)) return i - 1;
-        return 0;
+        return MathLib::GetDegree(data);
     }
     size_t NaturalNumber::GetSize(void) const {
         return data.GetSize();
@@ -121,11 +150,7 @@ namespace MathLib {
         return LongDivMod(other, mod);
     }
     NaturalNumber NaturalNumber::Mul(const NaturalNumber& other) const {
-        if (other.IsZero()) return NaturalNumber();
-        uint8_t mod = 0;
-        const NaturalNumber n = *this * other.DivMod(2, mod);
-        if (mod) return n + n + *this;
-        return n + n;
+        return MultSequence(SubSequence<uint8_t>(data, 0, GetDegree() + 1), SubSequence<uint8_t>(other.data, 0, other.GetDegree() + 1));
     }
     NaturalNumber NaturalNumber::DivModBySubtraction(const NaturalNumber& other, NaturalNumber& mod) const {
         if (other.IsZero()) return NaturalNumber();
@@ -223,20 +248,34 @@ namespace MathLib {
     }
     NaturalNumber NaturalNumber::ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const {
         if (IsZero()) return exp.IsZero() ? NaturalNumber::FromT<uint8_t>(1) : NaturalNumber();
+        if (exp.IsZero()) return NaturalNumber::FromT<uint8_t>(1);
         NaturalNumber ret = NaturalNumber::FromT<uint8_t>(1);
         NaturalNumber base = *this % mod;
-        const size_t bits = exp.GetSize() * 8;
+        const size_t degree = exp.GetDegree();
+        size_t bits = (degree + 1) * 8;
+        const uint8_t tmp = exp.data.AtUnsafe(degree);
+        for (uint8_t i = 8; i; i--) {
+            if (tmp & (1 << (i - 1))) break;
+            bits--;
+        }
         for (size_t i = 0; i < bits; i++) {
             if (i) base = (base * base) % mod;
             if (exp.GetBit(i)) ret = (ret * base) % mod;
         }
-        return ret;
+        return Array<uint8_t>(ret.data.GetValue(), ret.GetDegree() + 1);
     }
     void NaturalNumber::MultiplyBy256(uint8_t last) {
         const size_t size = data.GetSize();
         Array<uint8_t> arr = Array<uint8_t>(size + 1);
         arr.AtUnsafe(0) = last;
         MemoryCopy(data.GetValue(), arr.GetValue() + 1, size);
+        data = arr;
+    }
+    void NaturalNumber::MultiplyBy256ToThePowerOf(size_t n) {
+        const size_t size = data.GetSize();
+        Array<uint8_t> arr = Array<uint8_t>(size + n);
+        MemorySet8(arr.GetValue(), n, 0);
+        MemoryCopy(data.GetValue(), arr.GetValue() + n, size);
         data = arr;
     }
     NaturalNumber& NaturalNumber::operator+=(const Sequence<uint8_t>& other) {

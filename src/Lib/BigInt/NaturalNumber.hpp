@@ -45,6 +45,7 @@ namespace MathLib {
         [[nodiscard]] NaturalNumber GetModularInverseByFermatsLittleTheorem(const NaturalNumber& mod) const;
         [[nodiscard]] NaturalNumber ModularExponentiation(const NaturalNumber& exp, const NaturalNumber& mod) const;
         void MultiplyBy256(uint8_t last);
+        void MultiplyBy256ToThePowerOf(size_t n);
 
         NaturalNumber& operator+=(const Sequence<uint8_t>& other);
         [[nodiscard]] NaturalNumber operator+(const Sequence<uint8_t>& other) const;

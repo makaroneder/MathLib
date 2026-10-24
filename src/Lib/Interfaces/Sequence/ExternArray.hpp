@@ -1,6 +1,6 @@
-#ifndef MathLib_ExternArray_H
-#define MathLib_ExternArray_H
-#include "Interfaces/Sequence/Collection.hpp"
+#ifndef MathLib_Interfaces_Sequence_ExternArray_H
+#define MathLib_Interfaces_Sequence_ExternArray_H
+#include "Collection.hpp"
 
 namespace MathLib {
     [[noreturn]] void Panic(const char* str);

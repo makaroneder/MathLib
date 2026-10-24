@@ -1,7 +1,7 @@
-#include "TARHeader.hpp"
+#include "../../../Interfaces/Sequence/ExternArray.hpp"
 #include "../../../String.hpp"
 #include "../../../Memory.hpp"
-#include "../../../ExternArray.hpp"
+#include "TARHeader.hpp"
 
 namespace MathLib {
     bool TARHeader::IsValid(void) const {

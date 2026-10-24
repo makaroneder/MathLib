@@ -1,5 +1,5 @@
+#include "../../Interfaces/FunctionT.hpp"
 #include "Parser.hpp"
-#include "../../FunctionT.hpp"
 
 namespace MathLib {
     Parser::Parser(const Sequence<ParserLayer*>& layers) : layers(CollectionToArray<ParserLayer*>(layers)), tokens(), i(0) {}

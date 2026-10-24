@@ -1,6 +1,6 @@
-#include "ArHeader.hpp"
+#include "../../../Interfaces/Sequence/ExternArray.hpp"
 #include "../../../String.hpp"
-#include "../../../ExternArray.hpp"
+#include "ArHeader.hpp"
 
 namespace MathLib {
     ArHeader::ArHeader(void) : signature(0) {}

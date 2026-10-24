@@ -1,6 +1,6 @@
-#ifndef MathLib_FunctionPointer_H
-#define MathLib_FunctionPointer_H
-#include "Interfaces/Function.hpp"
+#ifndef MathLib_Interfaces_FunctionPointer_H
+#define MathLib_Interfaces_FunctionPointer_H
+#include "Function.hpp"
 
 namespace MathLib {
     template <typename Ret, typename... Args>

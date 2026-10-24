@@ -1,4 +1,4 @@
-#include "../../ExternArray.hpp"
+#include "../../Interfaces/Sequence/ExternArray.hpp"
 #include "CipherFileSystem.hpp"
 #include "../../Memory.hpp"
 #include "../Path.hpp"

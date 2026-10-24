@@ -18,6 +18,14 @@ namespace MathLib {
         [[nodiscard]] virtual T AtUnsafe(size_t index) const override {
             return sequence.AtUnsafe(interval.GetMin() + index);
         }
+        [[nodiscard]] SubSequence<T> Restrict(const Interval<size_t>& restriction) const {
+            if (restriction.GetMax() > GetSize()) Panic("Restriction is out of bounds");
+            return SubSequence<T>(sequence, Interval<size_t>(interval.GetMin() + restriction.GetMin(), interval.GetMin() + restriction.GetMax()));
+        }
+        [[nodiscard]] SubSequence<T> Restrict(size_t start, size_t end) const {
+            if (end > GetSize()) Panic("Restriction is out of bounds");
+            return SubSequence<T>(sequence, Interval<size_t>(interval.GetMin() + start, interval.GetMin() + end));
+        }
 
         private:
         Interval<size_t> interval;

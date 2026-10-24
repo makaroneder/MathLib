@@ -1,7 +1,7 @@
-#include "Channel.hpp"
-#include "../../FunctionT.hpp"
-#include "../../Interfaces/Sequence/SubSequence.hpp"
 #include "../../Interfaces/Sequence/TransformSequence.hpp"
+#include "../../Interfaces/Sequence/SubSequence.hpp"
+#include "../../Interfaces/FunctionT.hpp"
+#include "Channel.hpp"
 
 namespace MathLib {
     Channel::Channel(OneWayCipher& channel, Cipher& cipher) : channel(channel), cipher(cipher) {}

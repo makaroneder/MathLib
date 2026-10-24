@@ -1,8 +1,8 @@
 #ifndef MathLib_Math_Matrix_H
 #define MathLib_Math_Matrix_H
 #include "../Interfaces/Printable.hpp"
+#include "../Interfaces/FunctionT.hpp"
 #include "../Interfaces/Saveable.hpp"
-#include "../FunctionT.hpp"
 #include "Exponential.hpp"
 #include "MathObject.hpp"
 #include "Factorial.hpp"

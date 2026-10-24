@@ -1,8 +1,8 @@
-#include "BytePairEncoding.hpp"
-#include "../../../FunctionT.hpp"
-#include "../../../SingleTypePair.hpp"
-#include "../../../Interfaces/Dictionary.hpp"
 #include "../../../Interfaces/Sequence/ByteArray.hpp"
+#include "../../../Interfaces/Dictionary.hpp"
+#include "../../../Interfaces/FunctionT.hpp"
+#include "../../../SingleTypePair.hpp"
+#include "BytePairEncoding.hpp"
 
 namespace MathLib {
     BytePairEncodingGrammar BytePairEncoding::GenerateGrammar(const Sequence<uint8_t>& input) {

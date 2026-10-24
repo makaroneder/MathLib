@@ -1,7 +1,7 @@
 #ifndef MathLib_Interfaces_Sequence_Collection_H
 #define MathLib_Interfaces_Sequence_Collection_H
 #include "NonLinearCollection.hpp"
-#include "../../Iteratable.hpp"
+#include "../Iteratable.hpp"
 #include "../../Memory.hpp"
 
 namespace MathLib {

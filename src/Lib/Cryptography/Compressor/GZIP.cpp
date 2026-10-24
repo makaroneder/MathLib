@@ -1,10 +1,10 @@
-#include "GZIP.hpp"
-#include "Deflate.hpp"
-#include "GZIPHeader.hpp"
-#include "../../ExternArray.hpp"
-#include "../OneWayCipher/CRC.hpp"
-#include "../../Interfaces/Sequence/ByteArray.hpp"
+#include "../../Interfaces/Sequence/ExternArray.hpp"
 #include "../../Interfaces/Sequence/SubSequence.hpp"
+#include "../../Interfaces/Sequence/ByteArray.hpp"
+#include "../OneWayCipher/CRC.hpp"
+#include "GZIPHeader.hpp"
+#include "Deflate.hpp"
+#include "GZIP.hpp"
 
 namespace MathLib {
     Array<uint8_t> GZIP::Encrypt(const Sequence<uint8_t>& data, const CipherKey& key) const {

@@ -1,7 +1,7 @@
 #ifndef MathLib_EquationSolver_BuiltinFunction_H
 #define MathLib_EquationSolver_BuiltinFunction_H
+#include "../Interfaces/FunctionPointer.hpp"
 #include "Node.hpp"
-#include "../FunctionPointer.hpp"
 
 namespace MathLib {
     using BuiltinFunctionPointer = FunctionPointer<Node*, const Sequence<const Node*>&>;

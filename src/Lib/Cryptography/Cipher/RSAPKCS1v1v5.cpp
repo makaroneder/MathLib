@@ -10,9 +10,8 @@ namespace MathLib {
         Array<uint8_t> message = k;
         message.AtUnsafe(0) = 0;
         message.AtUnsafe(1) = 2;
-        for (size_t i = 2; i < k - size - 1; i++) {
+        for (size_t i = 2; i < k - size - 1; i++)
             message.AtUnsafe(i) = RandomNumber<uint8_t>(1, UINT8_MAX);
-        }
         message.AtUnsafe(k - size - 1) = 0;
         for (size_t i = 0; i < size; i++) message.AtUnsafe(i + k - size) = data.AtUnsafe(i);
         MathLib::Array<uint8_t> ret = RSA().Encrypt(message, key);

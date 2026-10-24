@@ -1,7 +1,7 @@
 #ifndef MathLib_Cryptography_OneWayCipher_H
 #define MathLib_Cryptography_OneWayCipher_H
+#include "../Interfaces/Sequence/ExternArray.hpp"
 #include "CipherKey.hpp"
-#include "../ExternArray.hpp"
 
 namespace MathLib {
     struct OneWayCipher : Allocatable {

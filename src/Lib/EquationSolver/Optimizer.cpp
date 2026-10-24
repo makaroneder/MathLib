@@ -1,5 +1,5 @@
+#include "../Interfaces/FunctionT.hpp"
 #include "../Math/Factorial.hpp"
-#include "../FunctionT.hpp"
 #include "Optimizer.hpp"
 
 namespace MathLib {

@@ -1,12 +1,12 @@
 #ifndef MathLib_Geometry_WavefrontObject_H
 #define MathLib_Geometry_WavefrontObject_H
-#include "String.hpp"
-#include "Polygon.hpp"
-#include "LineShape.hpp"
-#include "../FunctionT.hpp"
-#include "../Math/Quaternion.hpp"
-#include "../FileSystem/File.hpp"
 #include "../EquationSolver/Tokenizer.hpp"
+#include "../Interfaces/FunctionT.hpp"
+#include "../FileSystem/File.hpp"
+#include "../Math/Quaternion.hpp"
+#include "LineShape.hpp"
+#include "Polygon.hpp"
+#include "String.hpp"
 
 namespace MathLib {
     template <typename T>

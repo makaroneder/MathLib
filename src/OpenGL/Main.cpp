@@ -3,7 +3,6 @@
 #include "Texture.hpp"
 #include "GLSLProgram.hpp"
 #include <Typedefs.hpp>
-#include <ExternArray.hpp>
 #include <Math/Matrix4x4.hpp>
 #include <Math/Trigonometry.hpp>
 #include <3D/QuakeMDL/QuakeMDL.hpp>

@@ -1,9 +1,9 @@
 #ifndef MathLib_Geometry_Triangle_H
 #define MathLib_Geometry_Triangle_H
-#include "../Renderer.hpp"
-#include "../Math/Vector3.hpp"
-#include "../Math/LinearInterpolation.hpp"
 #include "../Interfaces/Sequence/FixedSizeCollection.hpp"
+#include "../Math/LinearInterpolation.hpp"
+#include "../Math/Vector3.hpp"
+#include "../Renderer.hpp"
 
 namespace MathLib {
     template <typename T>

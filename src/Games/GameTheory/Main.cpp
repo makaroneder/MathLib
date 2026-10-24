@@ -1,10 +1,11 @@
 #include "Tensor.hpp"
 #include "TitForTat.hpp"
+#include "TriggerStrategy.hpp"
 #include "ConstantStrategy.hpp"
 #include <Interfaces/Sequence/VariadicSequence.hpp>
 #include <FileSystem/FileSystem.hpp>
+#include <Interfaces/FunctionT.hpp>
 #include <SingleTypePair.hpp>
-#include <FunctionT.hpp>
 #include <Logger.hpp>
 #include <iostream>
 
@@ -31,30 +32,17 @@ struct Human : Player {
         return ret < 0 ? SIZE_MAX : ret;
     }
 };
-struct TriggerStrategy : Player {
-    TriggerStrategy(bool strategy, Player& strategy1, Player& strategy2, const MathLib::Function<bool, bool, ssize_t, size_t>& switchCondition) : strategy1(strategy1), strategy2(strategy2), switchCondition(switchCondition), strategy(strategy) {}
-    [[nodiscard]] virtual size_t GetMove(ssize_t score, size_t prevEnemyMove) override {
-        strategy = switchCondition(strategy, score, prevEnemyMove);
-        return (strategy ? strategy2 : strategy1).GetMove(score, prevEnemyMove);
-    }
-
-    private:
-    Player& strategy1;
-    Player& strategy2;
-    const MathLib::Function<bool, bool, ssize_t, size_t>& switchCondition;
-    bool strategy;
-};
 void Main(int, char**, MathLib::FileSystem&) {
     const size_t turns = 5;
     const Tensor<ssize_t> payoffs = PrisonersDilemmaPayoffMatrix(1, 0, 2, -1);
-    TitForTat p1 = TitForTat(0);
+    TitForTat player1 = TitForTat(0);
 
     ConstantStrategy constant0 = ConstantStrategy(0);
     ConstantStrategy constant1 = ConstantStrategy(1);
-    const auto switchCond = MathLib::MakeFunctionT<bool, bool, ssize_t, size_t>([](bool strategy, ssize_t, size_t prevEnemyMove) -> bool {
+    const auto switchCondition = MathLib::MakeFunctionT<bool, bool, ssize_t, size_t>([](bool strategy, ssize_t, size_t prevEnemyMove) -> bool {
         return strategy || prevEnemyMove == 1;
     });
-    TriggerStrategy p2 = TriggerStrategy(false, constant0, constant1, switchCond);
+    TriggerStrategy player2 = TriggerStrategy(false, constant0, constant1, switchCondition);
 
     MathLib::Array<size_t> moves = MathLib::MakeArray<size_t>(SIZE_MAX, SIZE_MAX, SIZE_MAX);
     LogString("Payoffs: ");
@@ -63,14 +51,14 @@ void Main(int, char**, MathLib::FileSystem&) {
     ssize_t score1 = 0;
     ssize_t score2 = 0;
     for (size_t i = 0; i < turns; i++) {
-        const size_t tmp = moves.At(0);
-        moves.At(0) = p1.GetMove(score1, moves.At(1));
-        if (moves.At(0) == SIZE_MAX) break;
-        moves.At(1) = p2.GetMove(score2, tmp);
-        if (moves.At(1) == SIZE_MAX) break;
-        moves.At(2) = 0;
+        const size_t tmp = moves.AtUnsafe(0);
+        moves.AtUnsafe(0) = player1.GetMove(score1, moves.AtUnsafe(1));
+        if (moves.AtUnsafe(0) == SIZE_MAX) break;
+        moves.AtUnsafe(1) = player2.GetMove(score2, tmp);
+        if (moves.AtUnsafe(1) == SIZE_MAX) break;
+        moves.AtUnsafe(2) = 0;
         score1 += payoffs.At(moves);
-        moves.At(2) = 1;
+        moves.AtUnsafe(2) = 1;
         score2 += payoffs.At(moves);
     }
     LogString("Player 1 score: ");

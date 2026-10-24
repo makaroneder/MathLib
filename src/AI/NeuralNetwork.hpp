@@ -2,7 +2,7 @@
 #define NeuralNetwork_H
 #include "NeuralNetworkNode.hpp"
 #include "Point.hpp"
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionT.hpp>
 
 template <typename T>
 struct NeuralNetwork : NeuralNetworkNode<T> {

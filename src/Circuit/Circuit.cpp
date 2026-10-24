@@ -1,6 +1,6 @@
 #include "Circuit.hpp"
 #include <Interfaces/Sequence/FunctionSequence.hpp>
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionT.hpp>
 #include <String.hpp>
 
 Circuit::Circuit(void) {}

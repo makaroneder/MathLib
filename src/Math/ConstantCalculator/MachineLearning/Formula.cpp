@@ -1,7 +1,7 @@
 #include "Formula.hpp"
 #include <Interfaces/PartialFunctionApplication.hpp>
-#include <FunctionPointer.hpp>
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionPointer.hpp>
+#include <Interfaces/FunctionT.hpp>
 
 Formula::Formula(void) : value(), name(), children(), type(Type::None) {}
 Formula::Formula(const MathLib::RationalNumber& value) : value(value), name(), children(), type(Type::Constant) {}

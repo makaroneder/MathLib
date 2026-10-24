@@ -1,7 +1,7 @@
 #include "GitTree.hpp"
 #include <Cryptography/OneWayCipher/SHA/SHA1.hpp>
+#include <Interfaces/Sequence/ExternArray.hpp>
 #include <Cryptography/Compressor/ZLib.hpp>
-#include <ExternArray.hpp>
 
 MathLib::String GitTree::GetHash(void) const {
     const MathLib::Array<uint8_t> hash = MathLib::SHA1().Encrypt(SaveInternal(), MathLib::CipherKey());

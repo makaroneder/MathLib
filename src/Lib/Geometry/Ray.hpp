@@ -1,7 +1,7 @@
 #ifndef MathLib_Geometry_Ray_H
 #define MathLib_Geometry_Ray_H
-#include "LineShape.hpp"
 #include "../Math/Quaternion.hpp"
+#include "LineShape.hpp"
 
 namespace MathLib {
     template <typename T>

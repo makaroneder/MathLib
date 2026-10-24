@@ -1,8 +1,8 @@
 #ifndef MathLib_Geometry_Polygon_H
 #define MathLib_Geometry_Polygon_H
 #include "../Math/SystemOfLinearEquations.hpp"
+#include "../Interfaces/FunctionT.hpp"
 #include "../Math/Vector3.hpp"
-#include "../FunctionT.hpp"
 
 namespace MathLib {
     template <typename T, typename Vertex>

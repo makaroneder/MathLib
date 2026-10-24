@@ -1,6 +1,6 @@
 #include "Scope.hpp"
 #include <FileSystem/FileSystem.hpp>
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionT.hpp>
 #include <Logger.hpp>
 
 void Main(int, char**, MathLib::FileSystem&) {

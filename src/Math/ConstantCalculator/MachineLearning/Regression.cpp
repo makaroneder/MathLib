@@ -1,5 +1,5 @@
 #include "Regression.hpp"
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionT.hpp>
 
 Formula MakeMeanSquaredError(const MathLib::Sequence<DataPoint>& dataSet, const MathLib::Function<Formula, Formula>& function) {
     const size_t size = dataSet.GetSize();

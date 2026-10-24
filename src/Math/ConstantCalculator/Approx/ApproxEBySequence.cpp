@@ -1,6 +1,6 @@
 #include "ApproxEBySequence.hpp"
 #include "../Thread.hpp"
-#include <FunctionPointer.hpp>
+#include <Interfaces/FunctionPointer.hpp>
 
 void ApproxEBySequenceUnit(MathLib::NaturalNumber start, MathLib::NaturalNumber end, ApproxEBySequenceUnitReturnValue* ret) {
     for (MathLib::NaturalNumber i = start; i < end;) {

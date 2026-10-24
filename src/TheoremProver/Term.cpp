@@ -1,5 +1,5 @@
 #include "Term.hpp"
-#include <FunctionT.hpp>
+#include <Interfaces/FunctionT.hpp>
 
 Term::Term(void) : left(nullptr), right(nullptr), value(0), type(Type::None) {}
 Term::Term(Type type, size_t value) : left(nullptr), right(nullptr), value(value), type(type) {}

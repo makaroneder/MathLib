@@ -1,7 +1,7 @@
 #ifdef __x86_64__
-#include "QEMUFileSystem.hpp"
 #include "../IO.hpp"
-#include <FunctionT.hpp>
+#include "QEMUFileSystem.hpp"
+#include <Interfaces/FunctionT.hpp>
 #include <FileSystem/Path.hpp>
 
 void QEMUFileSystem::SetSelector(QEMUSelector selector) const {

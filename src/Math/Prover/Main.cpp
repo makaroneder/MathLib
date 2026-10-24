@@ -9,8 +9,8 @@
 #include <Compiler/Lexer/StringMatchLexerRule.hpp>
 #include <Interfaces/IdentityFunction.hpp>
 #include <FileSystem/FileSystem.hpp>
+#include <Interfaces/FunctionT.hpp>
 #include <Compiler/Toolchain.hpp>
-#include <FunctionT.hpp>
 #include <iostream>
 
 enum class TokenType : uint8_t {

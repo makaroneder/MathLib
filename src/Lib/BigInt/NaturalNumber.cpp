@@ -185,12 +185,12 @@ namespace MathLib {
         mod = NaturalNumber();
         const size_t degree = GetDegree() + 1;
         for (size_t i = degree; i; i--) {
-            mod.MultiplyBy256(data.At(i - 1));
+            mod.MultiplyBy256(data.AtUnsafe(i - 1));
             NaturalNumber tmp;
             const NaturalNumber div = mod.DivModBySubtraction(other, tmp);
             mod = tmp;
             if (div.GetDegree()) return NaturalNumber();
-            ret.MultiplyBy256(div.IsZero() ? 0 : div.data.At(0));
+            ret.MultiplyBy256(div.IsZero() ? 0 : div.data.AtUnsafe(0));
         }
         return ret;
     }

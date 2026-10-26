@@ -1,5 +1,4 @@
 #include <Cryptography/Cipher/RSAPKCS1v1v5.hpp>
-#include <Interfaces/Sequence/ByteArray.hpp>
 #include <FileSystem/FileSystem.hpp>
 #include <DER/DER.hpp>
 #include <iostream>
@@ -17,20 +16,17 @@ void Main(int argc, char** argv, MathLib::FileSystem& fs) {
         if (keyWrapper.children.AtUnsafe(size - 2).type != MathLib::DERTerm::Type::Sequence) MathLib::Panic("Failed to load key");
         if (keyWrapper.children.AtUnsafe(size - 2).children.IsEmpty()) MathLib::Panic("Failed to load key");
         if (keyWrapper.children.AtUnsafe(size - 2).children.At(0).value != MathLib::Array<uint8_t>((const uint8_t*)"1.2.840.113549.1.1.1", 20)) MathLib::Panic("Failed to load key");
-        
         if (keyWrapper.children.AtUnsafe(size - 1).type != MathLib::DERTerm::Type::ByteArray) MathLib::Panic("Failed to load key");
         MathLib::DERTerm key;
         if (!MathLib::ParseDERFromSequence(key, keyWrapper.children.AtUnsafe(size - 1).value)) MathLib::Panic("Failed to load key");
         if (key.type != MathLib::DERTerm::Type::Sequence) MathLib::Panic("Failed to load key");
         if (key.children.GetSize() < 4) MathLib::Panic("Failed to load key");
-        publicKey = MathLib::MakeArray<MathLib::CipherKey>(
-            key.children.At(1).value,
-            key.children.At(2).value
-        );
-        privateKey = MathLib::MakeArray<MathLib::CipherKey>(
-            key.children.At(1).value,
-            key.children.At(3).value
-        );
+        for (uint8_t i = 0; i < 4; i++)
+            if (key.children.AtUnsafe(i).type != MathLib::DERTerm::Type::Integer) MathLib::Panic("Failed to load key");
+        if (key.children.AtUnsafe(0).value.GetSize() != 1) MathLib::Panic("Failed to load key");
+        if (key.children.AtUnsafe(0).value.AtUnsafe(0)) MathLib::Panic("Failed to load key");
+        publicKey = MathLib::MakeArray<MathLib::CipherKey>(key.children.AtUnsafe(1).value, key.children.AtUnsafe(2).value);
+        privateKey = MathLib::MakeArray<MathLib::CipherKey>(key.children.AtUnsafe(1).value, key.children.AtUnsafe(3).value);
     }
     // TODO: Test after implementing faster divison algorithm
     MathLib::RSAPKCS1v1v5 rsa;

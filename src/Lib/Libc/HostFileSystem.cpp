@@ -1,13 +1,11 @@
 #ifndef Freestanding
 #include "HostFileSystem.hpp"
-#ifndef __MINGW32__
 #if __cplusplus >= 201703
     #include <filesystem>
     namespace fs = std::filesystem;
 #else
     #include <experimental/filesystem>
     namespace fs = std::experimental::filesystem;
-#endif
 #endif
 
 namespace MathLib {
@@ -71,8 +69,7 @@ namespace MathLib {
         return ret;
     }
     Array<FileInfo> HostFileSystem::ReadDirectory(const Sequence<char>& path_) {
-        #ifndef __MINGW32__
-        const String path = String(fs::current_path().c_str()) + '/' + path_;
+        const String path = String(fs::current_path().generic_string()) + '/' + path_;
         if (!fs::exists(path.GetValue()) || !fs::is_directory(path.GetValue())) return Array<FileInfo>();
         Array<FileInfo> ret;
         for (const fs::directory_entry& entry : fs::directory_iterator(path.GetValue())) {
@@ -82,14 +79,9 @@ namespace MathLib {
             if (!ret.Add(FileInfo(type, String(entry.path().filename().string())))) return Array<FileInfo>();
         }
         return ret;
-        #else
-        (void)path_;
-        return Array<FileInfo>();
-        #endif
     }
     bool HostFileSystem::CreateDirectory(const Sequence<char>& path_, bool overwrite) {
-        #ifndef __MINGW32__
-        const String path = String(fs::current_path().c_str()) + '/' + path_;
+        const String path = String(fs::current_path().generic_string()) + '/' + path_;
         if (fs::exists(path.GetValue())) {
             if (!fs::is_directory(path.GetValue())) return false;
             if (overwrite) for (const fs::directory_entry& entry : std::filesystem::directory_iterator(path.GetValue()))
@@ -97,11 +89,6 @@ namespace MathLib {
             return true;
         }
         return fs::create_directory(path.GetValue());
-        #else
-        (void)path_;
-        (void)overwrite;
-        return false;
-        #endif
     }
     FILE* HostFileSystem::GetFile(size_t file) {
         return file < files.GetSize() ? files[file] : nullptr;

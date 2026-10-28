@@ -14,6 +14,10 @@ dataDir : str = "Data"
 debug : bool = False
 force : bool = False
 
+windowsMode : bool = False
+windowsSDL2DLL = "/mnt/c/SDL2/x86_64-w64-mingw32/bin"
+windowsSDL2Include = "/mnt/c/SDL2/x86_64-w64-mingw32/include"
+
 def AssertNotNone(value : str | None) -> str:
     if value is not None: return value
     raise ValueError
@@ -260,12 +264,13 @@ envs : dict[str, Environment] = {
         }),
     })),
     "windows" : baseEnv.add(Environment({
-        "cc" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC"], [], []),
-        "cxx" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC"], [], []),
+        "cc" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC", f"-I {windowsSDL2Include}"], [], []),
+        "cxx" : Tool("x86_64-w64-mingw32-g++-win32", ["-fPIC", f"-I {windowsSDL2Include}"], [], []),
         "as" : Tool("nasm", [], [], []),
     }, {
         "static" : Linker(Tool("x86_64-w64-mingw32-ar", [], [], []), {
             "console" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/static", "-static-libstdc++" ,"-static-libgcc", "-static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "sdl2" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/static", "-static-libstdc++" ,"-static-libgcc", "-static", "-Wl,--whole-archive -l:SDL2Init.lib -Wl,--no-whole-archive"], [f"-L {windowsSDL2DLL}", f"-l:SDL2.dll", "-l:Math.lib"], ["Math.lib", "SDL2Init.lib"])),
             "miniaudio" : baseExec.add(Tool("x86_64-w64-mingw32-g++-win32", [f"-L {buildDir}/windows/static", "-static-libstdc++" ,"-static-libgcc", "-static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
         }),
         "dynamic" : Linker(Tool("g++", [], [], []), {
@@ -485,6 +490,7 @@ if __name__ == "__main__":
         print(f"Usage: {argv[0]} <target>")
         exit(1)
     defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("host", "dynamic", "sdl2")
+    if windowsMode: defaultEnv = EnvironmentIdentifier("windows", "static", "sdl2")
     currentTargets : list[str] = executables if argv[1] == "all" else [argv[1]]
     failedTargets : list[str] = []
     for target in currentTargets:

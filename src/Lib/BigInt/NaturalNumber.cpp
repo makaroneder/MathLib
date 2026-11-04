@@ -20,10 +20,38 @@ namespace MathLib {
         const size_t sizeA = a.GetSize();
         const size_t sizeB = b.GetSize();
         if (!sizeA || !sizeB) return NaturalNumber();
-        size_t n = Max<size_t>(GetDegree(a), GetDegree(b)) + 1;
+        const size_t degA = GetDegree(a);
+        const size_t degB = GetDegree(b);
+        if (!(degA || a.AtUnsafe(0)) || !(degB || b.AtUnsafe(0))) return NaturalNumber();
+        size_t n = Max<size_t>(degA, degB) + 1;
         if (n == 1) {
             const uint16_t tmp = a.AtUnsafe(0) * b.AtUnsafe(0);
             return tmp <= UINT8_MAX ? NaturalNumber::FromT<uint8_t>(tmp) : NaturalNumber::FromT<uint16_t>(tmp);
+        }
+        if (n == 2) {
+            const uint16_t a16 = (uint16_t)a.AtUnsafe(0) | (degA == 1 ? (uint16_t)a.AtUnsafe(1) << 8 : 0);
+            const uint16_t b16 = (uint16_t)b.AtUnsafe(0) | (degB == 1 ? (uint16_t)b.AtUnsafe(1) << 8 : 0);
+            const uint32_t tmp = (uint32_t)a16 * b16;
+            if (tmp <= UINT8_MAX) return NaturalNumber::FromT<uint8_t>(tmp);
+            if (tmp <= UINT16_MAX) return NaturalNumber::FromT<uint16_t>(tmp);
+            return NaturalNumber::FromT<uint32_t>(tmp);
+        }
+        if (n <= 4) {
+            uint32_t a32 = 0;
+            for (uint8_t i = 0; i <= degA; i++) {
+                a32 <<= 8;
+                a32 |= a.AtUnsafe(degA - i);
+            }
+            uint32_t b32 = 0;
+            for (uint8_t i = 0; i <= degB; i++) {
+                b32 <<= 8;
+                b32 |= b.AtUnsafe(degB - i);
+            }
+            const uint64_t tmp = (uint64_t)a32 * b32;
+            if (tmp <= UINT8_MAX) return NaturalNumber::FromT<uint8_t>(tmp);
+            if (tmp <= UINT16_MAX) return NaturalNumber::FromT<uint16_t>(tmp);
+            if (tmp <= UINT32_MAX) return NaturalNumber::FromT<uint32_t>(tmp);
+            return NaturalNumber::FromT<uint64_t>(tmp);
         }
         n += n % 2;
         const size_t m = n / 2;
@@ -355,9 +383,8 @@ namespace MathLib {
     NaturalNumber NaturalNumber::operator^(const NaturalNumber& other) const {
         if (other.IsZero()) return FromT<uint8_t>(1);
         uint8_t mod = 0;
-        const NaturalNumber n = *this ^ other.DivMod(2, mod);
-        if (mod) return n * n * *this;
-        return n * n;
+        const NaturalNumber n = Mul(*this) ^ other.DivMod(2, mod);
+        return mod ? Mul(n) : n;
     }
     bool NaturalNumber::LessThanEqual(const NaturalNumber& other) const {
         const size_t size = Max<size_t>(data.GetSize(), other.data.GetSize());

@@ -211,7 +211,7 @@ class Target:
     def getInputs(self : 'Target', sub : str) -> list[str]:
         return self.getInputsInternal(sub)
 
-baseGCCFlags : list[str] = ["-g", "-O0", "-DDebug", "-Wall", "-Wextra", "-Werror", "-I .", f"-I {srcDir}/Lib", f"-I {srcDir}/Platform", f"-I {buildDir}", "-Wno-packed-bitfield-compat", "-Wno-unused-function"]
+baseGCCFlags : list[str] = ["-g", "-O0", "-DDebug", "-fdata-sections", "-ffunction-sections", "-Wall", "-Wextra", "-Werror", "-I .", f"-I {srcDir}/Lib", f"-I {srcDir}/Platform", f"-I {buildDir}", "-Wno-packed-bitfield-compat", "-Wno-unused-function"]
 baseNASMFlags : list[str] = ["-g", "-O0", "-DDebug", "-Werror", f"-I {srcDir}", f"-I {srcDir}/Lib", f"-I {srcDir}/Platform"]
 osGCCFlags : list[str] = [f"-I {srcDir}/OS/Shared", "-DFreestanding", "-ffreestanding", "-fstack-protector-all", "-mcmodel=large", "-mno-red-zone", "-fno-exceptions", "-fno-rtti", "-fno-omit-frame-pointer"]
 
@@ -249,11 +249,11 @@ envs : dict[str, Environment] = {
         "as" : Tool("nasm", [], [], []),
     }, {
         "static" : Linker(Tool("ar", [], [], []), {
-            "console" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
-            "sdl2" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:SDL2Init.lib -Wl,--no-whole-archive"], ["-l:libSDL2.so", "-l:Math.lib"], ["Math.lib", "SDL2Init.lib"])),
-            "openGL" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:libGL.so", "-l:libglfw.so", "-l:libglbinding.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
-            "curl" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:libcurl.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
-            "miniaudio" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-Wl,--whole-archive -l:ConsoleInit.lib -Wl,--no-whole-archive"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
+            "console" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-l:ConsoleInit.lib"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "sdl2" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-l:SDL2Init.lib"], ["-l:libSDL2.so", "-l:Math.lib"], ["Math.lib", "SDL2Init.lib"])),
+            "openGL" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-l:ConsoleInit.lib"], ["-l:libGL.so", "-l:libglfw.so", "-l:libglbinding.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "curl" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-l:ConsoleInit.lib"], ["-l:libcurl.so", "-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
+            "miniaudio" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/static", "-l:ConsoleInit.lib"], ["-l:Miniaudio.lib", "-l:Math.lib"], ["Math.lib", "Miniaudio.lib", "ConsoleInit.lib"])),
         }),
         "dynamic" : Linker(Tool("g++", [], [], []), {
             "console" : baseExec.add(Tool("g++", [f"-L {buildDir}/host/dynamic", "-l:ConsoleInit.lib"], ["-l:Math.lib"], ["Math.lib", "ConsoleInit.lib"])),
@@ -293,7 +293,7 @@ envs : dict[str, Environment] = {
     }, {
         "static" : Linker(Tool("x86_64-elf-ar", ["-rcs", "@"], [], []), {}),
         "executable" : Linker(Tool("false", [], [], []), {
-            "elf" : baseExec.add(Tool("x86_64-elf-g++", ["-Bsymbolic", "-nostdlib"], ["-l gcc", f"-Xlinker -Map={buildDir}/os/Kernel.map"], [])),
+            "elf" : baseExec.add(Tool("x86_64-elf-g++", ["-Bsymbolic", "-nostdlib", "-Wl,--gc-sections", "-Wl,--strip-all"], ["-l gcc", f"-Xlinker -Map={buildDir}/os/Kernel.map"], [])),
         }),
     })),
     "binaryAssembler" : Environment({
@@ -414,7 +414,7 @@ targets : dict[str, Target] = {
     "debugOS": Target(lambda inputs, dependencies, output, env : env.getEnv().tools["gdb"].run(dependencies[0], []), lambda : ["OS.gdb"], lambda env : ["gdb"], TargetEnvironment(["os"], [], []), lambda sub : [], False),
 }
 gfxRuntime : list[str] = ["sdl2"]
-executables : list[str] = ["OS.gdb", "Main.aml", "X86.bin", "Certificate.der"]
+executables : list[str] = ["OS.gdb", "Kernel.map", "Main.aml", "X86.bin", "Certificate.der"]
 def AddExecutableWithRunDependencies(name : str, env : TargetEnvironment, runFlags : Callable[[list[str]], list[str]], flags: list[str], directories: list[str], validExtensions : list[str], runDeps : list[str]) -> None:
     executables.append(f"{name}.out")
     targets[f"{name}.lib"] = Link(TargetEnvironment(env.env, env.linker, []), flags, directories, validExtensions, [], [])
@@ -427,6 +427,7 @@ AddExecutableWithRunDependencies("AML", TargetEnvironment(None, None, ["console"
 AddExecutableWithRunDependencies("X86", TargetEnvironment(None, None, ["console"]), lambda program : program[1:], [], ["Emulator/X86"], [".cpp"], ["X86.bin"])
 AddExecutableWithRunDependencies("ASN1", TargetEnvironment(None, None, ["console"]), lambda program : program[1:], [], ["ASN1"], [".cpp"], ["Certificate.der"])
 AddExecutableWithRunDependencies("RSA", TargetEnvironment(None, None, ["console"]), lambda program : program[1:], [], ["RSA"], [".cpp"], ["Certificate.der.key"])
+AddExecutableWithRunDependencies("ParseMap", TargetEnvironment(None, None, ["console"]), lambda program : program[1:], [], ["ParseMap"], [".cpp"], ["Kernel.map"])
 AddExecutable("4D", TargetEnvironment(None, None, gfxRuntime), lambda program : [f"-program {dataDir}/4D/Tesseract.txt"], [], ["4D"], [".cpp"])
 AddExecutable("AES", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/AES"], [], ["AES"], [".cpp"])
 AddExecutable("AI", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["AI"], [".cpp"])

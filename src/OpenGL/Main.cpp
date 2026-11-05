@@ -16,7 +16,7 @@ void Main(int, char**, MathLib::FileSystem& fs) {
         MakeShader(fs.Open("src/OpenGL/Shaders/Default/Vertex.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), GL_VERTEX_SHADER),
         MakeShader(fs.Open("src/OpenGL/Shaders/Default/Fragment.glsl"_M, MathLib::OpenMode::Read).ReadUntil('\0').GetValue(), GL_FRAGMENT_SHADER)
     );
-    MathLib::quakeMDLPalette = fs.Open("Data/OpenGL/Palette.lmp"_M, MathLib::OpenMode::Read).ReadAll();
+    MathLib::quakeMDLPalette = fs.Open("Data/OpenGL/Palette.lmp"_M, MathLib::OpenMode::Read).ReadAll<uint8_t>();
     MathLib::QuakeMDL quakeMDL;
     if (!quakeMDL.LoadFromPath(fs, "Data/OpenGL/Soldier.mdl"_M)) MathLib::Panic("Failed to load quake model");
 

@@ -3,24 +3,31 @@ SECTIONS {
     . = 2M;
     kernelStart = .;
     .multibootHeader ALIGN(4K) : {
-        *(.multibootHeader)
+        KEEP(*(.multibootHeader))
     }
     .text ALIGN(4K) : {
         textStart = .;
-        *(.text)
+        KEEP(*(.text))
+        KEEP(*(.ctors))
+        KEEP(*(.init))
+        KEEP(*(.fini))
+        *(.text*)
     }
     .data ALIGN(4K) : {
         dataStart = .;
-        *(.data)
+        KEEP(*(.data))
+        *(.data*)
     }
     .rodata ALIGN(4K) : {
         rodataStart = .;
-        *(.rodata)
+        KEEP(*(.rodata))
+        *(.rodata*)
     }
     .bss ALIGN(4K) : {
         bssStart = .;
-        *(COMMON)
-        *(.bss)
+        KEEP(*(COMMON))
+        KEEP(*(.bss))
+        *(.bss*)
     }
     kernelEnd = .;
 }

@@ -18,7 +18,13 @@ namespace MathLib {
         [[nodiscard]] size_t Tell(void) const;
         [[nodiscard]] size_t GetSizeLeft(void) const;
         [[nodiscard]] bool CopyTo(Writable& dst);
-        [[nodiscard]] Array<uint8_t> ReadAll(void);
+        template <typename T>
+        [[nodiscard]] Array<T> ReadAll(void) {
+            const size_t size = GetSizeLeft();
+            if (size % sizeof(T)) return Array<T>();
+            Array<T> ret = size / sizeof(T);
+            return ReadCollection<T>(ret) ? ret : Array<T>();
+        }
         template <typename T>
         [[nodiscard]] bool ReadPositioned(T& value, size_t position) {
             return ReadPositionedBuffer(&value, sizeof(T), position);

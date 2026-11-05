@@ -54,9 +54,4 @@ namespace MathLib {
         uint8_t buffer[size];
         return ReadBuffer(buffer, size) && dst.WriteBuffer(buffer, size);
     }
-    Array<uint8_t> ByteDevice::ReadAll(void) {
-        const size_t size = GetSizeLeft();
-        Array<uint8_t> ret = size;
-        return ReadCollection<uint8_t>(ret) ? ret : Array<uint8_t>();
-    }
 }

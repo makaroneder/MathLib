@@ -482,7 +482,7 @@ AddExecutable("TheoremProver", TargetEnvironment(None, None, ["console"]), lambd
 AddExecutable("TypeTheory", TargetEnvironment(None, None, ["console"]), lambda program : [f"{dataDir}/TypeTheory/Main.txt"], [], ["TypeTheory"], [".cpp"])
 AddExecutable("VideoPlayer", TargetEnvironment(None, None, gfxRuntime), lambda program : ["-width 800", "-height 800", "-speed 0.1", "-skipDuration 1", "-multX 4", "-multY 4", f"-path {dataDir}/VideoPlayer/Video.aseprite"], [], ["VideoPlayer"], [".cpp"])
 AddExecutable("WebScraper", TargetEnvironment(None, None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
-AddExecutable("WebsiteReader", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["WebsiteReader"], [".cpp"])
+AddExecutable("WebsiteReader", TargetEnvironment(None, None, ["console"]), lambda program : ["https://tls-v1-2.badssl.com:1012"], [], ["WebsiteReader"], [".cpp"])
 AddExecutable("ModelGenerator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
 AddExecutable("MapGenerator", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["MapGenerator"], [".cpp"])
 

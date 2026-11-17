@@ -1,6 +1,5 @@
-#include "Block.hpp"
+#include "../Shared/Map.hpp"
 #include <Image/Aseprite/Aseprite.hpp>
-#include <FileSystem/FileSystem.hpp>
 #include <Interfaces/Dictionary.hpp>
 #include <WindowManager.hpp>
 #include <Font/PSF1.hpp>
@@ -15,29 +14,14 @@ MathLib::Array<MathLib::String> GetFileList(MathLib::FileSystem& fs, const MathL
         if (fileInfo.type == MathLib::FileInfo::Type::File && !fileList.Add(fileInfo.path)) MathLib::Panic("Failed to read directory");
     return fileList;
 }
-void Save(MathLib::FileSystem& fs, const MathLib::String& outputPath, const MathLib::Array<Block>& blocks) {
-    MathLib::File file = fs.Open(outputPath, MathLib::OpenMode::Write);
-    if (!file.Write<size_t>(blocks.GetSize())) MathLib::Panic("Failed to save block count");
-    for (const Block& block : blocks)
-        if (!block.Save(file)) MathLib::Panic("Failed to save block");
-}
-void Load(MathLib::FileSystem& fs, const MathLib::String& outputPath, MathLib::Array<Block>& blocks) {
-    MathLib::File file = fs.Open(outputPath, MathLib::OpenMode::Read);
-    if (!file.Exists()) return;
-    size_t blockCount;
-    if (!file.Read<size_t>(blockCount)) MathLib::Panic("Failed to load block count");
-    blocks = blockCount;
-    for (Block& block : blocks)
-        if (!block.Load(file)) MathLib::Panic("Failed to load block");
-}
 void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowManager) {
-    const MathLib::String inputPath = "Data/MapGenerator/";
+    const MathLib::String inputPath = "Data/AAAI/";
     const MathLib::String fontPath = "Data/Fonts/zap-light16.psf";
     const MathLib::String outputPath = "bin/Map.bin";
-    const size_t cellSize = 32;
-    const size_t uiHeight = 192;
     const size_t width = 800;
     const size_t height = 800;
+    const size_t cellSize = 32;
+    const size_t uiHeight = 192;
     const size_t drawCellX = ((width + cellSize - 1) / cellSize);
     const size_t drawCellY = ((height - uiHeight + cellSize - 1) / cellSize);
     const size_t centerX = width / 2;
@@ -47,15 +31,16 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     defer(delete renderer);
     MathLib::PSF1 font;
     if (!font.LoadFromPath(fs, fontPath)) MathLib::Panic("Failed to load font");
+    MathLib::Dictionary<MathLib::String, MathLib::Aseprite> cachedTextures;
     MathLib::Array<MathLib::String> fileList = GetFileList(fs, inputPath);
     size_t currentFile = 0;
     ssize_t offsetX = 0;
     ssize_t offsetY = 0;
     MathLib::Array<Block> blocks;
+    LoadMap(fs, outputPath, blocks);
     bool drawGrid = true;
     bool update = true;
     MathLib::num_t prevTime = MathLib::GetTime();
-    Load(fs, outputPath, blocks);
     while (true) {
         const MathLib::num_t time = MathLib::GetTime();
         std::cout << "FPS: " << 1 / (time - prevTime) << std::endl;
@@ -63,42 +48,24 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
         if (update) {
             update = false;
             renderer->Fill(0);
-            if (true) {
-                MathLib::Dictionary<MathLib::String, MathLib::Aseprite> cachedTextures;
-                for (const Block& block : blocks) {
-                    if (block.path.IsEmpty()) continue;
-                    const ssize_t x = (block.x - offsetX) * cellSize + cellSize / 2;
-                    if (x < 0 || (size_t)x >= width) continue;
-                    const ssize_t y = (block.y - offsetY) * cellSize + cellSize / 2;
-                    if (y < 0 || (size_t)y >= height - uiHeight) continue;
-                    MathLib::Aseprite texture;
-                    const MathLib::Expected<MathLib::Aseprite> tmp = cachedTextures.Get(block.path);
-                    if (tmp.HasValue()) texture = tmp.Get();
-                    else {
-                        if (!texture.LoadFromPath(fs, inputPath + block.path)) MathLib::Panic("Failed to load texture");
-                        if (!cachedTextures.Add(block.path, texture)) MathLib::Panic("Failed to cache texture");
-                    }
-                    renderer->DrawImage(texture.At(0), x, y);
-                }
-            }
+            DrawMap(*renderer, cellSize, offsetX, offsetY, blocks, fs, inputPath, cachedTextures);
+            renderer->FillRectangle(centerX, height - uiHeight / 2, width, uiHeight, 0x000000ff);
             if (drawGrid) renderer->DrawGrid(centerX, centerY, cellSize, cellSize, drawCellX, drawCellY, UINT32_MAX);
             else renderer->DrawLinePararellToOX(0, width, height - uiHeight, UINT32_MAX);
-            if (!fileList.IsEmpty()) {
-                const size_t size = fileList.GetSize();
-                for (size_t i = 0; i < size; i++)
-                    renderer->PutsFromLeft(fileList.AtUnsafe(i), font, 0, height - uiHeight + i * font.GetHeight(), i == currentFile ? 0xffff00ff : UINT32_MAX, 0);
-            }
+            const size_t size = fileList.GetSize();
+            for (size_t i = 0; i < size; i++)
+                renderer->PutsFromLeft(fileList.AtUnsafe(i), font, 0, height - uiHeight + i * font.GetHeight(), i == currentFile ? 0xffff00ff : UINT32_MAX, 0);
         }
         if (!renderer->Update()) MathLib::Panic("Failed to update UI");
         const MathLib::Event event = renderer->GetEvent();
         if (event.type == MathLib::Event::Type::Quit) break;
         if (event.type == MathLib::Event::Type::KeyPressed && event.pressed) switch (event.key) {
             case 'f': {
-                Save(fs, outputPath, blocks);
+                SaveMap(fs, outputPath, blocks);
                 break;
             }
             case 'v': {
-                Load(fs, outputPath, blocks);
+                LoadMap(fs, outputPath, blocks);
                 update = true;
                 break;
             }
@@ -108,6 +75,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
                 break;
             }
             case 'r': {
+                cachedTextures = MathLib::Dictionary<MathLib::String, MathLib::Aseprite>();
                 fileList = GetFileList(fs, inputPath);
                 update = true;
                 break;
@@ -172,5 +140,5 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
             update = true;
         }
     }
-    Save(fs, outputPath, blocks);
+    SaveMap(fs, outputPath, blocks);
 }

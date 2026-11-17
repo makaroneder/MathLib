@@ -484,7 +484,8 @@ AddExecutable("VideoPlayer", TargetEnvironment(None, None, gfxRuntime), lambda p
 AddExecutable("WebScraper", TargetEnvironment(None, None, ["curl"]), lambda program : [f"{dataDir}/WebScraper/Wikipedia.json", f"{buildDir}/WebScraperOutput"], [], ["WebScraper"], [".cpp"])
 AddExecutable("WebsiteReader", TargetEnvironment(None, None, ["console"]), lambda program : ["https://tls-v1-2.badssl.com:1012"], [], ["WebsiteReader"], [".cpp"])
 AddExecutable("ModelGenerator", TargetEnvironment(None, None, ["console"]), lambda program : [], [], ["ModelGenerator"], [".cpp"])
-AddExecutable("MapGenerator", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["MapGenerator"], [".cpp"])
+AddExecutable("MapGenerator", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/AAAI/MapGenerator", "Games/AAAI/Shared"], [".cpp"])
+AddExecutable("AAAI", TargetEnvironment(None, None, gfxRuntime), lambda program : [], [], ["Games/AAAI/Game", "Games/AAAI/Shared"], [".cpp"])
 
 if __name__ == "__main__":
     if len(argv) < 2:
@@ -493,9 +494,7 @@ if __name__ == "__main__":
     defaultEnv : EnvironmentIdentifier = EnvironmentIdentifier("host", "dynamic", "sdl2")
     if windowsMode: defaultEnv = EnvironmentIdentifier("windows", "static", "sdl2")
     currentTargets : list[str] = executables if argv[1] == "all" else [argv[1]]
-    failedTargets : list[str] = []
-    for target in currentTargets:
-        if not MakeTarget(target, defaultEnv): failedTargets.append(target)
+    failedTargets : list[str] = [target for target in currentTargets if not MakeTarget(target, defaultEnv)]
     if len(failedTargets) == 1:
         print(f"Failed to run target {failedTargets[0]}")
         exit(1)

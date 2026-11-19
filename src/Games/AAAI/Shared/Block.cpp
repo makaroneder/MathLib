@@ -2,8 +2,9 @@
 
 Block::Block(void) : path(), x(), y() {}
 Block::Block(const MathLib::String& path, ssize_t x, ssize_t y) : path(path), x(x), y(y) {}
-bool Block::Equals(const Block& other) const {
-    return x == other.x && y == other.y && path == other.path;
+bool Block::LessThanEqual(const Block& other) const {
+    if (x < other.x) return true;
+    return x == other.x && y <= other.y;
 }
 bool Block::Save(MathLib::Writable& file) const {
     return file.Write<ssize_t>(x) && file.Write<ssize_t>(y) && file.Puts(path) + file.Write<char>('\0');

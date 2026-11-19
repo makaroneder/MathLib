@@ -29,7 +29,6 @@
 #include "../Cryptography/Cipher/PolyalphabeticCipher.hpp"
 #include "../FileSystem/Cipher/TAR/UnixStandardTAR/UnixStandardTAR.hpp"
 #include "../Cryptography/Compressor/BytePairEncoding/BytePairEncoding.hpp"
-// TODO: Add test cases
 
 namespace MathLib {
     bool Test::ReportRecord(const Record& record) {
@@ -49,11 +48,27 @@ namespace MathLib {
         }
         return ret + padding + Formatter<size_t>::ToString(passed) + '/' + Formatter<size_t>::ToString(records.GetSize()) + " tests passed";
     }
-    void TestSort(Test& test, const Sequence<uint8_t>& data, const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& sort, ComparisionFunctionType type) {
+    void TestSort(Test& test, const String& str, const Sequence<uint8_t>& data, const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& sort) {
         Array<uint8_t> sorted = CollectionToArray<uint8_t>(data);
-        const ComparisionFunction<uint8_t> compare = ComparisionFunction<uint8_t>(type);
-        TestOperation(test, sort(sorted, compare));
-        TestOperation(test, sorted.IsSorted(compare));
+        const ComparisionFunction<uint8_t> compares[] = {
+            ComparisionFunction<uint8_t>(ComparisionFunctionType::LessThan),
+            ComparisionFunction<uint8_t>(ComparisionFunctionType::LessThanEqual),
+            ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThan),
+            ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThanEqual),
+        };
+        bool status = true;
+        for (size_t i = 0; i < SizeOfArray(compares); i++) {
+            if (!sort(sorted, compares[i])) {
+                status = false;
+                if (!test.ReportRecord(Record(str + " with comparison " + ToString(i, 10) + " (sorting)", false))) Panic("Failed to add test record");
+                break;
+            }
+            if (sorted.IsSorted(compares[i])) continue;
+            status = false;
+            if (!test.ReportRecord(Record(str + " with comparison " + ToString(i, 10) + " (verifing sort)", false))) Panic("Failed to add test record");
+            break;
+        }
+        if (status && !test.ReportRecord(Record(str, true))) Panic("Failed to add test record");
     }
     Test TestSelf(void) {
         Test test;
@@ -230,42 +245,35 @@ namespace MathLib {
         TestOperation(test, MakeArray<uint8_t>(1, 2, 3, 4, 5).RightFold<uint8_t>(1, MakeFunctionT<uint8_t, uint8_t, uint8_t>([](uint8_t a, uint8_t b) -> uint8_t {
             return a * b;
         })) == 120);
-
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& bubbleSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        TestSort(test, "BubbleSort", identitySequence, MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.BubbleSort(compare);
-        });
-        TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::LessThan);
-        TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::LessThanEqual);
-        TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::GreaterThan);
-        TestSort(test, identitySequence, bubbleSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& stoogeSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        }));
+        TestSort(test, "StoogeSort", identitySequence, MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.StoogeSort(compare);
-        });
-        TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::LessThan);
-        TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::LessThanEqual);
-        TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::GreaterThan);
-        TestSort(test, identitySequence, stoogeSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& oddEvenSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        }));
+        TestSort(test, "OddEvenSort", identitySequence, MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.OddEvenSort(compare);
-        });
-        TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::LessThan);
-        TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::LessThanEqual);
-        TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::GreaterThan);
-        TestSort(test, identitySequence, oddEvenSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& cocktailShakerSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        }));
+        TestSort(test, "CocktailShakerSort", identitySequence, MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.CocktailShakerSort(compare);
-        });
-        TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::LessThan);
-        TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::LessThanEqual);
-        TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::GreaterThan);
-        TestSort(test, identitySequence, cocktailShakerSort, ComparisionFunctionType::GreaterThanEqual);
-        const Function<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>& insertationSort = MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
+        }));
+        TestSort(test, "InsertationSort", identitySequence, MakeFunctionT<bool, Array<uint8_t>&, const Function<bool, uint8_t, uint8_t>&>([](Array<uint8_t>& sorted, const Function<bool, uint8_t, uint8_t>& compare) -> bool {
             return sorted.InsertationSort(compare);
-        });
-        TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::LessThan);
-        TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::LessThanEqual);
-        TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::GreaterThan);
-        TestSort(test, identitySequence, insertationSort, ComparisionFunctionType::GreaterThanEqual);
+        }));
+        if (true) {
+            const size_t size = identitySequence.GetSize();
+            String str = "Binary search";
+            for (size_t i = 0; i < size; i++) {
+                if (identitySequence.BinarySearch(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThan), i) != i) {
+                    str = "Binary search with index "_M + ToString(i, 10) + " (greater than)";
+                    break;
+                }
+                if (identitySequence.BinarySearch(ComparisionFunction<uint8_t>(ComparisionFunctionType::GreaterThanEqual), i) == i) continue;
+                str = "Binary search with index "_M + ToString(i, 10) + " (greater or equal than)";
+                break;
+            }
+            if (!test.ReportRecord(Record(str, str == "Binary search"))) Panic("Failed to add test record");
+        }
 
         TestOperation(test, IdentityCipher().TestEncryption<uint8_t>(identitySequence, CipherKey()));
         TestOperation(test, CaesarCipher().TestEncryption<uint8_t>(identitySequence, CipherKey(ByteArray::ToByteArray<ssize_t>(3))));
@@ -293,33 +301,42 @@ namespace MathLib {
         TestOperation(test, Base64().TestEncryption<uint8_t>(identitySequence, CipherKey()));
 
         const SHA1 sha1;
-        const SHA256 sha256;
         TestOperation(test, sha1.IsEncrypted<uint8_t>(EmptySequence<uint8_t>(), MakeArray<uint8_t>(0xda, 0x39, 0xa3, 0xee, 0x5e, 0x6b, 0x4b, 0x0d, 0x32, 0x55, 0xbf, 0xef, 0x95, 0x60, 0x18, 0x90, 0xaf, 0xd8, 0x07, 0x09), CipherKey(MakeArray<uint8_t>(false))));
         TestOperation(test, sha1.IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0x2f, 0xd4, 0xe1, 0xc6, 0x7a, 0x2d, 0x28, 0xfc, 0xed, 0x84, 0x9e, 0xe1, 0xbb, 0x76, 0xe7, 0x39, 0x1b, 0x93, 0xeb, 0x12), CipherKey(MakeArray<uint8_t>(false))));
         TestOperation(test, sha1.IsEncrypted<char>("The quick brown fox jumps over the lazy cog"_M, MakeArray<uint8_t>(0xde, 0x9f, 0x2c, 0x7f, 0xd2, 0x5e, 0x1b, 0x3a, 0xfa, 0xd3, 0xe8, 0x5a, 0x0b, 0xd1, 0x7d, 0x9b, 0x10, 0x0d, 0xb4, 0xb3), CipherKey(MakeArray<uint8_t>(false))));
+        TestOperation(test, HMAC(sha1).IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0xde, 0x7c, 0x9b, 0x85, 0xb8, 0xb7, 0x8a, 0xa6, 0xbc, 0x8a, 0x7a, 0x36, 0xf7, 0x0a, 0x90, 0x70, 0x1c, 0x9d, 0xb4, 0xd9), CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<HMAC::BlockSize>(HMAC::BlockSize::SHA1)), CipherKey(ByteArray::ToByteArray<char>("key"_M)), CipherKey()))));
+
+        const SHA256 sha256;
         TestOperation(test, sha256.IsEncrypted<uint8_t>(EmptySequence<uint8_t>(), MakeArray<uint8_t>(0xe3, 0xb0, 0xc4, 0x42, 0x98, 0xfc, 0x1c, 0x14, 0x9a, 0xfb, 0xf4, 0xc8, 0x99, 0x6f, 0xb9, 0x24, 0x27, 0xae, 0x41, 0xe4, 0x64, 0x9b, 0x93, 0x4c, 0xa4, 0x95, 0x99, 0x1b, 0x78, 0x52, 0xb8, 0x55), CipherKey(MakeArray<uint8_t>(false))));
         TestOperation(test, sha256.IsEncrypted<uint8_t>(EmptySequence<uint8_t>(), MakeArray<uint8_t>(0xd1, 0x4a, 0x02, 0x8c, 0x2a, 0x3a, 0x2b, 0xc9, 0x47, 0x61, 0x02, 0xbb, 0x28, 0x82, 0x34, 0xc4, 0x15, 0xa2, 0xb0, 0x1f, 0x82, 0x8e, 0xa6, 0x2a, 0xc5, 0xb3, 0xe4, 0x2f), CipherKey(MakeArray<uint8_t>(true))));
         TestOperation(test, sha256.IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0x73, 0x0e, 0x10, 0x9b, 0xd7, 0xa8, 0xa3, 0x2b, 0x1c, 0xb9, 0xd9, 0xa0, 0x9a, 0xa2, 0x32, 0x5d, 0x24, 0x30, 0x58, 0x7d, 0xdb, 0xc0, 0xc3, 0x8b, 0xad, 0x91, 0x15, 0x25), CipherKey(MakeArray<uint8_t>(true))));
         TestOperation(test, sha256.IsEncrypted<char>("The quick brown fox jumps over the lazy dog."_M, MakeArray<uint8_t>(0x61, 0x9c, 0xba, 0x8e, 0x8e, 0x05, 0x82, 0x6e, 0x9b, 0x8c, 0x51, 0x9c, 0x0a, 0x5c, 0x68, 0xf4, 0xfb, 0x65, 0x3e, 0x8a, 0x3d, 0x8a, 0xa0, 0x4b, 0xb2, 0xc8, 0xcd, 0x4c), CipherKey(MakeArray<uint8_t>(true))));
-
-        TestOperation(test, HMAC(sha1).IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0xde, 0x7c, 0x9b, 0x85, 0xb8, 0xb7, 0x8a, 0xa6, 0xbc, 0x8a, 0x7a, 0x36, 0xf7, 0x0a, 0x90, 0x70, 0x1c, 0x9d, 0xb4, 0xd9), CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<HMAC::BlockSize>(HMAC::BlockSize::SHA1)), CipherKey(ByteArray::ToByteArray<char>("key"_M)), CipherKey()))));
         TestOperation(test, HMAC(sha256).IsEncrypted<char>("The quick brown fox jumps over the lazy dog"_M, MakeArray<uint8_t>(0xf7, 0xbc, 0x83, 0xf4, 0x30, 0x53, 0x84, 0x24, 0xb1, 0x32, 0x98, 0xe6, 0xaa, 0x6f, 0xb1, 0x43, 0xef, 0x4d, 0x59, 0xa1, 0x49, 0x46, 0x17, 0x59, 0x97, 0x47, 0x9d, 0xbc, 0x2d, 0x1a, 0x3c, 0xd8), CipherKey(MakeArray<CipherKey>(CipherKey(ByteArray::ToByteArray<HMAC::BlockSize>(HMAC::BlockSize::SHA256)), CipherKey(ByteArray::ToByteArray<char>("key"_M)), CipherKey()))));
 
-        const size_t size1 = SizeOfArray(TLS::supportedCipherSuites);
-        const size_t size2 = SizeOfArray(TLS::supportedCompressionMethods);
-        const CipherKey tlsKey = CipherKey(MakeArray<CipherKey>(
-            CipherKey(ByteArray::ToByteArray<TLSRecordHeader::Type>(TLSRecordHeader::Type::ApplicationData)),
-            CipherKey(ByteArray::ToByteArray<uint16_t>(TLS::version)),
-            CipherKey(ByteArray::ToByteArray<uint64_t>(0))
-        ));
-        for (size_t i = 0; i < size1; i++) {
-            for (size_t j = 0; j < size2; j++) {
-                EncryptionMethod cipherSuite = EncryptionMethod(TLS::supportedCipherSuites[i], TLS::supportedCompressionMethods[j]);
-                cipherSuite.macKey = cipherSuite.GetMACSize();
-                cipherSuite.cipherKey = cipherSuite.GetKeySize();
-                cipherSuite.cipherIV = cipherSuite.GetIVSize();
-                TestOperation(test, cipherSuite.TestEncryption<uint8_t>(identitySequence, tlsKey));
+        if (true) {
+            const size_t size1 = SizeOfArray(TLS::supportedCipherSuites);
+            const size_t size2 = SizeOfArray(TLS::supportedCompressionMethods);
+            const CipherKey tlsKey = CipherKey(MakeArray<CipherKey>(
+                CipherKey(ByteArray::ToByteArray<TLSRecordHeader::Type>(TLSRecordHeader::Type::ApplicationData)),
+                CipherKey(ByteArray::ToByteArray<uint16_t>(TLS::version)),
+                CipherKey(ByteArray::ToByteArray<uint64_t>(0))
+            ));
+            String str = "TLS encryption";
+            bool failed = false;
+            for (size_t i = 0; i < size1; i++) {
+                for (size_t j = 0; j < size2; j++) {
+                    EncryptionMethod cipherSuite = EncryptionMethod(TLS::supportedCipherSuites[i], TLS::supportedCompressionMethods[j]);
+                    cipherSuite.macKey = cipherSuite.GetMACSize();
+                    cipherSuite.cipherKey = cipherSuite.GetKeySize();
+                    cipherSuite.cipherIV = cipherSuite.GetIVSize();
+                    if (cipherSuite.TestEncryption<uint8_t>(identitySequence, tlsKey)) continue;
+                    failed = true;
+                    str = "TLS encryption with cipher "_M + ToString(i, 10) + " and compression " + ToString(j, 10);
+                    break;
+                }
+                if (failed) break;
             }
+            if (!test.ReportRecord(Record(str, !failed))) Panic("Failed to add test record");
         }
         return test;
     }

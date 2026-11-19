@@ -1,7 +1,9 @@
 #include "Map.hpp"
+#include <Interfaces/ComparisionFunction.hpp>
 
-void SaveMap(MathLib::FileSystem& fs, const MathLib::String& outputPath, const MathLib::Array<Block>& blocks) {
+void SaveMap(MathLib::FileSystem& fs, const MathLib::String& outputPath, MathLib::Array<Block>& blocks) {
     MathLib::File file = fs.Open(outputPath, MathLib::OpenMode::Write);
+    if (!blocks.CocktailShakerSort(MathLib::ComparisionFunction<Block>(MathLib::ComparisionFunctionType::GreaterThan))) MathLib::Panic("Failed to sort map");
     if (!file.Write<size_t>(blocks.GetSize())) MathLib::Panic("Failed to save block count");
     for (const Block& block : blocks)
         if (!block.Save(file)) MathLib::Panic("Failed to save block");

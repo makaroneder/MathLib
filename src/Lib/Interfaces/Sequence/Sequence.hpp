@@ -82,6 +82,17 @@ namespace MathLib {
                 if (AtUnsafe(i + start) != other.AtUnsafe(i)) return false;
             return true;
         }
+        [[nodiscard]] size_t BinarySearch(const Function<bool, T, T>& compare, const T& value, size_t start = 0) const {
+            return BinarySearch(compare, value, start, GetSize());
+        }
+        [[nodiscard]] size_t BinarySearch(const Function<bool, T, T>& compare, const T& value, size_t start, size_t end) const {
+            if (end <= start || end > GetSize()) return SIZE_MAX;
+            const size_t middle = (start + end) / 2;
+            const T tmp = AtUnsafe(middle);
+            if (value == tmp) return middle;
+            if (compare(tmp, value)) return BinarySearch(compare, value, start, middle);
+            return BinarySearch(compare, value, middle, end);
+        }
         [[nodiscard]] size_t Find(const T& value, size_t start = 0) const {
             const size_t size = GetSize();
             for (size_t i = start; i < size; i++)

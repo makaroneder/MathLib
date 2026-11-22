@@ -18,10 +18,10 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     const MathLib::String inputPath = "Data/AAAI/";
     const MathLib::String fontPath = "Data/Fonts/zap-light16.psf";
     const MathLib::String outputPath = "bin/Map.bin";
-    const size_t width = 800;
-    const size_t height = 800;
-    const size_t cellSize = 32;
     const size_t uiHeight = 192;
+    const size_t width = 512;
+    const size_t height = 512 + uiHeight;
+    const size_t cellSize = 32;
     const size_t drawCellX = ((width + cellSize - 1) / cellSize);
     const size_t drawCellY = ((height - uiHeight + cellSize - 1) / cellSize);
     const size_t centerX = width / 2;
@@ -48,7 +48,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
         if (update) {
             update = false;
             renderer->Fill(0);
-            DrawMap(*renderer, cellSize, offsetX, offsetY, blocks, fs, inputPath, cachedTextures);
+            DrawMap(*renderer, cellSize, offsetX * cellSize, offsetY * cellSize, blocks, fs, inputPath, cachedTextures);
             renderer->FillRectangle(centerX, height - uiHeight / 2, width, uiHeight, 0x000000ff);
             if (drawGrid) renderer->DrawGrid(centerX, centerY, cellSize, cellSize, drawCellX, drawCellY, UINT32_MAX);
             else renderer->DrawLinePararellToOX(0, width, height - uiHeight, UINT32_MAX);

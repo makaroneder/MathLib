@@ -1,6 +1,7 @@
 #include "Block.hpp"
 
 Block::Block(void) : path(), x(), y() {}
+Block::Block(ssize_t x, ssize_t y) : path(), x(x), y(y) {}
 Block::Block(const MathLib::String& path, ssize_t x, ssize_t y) : path(path), x(x), y(y) {}
 bool Block::LessThanEqual(const Block& other) const {
     if (x < other.x) return true;

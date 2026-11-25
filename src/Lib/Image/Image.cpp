@@ -51,6 +51,19 @@ namespace MathLib {
     bool Image::CopyFromBuffer(const Image& buffer) {
         return pixels.CopyFromBuffer(buffer.pixels);
     }
+    bool Image::CopyImage(const Image& image, ssize_t centerX, ssize_t centerY) {
+        const size_t width = image.GetWidth();
+        const size_t height = image.GetHeight();
+        const ssize_t leftX = centerX - width / 2;
+        const ssize_t topY = centerY - height / 2;
+        const ssize_t maxX = Min<ssize_t>(GetWidth() - leftX, width);
+        const ssize_t maxY = Min<ssize_t>(GetHeight() - topY, height);
+        const size_t minX = Max<ssize_t>(-leftX, 0);
+        const size_t minY = Max<ssize_t>(-topY, 0);
+        for (ssize_t y = minY; y < maxY; y++)
+            if (!pixels.CopyPartial(leftX + minX, leftX + maxX, topY + y, image.pixels.GetPointer() + y * width + minX)) return false;
+        return true;
+    }
     Image Image::Resize(size_t xMultiplier, size_t yMultiplier) const {
         const size_t width = GetWidth();
         const size_t height = GetHeight();

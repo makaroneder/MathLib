@@ -5,6 +5,7 @@
 #include <Interfaces/Dictionary.hpp>
 #include <Image/Aseprite/Aseprite.hpp>
 
+void SortMap(MathLib::Array<Block>& blocks);
 void SaveMap(MathLib::FileSystem& fs, const MathLib::String& outputPath, MathLib::Array<Block>& blocks);
 void LoadMap(MathLib::FileSystem& fs, const MathLib::String& outputPath, MathLib::Array<Block>& blocks);
 void DrawMap(MathLib::Renderer& renderer, ssize_t cellSize, ssize_t offsetX, ssize_t offsetY, const MathLib::Array<Block>& blocks, MathLib::FileSystem& fs, const MathLib::String& path, MathLib::Dictionary<MathLib::String, MathLib::Aseprite>& cachedTextures);

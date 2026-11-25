@@ -21,6 +21,7 @@ namespace MathLib {
         [[nodiscard]] bool CopyFromBuffer(const Collection<uint32_t>& buffer);
         [[nodiscard]] bool CopyFromBuffer(const Matrix<uint32_t>& buffer);
         [[nodiscard]] bool CopyFromBuffer(const Image& buffer);
+        [[nodiscard]] bool CopyImage(const Image& image, ssize_t centerX, ssize_t centerY);
         [[nodiscard]] Image Resize(size_t xMultiplier, size_t yMultiplier) const;
         [[nodiscard]] Image Mirror(void) const;
         [[nodiscard]] Image RotateUpsideDown(void) const;

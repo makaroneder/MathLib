@@ -1,9 +1,12 @@
 #include "Map.hpp"
 #include <Interfaces/ComparisionFunction.hpp>
 
+void SortMap(MathLib::Array<Block>& blocks) {
+    if (!blocks.CocktailShakerSort(MathLib::ComparisionFunction<Block>(MathLib::ComparisionFunctionType::GreaterThan))) MathLib::Panic("Failed to sort map");
+}
 void SaveMap(MathLib::FileSystem& fs, const MathLib::String& outputPath, MathLib::Array<Block>& blocks) {
     MathLib::File file = fs.Open(outputPath, MathLib::OpenMode::Write);
-    if (!blocks.CocktailShakerSort(MathLib::ComparisionFunction<Block>(MathLib::ComparisionFunctionType::GreaterThan))) MathLib::Panic("Failed to sort map");
+    SortMap(blocks);
     if (!file.Write<size_t>(blocks.GetSize())) MathLib::Panic("Failed to save block count");
     for (const Block& block : blocks)
         if (!block.Save(file)) MathLib::Panic("Failed to save block");
@@ -26,15 +29,15 @@ void DrawMap(MathLib::Renderer& renderer, ssize_t cellSize, ssize_t offsetX, ssi
     for (ssize_t y = minBlocksY; y < maxBlocksY; y++) {
         for (ssize_t x = minBlocksX; x < maxBlocksX; x++) {
             const size_t i = blocks.BinarySearch(compare, Block(x, y));
-            if (i == SIZE_MAX) continue;
+            if (i == SIZE_MAX || blocks.AtUnsafe(i).path.IsEmpty()) continue;
             MathLib::Aseprite texture;
             const MathLib::Expected<MathLib::Aseprite> tmp = cachedTextures.Get(blocks.AtUnsafe(i).path);
             if (tmp.HasValue()) texture = tmp.Get();
             else {
-                if (!texture.LoadFromPath(fs, path + blocks.AtUnsafe(i).path)) MathLib::Panic("Failed to load texture");
-                if (!cachedTextures.Add(blocks.AtUnsafe(i).path, texture)) MathLib::Panic("Failed to cache texture");
+                if (!texture.LoadFromPath(fs, path + blocks.AtUnsafe(i).path)) MathLib::Panic("Failed to load texture "_M + blocks.AtUnsafe(i).path);
+                if (!cachedTextures.Add(blocks.AtUnsafe(i).path, texture)) MathLib::Panic("Failed to cache texture "_M + blocks.AtUnsafe(i).path);
             }
-            if (texture.IsEmpty()) MathLib::Panic("Empty texture provided");
+            if (texture.IsEmpty()) MathLib::Panic("Texture "_M + blocks.AtUnsafe(i).path + " is empty");
             renderer.DrawImage(texture.AtUnsafe(0), x * cellSize - offsetX + texture.AtUnsafe(0).GetWidth() / 2, y * cellSize + cellSize - offsetY - texture.AtUnsafe(0).GetHeight() / 2);
         }
     }

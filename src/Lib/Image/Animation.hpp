@@ -9,6 +9,8 @@ namespace MathLib {
         Animation(void);
         Animation(const Video* video);
         [[nodiscard]] bool IsEmpty(void) const;
+        [[nodiscard]] size_t GetWidth(void) const;
+        [[nodiscard]] size_t GetHeight(void) const;
         void Draw(Renderer& renderer, ssize_t centerX, ssize_t centerY) const;
         [[nodiscard]] bool CopyTo(Renderer& renderer) const;
         void Reset(void);

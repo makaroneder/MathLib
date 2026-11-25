@@ -6,6 +6,12 @@ namespace MathLib {
     bool Animation::IsEmpty(void) const {
         return !video || video->IsEmpty();
     }
+    size_t Animation::GetWidth(void) const {
+        return video ? video->GetWidth() : 0;
+    }
+    size_t Animation::GetHeight(void) const {
+        return video ? video->GetHeight() : 0;
+    }
     void Animation::Draw(Renderer& renderer, ssize_t centerX, ssize_t centerY) const {
         if (video) renderer.DrawImage(video->AtUnsafe(frame), centerX, centerY);
     }

@@ -63,6 +63,11 @@ namespace MathLib {
             MemoryCopy((const uint8_t*)buffer.ptr.GetValue() + bufferY * size, (uint8_t*)ptr.GetValue() + y * size, size);
             return true;
         }
+        [[nodiscard]] bool CopyPartial(size_t startX, size_t endX, size_t y, const T* buffer) {
+            if (!buffer || endX < startX || endX >= width || y >= height) return false;
+            MemoryCopy(buffer, ptr.GetValue() + y * width + startX, (endX - startX) * sizeof(T));
+            return true;
+        }
         [[nodiscard]] bool IsSquare(void) const {
             return width == height;
         }

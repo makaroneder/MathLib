@@ -19,8 +19,8 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
     const MathLib::String fontPath = "Data/Fonts/zap-light16.psf";
     const MathLib::String outputPath = "bin/Map.bin";
     const size_t uiHeight = 192;
-    const size_t width = 512;
-    const size_t height = 512 + uiHeight;
+    const size_t width = 320;
+    const size_t height = 320 + uiHeight;
     const size_t cellSize = 32;
     const size_t drawCellX = ((width + cellSize - 1) / cellSize);
     const size_t drawCellY = ((height - uiHeight + cellSize - 1) / cellSize);
@@ -137,6 +137,7 @@ void Main(int, char**, MathLib::FileSystem& fs, MathLib::WindowManager& windowMa
                 }
                 default: break;
             }
+            SortMap(blocks);
             update = true;
         }
     }
